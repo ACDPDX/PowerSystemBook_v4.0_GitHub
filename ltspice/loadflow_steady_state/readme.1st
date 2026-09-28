@@ -5,33 +5,4 @@ I do not want to concur with a commercial product ( speed, reliability, optimiza
 didactical explorations and HAVE FUN !
 
 
-Since this product is not commercial i cannot give any garantees for the reliability of the results of the computations. 
-But i tried to correct all errors and test all devices and i think it is now rather reliable 
 
-
-It is the best to read first 
-
-	ltspice_loadflow_eng.doc
-
-You can also look at the libraries 
-
-	ltspice.lib ltspice_special.lib ltspice_ctrl.lib ltspice_ctrl_extd.lib and ltspice_util.lib
-
-The mathematical description of the models are in 
-	
-	mathem_models.doc
-
-Some function definition for the ltspice graphic processor are in plot.defs
-
-
-If you have any questions, comments, suggestions, or find some bugs, please mail me at
-  friedrich-schmidt@gmx.at
-
-You can also visit my website at
-  http:\\members.aon.at\fschmid7 
-There are also files for doing transient network analysis 
-=========================================================
-
-NOTE: Sometimes the pv-slack elements have convergence issues
-See some workaround at 
-C:\Users\fried\Documents\ltspice\loadflow_steady_state_SomeHelpfiles
