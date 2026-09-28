@@ -1,0 +1,96 @@
+*Coupled resistors of ATP-matrix not used!
+*Resistor value of VERIFY command  connected in series at the input port
+.subckt template a1 a4 a2 a5 a3 a6 b1 b4 b2 b5 b3 b6
++PARAMS:
++ XL11=6.8804296E-04 XM12=5.7432281E-04 XM13=5.7438090E-04 XM14=6.3117138E-04 XM15=5.7432281E-04 XM16=5.7438090E-04 
++ XM21=5.7432281E-04 XL22=6.8803280E-04 XM23=5.7432281E-04 XM24=5.7432281E-04 XM25=6.3116123E-04 XM26=5.7432281E-04 
++ XM31=5.7438090E-04 XM32=5.7432281E-04 XL33=6.8804296E-04 XM34=5.7438090E-04 XM35=5.7432281E-04 XM36=6.3117138E-04 
++ XM41=6.3117138E-04 XM42=5.7432281E-04 XM43=5.7438090E-04 XL44=6.3091348E-04 XM45=5.7432281E-04 XM46=5.7438090E-04 
++ XM51=5.7432281E-04 XM52=6.3116123E-04 XM53=5.7432281E-04 XM54=5.7432281E-04 XL55=6.3090333E-04 XM56=5.7432281E-04 
++ XM61=5.7438090E-04 XM62=5.7432281E-04 XM63=6.3117138E-04 XM64=5.7438090E-04 XM65=5.7432281E-04 XL66=6.3091348E-04 
+*input Ce and Cshield in F/m like in the ATP-Matrix
++ Ce=3.37095e-10
++ Cshield=1.514496e-9
+*input R,Rsh like in the VERIFY command for a 1km line!!!
++ R=0.01743 Rsh=0.06579 
++ length=10
++ length1={length*1000}
++ fn=50
++ g=1e12
+.param omega={fn*2*3.14159}
+.param R1={R*length}
+.param Rsh1={Rsh*length}
+.param Ce1={length1*Ce}
+.param Cshield1={length1*Cshield}
+.param k12={XM12/sqrt(XL11*XL22)}
+.param k13={XM13/sqrt(XL11*XL33)}
+.param k14={XM14/sqrt(XL11*XL44)}
+.param k15={XM15/sqrt(XL11*XL55)}
+.param k16={XM16/sqrt(XL11*XL66)}
+.param k23={XM23/sqrt(XL22*XL33)}
+.param k24={XM24/sqrt(XL22*XL44)}
+.param k25={XM25/sqrt(XL22*XL55)}
+.param k26={XM26/sqrt(XL22*XL66)}
+.param k34={XM34/sqrt(XL33*XL44)}
+.param k35={XM35/sqrt(XL33*XL55)}
+.param k36={XM36/sqrt(XL33*XL66)}
+.param k45={XM45/sqrt(XL44*XL55)}
+.param k46={XM46/sqrt(XL44*XL66)}
+.param k56={XM56/sqrt(XL55*XL66)}
+R1 a1 a1a {R1}
+R2 a2 a2a {R1}
+R3 a3 a3a {R1}
+R4 a4 a4a {Rsh1}
+R5 a5 a5a {Rsh1}
+R6 a6 a6a {Rsh1}
+* self inductance
+L1 a1a b1 {length1/omega*(XL11)} rser=0
+L2 a2a b2 {length1/omega*(XL22)} rser=0
+L3 a3a b3 {length1/omega*(XL33)} rser=0
+L4 a4a b4 {length1/omega*(XL44)} rser=0
+L5 a5a b5 {length1/omega*(XL55)} rser=0
+L6 a6a b6 {length1/omega*(XL66)} rser=0
+
+K12 L1 L2 {k12}
+K13 L1 L3 {k13}
+K14 L1 L4 {k14}
+K15 L1 L5 {k15}
+K16 L1 L6 {k16}
+
+K23 L2 L3 {k23}
+K24 L2 L4 {k24}
+K25 L2 L5 {k25}
+K26 L2 L6 {k26}
+
+K34 L3 L4 {k34}
+K35 L3 L5 {k35}
+K36 L3 L6 {k36}
+
+K45 L4 L5 {k45}
+K46 L4 L6 {k46}
+
+56 L5 L6 {K56}
+
+* Capacitance matrix from ATP only at right side
+Conductor:
+Gc1 b1 0  VALUE={ce1*DDT(v(b1))-ce1*DDT(v(b4))} tripdv={tdv} tripdt={tdt}
+Gc2 b2 0  VALUE={ce1*DDT(v(b2))-ce1*DDT(v(b5))} tripdv={tdv} tripdt={tdt}
+Gc3 b3 0  VALUE={ce1*DDT(v(b3))-ce1*DDT(v(b6))} tripdv={tdv} tripdt={tdt}
+Shield:
+Gc4 b4 0  VALUE={-ce1*DDT(v(b1))+Cshield1*DDT(v(b4))} tripdv={tdv} tripdt={tdt}
+Gc5 b5 0  VALUE={-ce1*DDT(v(b2))+Cshield1*DDT(v(b5))} tripdv={tdv} tripdt={tdt}
+Gc6 b6 0  VALUE={-ce1*DDT(v(b3))+Cshield1*DDT(v(b6))} tripdv={tdv} tripdt={tdt}
+Rgnd1 a1 0 {g}
+Rgnd2 a2 0 {g}
+Rgnd3 a3 0 {g}
+Rgnd4 a4 0 {g}
+Rgnd5 a5 0 {g}
+Rgnd6 a6 0 {g}
+Rgnd7 b1 0 {g}
+Rgnd8 b2 0 {g}
+Rgnd9 b3 0 {g}
+Rgnd10 b4 0 {g}
+Rgnd11 b5 0 {g}
+Rgnd12 b6 0 {g}
+*******************************
+.ENDS

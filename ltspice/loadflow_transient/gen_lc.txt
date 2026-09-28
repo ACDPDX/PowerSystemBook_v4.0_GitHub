@@ -1,0 +1,36 @@
+Copy the reduced capacitive ATP-Matrix to Mat_C.txt
+Copy the reduced ohmic/inductive ATP-Matrix to Mat_L.txt
+(for an example see mat_c.save mat_l.save)
+In Windows powershell:
+Call .\tinyperl gen_lc.pl > outfile1
+or .\gen_lc.exe > outfile1
+AND
+Call .\tinyperl gen_template.pl -sys:systems > outfile2
+systems parameter is according to the count of the line systems 1,2,3,4,...
+Example .\gen_template.exe -sys:4 > outfile2
+
+Open now outfile2 copy/paste data from outfile1 into outfile2 
+at the appropriate placeholder symbol >>>>>>>>>>>>>>>>>> <<<<<<<<<<<<<<<<<<<<<
+
+copy/paste or append from outfile2 to the line_coupled.lib file  
+
+see also help: tinyperl gen_lc.pl -h or tinyperl gen_template.pl -h 
+
+Note to the ATP Program:
+=======================
+
+Double click onto the previously designed line component  
+On Model Page:
+Date: mark printed output
+Ze Ce should be marked
+Run ATP!
+Matrices are constructed and printed onto the screen!
+In the command window copy 
+right mouse mark the c-matrix and then press enter -> 
+Paste into editor and name it as Mat_C.txt 
+and 
+right mouse mark the rl-matrix and then press enter -> 
+Paste into editor and name it as Mat_L.txt 
+
+
+

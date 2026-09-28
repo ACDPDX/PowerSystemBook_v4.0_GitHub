@@ -1,0 +1,720 @@
+* DC machines
+
+*NOTE:
+*Speed positiv: 
+*ML pos. is generator
+*ML neg. is motor
+*Speed negativ:
+*ML pos. is motor
+*ML neg. is generator
+
+*1****   GNM   *********
+* fremderregte Gleichstrom-Nebenschluss-Maschine  *
+
+.SUBCKT	GNM  A1 A2 F1 F2 MLast n
++PARAMS:
++	UAN=400V	IAN=10A	PN=3.2kW	nN=2000 ; [1/min]
++	UEN=200V	IEN=2A	rcu=0.1 az=1
++	tauA=50ms	tauE=600ms	tauMech=300ms rbg=0.1 rem=0 mot=1
++	IA0=0A	psiE0=0Vs  n0=0  ; [1/min]
++   Mvz=1
+*****	Zwischenrechnungen   **********
+.PARAM
++	RA={rcu*UAN/IAN}
++	LA={tauA*RA}
++	RE={UEN/IEN}
++	LE={tauE*RE}
++	omegaN={nN*(2*pi)/60}
++	kAE={UAN*(1-rcu*mot)/(omegaN*LE*IEN)}
+*+	MRbg={(UAN*IAN*(1-rbg)-PN)/omegaN}
++	MN={PN/omegaN}
++	MRbg={MN*rbg}
++	Jmotor={tauMech*MN/omegaN}
++	PsiEN={LE*IEN}
++   a=0.6
++   m=9
+* Measurements
+Vkae kae 0 {kAE} 
+VMrbg Mrbgn 0 {Mrbg} 
+Vra RA 0 {RA} 
+VJ J 0 {Jmotor} 
+VpsiEN PsiEn 0 {PsiEn} 
+EEN En 0 value={kAe*Psien*omegaN} tripdv=1 tripdt=1
+EEa E  0 value={kAe*v(Psie)*v(omega)} tripdv=1 tripdt=1
+EP P 0 value={v(Mi)*v(omega)+v(Pcu)} tripdv=1 tripdt=1
+EPcu Pcu 0 value={v(ia)*v(ia)*RA} tripdv=1 tripdt=1
+*  Erregerkreis
+XErr	F1	F2	PsiE GNM_Erregerkreis 
++PARAMS: RE={RE} PsiEN={PsiEN} IEN={IEN} PsiE0={PsiE0} rem={rem} a={a} m={m} az={az}
+Xank	A1	A2	psiE	omega	Mi	iA GNM_Ankerkreis
++PARAMS: RA={RA} LA={LA} IA0={IA0} kAE={kAE}
+Xmech	MLast n  n1 omega	Mi	 GNM_Mechanik
++PARAMS: n0={n0} Jmotor={Jmotor} MRbg={MRbg} Mvz={Mvz}
+.ENDS ;  GNM
+
+
+.SUBCKT	GNM_fixed_speed  A1 A2 F1 F2 MLast n
++PARAMS:
++	UAN=400V	IAN=10A	PN=3.2kW	nN=2000 ; [1/min]
++	UEN=200V	IEN=2A	rcu=0.1
++	tauA=50ms	tauE=600ms rbg=0.1 psiE0=0 rem=0 mot=1 az=1
++	IA0=0A	psiE0=0Vs  n0=0  ; [1/min]
+*****	Zwischenrechnungen   **********
+.PARAM
++	RA={rcu*UAN/IAN}
++	LA={tauA*RA}
++	RE={UEN/IEN}
++	LE={tauE*RE}
++	omegaN={nN*(2*pi)/60}
++	kAE={UAN*(1-rcu*mot)/(omegaN*LE*IEN)}
+;+	MRbg={(UAN*IAN*(1-rbg)-PN)/omegaN}
++	MN={PN/omegaN}
++	MRbg={MN*rbg}
+; +	Jmotor={tauMech*MN/omegaN} ;infinity at constant speed
++	PsiEN={LE*IEN}
++   a=0.6
++   m=9
+* Measurements
+Vkae kae 0 {kAE} 
+VMrbg Mrbgn 0 {Mrbg} 
+Vra RA 0 {RA} 
+VpsiEN PsiEn 0 {PsiEn}
+EEN En 0 value={kAe*Psien*omegaN} tripdv=1 tripdt=1
+EEa E  0 value={kAe*v(Psie)*v(omega)} tripdv=1 tripdt=1
+EP P 0 value={v(Mi)*v(omega)+v(Pcu)} tripdv=1 tripdt=1
+EPcu Pcu 0 value={v(ia)*v(ia)*RA} tripdv=1 tripdt=1
+*  Erregerkreis
+XErr	F1	F2	PsiE GNM_Erregerkreis 
++PARAMS: RE={RE} PsiEN={PsiEN} IEN={IEN} PsiE0={PsiE0} rem={rem} a={a} m={m} az={az}
+Xank	A1	A2	psiE	omega	Mi	iA GNM_Ankerkreis
++PARAMS: RA={RA} LA={LA} IA0={IA0} kAE={kAE}
+Xmech	MLast n  n1 omega	Mi	 GNM_Mechanik_fixed_speed
++PARAMS: n0={n0} MRbg={MRbg}
+.ENDS ;  GNM
+
+.SUBCKT	GNM_fixed_speed2  A1 A2 F1 F2 MLast n
++PARAMS:
++	UAN=400V	IAN=10A	PN=3.2kW	nN=2000 ; [1/min]
++	UEN=200V	IEN=2A	rcu=0.1
++	tauA=50ms	tauE=600ms rbg=0.1 psiE0=0 rem=0 mot=1 az=1
++	IA0=0A	psiE0=0Vs   ; [1/min]
+*****	Zwischenrechnungen   **********
+.PARAM
++	RA={rcu*UAN/IAN}
++	LA={tauA*RA}
++	RE={UEN/IEN}
++	LE={tauE*RE}
++	omegaN={nN*(2*pi)/60}
++	kAE={UAN*(1-rcu*mot)/(omegaN*LE*IEN)}
+;+	MRbg={(UAN*IAN*(1-rbg)-PN)/omegaN}
++	MN={PN/omegaN}
++	MRbg={MN*rbg}
+; +	Jmotor={tauMech*MN/omegaN} ;infinity at constant speed
++	PsiEN={LE*IEN}
++   a=0.6
++   m=9
+* Measurements
+Vkae kae 0 {kAE} 
+VMrbg Mrbgn 0 {Mrbg} 
+Vra RA 0 {RA} 
+VpsiEN PsiEn 0 {PsiEn}
+EEN En 0 value={kAe*Psien*omegaN} tripdv=1 tripdt=1
+EEa E  0 value={kAe*v(Psie)*v(omega)} tripdv=1 tripdt=1
+EP P 0 value={v(Mi)*v(omega)+v(Pcu)} tripdv=1 tripdt=1
+EPcu Pcu 0 value={v(ia)*v(ia)*RA} tripdv=1 tripdt=1
+*  Erregerkreis
+XErr	F1	F2	PsiE GNM_Erregerkreis 
++PARAMS: RE={RE} PsiEN={PsiEN} IEN={IEN} PsiE0={PsiE0} rem={rem} a={a} m={m} az={az}
+Xank	A1	A2	psiE	omega	Mi	iA GNM_Ankerkreis
++PARAMS: RA={RA} LA={LA} IA0={IA0} kAE={kAE}
+Xmech	MLast n omega	Mi	 GNM_Mechanik_fixed_speed2
++PARAMS: MRbg={MRbg}
+.ENDS ;  GNM
+
+*****   GRM   
+* Gleichstrom-Reihenschluss-Maschine
+* Default: Gleichstrom-Reihenschluss-Maschine
+* Reihenschlussmaschine(series connection machine): serial UEN=0 IEN~IN, rcu rather small <<1 default model
+* Nebenschlussmaschine(shunt connection machine): parallel UEN~UN, rcu high >1
+.SUBCKT	GRM A1 A2 D1 D2 MLast  n   
++PARAMS:
++	UN=400V	IN=10A	PN=3.2kW	nN=2000 ; [1/min]
++	rcuE=0.05	rcuA=0.1  UEN=0 IEN=10A
++	tauA=50ms	tauE=600ms	tauMech=300ms  rbg=0.1 PsiE0=0 rem=0 mot=1 az=1
++	n0=0  ; [1/min]
++   Mvz=1
+*****	Zwischenrechnungen   **********
+.PARAM
++	RA={rcuA*UN/IN}
++	LA={tauA*RA}
++	RErr={rcuE*UN/IN}
++	omegaN={nN*(2*pi)/60}
++	kAE={UN*(1-rcuA*mot-rcuE*mot)/(omegaN*PsiEN)}
+*+	MRbg={(UN*IN*(1-rcuA-rcuE)-PN)/omegaN}
+*+	MRbg={(UN*IN*(1-rbg)-PN)/omegaN}
++	MN={PN/omegaN}
++	MRbg={MN*rbg}
++	Jmotor={tauMech*MN/omegaN}
++	psiEN={rcuE*UN*tauE}
++   a=0.6
++   m=9
++   IE=IF(UEN>0,UEN/RErr,IEN) ; IF UEN>0 shunt connection machine else series connection machine
+* Measurements
+Vkae kae 0 {kAE}
+VMrbg Mrbgn 0 {Mrbg} 
+Vra RA 0 {RA} 
+VJ J 0 {Jmotor} 
+VpsiEN PsiEn 0 {PsiEn}
+EEN En 0 value={kAe*Psien*omegaN} tripdv=1 tripdt=1
+EEa E  0 value={kAe*v(Psie)*v(omega)} tripdv=1 tripdt=1
+EP P 0 value={v(Mi)*v(omega)+v(Pcu)} tripdv=1 tripdt=1
+EPcu Pcu 0 value={v(ia)*v(ia)*RA} tripdv=1 tripdt=1
+****** Ersatzschaltungen und Gleichungssystem  ******
+Xanker	A1  A2  psiE  omega Mi iA GRM_Ankerkreis  
++PARAMS:  RA={RA}  LA={LA}  kAE={kAE}
+XFeld		D1  D2  psiE   GRM_Erregerkreis  
++PARAMS:  IN={IE} RErr={RErr}  psiEN={psiEN} psiE0={psiE0} rem={rem} a={a} m={m} az={az} 
+Xmech	MLast  n  n1  omega   Mi GRM_Mechanik   
++PARAMS: n0={n0}  Jmotor={Jmotor} Mrbg={Mrbg} Mvz={Mvz}
+.ENDS  ; GRM
+
+*****   GRM fixed speed    
+* Gleichstrom-Reihenschluss-Maschine
+* Default: Gleichstrom-Reihenschluss-Maschine
+* Reihenschlussmaschine(series connection machine): serial UEN=0 IEN~IN, rcu rather small <<1 default model
+* Nebenschlussmaschine(shunt connection machine): parallel UEN~UN, rcu high >1
+.SUBCKT	GRM_fixed_speed A1 A2 D1 D2 MLast  n   
++PARAMS:
++	UN=400V	IN=10A	PN=3.2kW	nN=2000 ; [1/min]
++	rcuE=0.05	rcuA=0.1 UEN=0 IEN=10A
++	tauA=50ms	tauE=600ms  rbg=0.1 PsiE0=0 rem=0 mot=1 az=1
++	n0=0   ; [1/min]
+*****	Zwischenrechnungen   **********
+.PARAM
++	RA={rcuA*UN/IN}
++	LA={tauA*RA}
++	RErr={rcuE*UN/IN}
++	omegaN={nN*(2*pi)/60}
++	kAE={UN*(1-rcuA*mot-rcuE*mot)/(omegaN*PsiEN)}
+*+	MRbg={(UN*IN*(1-rcuA-rcuE)-PN)/omegaN}
+;+	MRbg={(UN*IN*(1-rbg)-PN)/omegaN}
++	MN={PN/omegaN}
++	MRbg={MN*rbg}
+; +	Jmotor={tauMech*MN/omegaN} ;infinity at constant speed
++	psiEN={rcuE*UN*tauE}
++   a=0.6
++   m=9
++   IE=IF(UEN>0,UEN/RErr,IEN) ; IF UEN>0 shunt connection machine else series connection machine
+* Measurements
+Vkae kae 0 {kAE}
+VMrbg Mrbgn 0 {Mrbg}
+Vra RA 0 {RA} 
+VpsiEN PsiEn 0 {PsiEn}
+EEN En 0 value={kAe*Psien*omegaN} tripdv=1 tripdt=1
+EEa E  0 value={kAe*v(Psie)*v(omega)} tripdv=1 tripdt=1
+EP P 0 value={v(Mi)*v(omega)+v(Pcu)} tripdv=1 tripdt=1
+EPcu Pcu 0 value={v(ia)*v(ia)*RA} tripdv=1 tripdt=1
+****** Ersatzschaltungen und Gleichungssystem  ******
+Xanker	A1  A2  psiE  omega Mi iA GRM_Ankerkreis  
++PARAMS:  RA={RA}  LA={LA}  kAE={kAE}
+XFeld		D1  D2  psiE   GRM_Erregerkreis  
++PARAMS:  IN={IE} RErr={RErr}  psiEN={psiEN} psiE0={psiE0} a={a} m={m} rem={rem} az={az}
+Xmech	MLast  n  n1  omega   Mi GRM_Mechanik_fixed_speed   
++PARAMS: n0={n0}  Mrbg={Mrbg} 
+.ENDS  ; GRM
+
+* DC-Compound machine seriell+shunt
+.subckt GDM A1 A2 F1 F2 D1 D2 M n params: UA=230 UE=110 IAN=23 RA=0.8 LA=0.04 RE=110 RR=0.2 NR_NE=0.1 Rp=1 Rh=1e6 
++ J=0.0025  tpsi=0.8 sigmaE=0.03 sigmaR=0.03 a=0.6 m=9 az=1 nN=2900 Mn=15.73 mot=1 rbg=0.001 Mvz=1
+.PARAM  IEN={ RP/(RR+RP)*IAN + UE/RE/Nr_Ne } 
+.PARAM  psiEN={ IEN*RE*Nr_Ne*Nr_Ne*tpsi}
+.PARAM  omegaN={nN*2*3.1416/60}
+.PARAM  kAE={ (UA-mot*(RA+RR*RP/(RR+RP))*IAN)/omegaN/psiEN }
+.PARAM  LhN={psiEN/IEN}  LEs={LhN*sigmaE}   LRs={LhN*sigmaR}
+.PARAM  psiEh0={psiEN/a*UE/RE/Nr_Ne/IEN}      ; Schaetzwert
+.PARAM  omega0={UA/kAE/psiEh0}
+.PARAM  Mrbg={Mn*rbg}
+Vkae kae 0 {kAE} 
+VMrbg Mrbgn 0 {Mrbg} 
+VpsiEN PsiEn 0 {PsiEn} 
+EEN En 0 value={kAe*Psien*omegaN} tripdv=1 tripdt=1
+EEa E  0 value={kAe*v(Psi_h)*v(omega)} tripdv=1 tripdt=1
+EMi Mi 0 value={kAE*v(Psi_h)*v(iA)} tripdv=1 tripdt=1
+EPout Pout 0 value={v(Mi)*v(omega)} tripdv=1 tripdt=1
+EPin Pin 0 value={v(iA)*UA} tripdv=1 tripdt=1
+xanchor A1 A2 iA iR omega psi_h anchor params: RA={RA} LA={LA} kAE={kAE}
+xshunt F1 F2 iE psi_E shunt params: NR_NE={NR_NE} Re={Re} psiEh0={psiEh0}
+xserial D1 D2 iR iA psi_R serial params: RR={RR} psiEh0={psiEh0}
+rp D1 D2 {Rp}
+*    Integrator des Haupt-Flusses
+Gph  0    psi_h    VALUE={ 0 - Rh*v(ih) } tripdv=1 tripdt=1
+Cph  psi_h    0    1    IC={psiEh0}
+Rph  psi_h    0    1E6
+*    Integrator der mech. Winkelgeschwindigkeit
+Gom  0    omega    VALUE={ (kAE*v(psi_h)*v(iA)+v(M)*Mvz-v(rbg)) / J } tripdv=1 tripdt=1
+Com  omega    0    1    IC={omega0}
+Rom  omega    0    1E6
+En   n        0    value={v(omega)*60/2/pi} tripdv=1 tripdt=1
+*    Berechnung der variablen Haupt-Induktivit„t
+GLh  0    Lh   VALUE={(1/( a+(1-a)*v(psi_h)/psiEN*PWRS(v(psi_h)/psiEN,m-1)))*LhN*az} tripdv=1 tripdt=1
+RLh  Lh   0    1
+*    Gleichungs-System zur Stromberechnung iR , iE' und ih
+GiR  0    iR   VALUE={v(psi_R) - LRs*v(iR) - v(Lh) * (v(iR)+v(iE)+v(ih) ) } tripdv=1 tripdt=1
+GiE  0    iE   VALUE={v(psi_E) - LEs*v(iE) - v(Lh) * (v(iR)+v(iE)+v(ih) ) } tripdv=1 tripdt=1
+Gih  0    ih   VALUE={v(psi_h) - 0         - v(Lh) * (v(iR)+v(iE)+v(ih) ) } tripdv=1 tripdt=1
+RiR  iR   0    1E6
+RiE  iE   0    1E6
+Rih  ih   0    1E6
+*    mechanisches Lastmoment Mw(t)
+GRbg	0	Rbg	TABLE {v(n)}   (-1,-1) (1,1) 
+RRbg	Rbg	0	{MRbg+1u}
+.ends
+
+* DC-Compound machine serial+shunt fixed speed
+.subckt GDM_fixed_speed A1 A2 F1 F2 D1 D2 M n params: UA=230 UE=110 IAN=23 RA=0.8 LA=0.04 RE=110 RR=0.2 
++ NR_NE=0.1 Rp=1 Rh=1e6 J=0.0025  tpsi=0.8 sigmaE=0.03 sigmaR=0.03 a=0.6 m=9 az=1 nN=2900 n0=2900 
++ Mn=15.73 mot=1 rbg=0.001
+.PARAM  IEN={ RP/(RR+RP)*IAN + UE/RE/Nr_Ne } 
+.PARAM  psiEN={ IEN*RE*Nr_Ne*Nr_Ne*tpsi}
+.PARAM  omegaN={nN*2*pi/60}
+.PARAM  kAE={ (UA-mot*(RA+RR*RP/(RR+RP))*IAN)/omegaN/psiEN }
+.PARAM  LhN={psiEN/IEN}  LEs={LhN*sigmaE}   LRs={LhN*sigmaR}
+.PARAM  psiEh0={psiEN/a*UE/RE/Nr_Ne/IEN}      ; Schaetzwert
+.PARAM  omega0={UA/kAE/psiEh0}
+.PARAM  Mrbg={Mn*rbg}
+Vkae kae 0 {kAE} 
+VMrbg Mrbgn 0 {Mrbg} 
+VpsiEN PsiEn 0 {PsiEn} 
+EEN En 0 value={kAe*Psien*omegaN} tripdv=1 tripdt=1
+EEa E  0 value={kAe*v(Psi_h)*v(omega)} tripdv=1 tripdt=1
+EMi Mi 0 value={kAE*v(Psi_h)*v(iA)} tripdv=1 tripdt=1
+EPout Pout 0 value={v(Mi)*v(omega)} tripdv=1 tripdt=1
+EPin Pin 0 value={v(iA)*UA} tripdv=1 tripdt=1
+xanchor A1 A2 iA iR omega psi_h anchor params: RA={RA} LA={LA} kAE={kAE}
+xshunt F1 F2 iE psi_E shunt params: NR_NE={NR_NE} Re={Re} psiEh0={psiEh0}
+xserial D1 D2 iR iA psi_R serial params: RR={RR} psiEh0={psiEh0}
+rp D1 D2 {Rp}
+*    Integrator des Haupt-Flusses
+Gph  0    psi_h    VALUE={ 0 - Rh*v(ih) } tripdv=1 tripdt=1
+Cph  psi_h    0    1    IC={psiEh0}
+Rph  psi_h    0    1E6
+*    mech. Winkelgeschwindigkeit
+Eom	omega	0	VALUE={(2*pi)*n0/60} tripdv=1 tripdt=1 ; fix omega
+Emoment M 0   VALUE={ -kAE*v(psi_h)*v(iA)+v(rbg)} tripdv=1 tripdt=1
+En   n        0    VALUE={v(omega)/(2*pi)*60} tripdv=1 tripdt=1
+*    Berechnung der variablen Haupt-Induktivit„t
+GLh  0    Lh   VALUE={(1/( a+(1-a)*v(psi_h)/psiEN*PWRS(v(psi_h)/psiEN,m-1)))*LhN*az} tripdv=1 tripdt=1
+RLh  Lh   0    1
+*    Gleichungs-System zur Stromberechnung iR , iE' und ih
+GiR  0    iR   VALUE={v(psi_R) - LRs*v(iR) - v(Lh) * (v(iR)+v(iE)+v(ih) ) } tripdv=1 tripdt=1
+GiE  0    iE   VALUE={v(psi_E) - LEs*v(iE) - v(Lh) * (v(iR)+v(iE)+v(ih) ) } tripdv=1 tripdt=1
+Gih  0    ih   VALUE={v(psi_h) - 0         - v(Lh) * (v(iR)+v(iE)+v(ih) ) } tripdv=1 tripdt=1
+RiR  iR   0    1E6
+RiE  iE   0    1E6
+Rih  ih   0    1E6
+*    mechanisches Lastmoment Mw(t)
+GRbg	0	Rbg	TABLE {v(n)}   (-1,-1) (1,1) 
+RRbg	Rbg	0	{MRbg+1u}
+.ends
+
+.subckt anchor A1 A2 iA iR omega psi_h params: RA=1 LA=1 kAE=1
+E1 A1 A2a VALUE={RA*i(vIa)+LA*DDT(i(vIa))+kAE*v(psi_h)*v(omega)} tripdv=1 tripdt=1
+R1 A2a A2b 1m
+EV ia 0 value={i(Via)} tripdv=1 tripdt=1
+VIA A2b A2 0
+.ends
+
+
+.subckt shunt F1 F2 iE psi_E params: NR_Ne=0.1 Re=1 psiEh0=1
+Gue  ue1  0  value={v(iE)} tripdv=1 tripdt=1
+Rue  ue1  ue  {Re}
+Eue  ue   0  value={v(F1,F2)/NR_Ne} tripdv=1 tripdt=1
+Ge   F1  F2 value={v(iE)*NR_NE} tripdv=1 tripdt=1
+GpE  0    psi_E    VALUE={ v(Ue1,0)} tripdv=1 tripdt=1
+CpE  psi_E    0    1    IC={psiEh0}
+RpE  psi_E    0    1E6
+.ends
+
+
+.subckt serial D1 D2 iR iA psi_R params: RR=1 psiEh0=1
+RR D1 D1b {RR}
+GiE D1b D2 value={v(iR)} tripdv=1 tripdt=1
+GpR  0    psi_R    VALUE={v(D1b,D2) } tripdv=1 tripdt=1
+CpR  psi_R    0    1    IC={psiEh0}
+RpR  psi_R    0    1E6
+.ends
+
+
+.SUBCKT GNM_Erregerkreis F1 F2 PsiE
++PARAMS: Re=100 IEN=2 PsiEN=120 PsiE0=0 a=0.6 m=9 rem=0 az=1
+.PARAM  kpsi={ (a*rem + (1-a)*PWR(LIMIT(1p+rem,-1,1),m)) * IEN }
+.PARAM  dpsi=20
+viE	F1	F1a	0
+RE	F1a	F1b	{RE}
+GiE	F1b	F2	VALUE={IEN*(a*v(psiE)/az/psiEN + (1-a)*PWRS(LIMIT(1p+v(psiE)/psiEN/az,-10,10),m))/az} tripdv=1 tripdt=1
+GiE1   F1b	F2    VALUE={2*kpsi*exp(-dpsi*(v(psiE)/psiEN-rem)) } tripdv=1 tripdt=1
+GiE2   F1b	F2   VALUE={-3*kpsi*exp(-2.5*dpsi*(v(psiE)/psiEN-rem)) } tripdv=1 tripdt=1
+GPsiE	0	psiE	VALUE={(v(F1b,F2))} tripdv=1 tripdt=1
+RPsiE	psiE	0	1e6
+CPsiE	psiE	0	1	IC={rem*PsiEN+psiE0*psiEN}
+.ENDS ; GNM_Erregerkreis
+*
+
+*1b	GNM_Ankerkreis
+*
+.SUBCKT GNM_Ankerkreis A1	A2	psiE	omega	Mi  ia
++PARAMS: RA=1	LA=1	IA0=0	kAE=1
+viA	A1	A1a	0
+Eia   ia 0 value={i(viA)} tripdv=1 tripdt=1
+RA	A1a	A1b	{RA}
+LA	A1b	A1c	{LA}	IC={IA0}
+Eui	A1c	A2	VALUE={kAE*v(psiE)*v(omega)} tripdv=1 tripdt=1
+EMi	Mi	0	VALUE={kAE*i(viA)*v(psiE)} tripdv=1 tripdt=1
+.ENDS ; GNM_Ankerkreis
+
+
+*1c	GNM_Mechanik
+* Torque=pos. -> generator  Torque=neg. -> Motor 
+* In spicelab toolbox this is opposite
+.SUBCKT GNM_Mechanik MLast n  n1  omega  Mi
++PARAMS: n0=0  Jmotor=1 MRbg=1 Mvz=1
+Rlap	Mlast	0	1meg
+Eom	omega	0	VALUE={(2*pi)*n0/60+1/Jmotor*v(idt1)} tripdv=1 tripdt=1
+Gx 0 idt1 VALUE={v(Mi)-v(Rbg)+v(MLast)*Mvz} tripdv=1 tripdt=1
+Cx idt1 0 1
+Rx idt1 0 1e10
+En	n	0	VALUE={v(omega)/(2*pi)*60} tripdv=1 tripdt=1
+En1	n1	0	VALUE={v(n)} tripdv=1 tripdt=1
+*	Reibungsmoment
+GRbg	0	Rbg	TABLE {v(n)}   (-1,-1) (1,1)
+RRbg	Rbg	0	{MRbg}
+.ENDS ;  GNM_Mechanik
+
+* Torque=pos. -> generator  Torque=neg. -> Motor 
+* In spicelab toolbox this is opposite
+.SUBCKT GNM_Mechanik_fixed_speed MLast n  n1  omega  Mi
++PARAMS: n0=0  MRbg=1
+Rlap	Mlast	0	1meg
+Eom	omega	0	VALUE={(2*pi)*n0/60} tripdv=1 tripdt=1 ;fix omega 
+EMoment Mlast 0 VALUE={-v(Mi)+v(Rbg)} tripdv=1 tripdt=1
+En	n	0	VALUE={v(omega)/(2*pi)*60} tripdv=1 tripdt=1
+En1	n1	0	VALUE={v(n)} tripdv=1 tripdt=1
+*	Reibungsmoment
+GRbg	0	Rbg	TABLE {v(n)}   (-1,-1) (1,1)
+RRbg	Rbg	0	{MRbg}
+.ENDS ;  GNM_Mechanik
+
+* Torque=pos. -> generator  Torque=neg. -> Motor 
+* In spicelab toolbox this is opposite
+.SUBCKT GNM_Mechanik_fixed_speed2 MLast n  omega  Mi
++PARAMS:  MRbg=1
+Rlap	Mlast	0	1meg
+Eom	omega	0	VALUE={(2*pi)*v(n)/60} tripdv=1 tripdt=1 ;fix omega 
+EMoment Mlast 0 VALUE={-v(Mi)+v(Rbg)} tripdv=1 tripdt=1
+*	Reibungsmoment
+GRbg	0	Rbg	TABLE {v(n)}   (-1,-1) (1,1)
+RRbg	Rbg	0	{MRbg}
+.ENDS ;  GNM_Mechanik
+
+*2a	GRM_Erregerkreis
+* NOTE: Here is the serial circuit ->  IE=IA(IN) !!!! 
+.SUBCKT GRM_Erregerkreis  D1  D2  psiE   
++PARAMS:  RErr=1  psiEN=1  IN=1 a=0.6 m=9 psiE0=0 rem=0 az=1
+.PARAM  kpsi={ (a*rem + (1-a)*PWR(LIMIT(1p+rem,-1,1),m)) * IN }
+.PARAM  dpsi=20
+VIE D1  D1b 0V
+RE	D1b	D1a	{RErr}
+GiE	D1a	D2	VALUE={IN*(a*v(PsiE)/az/psiEN+(1-a)*PWRS(LIMIT(1p+v(psiE)/psiEN/az,-10,10),m))/az}  tripdv=1 tripdt=1
+GiE1   D1a	D2    VALUE={2*kpsi*exp(-dpsi*(v(psiE)/psiEN-rem)) }  tripdv=1 tripdt=1
+GiE2   D1a	D2   VALUE={-3*kpsi*exp(-2.5*dpsi*(v(psiE)/psiEN-rem)) } tripdv=1 tripdt=1
+RD1a   D1a  0   1e9
+GPsiE	0	psiE	VALUE={(v(D1a,D2))}  tripdv=1 tripdt=1
+RPsiE	psiE	0	1e6
+CPsiE	psiE	0	1	IC={rem*PsiEN+psiE0*psiEN}
+.ENDS    ;   GRM_Erregerkreis
+
+.SUBCKT GRM_Ankerkreis  A1  A2  psiE  omega Mi ia 
++PARAMS: RA=1  LA=1  kAE=1
+viA	A1	A1a	0
+Eia   ia 0 value={i(viA)} tripdv=1 tripdt=1
+RA	A1a	A1b	{RA}
+LA	A1b	A1c	{LA}
+Eui	A1c	A2	VALUE={kAE*v(psiE)*v(omega)} tripdv=1 tripdt=1
+EMi	Mi	0	VALUE={kAE*v(psiE)*i(ViA)} tripdv=1 tripdt=1
+.ENDS   ; GRM_Ankerkreis
+
+*2c	GRM_Mechanik
+*
+.SUBCKT GRM_Mechanik  MLast  n   n1 omega Mi
++PARAMS: n0=0  Jmotor=1 Mrbg=1 Mvz=1
+Rlap	Mlast	0	1k
+Eom	omega	0	VALUE={(2*pi)*n0/60+1/Jmotor*v(idt1)} tripdv=1 tripdt=1
+Gx 0 idt1 VALUE={v(Mi)-v(Rbg)+v(MLast)*Mvz} tripdv=1 tripdt=1
+Cx idt1 0 1
+Rx idt1 0 1e10
+En	n	0	VALUE={v(omega)/(2*pi)*60} tripdv=1 tripdt=1
+En2	n1	0	VALUE={v(omega)/(2*pi)*60} tripdv=1 tripdt=1
+*	Reibungsmoment
+GRbg	0	Rbg	TABLE {v(n)}   (-1,-1) (1,1)
+RRbg	Rbg	0	{MRbg}
+.ENDS   ; GRM_Mechanik
+
+* Torque=pos. -> generator  Torque=neg. -> Motor 
+* In spicelab toolbox this is opposite
+.SUBCKT GRM_Mechanik_fixed_speed  MLast  n   n1 omega Mi
++PARAMS: n0=0 Mrbg=1
+Rlap	Mlast	0	1k
+Eom	omega	0	VALUE={2*pi*n0/60} tripdv=1 tripdt=1; fix omega 
+EMoment Mlast 0 VALUE={-v(Mi)+v(Rbg)} tripdv=1 tripdt=1
+En	n	0	VALUE={v(omega)/(2*pi)*60}  tripdv=1 tripdt=1
+En1	n1	0	VALUE={v(omega)/(2*pi)*60}  tripdv=1 tripdt=1
+*	Reibungsmoment
+GRbg	0	Rbg	TABLE {v(n)}   (-1,-1) (1,1)
+RRbg	Rbg	0	{MRbg}
+.ENDS   ; GRM_Mechanik
+
+.SUBCKT KM U1 U2 Z1 Z2 isx isy irx iry omega 
++PARAMS: Rcu=1  p=1   Lh=1  Ls=1
+*	Stator-Wicklungsstroeme
+Gx	U1	U2	VALUE={v(isx)} tripdv=1 tripdt=1
+Gy	Z1	Z2	VALUE={v(isy)} tripdv=1 tripdt=1
+*	Flusskomponenten
+Epsi_sx	psisx	0	VALUE={v(idt1)} tripdv=1 tripdt=1
+G1 0 idt1 VALUE={v(U1,U2)-Rcu*v(isx)} tripdv=1 tripdt=1
+C1 idt1 0 1
+R1 idt1 0 1e10
+Epsi_sy	psisy	0	VALUE={v(idt2)} tripdv=1 tripdt=1
+G2 0 idt2 VALUE={v(Z1,Z2)-Rcu*v(isy)} tripdv=1 tripdt=1
+C2 idt2 0 1
+R2 idt2 0 1e10
+Epsi_rx	psirx	0	VALUE={v(idt3)} tripdv=1 tripdt=1
+G3 0 idt3 VALUE={-Rcu*v(irx)-p*v(omega)*v(psiry)} tripdv=1 tripdt=1
+C3 idt3 0 1
+R3 idt3 0 1e10
+Epsi_ry	psiry	0	VALUE={v(idt4)} tripdv=1 tripdt=1
+G4 0 idt4 VALUE={-Rcu*v(iry)+p*v(omega)*v(psirx)} tripdv=1 tripdt=1
+C4 idt4 0 1
+R4 idt4 0 1e10
+*	Stromkomponenten
+Gisx		0	isx	
++VALUE={v(psisx)-(Lh+Ls)*v(isx)-Lh*v(irx)} tripdv=1 tripdt=1
+Risx		isx	0	1MEG
+Girx		0	irx	
++VALUE={v(psirx)-(Lh+Ls)*v(irx)-Lh*v(isx)} tripdv=1 tripdt=1
+Rirx		irx	0	1MEG
+Gisy		0	isy	
++VALUE={v(psisy)-(Lh+Ls)*v(isy)-Lh*v(iry)} tripdv=1 tripdt=1
+Risy		isy	0	1MEG
+Giry		0	iry
++VALUE={v(psiry)-(Lh+Ls)*v(iry)-Lh*v(isy)} tripdv=1 tripdt=1
+Riry		iry	0	1MEG
+.ENDS    ;   KM
+
+*4b	KM_Mechanik
+*
+*
+.SUBCKT  KM_Mechanik  MLast  n  n1 isx isy irx iry omega 
++PARAMS:  p=1  Lh=1  MN=1  rbg=1  n0=0  J=1 Mvz=1
+*	mechanische Groessen
+Emi		Mi	0	VALUE={p*Lh*(v(isy)*v(irx)-v(isx)*v(iry))} tripdv=1 tripdt=1
+GRbg		0	Rbg	TABLE {v(n)} (-1,-1) (1,1) 
+Rlap		Mlast	0	1k
+RRbg		Rbg	0	{MN*rbg}
+En		n	0	VALUE={n0+1/J*60/(2*pi)*v(idt1)} tripdv=1 tripdt=1
+Gx 0 idt1 VALUE={v(Mi)-v(Rbg)+v(MLast)*Mvz} tripdv=1 tripdt=1
+Cx idt1 0 1
+Rx idt1 0 1e10
+En2		n1	0	VALUE={v(n)} tripdv=1 tripdt=1
+Eom	omega	0	VALUE={v(n)*(pi/30)} tripdv=1 tripdt=1
+.ENDS  ;  KM_Mechanik
+
+*****************
+* capacitor motor
+*****************
+.SUBCKT Kond_Motor	U1	U2	Z1	Z2	n	Mlast	n1
++	PARAMS:
++	UN=230V
++	IN=2.5A	; Nennstrom der Hauptwicklung
++	cos_phiN=0.8
++	fN=50Hz
++	p=1
++	nN=2800
++	PN=700
++	I0rel=0.6
++	Ikrel=5
++	rbg=0.1
++	taumech=0.25
++	n0=0
++   Mvz=1
+.PARAM
++	MN={PN*60/(2*pi)/nN}
++	Pel={2*UN*IN*cos_phiN}
++	Pcu={Pel-PN*(1+rbg)}
++	Rcu={Pcu/2/IN/IN/2}
++	omega_el={(2*pi)*fN}
++	Ls={UN/Ikrel/IN/omega_el/2}
++	Lh={UN/I0rel/IN/omega_el-Ls}
++	J={taumech*MN/(2*pi)/nN*60}
+XKM		U1	U2	Z1	Z2	isx	isy	irx	iry	omega	KM 
++PARAMS:  Rcu={Rcu}  p={p}  Lh={Lh}  Ls={Ls}
+Xmech	MLast	n	n1	isx	isy	irx	iry	omega	KM_Mechanik 
++PARAMS:  p={p}  Lh={Lh}  MN={MN}  rbg={rbg}  n0={n0}  J={J} Mvz={Mvz}
+.ENDS   ; Kond_Motor
+
+
+**************************************
+* single phase series commutator motor
+**************************************
+.SUBCKT	ERM A1  A2 D1  D2  n   MLast n1   
++PARAMS:
++	UN=230V	IN=5.3A	PelN=1.150kW	nN=21000 ; [1/min]
++	fN=50Hz	sigma=0.1	rcuAE=0.13		rbg=0.1
++	tauMech=100ms		n0=0   ; [1/min]
++   Mvz=1
+*****	Zwischenrechnungen   **********
+.PARAM
++	ZN={UN/IN}
++	cos_phiN={PelN/UN/IN}	
++	RN={ZN*cos_phiN}
++	XN={ZN*SQRT(1-cos_phiN*cos_phiN)}
++	Xh={XN/(1+sigma)}
++	Rcu={ZN*rcuAE}
++	PRcuN={IN*IN*Rcu}
++	MiN={(PelN-PRcuN)/(2*pi*nN/60)}
++	kAE={(RN-Rcu)*fN*60/nN/Xh}
++	Jmotor={tauMech*MiN/(2*pi*nN/60)}
+****** Ersatzschaltungen und Gleichungssystem  ******
+XElKreis  A1  A2 D1  D2   n  Mi  ERM_Anker   
++PARAMS:  Rcu={Rcu}  XN={XN}  fN={fN}  Xh={Xh}  kAE={kAE}
+Xmech	MLast  n  n1  Mi  ERM_Mechanik
++PARAMS:  n0={n0}  Jmotor={Jmotor} MiN={MiN} rbg={rbg} Mvz={Mvz}
+.ENDS  ERM
+
+.SUBCKT ERM_Anker  A1  A2 D1  D2  n  Mi 
++PARAMS:  Rcu=1  XN=1  Xh=1  fN=1  kAE=1
+viA	A1	A1a	0
+viE	D1	D2	0
+RA	A1a	A1b	{Rcu}
+LA	A1b	A1c	{XN/(2*pi)/fN}
+Eui	A1c	A2	VALUE={kAE*i(viE)*Xh/fN*v(n)/60} tripdv=1 tripdt=1
+EMi	Mi	0	VALUE={kAE*i(viE)*Xh/(2*pi)/fN*i(viA)} tripdv=1 tripdt=1
+.ENDS   ;  ERM_Anker
+
+*$
+*$
+
+*3b ERM_Mechanik
+*
+*
+.SUBCKT ERM_Mechanik  MLast  n  n1  Mi 
++PARAMS: n0=0  Jmotor=1  MiN=1  rbg=1 Mvz=1
+En	n	0	VALUE={n0+1/Jmotor*30/pi*v(idt1)} tripdv=1 tripdt=1
+Gx 0 idt1 VALUE={v(Mi)-v(Rbg)+v(MLast)*Mvz} tripdv=1 tripdt=1
+Cx idt1 0 1
+Rx idt1 0 1e10
+
+Rlap		Mlast	0	1k
+En1	n1	0	VALUE={v(n)} tripdv=1 tripdt=1
+Rn1	n1	0	1k
+*	Reibungsmoment
+GRbg	0	Rbg	TABLE {v(n)}   (-1,-1) (1,1)
+RRbg	Rbg	0	{MiN*rbg}
+.ENDS    ; ERM_Mechanik
+
+
+
+
+
+*11*****   Last_Hub  **********
+* mechanische Last bei reiner Hubarbeit *
+
+* 
+* Torque=pos. -> generator  Torque=neg. -> Motor 
+* In spicelab toolbox this is opposite
+.SUBCKT Load_lift  n  M  Torque
++	PARAMS: 
++ 	TD = 0
+*	Bei reiner Hubarbeit ist das Lastmoment konstant
+G	0	M	VALUE={if (Time > TD,v(Torque),0)} tripdv=1 tripdt=1
+R   M   0   1 
+.Ends
+***	Ende des SUBCIRCUITS Last_Hub
+*$
+*$
+
+*12*****   Last_Reibung   *********
+* mechanische Last bei Reibungs- und Zerspanungsarbeit *
+* Torque=pos. -> generator  Torque=neg. -> Motor 
+* In spicelab toolbox this is opposite
+.SUBCKT Load_friction  n M Torque
++	PARAMS: 
+*	Bei Reibung und zerspanender Arbeit ist das Lastmoment
+*	konstant, aber drehrichtungsabhaengig !
+G	0	M1	TABLE {v(n)}=(-1,-1) (1,1)
+R	M1	0	1
+Gfr 0   M   VALUE={V(M1)*v(Torque)} tripdv=1 tripdt=1 
+Rfr	M	0	1
+.ENDS
+***	Ende des SUBCIRCUITS Last_Reibung
+*$
+
+*13*****   Last_Drehzahl  **********
+* mechanische Last bei drehzahlabhaengigem Lastmoment *
+* Torque=pos. -> generator  Torque=neg. -> Motor 
+* In spicelab toolbox this is opposite
+.SUBCKT Load_speed  n M  Torque
++	PARAMS: 
++	nN=3000
++	exponent=1
+*	Bei vielen Lastfaellen ist das Lastmoment drehzahlabhaengig.
+*	MLast(n)=torqueN*(n/nN)^exponent
+G	0	M1	Value = {PWRS(v(n)/nN,exponent)} tripdv=1 tripdt=1
+R	M1	0	1
+GM  0   M   VALUE={V(M1)*v(Torque)} tripdv=1 tripdt=1 
+RM  M   0   1 
+.ENDS
+***	Ende des SUBCIRCUITS Last_Drehzahl
+*$
+
+*14*****   Last_Winkel  **********
+* mechanische Last bei drehwinkelabhaengigem Lastmoment *
+* Torque=pos. -> generator  Torque=neg. -> Motor 
+* In spicelab toolbox this is opposite
+.SUBCKT Load_angle  n M Torque
++	PARAMS: 
++	angle_translation_factor=1 ; transmission 1:1
+*	Es wird die Abhaengigkeit des Lastmomentes vom Drehwinkel berechnet.
+*	Der Drehwinkel wird durch Integration der Drehzahl bestimmt.
+*	Die Winkeluebersetzung beruecksichtigt ein moegliches Getriebe.
+E	Winkel  0	VALUE={angle_translation_factor*v(idt1)} tripdv=1 tripdt=1
+Gx 0 idt1 VALUE={v(n)/60*2*pi} tripdv=1 tripdt=1
+Cx idt1 0 1
+Rx idt1 0 1e10
+G	0	M1	Value = {sin(v(Winkel))} tripdv=1 tripdt=1
+R	M1	0	1
+GM  0   M   VALUE={V(M1)*v(Torque)} tripdv=1 tripdt=1
+RM  M   0   1
+.ENDS
+***	Ende des SUBCIRCUITS Last_Winkel
+*$
+
+*15*****   Last_Beschleunigung  **********
+* mechanische Last bei beschleunigsabhaengigem Lastmoment *
+* Torque=pos. -> generator  Torque=neg. -> Motor 
+* In spicelab toolbox this is opposite
+.SUBCKT Load_Acceleration  n M Torque
++	PARAMS: 
++	Nn=1000
++	Startuptime=1
+*	Es wird das Moment zur Beschleunigung der traegen Masse der Last
+*	berechnet.
+*	Das Massentraegheitsmoment der Last J_Last wird aus der Anlaufzeit
+*	bei konstant angenommenem Beschleunigungsmoment=Nennmoment berechnet.
+EJ  J   0   Value={Startuptime*v(Torque)/(6.2832*Nn/60)} tripdv=1 tripdt=1
+G	0	M	Value = {v(J)*6.2832/60*DDT(v(n))} tripdv=1 tripdt=1
+R	M	0	1
+.ENDS
+***	Ende des SUBCIRCUITS Last_Beschleunigung
+
+
+

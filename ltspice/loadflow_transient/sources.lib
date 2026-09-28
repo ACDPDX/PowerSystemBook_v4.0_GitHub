@@ -1,0 +1,734 @@
+*******************************************************************************
+* HINT: for the future in all .lib's
+* Exchange all E-sources with G-sources to hold the matrix smaller
+* E.g. E1 1 0 VALUE={...} change to GE1 0 1 VALUE={...} rpar=1
+*******************************************************************************
+* V_3Phase         sine 3phase source with exponential swingin
+* V_3Phase_te      sine 3phase source with exponential swingin (thevenin equivalent)
+* V_3Phase_nostar  sine 3phase source with exponential swingin (high ohmic starpoint)
+* I_3Phase         sine 3phase current source with exponential swingin
+* V_3Phase_cos     cosine 3 phase source with exp. swingin
+* V_3Phase_ctrl    controlled 3 phase source
+* I_3Phase_ctrl    controlled 3phase current source with exponential swingin
+* V_3Phase_1       3phase source without exponential swingin
+* V_3Phase_1_cos   cosine 3 phase source wo exp. swingin
+* V_3Phase_1_ctrl  controlled 3 phase source without exponential swingin
+* V_3Phase_AC      3phase AC voltage source
+* I_3Phase_AC      3phase AC current source
+* V_1Phase         1phase voltage source with exponential swingin
+* I_1Phase         1phase current source with exponential swingin
+* V_1Phase_ctrl    controlled 1phase source with exp. swingin
+* V_1Phase_1 1phase 1phase source without exponential swingin
+* V_1Phase_1_ctrl   controlled 1phase source without exponential swingin
+* V_1Phase_ctrl_frequency Frequency ctrl input
+* V_3Phase_ctrl_frequency Frequency ctrl input
+* V_1Phase_AC       1 phase AC source
+*
+* V_ctrl Pwl source for pwl input
+* V_pulse    source for pulse input
+* *************************************************
+* TD = time delay
+* Texp = for exponential increase of voltage
+* Tpwl = for linear increase of voltage
+* phi = phase shift of 1phase units
+* phir,s,t  = phase shift for 3phase units
+*****************************************************************************
+
+
+.SUBCKT I_3Phase L1 L2 L3 N
++PARAMS: I1Nenn=100 fact=1.414 frequ={fn1} Texp=5m Tpwl=0ms TD = 0 irf=1 isf=1 itf=1 phir=0 phis=-120 phit=120 dphi=0 sign=1
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+Gl1	N	L1	Value={if(time > TD,v(pwl)*fact*I1Nenn*irf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phir+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+Gl2	N	L2	Value={if(time > TD,v(pwl)*fact*I1Nenn*isf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phis+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+Gl3	N	L3	Value={if(time > TD,v(pwl)*fact*I1Nenn*itf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phit+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+RGND N 0 1e10
+RGND1 L1 0 1e10
+RGND2 L2 0 1e10
+RGND3 L3 0 1e10
+.ENDS
+
+.SUBCKT I_3Phase_harmonics L1 L2 L3 N
++PARAMS:
++ Mult=1
++ A0=1
++ A1=0
++ A2=0
++ A3=0
++ A4=0
++ A5=0
++ fn0={fn1}
++ n1=3
++ n2=5
++ n3=7
++ n4=9
++ n5=11
++ phir=0
++ phis=-120
++ phit=120
++ dphi=0
++ fact=1.414
++ TD=0
++ Tpwl=0
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+Gl1	N	L1	Value={ if(time > TD,(fact*Mult*v(pwl)*
++(A0*sin(2*pi*(fn0*(TIME-TD)+(phir+dphi)/360))+
++ A1*sin(2*pi*(fn0*n1*(TIME-TD)+n1*(phir+dphi)/360))+
++ A2*sin(2*pi*(fn0*n2*(TIME-TD)+n2*(phir+dphi)/360))+
++ A3*sin(2*pi*(fn0*n3*(TIME-TD)+n3*(phir+dphi)/360))+
++ A4*sin(2*pi*(fn0*n4*(TIME-TD)+n4*(phir+dphi)/360))+
++ A5*sin(2*pi*(fn0*n5*(TIME-TD)+n5*(phir+dphi)/360)))),0)} tripdv={tdv} tripdt={tdt}
+Gl2	N	L2	Value={ if(time > TD,(fact*Mult*v(pwl)*
++(A0*sin(2*pi*(fn0*(TIME-TD)+(phis+dphi)/360))+
++ A1*sin(2*pi*(fn0*n1*(TIME-TD)+n1*(phis+dphi)/360))+
++ A2*sin(2*pi*(fn0*n2*(TIME-TD)+n2*(phis+dphi)/360))+
++ A3*sin(2*pi*(fn0*n3*(TIME-TD)+n3*(phis+dphi)/360))+
++ A4*sin(2*pi*(fn0*n4*(TIME-TD)+n4*(phis+dphi)/360))+
++ A5*sin(2*pi*(fn0*n5*(TIME-TD)+n5*(phis+dphi)/360)))),0)} tripdv={tdv} tripdt={tdt}
+Gl3	N	L3	Value={if(time > TD,(fact*Mult*v(pwl)*
++(A0*sin(2*pi*(fn0*(TIME-TD)+(phit+dphi)/360))+
++ A1*sin(2*pi*(fn0*n1*(TIME-TD)+n1*(phit+dphi)/360))+
++ A2*sin(2*pi*(fn0*n2*(TIME-TD)+n2*(phit+dphi)/360))+
++ A3*sin(2*pi*(fn0*n3*(TIME-TD)+n3*(phit+dphi)/360))+
++ A4*sin(2*pi*(fn0*n4*(TIME-TD)+n4*(phit+dphi)/360))+
++ A5*sin(2*pi*(fn0*n5*(TIME-TD)+n5*(phit+dphi)/360)))),0)} tripdv={tdv} tripdt={tdt}
+RGND N 0 1e10
+RGND1 L1 0 1e10
+RGND2 L2 0 1e10
+RGND3 L3 0 1e10
+.ENDS
+
+* *************************************************
+*
+* fact=0.8165 = sqrt(2)/sqrt(3) = sqrt(2)/sqrt(3)
+*
+*
+.SUBCKT V_3Phase L1 L2 L3 N
++PARAMS: U1Nenn=400 fact=0.8165 frequ={fn1} Texp=5m Tpwl=0ms TD = 0 vrf=1 vsf=1 vtf=1 phir=0 phis=-120 phit=120 dphi=0 sign=1
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+El1	L1	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vrf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phir+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El2	L2	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vsf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phis+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El3	L3	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vtf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phit+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+RGND N 0 1e10
+.ENDS
+
+.SUBCKT V_3Phase2 L1 L2 L3 N L4 L5 L6 N1
++PARAMS: U1Nenn=400 fact=0.8165 frequ={fn1} Texp=5m Tpwl=0ms TD = 0 vrf=1 vsf=1 vtf=1 phir=0 phis=-120 phit=120 dphi=0 sign=1
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+El1	L1	L4	Value={if(time > TD,v(pwl)*fact*U1Nenn*vrf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phir+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El2	L2	L5	Value={if(time > TD,v(pwl)*fact*U1Nenn*vsf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phis+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El3	L3	L6	Value={if(time > TD,v(pwl)*fact*U1Nenn*vtf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phit+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+RN N N1 1e-6
+RGND N 0 1e10
+.ENDS
+
+.SUBCKT V_3Phase_cos L1 L2 L3 N
++PARAMS: U1Nenn=400 fact=0.8165 frequ={fn1} Texp=5m Tpwl=0ms TD = 0 vrf=1 vsf=1 vtf=1 phir=0 phis=-120 phit=120 dphi=0 sign=1
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+El1	L1	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vrf*cos(2*sign*pi*(FREQU*(TIME-TD)+(phir+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El2	L2	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vsf*cos(2*sign*pi*(FREQU*(TIME-TD)+(phis+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El3	L3	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vtf*cos(2*sign*pi*(FREQU*(TIME-TD)+(phit+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+RGND N 0 1e10
+.ENDS
+
+
+.SUBCKT V_3Phase_DC L1 L2 L3 N
++PARAMS: U1Nenn=400 fact=0.8165 TD=0 vrf=1 vsf=-0.5 vtf=-0.5
+EL1 L1 0 value={IF(Time>td,U1Nenn*vrf*fact,0)} tripdv={tdv} tripdt={tdt}
+EL2 L2 0 value={IF(Time>td,U1Nenn*vsf*fact,0)} tripdv={tdv} tripdt={tdt} 
+EL3 L3 0 value={IF(Time>td,U1Nenn*vtf*fact,0)} tripdv={tdv} tripdt={tdt}
+RGND N 0 1e10
+.ENDS
+*$
+* ENDE SUBCKT V_3Phase
+*
+
+* thevenin equivalent voltage source
+.SUBCKT V_3Phase_te L1 L2 L3 N
++PARAMS: U1Nenn=400 gin=1e5 fact=0.8165 frequ={fn1} Texp=5m Tpwl=0ms TD = 0 vrf=1 vsf=1 vtf=1 phir=0 phis=-120 phit=120 dphi=0 sign=1
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+Gl1	N  L1	Value={if(time > TD,gin*v(pwl)*fact*U1Nenn*vrf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phir+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} rpar={1/gin} tripdv={tdv} tripdt={tdt}
+Gl2	N  L2	Value={if(time > TD,gin*v(pwl)*fact*U1Nenn*vsf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phis+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} rpar={1/gin}tripdv={tdv} tripdt={tdt}
+Gl3	N  L3	Value={if(time > TD,gin*v(pwl)*fact*U1Nenn*vtf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phit+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} rpar={1/gin} tripdv={tdv} tripdt={tdt}
+RGND N 0 1e10
+.ENDS
+*$
+
+.SUBCKT V_3Phase_nostar L1 L2 L3
++PARAMS: U1Nenn=400 fact=0.8165 frequ={fn1} Texp=5m Tpwl=0ms TD = 0 vrf=1 vsf=1 vtf=1 phir=0 phis=-120 phit=120 dphi=0 sign=1
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+El1	L1	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vrf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phir+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El2	L2	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vsf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phis+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El3	L3	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vtf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phit+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+RGND N 0 1e10
+* ENDE SUBCKT V_3Phase
+
+
+* same as V_3Phase but Texp initially 0
+.SUBCKT V_3Phase_1 L1 L2 L3 N
++PARAMS: U1Nenn=400 fact=0.8165 frequ={fn1} Texp=0m Tpwl=0ms TD = 0 vrf=1 vsf=1 vtf=1 phir=0 phis=-120 phit=120 dphi=0 sign=1
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+El1	L1	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vrf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phir+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El2	L2	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vsf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phis+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El3	L3	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vtf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phit+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+RGND N 0 1e10
+.ENDS
+
+
+* same as V_3Phase_cos but Texp initially 0
+.SUBCKT V_3Phase_1_cos L1 L2 L3 N
++PARAMS: U1Nenn=400 fact=0.8165 frequ={fn1} Texp=0m Tpwl=0ms TD = 0 vrf=1 vsf=1 vtf=1 phir=0 phis=-120 phit=120 dphi=0 sign=1
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+El1	L1	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vrf*cos(2*sign*pi*(FREQU*(TIME-TD)+(phir+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El2	L2	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vsf*cos(2*sign*pi*(FREQU*(TIME-TD)+(phis+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El3	L3	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vtf*cos(2*sign*pi*(FREQU*(TIME-TD)+(phit+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+RGND N 0 1e10
+.ENDS
+*$
+* ENDE SUBCKT V_3Phase_1_cos
+
+
+* same as V_3Phase_ctrl but Texp initially 0
+.SUBCKT V_3Phase_1_ctrl L1 L2 L3 N ctrl
++PARAMS: U1Nenn=400 fact=0.8165 frequ={fn1} Texp=0m Tpwl=0ms TD = 0 vrf=1 vsf=1 vtf=1 phir=0 phis=-120 phit=120 dphi=0 sign=1
+Rctrl ctrl 0 1e12
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+El1	L1	N	Value={if(time > TD,v(pwl)*fact*v(ctrl)*U1Nenn*vrf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phir+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El2	L2	N	Value={if(time > TD,v(pwl)*fact*v(ctrl)*U1Nenn*vsf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phis+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El3	L3	N	Value={if(time > TD,v(pwl)*fact*v(ctrl)*U1Nenn*vtf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phit+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+RGND N 0 1e10
+.ENDS
+*$
+* ENDE SUBCKT V_3Phase
+
+
+.SUBCKT V_3Phase_ctrl L1 L2 L3 N ctrl
++PARAMS: U1Nenn=400 fact=0.8165 frequ={fn1} Texp=5m Tpwl=0ms TD = 0 vrf=1 vsf=1 vtf=1 phir=0 phis=-120 phit=120 dphi=0 sign=1
+Rctrl ctrl 0 1e12
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+El1	L1	N	Value={if(time > TD,v(pwl)*fact*v(ctrl)*U1Nenn*vrf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phir+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El2	L2	N	Value={if(time > TD,v(pwl)*fact*v(ctrl)*U1Nenn*vsf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phis+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El3	L3	N	Value={if(time > TD,v(pwl)*fact*v(ctrl)*U1Nenn*vtf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phit+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+RGND N 0 1e10
+.ENDS
+*$
+* ENDE SUBCKT V_3Phase
+
+*$
+
+.SUBCKT I_3Phase_ctrl L1 L2 L3 N ctrl
++PARAMS: I1Nenn=100 fact=1.414 frequ={fn1} Texp=5m Tpwl=0ms TD = 0 irf=1 isf=1 itf=1 phir=0 phis=-120 phit=120 dphi=0 sign=1
+Rctrl ctrl 0 1e12
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+Gl1	N	L1	Value={if(time > TD,v(pwl)*fact*I1Nenn*v(ctrl)*irf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phir+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+Gl2	N	L2	Value={if(time > TD,v(pwl)*fact*I1Nenn*v(ctrl)*isf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phis+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+Gl3	N	L3	Value={if(time > TD,v(pwl)*fact*I1Nenn*v(ctrl)*itf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phit+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+RGND N 0 1e10
+RGND1 L1 0 1e10
+RGND2 L2 0 1e10
+RGND3 L3 0 1e10
+.ENDS
+*$
+
+.SUBCKT V_3Phase_AC L1 L2 L3 N
++PARAMS: U1Nenn=110k phir=0 phis=-120 phit=120 dphi=0 sign=1
+V1 L1 N AC {U1Nenn/sqrt(3)} {(phir+dphi)}
+V2 L2 N AC {U1Nenn/sqrt(3)} {(phis+dphi)}
+V3 L3 N AC {U1Nenn/sqrt(3)} {(phit+dphi)}
+.ENDS
+*$
+
+.SUBCKT I_3Phase_AC L1 L2 L3 N
++PARAMS: I1Nenn=100 phir=0 phis=-120 phit=120 dphi=0 sign=1
+I1 L1 N AC {I1Nenn} {(phir+dphi)}
+I2 L2 N AC {I1Nenn} {(phis+dphi)}
+I3 L3 N AC {I1Nenn} {(phit+dphi)}
+.ENDS
+*$
+
+.SUBCKT V_1Phase_AC L1 N
++PARAMS: U1Nenn=110k phi=0
+V1 L1 N AC {U1Nenn/sqrt(3)} {phi}
+.ENDS
+*$
+
+.SUBCKT I_1Phase_AC L1 N
++PARAMS: I1Nenn=110k phi=0
+V1 L1 N AC {I1Nenn} {phi}
+RGND1 L1 0 1e10
+RGND2 N 0 1e10
+.ENDS
+*$
+
+.SUBCKT V_1Phase L1 N
++PARAMS: U1Nenn=400 fact=0.8165 frequ={fn1} Texp=5m Tpwl=0ms TD = 0 phi=0 sign=1
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+El1	L1	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*sin(2*sign*pi*(FREQU*(TIME-TD)+phi/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+* ENDE SUBCKT
+
+.SUBCKT I_1Phase L1 N
++PARAMS: I1Nenn=100 fact=1.414 frequ={fn1} Texp=5m Tpwl=0ms TD = 0 phi=0 sign=1
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+Gl1	N	L1	Value={if(time > TD,v(pwl)*fact*I1Nenn*sin(2*sign*pi*(FREQU*(TIME-TD)+phi/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+RGND1 L1 0 1e10
+RGND2 N 0 1e10
+.ENDS
+*$
+* ENDE SUBCKT
+
+* same model as above but initially Texp=0
+.SUBCKT V_1Phase_1 L1 N
++PARAMS: U1Nenn=400 fact=0.8165 frequ={fn1} Texp=0m Tpwl=0ms TD = 0 phi=0 sign=1
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+El1	L1	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*sin(2*sign*pi*(FREQU*(TIME-TD)+phi/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+* ENDE SUBCKT
+
+.SUBCKT V_1Phase_ctrl L1 N ctrl
++PARAMS: U1Nenn=400 fact=0.8165 frequ={fn1} Texp=5m Tpwl=0ms TD = 0 phi=0 sign=1
+Rctrl ctrl 0 1e12
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+El1	L1	N	Value={if(time > TD,v(pwl)*fact*v(ctrl)*U1Nenn*sin(2*sign*pi*(FREQU*(TIME-TD)+phi/360))*(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+* ENDE SUBCKT
+
+* frequency value is at ctrl input
+.SUBCKT V_1Phase_ctrl_frequency L1 N ctrl
++PARAMS: U1Nenn=400 fact=0.8165
+A1 ctrl N001 0 0 0 0 out 0 MODULATOR mark=1 space=0
+V1 N001 0 PWL(0 1 1 1)
+Eout L1 N VALUE={v(out)*U1Nenn*fact} tripdv={tdv} tripdt={tdt}
+Rctrl ctrl 0 1e12
+RGND N 0 1e10
+.ENDS
+
+* frequency value is at ctrl input in Hz
+.SUBCKT V_1Phase_ctrl_frequency_new L1 N ctrl
++PARAMS: U1Nenn=400 fact=0.8165 Tpwl=0ms Texp=0m TD=500m F0=0 KF=1 phi=0 sign=1
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+EVCO L1 N VALUE = {if(time > TD,v(pwl)*U1Nenn*fact*sign*SIN(2*pi*phi/360+2*pi*(F0*TIME+(KF*v(VMOD))))*(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+G1 VMOD 0 ctrl 0 -1 ; Integral f*dt
+C1 VMOD 0 1 IC=0
+R1 VMOD 0 1E6
+RG ctrl 0 1G ;added by G
+RN N 0 1e10
+.ENDS
+
+* frequency value is at ctrl input in Hz
+.SUBCKT V_3Phase_ctrl_frequency L1 L2 L3 N ctrl
++PARAMS: U1Nenn=400 fact=0.8165 Tpwl=0ms Texp=0m TD=500m F0=0 KF=1 phir=0 phis=-120 phit=120 sign=1
+XL1 L1 N ctrl V_1phase_ctrl_frequency_new U1Nenn={U1Nenn} fact={fact} Tpwl={Tpwl} Texp={Texp} TD={TD} F0={F0} KF={KF} phi={Phir} sign={sign}
+XL2 L2 N ctrl V_1phase_ctrl_frequency_new U1Nenn={U1Nenn} fact={fact} Tpwl={Tpwl} Texp={Texp} TD={TD} F0={F0} KF={KF} phi={Phis} sign={sign}
+XL3 L3 N ctrl V_1phase_ctrl_frequency_new U1Nenn={U1Nenn} fact={fact} Tpwl={Tpwl} Texp={Texp} TD={TD} F0={F0} KF={KF} phi={Phit} sign={sign}
+RG ctrl 0 1G ;added by G
+RN N 0 1e10
+.ENDS
+
+* frequency (0..1..)*fn voltage (0..1..)*U1Nenn
+.SUBCKT V_1Phase_ctrl_frequency_voltage L1 N ctrlf ctrlu
++PARAMS: U1Nenn=400 fn=50 fact=0.8165 Tpwl=0ms Texp=0m TD=0m F0=0 KF=1 phi=0 sign=1 
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} tripdv={tdv} tripdt={tdt}
+Rpwl pwl 0 1
+EVCO L1 N VALUE = {if(time > TD,v(pwl)*U1Nenn*v(ctrlu)*fact*sign*SIN(2*pi*phi/360+2*pi*(F0*TIME+(KF*v(VMOD))))*(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+Ef f 0 VALUE={v(ctrlf)*fn} tripdv={tdv} tripdt={tdt}
+G1 VMOD 0 f 0 -1 ; Integral f*dt
+C1 VMOD 0 1 IC=0
+R1 VMOD 0 1E6
+RG ctrl 0 1G ;added by G
+RN N 0 1e10
+.ENDS
+
+* frequency value is at ctrl input in (0...1..)*fn 
+.SUBCKT V_3Phase_ctrl_frequency_voltage L1 L2 L3 N ctrlf ctrlu
++PARAMS: U1Nenn=400 fn=50 fact=0.8165 Tpwl=0ms Texp=0m TD=0m F0=0 KF=1 phir=0 phis=-120 phit=120 sign=1 
+XL1 L1 N ctrlf ctrlu V_1phase_ctrl_frequency_voltage U1Nenn={U1Nenn} fn={fn} fact={fact} Tpwl={Tpwl} Texp={Texp} TD={TD} F0={F0} KF={KF} phi={Phir} sign={sign}  
+XL2 L2 N ctrlf ctrlu V_1phase_ctrl_frequency_voltage U1Nenn={U1Nenn} fn={fn} fact={fact} Tpwl={Tpwl} Texp={Texp} TD={TD} F0={F0} KF={KF} phi={Phis} sign={sign}  
+XL3 L3 N ctrlf ctrlu V_1phase_ctrl_frequency_voltage U1Nenn={U1Nenn} fn={fn} fact={fact} Tpwl={Tpwl} Texp={Texp} TD={TD} F0={F0} KF={KF} phi={Phit} sign={sign}  
+RG ctrl 0 1G ;added by G
+.ENDS
+
+.SUBCKT I_1Phase_ctrl L1 N ctrl
++PARAMS: I1Nenn=100 fact=1.414 frequ={fn1} Texp=5m Tpwl=0ms TD = 0 phi=0 sign=1
+Rctrl ctrl 0 1e12
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+Gl1	N	L1	Value={if(time > TD,v(pwl)*fact*v(ctrl)*I1Nenn*sin(2*sign*pi*(FREQU*(TIME-TD)+phi/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+* ENDE SUBCKT
+
+* same model as above but initially Texp=0
+.SUBCKT V_1Phase_1_ctrl L1 N ctrl
++PARAMS: U1Nenn=400 fact=0.8165 frequ={fn1} Texp=0m Tpwl=0ms TD = 0 phi=0 sign=1
+Rctrl ctrl 0 1e12
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+El1	L1	N	Value={if(time > TD,v(pwl)*fact*v(ctrl)*U1Nenn*sin(2*sign*pi*(FREQU*(TIME-TD)+phi/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+* ENDE SUBCKT
+
+* PWM-Source
+.SUBCKT pwm_source U1 V1 W1 params: U_N=220 T=20m k=9
+.PARAM  U_D={3.8*U_N} f={1/T}  Tp={T/k}  
+Vsaege saege 0  PULSE({1.8*U_N} {-1.8*U_N} 0 {Tp/2-1n} {Tp/2-1n} 2n {Tp})
+Rsaege saege 0  1
+Est1  1y  0  VALUE={1.414*U_N*cos(2*pi*f*Time)} tripdv=0 tripdt=0
+Rst1  1y  0  1
+Est2  2y  0  VALUE={1.414*U_N*cos(2*pi*f*Time-2*pi/3)} tripdv=0 tripdt=0
+Rst2  2y  0  1
+Est3  3y  0  VALUE={1.414*U_N*cos(2*pi*f*Time-4*pi/3)} tripdv=0 tripdt=0
+Rst3  3y  0  1
+E1    U1 0  VALUE={U_D/2*(TABLE(v(saege)-v(1y),-1u,1,1u,-1))} tripdv=0 tripdt=0
+E2    V1 0  VALUE={U_D/2*(TABLE(v(saege)-v(2y),-1u,1,1u,-1))} tripdv=0 tripdt=0
+E3    W1 0  VALUE={U_D/2*(TABLE(v(saege)-v(3y),-1u,1,1u,-1))} tripdv=0 tripdt=0
+RN1 N3 0 1e6
+RN2 N2 0 1e6    
+.ENDS
+*
+* PWL - Source for a control node
+.SUBCKT v_ctrl ctrl
++PARAMS: t0=0 v0=0 t1=1 v1=1 t2=2e10 v2=1 t3=3e10 v3=1 t4=4e10 v4=1 t5=5e10 v5=1 t6=6e10 v6=1
+Vpwl ctrl 0 pwl {t0} {v0} {t1} {v1} {t2} {v2} {t3} {v3} {t4} {v4} {t5} {v5} {t6} {v6}
+.ENDS
+*$
+
+* PWL - Source mit 2 nodes
+.SUBCKT v_ctrl_2 ctrl1 ctrl2
++PARAMS: t0=0 v0=0 t1=1 v1=1 t2=2e10 v2=1 t3=3e10 v3=1 t4=4e10 v4=1 t5=5e10 v5=1 t6=6e10 v6=1
+Vpwl ctrl1 ctrl2 pwl {t0} {v0} {t1} {v1} {t2} {v2} {t3} {v3} {t4} {v4} {t5} {v5} {t6} {v6}
+.ENDS
+*$
+
+
+* PULSE - Source
+.SUBCKT v_pulse  out1
++PARAMS: Vinitial=0 Von=1 Tdelay=0 Trise=1u Tfall=1u Ton=50m Tperiod=100m Ncycles=10
+Vpulse out1 0 PULSE({Vinitial} {Von} {Tdelay} {Trise} {Tfall} {Ton} {Tperiod} {Ncycles})
+.ENDS
+*$
+
+* PULSE - Source
+.SUBCKT v_pulse_50Hz_110kV_1000_cycles  out1
++PARAMS: Vinitial=0 Von=110k Tdelay=0 Trise=1u Tfall=1u Ton=10m Tperiod=20m Ncycles=1000
+Vpulse out1 0 PULSE({Vinitial} {Von} {Tdelay} {Trise} {Tfall} {Ton} {Tperiod} {Ncycles})
+.ENDS
+*$
+
+* PULSE - Source
+.SUBCKT v_pulse_frequency  out1
++PARAMS: Vinitial=0 Von=400k Tdelay=0 Trise=1u Tfall=1u Frequency=100m Ncycles=10
+.PARAM Tperiod={1/Frequency}
+.PARAM Ton={Tperiod/2}
+Vpulse out1 0 PULSE({Vinitial} {Von} {Tdelay} {Trise} {Tfall} {Ton} {Tperiod} {Ncycles})
+.ENDS
+*$
+
+* PULSE - Source
+.SUBCKT v_pulse_2  out1 out2
++PARAMS: Vinitial=0 Von=1 Tdelay=0 Trise=1u Tfall=1u Ton=50m Tperiod=100m Ncycles=10
+Vpulse out1 out2 PULSE({Vinitial} {Von} {Tdelay} {Trise} {Tfall} {Ton} {Tperiod} {Ncycles})
+.ENDS
+*$
+
+
+**************************************************
+* This is a constant currentsource with
+* PQLQC=1 (phii=phiu+180) -> pure P-Gen (Current=const) for fix P use in conjunction with Vconst-device
+* PQLQC=2 (phii=phiu+90) -> pure QL-Gen=(Current=const) for fix QL use in conjunction with Vconst-device
+* PQLQC=3 (phii=phiu-90) -> pure QC-Gen=(Current=const) for fix QC use in conjunction with Vconst-device
+* QL-Gen: Liefert induktive Blindleistung (übererregt) Spannung steigt
+* QC-Gen: Liefert kap. Blindleistung (untererregt) Spannung sinkt
+*
+* For constant P,Q output use it with additional VConst element
+*
+* Use PhiU measurement for finetuning
+* (after simulation change phiu parameter
+*  of the device with the simulated value)
+* PhiU is always measured for phase 1
+**************************************************
+
+
+.SUBCKT PQ_Gen L1 L2 L3 phase params: P=100e6 Q=20e6 VN=400k frequ={fn1} Texp=5m TD=0 phiu=0
+.param phi={180/pi*atan2(Q,P)}
+.param SN={sqrt(P*P+Q*Q)}
+.param IN={SN/VN/sqrt(3)}
+XVconst L1a L2 L3 L1const L2const L3const Vconst_min_max VN={VN}
+* active P
+XU4 L1 L1a phase phasemeter_1a f={FREQU} deg=1 Rpar=1G
+XU3 L1const L2const L3const GND2 I_3Phase I1Nenn={IN} FREQU={FREQU} Texp={Texp} TD={TD} dphi={phi+phiu} fact=1.414
+Rgnd GND2 0 1e10
+.ENDS
+*$
+
+.subckt PhaseDet_1a in out
++params: fn=50 deg=1 Rpar=1G tdv=1  tdt=1
+Asc 0 in 0 0 0 2 1 0 MODULATOR mark={fn} space=0
+Ts 1 0 11 0 Td={1/fn} Z0=1
+Rs 11 0 1
+Gs 0 s 1 11 1
+Cs s 0 {1/fn} ic=0 Rpar={Rpar}
+Tc 2 0 22 0 Td={1/fn} Z0=1
+Rc 22 0 1
+Gc 0 c 2 22 1
+Cc c 0 {1/fn} ic=0 Rpar={Rpar}
+Br 0 out I=atan2(v(c),v(s)) Rpar={(180/pi)**u(deg)} tripdv={tdv} tripdt={tdt}
+.ends PhaseDet
+
+* 1 phase phasemeter of voltage
+.SUBCKT phasemeter_1a vin vout phi
++params: fn=50 deg=1 Rpar=1G tdt=1 tdv=1 tenable=1u phenable=10m phinit=0
+v01 vin vout 0
+e1 phi 0 Value={IF(time>phenable,v(phi1),phinit)} tripdt={tdt} tripdv={tdv}
+e02 vin1 0 Value={IF(time>tenable,v(vin),0)} tripdt={tdt} tripdv={tdv}
+xph1 vin1 phi1 PhaseDet_1a
++params: fn={fn} deg={deg} Rpar={Rpar} tdt={tdt} tdv={tdv}
+.ENDS
+
+* 1 phase phasemeter of current
+.SUBCKT phasemeter_current_1a vin vout phi
++params: fn=50 deg=1 Rpar=1G tdt=1 tdv=1 tenable=1u phenable=10m phinit=0
+v01 vin vout 0
+e1 i 0 VALUE={i(v01)} tripdt={tdt} tripdv={tdv}
+e3 i1 0 Value={IF(time>phenable,v(i),phinit)} tripdt={tdt} tripdv={tdv}
+e2 phi 0 Value={IF(time>tenable,v(phi1),0)} tripdt={tdt} tripdv={tdv}
+xph1 i1 phi1 PhaseDet_1a
++params: fn={fn} deg={deg} Rpar={Rpar} tdt={tdt} tdv={tdv}
+.ENDS
+
+
+.SUBCKT PQ_Gen_auto L1_1 L2 L3 params: P=100e6 Q=20e6 VN=400k frequ={fn1} Texp=5m TD=100m kp=1 tn=0.01 init=0 uhi=1.2 ulo=0.8
+.param SN=sqrt(P*P+Q*Q) IN={sqrt(2)*SN/VN/sqrt(3)}
+.param phiraw={180/pi*atan2(q,p)} phi=IF(phiraw>90,phiraw-180,IF(phiraw<-90,phiraw+180,phiraw))
+XU5 N002 L1 phiU2 phasemeter_1a f={frequ} deg=1 Rpar=1G
+XU4 akt phiU2 phi enable PI2 Kp={kp} Tn={Tn} Min=-360 Max=360 init=0
+XU13 N001 L1_1 phiI2 PhaseMeter_current_1a f={frequ} deg=1 Rpar=1G
+XU1 N001 N002 phii3 PhaseMeter_current_1a f={frequ} deg=1 Rpar=1G
+G1 L1const N VALUE={IF((time>TD),(-IN*sin(2*pi*FREQU*(time-TD)+v(phi)*pi/180))*((1-exp(-abs(time-TD)/(Texp+1p)))),0)} tripdv={tdv} tripdt={tdt}
+G2 L2const N VALUE={IF((time>TD),(-IN*sin(2*pi*FREQU*(time-TD)-120*pi/180+v(phi)*pi/180))*(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+G3 L3const N VALUE={IF((time>TD),(-IN*sin(2*pi*FREQU*(time-TD)+120*pi/180+v(phi)*pi/180))*(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+Rgnd N 0 1e10
+v1 enable 0 pwl {TD} 0 {TD+10m} 1
+Eakt2 akt2 0 VALUE={v(phii2)+phi} tripdv={tdv} tripdt={tdt}
+Eakt1 akt1 0 VALUE={v(phii3)+phi}  tripdv={tdv} tripdt={tdt}
+Eakt akt 0 VALUE={IF(P>=0,v(akt1),v(akt2))}  tripdv={tdv} tripdt={tdt}
+XVconst L1 L2 L3 L1const L2const L3const Vconst_min_max VN={VN} uhi={uhi} ulo={ulo}
+.ENDS
+*$
+
+**************************************************
+* the voltage of the output pins are hold fixed
+* You can use this model in conjunction with
+* impedances or loads to hold the power fixed
+**************************************************
+
+.SUBCKT Vconst_min_max in1 in2 in3 out1 out2 out3
++ PARAMS: VN=120000 uhi=1.2 ulo=0.8
+Xm in1 in2 in3 vrms bus_Veff_1
+X1r in1 0 out1 0 vrms N1N2_x params:VN={VN} uhi={uhi} ulo={ulo}
+X1s in2 0 out2 0 vrms N1N2_x params:VN={VN} uhi={uhi} ulo={ulo}
+X1t in3 0 out3 0 vrms N1N2_x params:VN={VN} uhi={uhi} ulo={ulo}
+Rgnd1 out1 0 1e10
+Rgnd2 out2 0 1e10
+Rgnd3 out3 0 1e10
+.ENDS
+*$
+
+
+.SUBCKT Vexp in1 in2 in3 out1 out2 out3 N
++ PARAMS: TD=0 Texp=100m
+Ein1 out1 N VALUE={IF(time>TD,v(in1,N)*(1-exp(-abs(time-TD)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Ein2 out2 N VALUE={IF(time>TD,v(in2,N)*(1-exp(-abs(time-TD)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Ein3 out3 N VALUE={IF(time>TD,v(in3,N)*(1-exp(-abs(time-TD)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+RN N 0 1e12
+Rgnd1 out1 0 1e10
+Rgnd2 out2 0 1e10
+Rgnd3 out3 0 1e10
+.ENDS
+*$
+
+
+
+.SUBCKT Vpwl in1 in2 in3 out1 out2 out3 N
++ PARAMS: TD=0 Tpwl=100m
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Epwl  pwl  N VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)}
+Ein1 out1 N VALUE={IF(time>TD,v(in1,N)*v(pwl),0)} tripdv={tdv} tripdt={tdt}
+Ein2 out2 N VALUE={IF(time>TD,v(in2,N)*v(pwl),0)} tripdv={tdv} tripdt={tdt}
+Ein3 out3 N VALUE={IF(time>TD,v(in3,N)*v(pwl),0)} tripdv={tdv} tripdt={tdt}
+RN N 0 1e12
+Rgnd1 out1 0 1e10
+Rgnd2 out2 0 1e10
+Rgnd3 out3 0 1e10
+.ENDS
+*$
+
+***************************************************************************
+* The voltage in the bus itself (out=in) is hold fixed by variable Q input
+***************************************************************************
+
+* controlled with ctrl_pin and with soft swingin
+.SUBCKT L_ctrl_exp_02  L1_1 L1_2 ctrl
++	PARAMS:
++	L=0.5	;
++   fn={fn1}
++   xl=0
++ length=1
++ TD=0
++ texp=25m
++ g=1e12
++ r_x=0.001
+.PARAM
++   L1=IF(xl>0,xl/fn/2/pi,L)
++   omega={2*fn*pi}
+Rctrl ctrl 0 1e12
+Ein in1a in1b VALUE={IF(time>TD,v(L1_1,L1_2x)*(1-exp(-abs(time-TD)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Gout L1_1 L1_2x VALUE={v(idt1)/(L1*length*v(ctrl))} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(in1a,in1b)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GR1 L1_2x L1_2 VALUE={v(L1_2x,L1_2)/(r_x*omega*L1*length)} tripdv={tdv} tripdt={tdt}
+Rx L1_2x 0 1e12 
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+.SUBCKT Qvar_min_max out1 out2 out3
+* Max should be 2-MIN
++ PARAMS: Kp=0.000001 Tn=0.01 Min=0.1 Max=1.9 init=1 QN=100e6 vconst=120000 Rv=5 tenable=100ms fn={fn1} TD=0 texp=50m
+.param X={vconst*vconst/1.73205/QN}
+*
+Xm out1 out2 out3 vrms bus_Veff_1
+* Phase 1
+XU8 0 out1x y2 L_ctrl_exp_02 length=1 L=0 XL={X} fN={fN} TD={TD} texp={texp}
+Rout1 out1x out1 {Rv}
+XU9 0 out1y y2 C_ctrl_exp_02 length=1 C=0 XC={X} fN={fN} TD={TD} texp={texp}
+R1out1 out1y out1 {Rv}
+*
+* Phase 2
+XU10 0 out2x y2 L_ctrl_exp_02 length=1 L=0 XL={X} fN={fN} TD={TD} texp={texp}
+Rout2 out2x out2 {Rv}
+XU11 0 out2y y2 C_ctrl_exp_02 length=1 C=0 XC={X} fN={fN} TD={TD} texp={texp}
+R1out2 out2y out2 {Rv}
+*
+* Phase 3
+XU12 0 out3x y2 L_ctrl_exp_02 length=1 L=0 XL={X} fN={fN} TD={TD} texp={texp}
+Rout3 out3x out3 {Rv}
+XU13 0 out3y y2 C_ctrl_exp_02 length=1 C=0 XC={X} fN={fN} TD={TD} texp={texp}
+R1out3 out3y out3 {Rv}
+*
+Ven ten 0 pwl 0s 0v {tenable} 0v {tenable+100m} 1v
+Gconst  0 vconst VALUE={vconst} rpar=1 tripdv={tdv} tripdt={tripdt}
+Genable 0 enable VALUE={v(ten)} rpar=1 tripdv={tdv} tripdt={tripdt}
+*
+XPi2 vrms vconst y enable PI2 params: Kp={Kp} Tn={Tn} Min={Min} Max={Max} init=1
+*
+Btab y2 0 v=table(v(y),{MIN},{MIN},1.0,1.0,{MAX},{1/MIN})
+.ENDS
+*$
+
+
+* Proportional/integral controller
+.SUBCKT PI2 x w y enable
++PARAMS: Kp=1 Tn=1 Min=-15G Max=15G ic=0 init=0
+renable enable 0 1e12
+R_R2        0 y  1k
+E_y	        y 0 VALUE={init*(1-v(enable))+v(enable)*LIMIT(V(w,x)*Kp+V(int)+init,Min,Max)} tripdv={tdv} tripdt={tdt}
+Gint       	0 int VALUE={v(enable)*V(w,x)*Kp * 1/Tn} tripdv={tdv} tripdt={tdt}
+Cint       	int 0 1 IC={IC}
+Rint       	int 0 1G
+.ENDS    PIx_Reg
+*$
+
+
+.SUBCKT N1N2_x in1 e1 out1 e2 vrms
++params: N1=1 N2=1 VN=380000 uhi=1.2 ulo=0.8
+Bue ue 0 v=limit(v(vrms)/VN,ulo,uhi)  tripdv={tdv} tripdt={tdt}
+B1 e2 out1 I=I(V1r)*v(ue) tripdv={tdv} tripdt={tdt}
+B2 in1x e1 V=v(out1,e2)*v(ue) tripdv={tdv} tripdt={tdt}
+V1r in1 in1x 0 Rser=1u
+.ENDS
+
+*$

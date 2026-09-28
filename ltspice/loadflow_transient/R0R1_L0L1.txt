@@ -1,0 +1,13 @@
+* !!!! Important: All this models are for symmetric and assymetric faults
+* where there is a zero-system present
+* All model parameters are the same for line.lib as for line2.lib
+* But L0 and R0 the zero-system impedances are only guessed
+* For cables:
+* R0R1=2 L0L1=1.1
+* For overhead lines
+* 10,20KV R0R1=3 L0L1=4
+* 110kv R0R1=2.5 L0L1=3.5
+* 220KV R0R1=2.5 L0L1=3
+* 400KV R0R1=2.25 L0L1=2.5
+* 750KV R0R1=2.0 L0L1=2.25
+* 1150KV R0R1=1.75 L0L1=2.0

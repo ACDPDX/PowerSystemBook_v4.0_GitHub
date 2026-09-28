@@ -1,0 +1,306 @@
+********************************************
+* Petersen generic
+********************************************
+
+
+.SUBCKT   Pet  N
++	PARAMS:
++   VN=110k;
++   fn={fn1}
++   IN=250
++   r_x=0.01
+.PARAM
++   omega={2*pi*fn}
++   ZN={VN/sqrt(3)/IN}
++	  L ={ZN/omega}
++   R= {r_x*ZN}
+LPet N 0 {L} rser={R}
+.ENDS
+
+
+********************************************
+* Petersen 110kV
+********************************************
+
+.SUBCKT   Pet_250A  N
++	PARAMS:
++   VN=110k;
++   fn={fn1}
++   IN=250
++   r_x=0.01
+.PARAM
++   omega={2*pi*fn}
++   ZN={VN/sqrt(3)/IN}
++	  L ={ZN/omega}
++   R= {r_x*ZN}
+LPet N 0 {L} rser={R}
+.ENDS
+
+.SUBCKT   Pet_250A_110kV  N
++	PARAMS:
++   VN=110k;
++   fn={fn1}
++   IN=250
++   r_x=0.01
+.PARAM
++   omega={2*pi*fn}
++   ZN={VN/sqrt(3)/IN}
++	  L ={ZN/omega}
++   R= {r_x*ZN}
+LPet N 0 {L} rser={R}
+.ENDS
+
+.SUBCKT   Pet_400A_110kV  N
++	PARAMS:
++   VN=110k;
++   fn={fn1}
++   IN=400
++   r_x=0.01
+.PARAM
++   omega={2*pi*fn}
++   ZN={VN/sqrt(3)/IN}
++	  L ={ZN/omega}
++   R= {r_x*ZN}
+LPet N 0 {L} rser={R}
+.ENDS
+
+.SUBCKT   Pet_600A_110kV  N
++	PARAMS:
++   VN=110k;
++   fn={fn1}
++   IN=600
++   r_x=0.01
+.PARAM
++   omega={2*pi*fn}
++   ZN={VN/sqrt(3)/IN}
++	  L ={ZN/omega}
++   R= {r_x*ZN}
+LPet N 0 {L} rser={R}
+.ENDS
+
+.SUBCKT   Pet_125A_110kV  N
++	PARAMS:
++   VN=110k;
++   fn={fn1}
++   IN=125
++   r_x=0.01
+.PARAM
++   omega={2*pi*fn}
++   ZN={VN/sqrt(3)/IN}
++	  L ={ZN/omega}
++   R= {r_x*ZN}
+LPet N 0 {L} rser={R}
+.ENDS
+
+.SUBCKT   Pet_50A_110kV  N
++	PARAMS:
++   VN=110k;
++   fn={fn1}
++   IN=125
++   r_x=0.01
+.PARAM
++   omega={2*pi*fn}
++   ZN={VN/sqrt(3)/IN}
++	  L ={ZN/omega}
++   R= {r_x*ZN}
+LPet N 0 {L} rser={R}
+.ENDS
+
+********************************************
+* Petersen 10kV
+********************************************
+
+.SUBCKT   Pet_50A_10kV  N
++	PARAMS:
++   VN=10k;
++   fn={fn1}
++   IN=50
++   r_x=0.01
+.PARAM
++   omega={2*pi*fn}
++   ZN={VN/sqrt(3)/IN}
++	  L ={ZN/omega}
++   R= {r_x*ZN}
+LPet N 0 {L} rser={R}
+.ENDS
+
+.SUBCKT   Pet_100A_10kV  N
++	PARAMS:
++   VN=10k;
++   fn={fn1}
++   IN=100
++   r_x=0.01
+.PARAM
++   omega={2*pi*fn}
++   ZN={VN/sqrt(3)/IN}
++	  L ={ZN/omega}
++   R= {r_x*ZN}
+LPet N 0 {L} rser={R}
+.ENDS
+
+.SUBCKT   Pet_250A_10kV  N
++	PARAMS:
++   VN=10k;
++   fn={fn1}
++   IN=250
++   r_x=0.01
+.PARAM
++   omega={2*pi*fn}
++   ZN={VN/sqrt(3)/IN}
++	  L ={ZN/omega}
++   R= {r_x*ZN}
+LPet N 0 {L} rser={R}
+.ENDS
+
+.SUBCKT   Pet_400A_10kV  N
++	PARAMS:
++   VN=10k;
++   fn={fn1}
++   IN=400
++   r_x=0.01
+.PARAM
++   omega={2*pi*fn}
++   ZN={VN/sqrt(3)/IN}
++	  L ={ZN/omega}
++   R= {r_x*ZN}
+LPet N 0 {L} rser={R}
+.ENDS
+
+********************************************
+* Petersen 20kV
+********************************************
+
+.SUBCKT   Pet_50A_20kV  N
++	PARAMS:
++   VN=20k;
++   fn={fn1}
++   IN=50
++   r_x=0.01
+.PARAM
++   omega={2*pi*fn}
++   ZN={VN/sqrt(3)/IN}
++	  L ={ZN/omega}
++   R= {r_x*ZN}
+LPet N 0 {L} rser={R}
+.ENDS
+
+.SUBCKT   Pet_100A_20kV  N
++	PARAMS:
++   VN=20k;
++   fn={fn1}
++   IN=100
++   r_x=0.01
+.PARAM
++   omega={2*pi*fn}
++   ZN={VN/sqrt(3)/IN}
++	  L ={ZN/omega}
++   R= {r_x*ZN}
+LPet N 0 {L} rser={R}
+.ENDS
+
+.SUBCKT   Pet_250A_20kV  N
++	PARAMS:
++   VN=20k;
++   fn={fn1}
++   IN=250
++   r_x=0.01
+.PARAM
++   omega={2*pi*fn}
++   ZN={VN/sqrt(3)/IN}
++	  L ={ZN/omega}
++   R= {r_x*ZN}
+LPet N 0 {L} rser={R}
+.ENDS
+
+.SUBCKT   Pet_400A_20kV  N
++	PARAMS:
++   VN=20k;
++   fn={fn1}
++   IN=400
++   r_x=0.01
+.PARAM
++   omega={2*pi*fn}
++   ZN={VN/sqrt(3)/IN}
++	  L ={ZN/omega}
++   R= {r_x*ZN}
+LPet N 0 {L} rser={R}
+.ENDS
+
+
+
+
+
+
+****************
+*  Pet with controlling pin
+****************
+
+* 110kV
+
+* Value at the ctrl pin is in A !!
+* IN determines the value of R = Z/100
+* IN should be only positiv and not zero
+
+
+.SUBCKT   Pet_var_110kV  N  ctrl
++	PARAMS:
++   VN=110k;
++   fn={fn1}
++   IN=250
++  r_x=0.01
+.PARAM
++   ZN={VN/sqrt(3)/IN}
++   R ={ZN*r_x}
+Rctrl ctrl 0 1e12
+VPet N y 0
+RPet y x {R}
+L1 x 0 Flux=v(L)*x
+EL   L 0 VALUE={v(ZN)/(2*pi*fn)} tripdv={tdv} tripdt={tdt}
+EZN ZN 0 VALUE={VN/sqrt(3)/(v(ctrl)+1e-8)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* 10kV
+
+* Value at the ctrl pin is in A !!
+* IN determines the value of R = Z/100
+* IN should be only positiv and not zero
+.SUBCKT  Pet_var_10kV N ctrl
++	PARAMS:
++   VN=10k;
++   fn={fn1}
++   IN=250
++   r_x=0.01
+.PARAM
++   ZN={VN/sqrt(3)/IN}
++   R ={ZN*r_x}
+Rctrl ctrl 0 1e12
+VPet N y 0
+RPet y x {R}
+L1 x 0 Flux=v(L)*x
+EL   L 0 VALUE={v(ZN)/(2*pi*fn)} tripdv={tdv} tripdt={tdt}
+EZN ZN 0 VALUE={VN/sqrt(3)/(v(ctrl)+1e-8)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* 20kV
+
+* Value at the ctrl pin is in A !!
+* IN determines the value of R = Z/100
+* IN should be only positiv and not zero
+.SUBCKT  Pet_var_20kV N ctrl
++	PARAMS:
++   VN=20k;
++   fn={fn1}
++   IN=250
++   r_x=0.01
+.PARAM
++   ZN={VN/sqrt(3)/IN}
++   R ={ZN*r_x}
+Rctrl ctrl 0 1e12
+VPet N y 0
+RPet y x {R}
+L1 x 0 Flux=v(L)*x
+EL   L 0 VALUE={v(ZN)/(2*pi*fn)} tripdv={tdv} tripdt={tdt}
+EZN ZN 0 VALUE={VN/sqrt(3)/(v(ctrl)+1e-8)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+

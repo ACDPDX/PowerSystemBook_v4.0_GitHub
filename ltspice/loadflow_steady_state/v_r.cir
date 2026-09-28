@@ -1,0 +1,37 @@
+Example of a simple V-R-circuit in LTSPICE-syntax; This line is always the first line and names the 
+* the circuit
+* all following lines need a asterisk as first sign in order to be recognized as a comment
+* inlinecomments are with  " ;" in front 
+
+
+* First sign of a subcircuitcall always is a x od. X
+* Call to the subcircuit "vri_slack"
+Xv   v1r  v1i  vri_slack  params: vr=100 vi=0  ; subckt Aufruf with parameters
+* v1r = inputnode real      v1i = inputnode imag   
+* Call to the subcircuit "z_r"  
+Xzr  v1r  v1i  v2r  v2i  z_r params: r=20  ; subckt Aufruf with parameters
+* v1r = inputnode real      v1i = inputnode imag     v2r = outputnode real     v2i = ouputnode imag 
+
+.subckt  vri_slack v1r   v1i  params: vr=100 vi=0
+* First sign of a voltagesource always is a V od. v
+V1r  v1r    0    {vr}  ; real part of voltage  v1r = outputnode+      0 = outputnode-  = Ground
+V1i  v1i    0     {vi}  ; imag part of voltage  v1i = outputnode+     0 = outoputnode-  = Ground
+.ends
+
+.subckt z_r v1r  v1i  v2r  v2i  params: r=10  ; subckt-Definition with parameters
+*G-Device voltagecontrolled currentsource I = f (V)  
+g1r    v1r  0   value =  {1/r*v(v1r) }     ; voltagecontrolled currentsource ( eqn 1 ) 
+* i1r = 1/r * v1r
+g1i    v1i   0   value =  {1/r*v(v1i) }     ; voltagecontrolled currentsource ( eqn 2 )
+* i1i = 1/r * v1i
+.ends ; end of the subcircuits
+
+.op  ;  ( operating point analysis )
+
+* convergence parameters for the simulator 
+.options reltol = 0.001  
+* relative errortolerance for current and voltage between two subsequent iterations
+.options abstol = 0.001 ; absolute. current errortolerance in A
+.options vntol = 0.001 ; absolute voltage errortolerance in V 
+
+.end ; End of circuit

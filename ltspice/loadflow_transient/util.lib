@@ -1,0 +1,331 @@
+* Util.lib
+* Transformer model conversion utility
+*
+* model2model_tr_ss   transient to steady state
+* model2model_ss_tr   steady state to transient
+* trafo_tap_l         transformer voltage regulation unit (switched to the primary side of the transformer)
+* trafo_tap_s         transformer phase regulation unit (switched to the primary side of the transformer)
+* N1N2                simple N1:N2 transformer (without lost)
+
+.subckt model2model_tr_ss ykros ykios y0ros y0ios inos inus xkos rkos rfeos xhos i0 ife imue vfe vcu ukn
++ params: SN=300e6 U1Nenn=400k U20=120k ur=0.002 ux=0.2 i0=0.002 p0=0.0006
+.param inos={SN/U1Nenn/sqrt(3)}    ; nominal current on primary side
+.param inus={inos*U1Nenn/U20}      ; nominal current on secondary side
+.param z1n={U1Nenn/sqrt(3)/inos}           ; nominal impedance
+.param rkos={z1n*ur}             ; ohmic part of short circuit impedance -> cooper lost
+.param xkos={z1n*ux}            ; inductive part of short circuit impedance
+.param rfeos={U1Nenn*U1Nenn/(p0*SN)}  ; lost due to iron modelled as resistance
+.param xhos={U1Nenn*U1Nenn/(SN*sqrt(i0*i0-p0*p0))}  ; magnetic field inductance
+.param vfe={p0*SN}   ; iron_lost
+.param vcu={ur*SN}   ; copper lost
+.param imue={(U1Nenn/sqrt(3))/xhos}     ; current to magnetize iron
+.param ife={(U1Nenn/sqrt(3))/rfeos}     ; current due to iron lost
+.param i0abs={sqrt(imue*imue+ife*ife)}  ; open circuit current = ife + imue
+.param ukn={sqrt(ur*ur+ux*ux)}           ;relative short circuit voltage (ohmic and inductive)
+.param ykr={rkos/(rkos*rkos+xkos*xkos)}
+.param yki={-xkos/(rkos*rkos+xkos*xkos)}
+.param y0r={1/rfeos}
+.param y0i={-1/xhos}
+vinos  inos   0  dc {inos}
+vinus  inus   0  dc {inus}
+vrkos  rkos   0  dc {rkos}
+vxkos  xkos   0  dc {xkos}
+vrfeos rfeos  0  dc {rfeos}
+vxhos  xhos   0  dc {xhos}
+vimue  imue   0  dc {imue}
+vife   ife    0  dc {ife}
+vi0    i0     0  dc {i0abs}
+vkros  ykros  0  dc {ykr}
+vkios  ykios  0  dc {yki}
+v0ros  y0ros  0  dc {y0r}
+v0ios  y0ios  0  dc {y0i}
+vvfe   vfe    0  dc {vfe}
+vvcu   vcu    0  dc {vcu}
+vukn   ukn    0  dc {ukn}
+.ends
+
+.subckt model2model_ss_tr ur_p ux_p i0_p p0_p inos inus xkos rkos rfeos xhos i0 ife imue vfe vcu ukn
++ params: SN=300e6 U1N=400k U20=120k ykr=1.0e-4 yki=-1.2e-2 y0r=1.0e-6 y0i=1.0e-6
+.param inos={SN/U1N/sqrt(3)}  ; nominal current on primary side
+.param inus={inos*U1N/U20}    ; nominal current on secondary side
+.param z1n={U1N/inos}         ; nominal impedance
+.param rkos={ykr/(ykr*ykr+yki*yki)}  ; ohmic part of short circuit impedance -> cooper lost
+.param xkos={-yki/(ykr*ykr+yki*yki)} ; inductive part of short circuit impedance
+.param rfeos={1/y0r}    ; lost due to iron modelled as resistance
+.param xhos={-1/y0i}     ; magnetic field inductance
+.param imue={(U1N/sqrt(3))/xhos}     ; current to magnetize iron
+.param ife={(U1N/sqrt(3))/rfeos}     ; current due to iron lost
+.param i0={sqrt(imue*imue+ife*ife)}  ; open circuit current = ife + imue
+.param ur_p={rkos*SN/(U1N*U1N)} ; ur% relative ohmic short circuit voltage
+.param ux_p={xkos*SN/(U1N*U1N)} ; ux% relative inductive short circuit voltage
+.param i0_p={i0/inos}  ; i0% relative open circuit current
+.param vfe={U1N*U1N/rfeos} ; iron_lost
+.param p0_p={vfe/SN}   ; p0% relative iron loast
+.param vcu={ur_p*SN}   ; copper lost
+.param ukn={sqrt(ur_p*ur_p+ux_p*ux_p)} ;relative short circuit voltage (ohmic and inductive)
+vinos  inos   0  dc {inos}
+vinus  inus   0  dc {inus}
+vrkos  rkos   0  dc {rkos}
+vxkos  xkos   0  dc {xkos}
+vrfeos rfeos  0  dc {rfeos}
+vxhos  xhos   0  dc {xhos}
+vimue  imue   0  dc {imue}
+vife   ife    0  dc {ife}
+vi0    i0     0  dc {i0}
+vur_p  ur_p   0  dc {ur_p}
+vux_p  ux_p   0  dc {ux_p}
+vi0_p  i0_p   0  dc {i0_p}
+vp0_p  p0_p   0  dc {p0_p}
+vvfe   vfe    0  dc {vfe}
+vvcu   vcu    0  dc {vcu}
+vukn   ukn    0  dc {ukn}
+.ends
+
+
+* another ideal transformer 1 phase
+* I2=I1*ue V1=V2*ue 
+* there is no coupling factor in this element
+* coupling factor is implemented in N1N2 with four g-sources
+.subckt N1N2_2 in1 in2 out1 out2
++params: N1=1 N2=1
+.param ue={N1/N2} ; N={1/ue}
+B1 out2 out1 I=I(V1r)*ue tripdv={tdv} tripdt={tdt}
+B2 in1x in2 V=v(out1,out2)*ue tripdv={tdv} tripdt={tdt}
+V1r in1 in1x 0 Rser=1u
+Rin1 in1 0 1e12
+Rin2 in2 0 1e12
+Rout1 out1 0 1e12
+Rout2 out2 0 1e12
+.ends
+
+
+
+* ideal transformer 1 phase with coupling factor k
+.subckt N1N2 in1 in2 out1 out2
++params: N1=1 N2=1 k=1
+.param ue={N1/N2}
+G1 0 M in1 in2 1
+G2 0 M out1 out2 {-1/k*ue}
+G3 in1 in2 M 0 1
+G4 out1 out2 M 0 {-1/k*ue}
+R2 M 0 1e12
+Rin1 in1 0 1e12
+Rin2 in2 0 1e12
+Rout1 out1 0 1e12
+Rout2 out2 0 1e12
+.ends
+
+* ideeal transformer 1 phase with voltage regulation via l-ctrl pin
+.subckt N1N2_ctrl in1 in2 out1 out2 l
++params: proz=1 k=1 N1=1 N2=1
+.param ue={N1/N2}
+G1 0 M in1 in2 1
+G2 0 M VALUE={-1/k*(v(out1)-v(out2))*(ue+ue*(v(l)*proz/100))} tripdv={tdv} tripdt={tdt}
+G3 in1 in2 M 0 1
+G4 out1 out2 VALUE={-1/k*(v(m))*(ue+ue*(v(l)*proz/100))} tripdv={tdv} tripdt={tdt}
+Rl l 0 1e12
+R2 M 0 1e12
+Rin1 in1 0 1e12
+Rin2 in2 0 1e12
+Rout1 out1 0 1e12
+Rout2 out2 0 1e12
+.ends
+
+* ideal transformer 1:1
+* for trafo_tap_l model
+* L in units ..,-2,-1,0,1,2,...
+.subckt N1N2_ctrl_l in1 in2 out1 out2 l
++params: proz=1 k=1
+G1 0 M in1 in2 1
+G2 0 M VALUE={-1/k*(v(out1)-v(out2))*(1+(v(l)*proz/100))} tripdv={tdv} tripdt={tdt}
+G3 in1 in2 M 0 1
+G4 out1 out2 VALUE={-1/k*(v(m))*(1+(v(l)*proz/100))} tripdv={tdv} tripdt={tdt}
+Rl l 0 1e12
+R2 M 0 1e12
+Rin1 in1 0 1e12
+Rin2 in2 0 1e12
+Rout1 out1 0 1e12
+Rout2 out2 0 1e12
+.ends
+
+* ideal transformer 1:1
+* for trafo_tap_s_model
+* S in units ..,-2,-1,0,1,2,...
+.subckt N1N2_ctrl_s in1 in2 out1 out2 s
++params: proz=1 k=1 N1=1 N2=1
+.param ue={N1/N2}
+G1 0 M in1 in2 1
+G2 0 M VALUE={-1/k*(v(out1)-v(out2))*((0+v(s)*proz/100))} tripdv={tdv} tripdt={tdt}
+G3 in1 in2 M 0 1
+G4 out1 out2 VALUE={-1/k*(v(m))*(0+(v(s)*proz/100))} tripdv={tdv} tripdt={tdt}
+Rs s 0 1e12
+R2 M 0 1e12
+Rin1 in1 0 1e12
+Rin2 in2 0 1e12
+Rout1 out1 0 1e12
+Rout2 out2 0 1e12
+.ends
+
+* ideal transformer 1:1
+* for trafo_tap_q_model
+* q in units ..,-2,-1,0,1,2,...
+.subckt N1N2_ctrl_q in1 in2 out1 out2 q
++params: proz=1 k=1 factor={0.5/0.866}
+G1 0 M in1 in2 1
+G2 0 M VALUE={-1/k*(v(out1)-v(out2))*(0+factor*(v(q)*proz/100))} tripdv={tdv} tripdt={tdt}
+G3 in1 in2 M 0 1
+G4 out1 out2 VALUE={-1/k*(v(m))*(0+factor*(v(q)*proz/100))} tripdv={tdv} tripdt={tdt}
+Rq q 0 1e12
+R2 M 0 1e12
+Rin1 in1 0 1e12
+Rin2 in2 0 1e12
+Rout1 out1 0 1e12
+Rout2 out2 0 1e12
+.ends
+
+* another ideal transformer
+.subckt L1L2k in1 in2 out1 out2
++params: L1=1 L2=1 k=1
+L1 in1 in2 {L1}
+L2 out1 out2 {L2}
+K12 L1 L2 {k}
+.ends
+
+* another ideal transformer with three windings
+.subckt N1N2N3 in1 in2 out1 out2 out3 out4
++params: N1=1 N2=1 N3=1 k=1
+X1 in1 in2 out1 out2 N1N2 params: N1={N1} N2={N2} k={k}
+X2 in1 in2 out3 out4 N1N2 params: N1={N1} N2={N3} k={k}
+.ends
+
+
+
+* L = -13,-12,..0,1,2,..12,13
+* (can operate with l=x parameter or via controlling node)
+* if via controlling node l should be zero
+* if via l=x parameter l-pin should be not connected
+
+.subckt trafo_tap_l in1 in2 in3 out1 out2 out3 l e1 e2
++params: l_=0 stproz=1 rgnd=1e12
+.param x={l_*stproz/100} N1={1+x} N2=1 k=1
+XU1 in1 e1 out1 e2 N1N2 params: N1={N1} N2=1 k={k}
+XU2 in2 e1 out2 e2 N1N2 params: N1={N1} N2=1 k={k}
+XU3 in3 e1 out3 e2 N1N2 params: N1={N1} N2=1 k={k}
+Rl l 0 {rgnd}
+Re1 e1 0 {rgnd}
+Re2 e2 0 {rgnd}
+.ends
+
+* S = -13,-12,..0,1,2,..12,13
+* (can operate with s=x parameter or via controlling node)
+* if via controlling node s should be zero
+* if via s=x parameter l-pin should be not connected
+
+.subckt trafo_tap_s in1 in2 in3 out1 out2 out3 s e1 e2
++params: s_=0 stproz=1 rgnd=1e12
+.param x={s_*stproz/100} N1={1e-6+x} N2=1 k=1
+XU1 rs e1 out1 e2 N1N2 N1=1 N2=1
+XU2 st e1 out2 e2 N1N2 N1=1 N2=1
+XU3 tr e1 out3 e2 N1N2 N1=1 N2=1
+XU4 in3 tr out1 e2 N1N2 N1={N1} N2=1 k={k}
+XU5 in1 rs out2 e2 N1N2 N1={N1} N2=1 k={k}
+XU6 in2 st out3 e2 N1N2 N1={N1} N2=1 k={k}
+Rs s 0 {rgnd}
+Re1 e1 0 {rgnd}
+Re2 e2 0 {rgnd}
+.ends
+
+* same model as below -> trafo_tap_q
+.subckt trafo_tap_q1 in1 in2 in3 out1 out2 out3 q e1 e2
++params: q_=0 stproz=1 rgnd=1e12
+.param x={q_*0.5/0.866025404*stproz/100} N1={1e-6+x} N2=1 k=1
+XU1 in1 rs out1 e2 N1N2 N1=1 N2=1
+XU2 in2 st out2 e2 N1N2 N1=1 N2=1
+XU3 in3 tr out3 e2 N1N2 N1=1 N2=1
+XU4 tr rs_neg out1 e2 N1N2 N1={N1} N2=1 k={1/k}
+XU5 rs st_neg out2 e2 N1N2 N1={N1} N2=1 k={1/k}
+XU6 st tr_neg out3 e2 N1N2 N1={N1} N2=1 k={1/k}
+XU7 e1 tr_neg out1 e2 N1N2 N1={N1} N2=1 k={1/k}
+XU8 e1 rs_neg out2 e2 N1N2 N1={N1} N2=1 k={1/k}
+XU9 e1 st_neg out3 e2 N1N2 N1={N1} N2=1 k={1/k}
+*
+Rq q 0 {rgnd}
+Re1 e1 0 {rgnd}
+Re2 e2 0 {rgnd}
+.ends
+
+.subckt trafo_tap_q in1 in2 in3 out1 out2 out3 q e1 e2
++params: q_=0 stproz=1 rgnd=1e12
+.param x={q_*0.5/0.866025404*stproz/100} N1={1e-6+x} N2=1 k=1
+X§U21 rs e1 out1 e2 N1N2 N1=1 N2=1 ;§pnba in1)in2)out1)out2
+X§U22 st e1 out2 e2 N1N2 N1=1 N2=1 ;§pnba in1)in2)out1)out2
+X§U23 tr e1 out3 e2 N1N2 N1=1 N2=1 ;§pnba in1)in2)out1)out2
+X§U24 rs_neg tr out1 e2 N1N2 N1={N1} N2=1 k={1/k} ;§pnba in1)in2)out1)out2
+X§U25 st_neg rs out2 e2 N1N2 N1={N1} N2=1 k={1/k} ;§pnba in1)in2)out1)out2
+X§U26 tr_neg st out3 e2 N1N2 N1={N1} N2=1 k={1/k} ;§pnba in1)in2)out1)out2
+X§U31 tr_neg in2 out1 e2 N1N2 N1={N1} N2=1 k={1/k} ;§pnba in1)in2)out1)out2
+X§U32 rs_neg in3 out2 e2 N1N2 N1={N1} N2=1 k={1/k} ;§pnba in1)in2)out1)out2
+X§U33 st_neg in1 out3 e2 N1N2 N1={N1} N2=1 k={1/k} ;§pnba in1)in2)out1)out2
+*
+Rq q 0 {rgnd}
+Re1 e1 0 {rgnd}
+Re2 e2 0 {rgnd}
+.ends
+
+* L = -13,-12,..0,1,2,..12,13
+.subckt trafo_tap_l_ctrl in1 in2 in3 out1 out2 out3 l e1 e2
++params: stproz=1.0 rgnd=1e12
+.param k=1
+XU1 in1 e1 out1 e2 l N1N2_ctrl_l params: k={k} proz={stproz}
+XU2 in2 e1 out2 e2 l N1N2_ctrl_l params: k={k} proz={stproz}
+XU3 in3 e1 out3 e2 l N1N2_ctrl_l params: k={k} proz={stproz}
+Rl l 0 {rgnd}
+Re1 e1 0 {rgnd}
+Re2 e2 0 {rgnd}
+.ends
+
+
+* S = -13,-12,..0,1,2,..12,13
+.subckt trafo_tap_s_ctrl in1 in2 in3 out1 out2 out3 s e1 e2
++params: stproz=1 rgnd=1e12
+.param k=1
+XU1 rs e1 out1 e2 N1N2 N1=1 N2=1
+XU2 st e1 out2 e2 N1N2 N1=1 N2=1
+XU3 tr e1 out3 e2 N1N2 N1=1 N2=1
+XU4 in3 tr out1 e2 s N1N2_ctrl_s params: k={k} proz={stproz}
+XU5 in1 rs out2 e2 s N1N2_ctrl_s params: k={k} proz={stproz}
+XU6 in2 st out3 e2 s N1N2_ctrl_s params: k={k} proz={stproz}
+Rs s 0 {rgnd}
+Re1 e1 0 {rgnd}
+Re2 e2 0 {rgnd}
+.ends
+
+
+
+.subckt trafo_tap_q_ctrl in1 in2 in3 out1 out2 out3 q e1 e2
++params: stproz=1 rgnd=1e12
+.param k=1 factor={0.5/0.866025404}
+XU1 in1 rs out1 e2 N1N2 N1=1 N2=1
+XU2 in2 st out2 e2 N1N2 N1=1 N2=1
+XU3 in3 tr out3 e2 N1N2 N1=1 N2=1
+XU4 tr rs_neg out1 e2 q N1N2_ctrl_q params: k={k} proz={stproz} factor={factor}
+XU5 rs st_neg out2 e2 q N1N2_ctrl_q params: k={k} proz={stproz} factor={factor}
+XU6 st tr_neg out3 e2 q N1N2_ctrl_q params: k={k} proz={stproz} factor={factor}
+XU7 e1 tr_neg out1 e2 q N1N2_ctrl_q params: k={k} proz={stproz} factor={factor}
+XU8 e1 rs_neg out2 e2 q N1N2_ctrl_q params: k={k} proz={stproz} factor={factor}
+XU9 e1 st_neg out3 e2 q N1N2_ctrl_q params: k={k} proz={stproz} factor={factor}
+*
+Rq q 0 {rgnd}
+Re1 e1 0 {rgnd}
+Re2 e2 0 {rgnd}
+.ends
+
+* input = phi
+* to get phi integrate voltage (idt.asy)
+.subckt inrush in out params:imuen=1 phin=1 m=9 a=0.75 N=1000
+Eout out 0 value={imuen*(a*v(in)/N/phin+(1-a)*(v(in)/N/phin)**m)} tripdv=1 tripdt=1
+.ends 
+
+
+
+

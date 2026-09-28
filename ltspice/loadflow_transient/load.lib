@@ -1,0 +1,3774 @@
+***************************************************************
+* three phase symmetric/asymmetric wye and delta loads
+* pf=3 means you can input a symmetric 3 phase load (sum of three phases) as the 1 phase load
+* therefore you have not to divide the phase load by hand
+* if Q,QN1=positive -> inductive load
+* if Q,QN1=negative -> capacitive load
+* if you want both types at the same bus use two different load models
+* The I=const and S/P=const models works between 0.8*VN and 1.2*VN below and above as Impedance=const
+* The I/P const models are symmetric impedance models (all three phases have same impedance) all other models can be also asymmetric
+* All devices with ctrl node can be altered(increase/decrease) via a external pwl voltage source
+
+*********************************************
+* New hidden parameters P,Q 
+* can be used if P,Q are symmetric per phase
+* Also for the asymmetric case useful: eg.
+* P=x Q=y PN3=z This means:
+* PN1=x PN2=x PN3=z QN1=QN2=QN3=y 
+*********************************************
+
+
+ * wye load only R
+.SUBCKT   Load_y_R  L1 L2 L3 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   pf=3
++   g=1e10
+.PARAM
++ V={VN/sqrt(3)}
++   PN10=IF(PN1<=0,PQ0,PN1) 
++   PN20=IF(PN2<=0,PQ0,PN2) 
++   PN30=IF(PN3<=0,PQ0,PN3) 
++	R1={V*V/PN10}
++	R2={V*V/PN20}
++	R3={V*V/PN30}   
+RL1 L1 N {R1*pf}
+RL2 L2 N {R2*pf}
+RL3 L3 N {R3*pf}
+RGND N 0 {g}
+.ENDS
+
+* wye load RL with seriell impedances
+.SUBCKT   Load_y_RL  L1 L2 L3 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++   pf=3
++   rser=1u ; add some damping for c,l's
++   g=1e10
+.PARAM
++   omega={2*pi*fn}
++   V={VN/sqrt(3)}
++   PN10=IF(PN1<=0,PQ0,PN1)
++   PN20=IF(PN2<=0,PQ0,PN2)
++   PN30=IF(PN3<=0,PQ0,PN3)
++   QN10=IF(QN1<=0,PQ0,QN1)
++   QN20=IF(QN2<=0,PQ0,QN2)
++   QN30=IF(QN3<=0,PQ0,QN3)
++	R1={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	R2={V*V*PN20/(PN20*PN20+QN20*QN20)}
++	R3={V*V*PN30/(PN30*PN30+QN30*QN30)}
++	L1={(V*V*QN10/(PN10*PN10+QN10*QN10))/omega}
++	L2={(V*V*QN20/(PN20*PN20+QN20*QN20))/omega}
++	L3={(V*V*QN30/(PN30*PN30+QN30*QN30))/omega}
+RL1 L1 L1a {R1*pf}
+RL2 L2 L2a {R2*pf}
+RL3 L3 L3a {R3*pf}
+LL1 L1a N {L1*pf} IC=0 Rser={rser}
+LL2 L2a N {L2*pf} IC=0 Rser={rser}
+LL3 L3a N {L3*pf} IC=0 Rser={rser}
+RGND N 0 {g}
+.ENDS
+
+* wye load RC with seriell impedances
+.SUBCKT   Load_y_RC L1 L2 L3 N
++	PARAMS:
++   VN=400;
++   fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=-1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++   pf=3
++   rser=1u; add some damping for c,l's
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(PN1<=0,PQ0,PN1) 
++   PN20=IF(PN2<=0,PQ0,PN2) 
++   PN30=IF(PN3<=0,PQ0,PN3) 
++   QN10=IF(QN1>=0,PQ0,QN1) 
++   QN20=IF(QN2>=0,PQ0,QN2) 
++   QN30=IF(QN3>=0,PQ0,QN3) 
++ R1={V*V*PN10/(PN10*PN10+QN10*QN10)}
++ R2={V*V*PN20/(PN20*PN20+QN20*QN20)}
++ R3={V*V*PN30/(PN30*PN30+QN30*QN30)}
++ C1={IF(QN1>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
++ C2={IF(QN2>=0,(PN20*PN20+QN20*QN20)/(V*V*QN20*omega),-(PN20*PN20+QN20*QN20)/(V*V*QN20*omega))}
++ C3={IF(QN3>=0,(PN30*PN30+QN30*QN30)/(V*V*QN30*omega),-(PN30*PN30+QN30*QN30)/(V*V*QN30*omega))}
+RL1 L1 L1a {R1*pf}
+RL2 L2 L2a {R2*pf}
+RL3 L3 L3a {R3*pf}
+CL1 L1a N {C1/pf} Rser={rser} Lser=0
+CL2 L2a N {C2/pf} Rser={rser} Lser=0
+CL3 L3a N {C3/pf} Rser={rser} Lser=0
+RGND N 0 {g}
+.ENDS
+
+ * wye load only RL with parallel impedances
+.SUBCKT   Load_y_RL_p  L1 L2 L3 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++   pf=3
++   rser=1u ; add some damping for c,l's
++   g=1e10
+.PARAM
++   omega={2*pi*fn}
++   V={VN/sqrt(3)}
++   PN10=IF(PN1<=0,PQ0,PN1)
++   PN20=IF(PN2<=0,PQ0,PN2)
++   PN30=IF(PN3<=0,PQ0,PN3)
++   QN10=IF(QN1<=0,PQ0,QN1)
++   QN20=IF(QN2<=0,PQ0,QN2)
++   QN30=IF(QN3<=0,PQ0,QN3)
++	R1={V*V/PN10}
++	R2={V*V/PN20}
++	R3={V*V/PN30}
++	L1={(V*V/QN10)/omega}
++	L2={(V*V/QN20)/omega}
++	L3={(V*V/QN30)/omega}
+RL1 L1 N {R1*pf}
+RL2 L2 N {R2*pf}
+RL3 L3 N {R3*pf}
+LL1 L1 N {L1*pf} IC=0 Rser={rser}
+LL2 L2 N {L2*pf} IC=0 Rser={rser}
+LL3 L3 N {L3*pf} IC=0 Rser={rser}
+RGND N 0 {g}
+.ENDS
+
+ * wye load only RL with parallel impedances
+ * with soft swingin
+.SUBCKT   Load_y_RL_p_exp  L1 L2 L3 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++   pf=3
++   r_x=0.1m
++   texp=50m
++   t_start=0.5s
++   IC1=0
++   IC2=0
++   IC3=0
++   g=1e10
+.PARAM
++   omega={2*pi*fn}
++   V={VN/sqrt(3)}
++   PN10=IF(PN1<=0,PQ0,PN1)
++   PN20=IF(PN2<=0,PQ0,PN2)
++   PN30=IF(PN3<=0,PQ0,PN3)
++   QN10=IF(QN1<=0,PQ0,QN1)
++   QN20=IF(QN2<=0,PQ0,QN2)
++   QN30=IF(QN3<=0,PQ0,QN3)
++	R1={V*V/PN10}
++	R2={V*V/PN20}
++	R3={V*V/PN30}
++   X1={(V*V/QN10)}
++   X2={(V*V/QN20)}
++   X3={(V*V/QN30)}
++   rser={X1*pf*r_x}
++	L1={X1/omega}
++	L2={X2/omega}
++	L3={X3/omega}
+*
+* Vexp
+EL1a L1a N VALUE={IF(time>t_Start,v(L1,N)*(1-exp(-abs(time-t_Start)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+EL2a L2a N VALUE={IF(time>t_Start,v(L2,N)*(1-exp(-abs(time-t_Start)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+EL3a L3a N VALUE={IF(time>t_Start,v(L3,N)*(1-exp(-abs(time-t_Start)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+* R
+Gout1 L1 N VALUE={v(L1a,N)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+Gout2 L2 N VALUE={v(L2a,N)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+Gout3 L3 N VALUE={v(L3a,N)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+* L
+Gx 0 idt1 VALUE={v(L1a,N1)/(L1*pf)} tripdv={tdv} tripdt={tdt} 
+Cx idt1 0 1 IC={IC1}
+Rx idt1 0 1e10
+Gy 0 idt2 VALUE={v(L2a,N2)/(L2*pf)} tripdv={tdv} tripdt={tdt} 
+Cy idt2 0 1 IC={IC2}
+Ry idt2 0 1e10
+Gz 0 idt3 VALUE={v(L3a,N3)/(L3*pf)} tripdv={tdv} tripdt={tdt} 
+Cz idt3 0 1 IC={IC3}
+Rz idt3 0 1e10
+Gout4 L1 N1 VALUE={v(idt1)} tripdv={tdv} tripdt={tdt} rpar=1e12
+Gout5 L2 N2 VALUE={v(idt2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+Gout6 L3 N3 VALUE={v(idt3)} tripdv={tdv} tripdt={tdt} rpar=1e12
+* L rser  
+Rout1 N1 N {rser}
+Rout2 N2 N {rser}
+Rout3 N3 N {rser}
+RGND N 0 {g}
+.ENDS
+
+* wye load RC with parallel impedances
+.SUBCKT   Load_y_RC_p L1 L2 L3 N
++	PARAMS:
++   VN=400;
++   fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=-1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++   pf=3
++   rser=1u; add some damping for c,l's
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(PN1<=0,PQ0,PN1) 
++   PN20=IF(PN2<=0,PQ0,PN2) 
++   PN30=IF(PN3<=0,PQ0,PN3) 
++   QN10=IF(QN1>=0,PQ0,QN1) 
++   QN20=IF(QN2>=0,PQ0,QN2) 
++   QN30=IF(QN3>=0,PQ0,QN3) 
++	R1={V*V/PN10}
++	R2={V*V/PN20}
++	R3={V*V/PN30}                            
++	C1={IF(QN1>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
++	C2={IF(QN2>=0,QN20/(V*V*omega),-QN20/(V*V*omega))}
++	C3={IF(QN3>=0,QN30/(V*V*omega),-QN30/(V*V*omega))}
+RL1 L1 N {R1*pf}
+RL2 L2 N {R2*pf}
+RL3 L3 N {R3*pf}
+CL1 L1 N {C1/pf} Rser={rser} Lser=0
+CL2 L2 N {C2/pf} Rser={rser} Lser=0
+CL3 L3 N {C3/pf} Rser={rser} Lser=0
+RGND N 0 {g}
+.ENDS
+
+
+* wye load R with control node
+.SUBCKT   Load_y_R_ctrl  L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   pf=3
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(PN1<=0,PQ0,PN1) 
++   PN20=IF(PN2<=0,PQ0,PN2) 
++   PN30=IF(PN3<=0,PQ0,PN3) 
++	R1={V*V/PN10}
++	R2={V*V/PN20}
++	R3={V*V/PN30}
+Rctrl ctrl 0 1e12   
+GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+* wye load RL with serial impedances and ctrl node
+.SUBCKT   Load_y_RL_ctrl_old  L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++   pf=3
++   rser=1u
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(PN1<=0,PQ0,PN1)
++   PN20=IF(PN2<=0,PQ0,PN2)
++   PN30=IF(PN3<=0,PQ0,PN3)
++   QN10=IF(QN1<=0,PQ0,QN1)
++   QN20=IF(QN2<=0,PQ0,QN2)
++   QN30=IF(QN3<=0,PQ0,QN3)
++	R1={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	R2={V*V*PN20/(PN20*PN20+QN20*QN20)}
++	R3={V*V*PN30/(PN30*PN30+QN30*QN30)}
++	L1={(V*V*QN10/(PN10*PN10+QN10*QN10))/omega}
++	L2={(V*V*QN20/(PN20*PN20+QN20*QN20))/omega}
++	L3={(V*V*QN30/(PN30*PN30+QN30*QN30))/omega}
+Rctrl ctrl 0 1e12
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+RL1 L1a L1b {rser}
+RL2 L2a L2b {rser}
+RL3 L3a L3b {rser}
+GLL1 L1b N VALUE={v(ctrl)*v(idt1)/(L1*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1b,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2b N VALUE={v(ctrl)*v(idt2)/(L2*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2b,N)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3b N VALUE={v(ctrl)*v(idt3)/(L3*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3b,N)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+RGND N 0 {g}
+.ENDS
+
+.SUBCKT   Load_y_RL_ctrl  L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++   pf=3
++   rser=1u
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(PN1<=0,PQ0,PN1)
++   PN20=IF(PN2<=0,PQ0,PN2)
++   PN30=IF(PN3<=0,PQ0,PN3)
++   QN10=IF(QN1<=0,PQ0,QN1)
++   QN20=IF(QN2<=0,PQ0,QN2)
++   QN30=IF(QN3<=0,PQ0,QN3)
++	R1={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	R2={V*V*PN20/(PN20*PN20+QN20*QN20)}
++	R3={V*V*PN30/(PN30*PN30+QN30*QN30)}
++	L1={(V*V*QN10/(PN10*PN10+QN10*QN10))/omega}
++	L2={(V*V*QN20/(PN20*PN20+QN20*QN20))/omega}
++	L3={(V*V*QN30/(PN30*PN30+QN30*QN30))/omega}
+Rctrl ctrl 0 1e12
+Rctrl1 ctrl1 0 1e12
+Ectrl ctrl1 0 value={1/(sqrt(v(ctrl))+1p)} tripdv=1 tripdt=1
+XU7 L1 L2 L3 N1 P001 P002 P003 N2 ctrl1 Trafo3Yy0_ideal_ctrl1 U1Nenn={VN} U20={VN} fn={fn} N1=1000
+L1 P001 N {L1*pf} rser={R1*pf}
+L2 P002 N {L2*pf} rser={R2*pf}
+L3 P003 N {L3*pf} rser={R3*pf}
+RN1 N1 0 1e12
+RN2 N2 0 1e12
+RGND N 0 {g}
+.ENDS
+
+* wye load RC serial impedances with control node
+.SUBCKT   Load_y_RC_ctrl  L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=-1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++   pf=3
++   rser=1u
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(PN1<=0,PQ0,PN1) 
++   PN20=IF(PN2<=0,PQ0,PN2) 
++   PN30=IF(PN3<=0,PQ0,PN3) 
++   QN10=IF(QN1>=0,PQ0,QN1) 
++   QN20=IF(QN2>=0,PQ0,QN2) 
++   QN30=IF(QN3>=0,PQ0,QN3) 
++ R1={V*V*PN10/(PN10*PN10+QN10*QN10)}
++ R2={V*V*PN20/(PN20*PN20+QN20*QN20)}
++ R3={V*V*PN30/(PN30*PN30+QN30*QN30)}
++ C1={IF(QN1>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
++ C2={IF(QN2>=0,(PN20*PN20+QN20*QN20)/(V*V*QN20*omega),-(PN20*PN20+QN20*QN20)/(V*V*QN20*omega))}
++ C3={IF(QN3>=0,(PN30*PN30+QN30*QN30)/(V*V*QN30*omega),-(PN30*PN30+QN30*QN30)/(V*V*QN30*omega))}
+Rctrl ctrl 0 1e12
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+RC1 L1a L1b {rser}
+RC2 L2a L2b {rser}
+RC3 L3a L3b {rser}
+GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*(C1/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b N VALUE={v(ctrl)*DDT(v(L2b,N))*(C2/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b N VALUE={v(ctrl)*DDT(v(L3b,N))*(C3/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+RGND N 0 {g}
+.ENDS
+
+* wye load RL with parallel impedances and ctrl node
+.SUBCKT   Load_y_RL_ctrl_p_old  L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++   pf=3
++   rser=1u
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(PN1<=0,PQ0,PN1)
++   PN20=IF(PN2<=0,PQ0,PN2)
++   PN30=IF(PN3<=0,PQ0,PN3)
++   QN10=IF(QN1<=0,PQ0,QN1)
++   QN20=IF(QN2<=0,PQ0,QN2)
++   QN30=IF(QN3<=0,PQ0,QN3)
++	R1={V*V/PN10}
++	R2={V*V/PN20}
++	R3={V*V/PN30}
++	L1={(V*V/QN10)/omega}
++	L2={(V*V/QN20)/omega}
++	L3={(V*V/QN30)/omega}
+Rctrl ctrl 0 1e12
+GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+RL1 L1 L1a {rser}
+RL2 L2 L2a {rser}
+RL3 L3 L3a {rser}
+GLL1 L1a N VALUE={v(ctrl)*v(idt1)/(L1*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1a,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2a N VALUE={v(ctrl)*v(idt2)/(L2*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2a,N)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3a N VALUE={v(ctrl)*v(idt3)/(L3*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3a,N)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+RGND N 0 {g}
+.ENDS
+
+* wye load RL with parallel impedances and ctrl node
+.SUBCKT   Load_y_RL_ctrl_p  L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++   pf=3
++   rser=1u
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(PN1<=0,PQ0,PN1)
++   PN20=IF(PN2<=0,PQ0,PN2)
++   PN30=IF(PN3<=0,PQ0,PN3)
++   QN10=IF(QN1<=0,PQ0,QN1)
++   QN20=IF(QN2<=0,PQ0,QN2)
++   QN30=IF(QN3<=0,PQ0,QN3)
++	R1={V*V/PN10}
++	R2={V*V/PN20}
++	R3={V*V/PN30}
++	L1={(V*V/QN10)/omega}
++	L2={(V*V/QN20)/omega}
++	L3={(V*V/QN30)/omega}
+Rctrl ctrl 0 1e12
+Ectrl ctrl1 0 value={1/(sqrt(v(ctrl))+1p)} tripdv=1 tripdt=1
+XU7 L1 L2 L3 N1 P001 P002 P003 N2 ctrl1 Trafo3Yy0_ideal_ctrl1 U1Nenn={VN} U20={VN} fn={fn} N1=1000
+L1 P001 N {L1*pf} rser={rser}
+L2 P002 N {L2*pf} rser={rser}
+L3 P003 N {L3*pf} rser={rser}
+R1 P001 N {R1*pf} 
+R2 P002 N {R2*pf} 
+R3 P003 N {R3*pf} 
+RN1 N1 0 1e12
+RN2 N2 0 1e12
+RGND N 0 {g}
+.ENDS
+
+
+
+* wye load RC with parallel impedances with control node
+.SUBCKT   Load_y_RC_ctrl_p  L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=-1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++   pf=3
++   rser=1u
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(PN1<=0,PQ0,PN1) 
++   PN20=IF(PN2<=0,PQ0,PN2) 
++   PN30=IF(PN3<=0,PQ0,PN3) 
++   QN10=IF(QN1>=0,PQ0,QN1) 
++   QN20=IF(QN2>=0,PQ0,QN2) 
++   QN30=IF(QN3>=0,PQ0,QN3) 
++	R1={V*V/PN10}
++	R2={V*V/PN20}
++	R3={V*V/PN30}                            
++	C1={IF(QN1>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
++	C2={IF(QN2>=0,QN20/(V*V*omega),-QN20/(V*V*omega))}
++	C3={IF(QN3>=0,QN30/(V*V*omega),-QN30/(V*V*omega))}
+Rctrl ctrl 0 1e12
+GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+RC1 L1 L1b {rser}
+RC2 L2 L2b {rser}
+RC3 L3 L3b {rser}
+GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*(C1/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b N VALUE={v(ctrl)*DDT(v(L2b,N))*(C2/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b N VALUE={v(ctrl)*DDT(v(L3b,N))*(C3/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+RGND N 0 {g}
+.ENDS
+
+* wye load R with P=const
+.SUBCKT   Load_y_R_const  L1 L2 L3 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++ R={IF(PN>0,V*V/PN,V*V/PQ0)}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 N VALUE={v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={v(L2,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={v(L3,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+* wye load RL with serial impedances and S=const
+.SUBCKT   Load_y_RL_const  L1 L2 L3 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++ P0=IF(P<=0,PQ0,PN)
++ Q0=IF(Q<=0,PQ0,QN)
++ R={IF(P>0,V*V*P0/(P0*P0+Q0*Q0),V*V*P0/(P0*P0+Q0*Q0))}
++ L={IF(Q>0,(V*V*Q0/(P0*P0+Q0*Q0))/omega,(V*V*Q0/(P0*P0+Q0*Q0))/omega)}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L1a VALUE={v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(L2,L2a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(L3,L3a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
+RL1 L1a L1b {rser}
+RL2 L2a L2b {rser}
+RL3 L3a L3b {rser}
+GLL1 L1b N VALUE={v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1b,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2b N VALUE={v(idt2)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2b,N)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3b N VALUE={v(idt3)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3b,N)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+RGND N 0 {g}
+.ENDS
+
+* wye load RC with serial impedances and S=const
+.SUBCKT   Load_y_RC_const  L1 L2 L3 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++ PN10=IF(P<=0,PQ0,PN) 
++ QN10=IF(Q>=0,PQ0,QN)  
++	R={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	C={IF(Q>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L1a VALUE={v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(L2,L2a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(L3,L3a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN^2/ua^2)
+RC1 L1a L1b {rser}
+RC2 L2a L2b {rser}
+RC3 L3a L3b {rser}
+GCL1 L1b N VALUE={DDT(v(L1b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b N VALUE={DDT(v(L2b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b N VALUE={DDT(v(L3b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+RGND N 0 {g}
+.ENDS
+
+* wye load RL with parallel impedances and S=const
+.SUBCKT   Load_y_RL_const_p  L1 L2 L3 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,PN)
++   QN10=IF(Q<=0,PQ0,QN)
++	R={V*V/PN10}
++	L={(V*V/QN10)/omega}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 N VALUE={v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={v(L2,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={v(L3,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
+RL1 L1 L1a {rser}
+RL2 L2 L2a {rser}
+RL3 L3 L3a {rser}
+GLL1 L1a N VALUE={v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1a,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2a N VALUE={v(idt2)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2a,N)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3a N VALUE={v(idt3)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3a,N)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+RGND N 0 {g}
+.ENDS
+
+* wye load RC with parallel impedances and S=const
+.SUBCKT   Load_y_RC_const_p  L1 L2 L3 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,PN) 
++   QN10=IF(Q>=0,PQ0,QN) 
++	R={V*V/PN10}                         
++	C={IF(Q>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 N VALUE={v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={v(L2,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={v(L3,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN^2/ua^2)
+RC1 L1 L1b {rser}
+RC2 L2 L2b {rser}
+RC3 L3 L3b {rser}
+GCL1 L1b N VALUE={DDT(v(L1b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b N VALUE={DDT(v(L2b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b N VALUE={DDT(v(L3b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+RGND N 0 {g}
+.ENDS
+
+* wye load R with I=const
+.SUBCKT   Load_y_R_iconst  L1 L2 L3 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++ R={IF(PN>0,V*V/PN,V*V/PQ0)}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 N VALUE={v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={v(L2,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={v(L3,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+* wye load RL with serial impedances and I=const
+.SUBCKT   Load_y_RL_iconst  L1 L2 L3 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++ P0=IF(P<=0,PQ0,PN)
++ Q0=IF(Q<=0,PQ0,QN)
++ R={V*V*P0/(P0*P0+Q0*Q0)}
++ L={(V*V*Q0/(P0*P0+Q0*Q0))/omega}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L1a VALUE={v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(L2,L2a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(L3,L3a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
+RL1 L1a L1b {rser}
+RL2 L2a L2b {rser}
+RL3 L3a L3b {rser}
+GLL1 L1b N VALUE={v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1b,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2b N VALUE={v(idt2)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2b,N)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3b N VALUE={v(idt3)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3b,N)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+RGND N 0 {g}
+.ENDS
+
+* wye load RC with serial impedances and I=const
+.SUBCKT   Load_y_RC_iconst  L1 L2 L3 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++ PN10=IF(P<=0,PQ0,PN) 
++ QN10=IF(Q>=0,PQ0,QN)  
++	R={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	C={IF(Q>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L1a VALUE={v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(L2,L2a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(L3,L3a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN^2/ua^2)
+RC1 L1a L1b {rser}
+RC2 L2a L2b {rser}
+RC3 L3a L3b {rser}
+GCL1 L1b N VALUE={DDT(v(L1b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b N VALUE={DDT(v(L2b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b N VALUE={DDT(v(L3b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+RGND N 0 {g}
+.ENDS
+
+* wye load RL with parallel impedances and I=const
+.SUBCKT   Load_y_RL_iconst_p  L1 L2 L3 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,PN)
++   QN10=IF(Q<=0,PQ0,QN)
++	R={V*V/PN10}
++	L={(V*V/QN10)/omega}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 N VALUE={v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={v(L2,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={v(L3,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua/VN)
+RL1 L1 L1a {rser}
+RL2 L2 L2a {rser}
+RL3 L3 L3a {rser}
+GLL1 L1a N VALUE={v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(L1a,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2a N VALUE={v(idt2)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+G2x 0 idt2 VALUE={v(L2a,N)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3a N VALUE={v(idt3)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+G3x 0 idt3 VALUE={v(L3a,N)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+RGND N 0 {g}
+.ENDS
+
+* wye load RC with parallel impedances and I=const
+.SUBCKT   Load_y_RC_iconst_p  L1 L2 L3 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,PN) 
++   QN10=IF(Q>=0,PQ0,QN) 
++	R={V*V/PN10}                         
++	C={IF(Q>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 N VALUE={v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={v(L2,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={v(L3,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN/ua)
+RC1 L1 L1b {rser}
+RC2 L2 L2b {rser}
+RC3 L3 L3b {rser}
+GCL1 L1b N VALUE={DDT(v(L1b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b N VALUE={DDT(v(L2b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b N VALUE={DDT(v(L3b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+RGND N 0 {g}
+.ENDS
+
+* Wye load R with S=const and ctrl node
+.SUBCKT   Load_y_R_const_ctrl  L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=0
++ Uhi=1.2
++ Ulo=0.8
++   g=1e10
+.PARAM
++ PN={P/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++ P0=IF(P<=0,PQ0,PN)
++ R={V*V*P0/(P0*P0)}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Rctrl ctrl 0 1e12
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+* Wye load RL with serial impedances and S=const and ctrl node  
+.SUBCKT   Load_y_RL_const_ctrl  L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++ P0=IF(P<=0,PQ0,PN)
++ Q0=IF(Q<=0,PQ0,QN)
++ R={V*V*P0/(P0*P0+Q0*Q0)}
++ L={(V*V*Q0/(P0*P0+Q0*Q0))/omega}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Rctrl ctrl 0 1e12
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
+RL1 L1a L1b {rser}
+RL2 L2a L2b {rser}
+RL3 L3a L3b {rser}
+GLL1 L1b N VALUE={v(ctrl)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1b,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2b N VALUE={v(ctrl)*v(idt2)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2b,N)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3b N VALUE={v(ctrl)*v(idt3)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3b,N)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+RGND N 0 {g}
+.ENDS
+
+* Wye load RC with serial impedances and S=const and ctrl node  
+.SUBCKT   Load_y_RC_const_ctrl  L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++ PN10=IF(P<=0,PQ0,PN) 
++ QN10=IF(Q>=0,PQ0,QN)  
++	R={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	C={IF(Q>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Rctrl ctrl 0 1e12
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN^2/ua^2)
+RC1 L1a L1b {rser}
+RC2 L2a L2b {rser}
+RC3 L3a L3b {rser}
+GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b N VALUE={v(ctrl)*DDT(v(L2b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b N VALUE={v(ctrl)*DDT(v(L3b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+RGND N 0 {g}
+.ENDS
+
+* Wye load RL with parallel impedances and S=const and ctrl node  
+.SUBCKT   Load_y_RL_const_ctrl_p  L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,PN)
++   QN10=IF(Q<=0,PQ0,QN)
++	R={V*V/PN10}
++	L={(V*V/QN10)/omega}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Rctrl ctrl 0 1e12
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
+RL1 L1 L1a {rser}
+RL2 L2 L2a {rser}
+RL3 L3 L3a {rser}
+GLL1 L1a N VALUE={v(ctrl)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(L1a,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2a N VALUE={v(ctrl)*v(idt2)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+G2x 0 idt2 VALUE={v(L2a,N)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3a N VALUE={v(ctrl)*v(idt3)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+G3x 0 idt3 VALUE={v(L3a,N)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+RGND N 0 {g}
+.ENDS
+
+* Wye load RC with parallel impedances and S=const and ctrl node  
+.SUBCKT   Load_y_RC_const_ctrl_p  L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,PN) 
++   QN10=IF(Q>=0,PQ0,QN) 
++	R={V*V/PN10}                         
++	C={IF(Q>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Rctrl ctrl 0 1e12
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN^2/ua^2
+RC1 L1 L1b {rser}
+RC2 L2 L2b {rser}
+RC3 L3 L3b {rser}
+GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b N VALUE={v(ctrl)*DDT(v(L2b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b N VALUE={v(ctrl)*DDT(v(L3b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+RGND N 0 {g}
+.ENDS
+
+.SUBCKT   Load_y_R_iconst_ctrl  L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++ P0=IF(P<=0,PQ0,PN)
++ R={V*V*P0/(P0*P0)}
+* Measurement of V START (see also model B6_minmax)
+Rctrl ctrl 0 1e12
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+* Wye load RL with serial impedances and I=const and ctrl node 
+.SUBCKT   Load_y_RL_iconst_ctrl  L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++ P0=IF(P<=0,PQ0,PN)
++ Q0=IF(Q<=0,PQ0,QN)
++ R={V*V*P0/(P0*P0+Q0*Q0)}
++ L={(V*V*Q0/(P0*P0+Q0*Q0))/omega}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Rctrl ctrl 0 1e12
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
+RL1 L1a L1b {rser}
+RL2 L2a L2b {rser}
+RL3 L3a L3b {rser}
+GLL1 L1b N VALUE={v(ctrl)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1b,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2b N VALUE={v(ctrl)*v(idt2)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2b,N)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3b N VALUE={v(ctrl)*v(idt3)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3b,N)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+RGND N 0 {g}
+.ENDS
+
+* Wye load RC with serial impedances and I=const and ctrl node 
+.SUBCKT   Load_y_RC_iconst_ctrl L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++ PN10=IF(P<=0,PQ0,PN) 
++ QN10=IF(Q>=0,PQ0,QN)  
++	R={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	C={IF(Q>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Rctrl ctrl 0 1e12
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN^2/ua^2)
+RC1 L1a L1b {rser}
+RC2 L2a L2b {rser}
+RC3 L3a L3b {rser}
+GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b N VALUE={v(ctrl)*DDT(v(L2b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b N VALUE={v(ctrl)*DDT(v(L3b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+RGND N 0 {g}
+.ENDS
+
+* Wye load RL with parallel impedances and I=const and ctrl node 
+.SUBCKT   Load_y_RL_iconst_ctrl_p  L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,PN)
++   QN10=IF(Q<=0,PQ0,QN)
++	R={V*V/PN10}
++	L={(V*V/QN10)/omega}
+* Measurement of V START (see also model B6_minmax)
+Rctrl ctrl 0 1e12
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua/VN)
+RL1 L1 L1a {rser}
+RL2 L2 L2a {rser}
+RL3 L3 L3a {rser}
+GLL1 L1a N VALUE={v(ctrl)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(L1a,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2a N VALUE={v(ctrl)*v(idt2)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+G2x 0 idt2 VALUE={v(L2a,N)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3a N VALUE={v(ctrl)*v(idt3)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+G3x 0 idt3 VALUE={v(L3a,N)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+RGND N 0 {g}
+.ENDS
+
+* Wye load RC with parallel impedances and I=const and ctrl node 
+.SUBCKT   Load_y_RC_iconst_ctrl_p  L1 L2 L3 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
++   g=1e10
+.PARAM
++ PN={P/3} QN={Q/3}
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,PN) 
++   QN10=IF(Q>=0,PQ0,QN) 
++	R={V*V/PN10}                         
++	C={IF(Q>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
+* Measurement of V START (see also model B6_minmax)
+Rctrl ctrl 0 1e12
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN/ua)
+RC1 L1 L1b {rser}
+RC2 L2 L2b {rser}
+RC3 L3 L3b {rser}
+GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b N VALUE={v(ctrl)*DDT(v(L2b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b N VALUE={v(ctrl)*DDT(v(L3b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+RGND N 0 {g}
+.ENDS
+
+* delta load R
+.SUBCKT   Load_d_R  L1 L2 L3
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   pf=3
+.PARAM
++	R1={IF(PN1>0,VN*VN/PN1,VN*VN/PQ0)}
++	R2={IF(PN2>0,VN*VN/PN2,VN*VN/PQ0)}
++	R3={IF(PN3>0,VN*VN/PN3,VN*VN/PQ0)}
+RL1 L1 L2 {R1*pf}
+RL2 L2 L3 {R2*pf}
+RL3 L3 L1 {R3*pf}
+.ENDS
+
+* delta load RL with seriell impedances
+.SUBCKT   Load_d_RL  L1 L2 L3
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++   pf=3
++   rser=1u ; add some damping for c,l's
+.PARAM
++ omega={2*pi*fn}
++  V={VN}
++   PN10=IF(PN1<=0,PQ0,PN1)
++   PN20=IF(PN2<=0,PQ0,PN2)
++   PN30=IF(PN3<=0,PQ0,PN3)
++   QN10=IF(QN1<=0,PQ0,QN1)
++   QN20=IF(QN2<=0,PQ0,QN2)
++   QN30=IF(QN3<=0,PQ0,QN3)
++	R1={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	R2={V*V*PN20/(PN20*PN20+QN20*QN20)}
++	R3={V*V*PN30/(PN30*PN30+QN30*QN30)}
++	L1={(V*V*QN10/(PN10*PN10+QN10*QN10))/omega}
++	L2={(V*V*QN20/(PN20*PN20+QN20*QN20))/omega}
++	L3={(V*V*QN30/(PN30*PN30+QN30*QN30))/omega}
+RL1 L1 L1a {R1*pf}
+RL2 L2 L2a {R2*pf}
+RL3 L3 L3a {R3*pf}
+LL1 L1a L2 {L1*pf} IC=0 Rser={rser}
+LL2 L2a L3 {L2*pf} IC=0 Rser={rser}
+LL3 L3a L1 {L3*pf} IC=0 Rser={rser}
+.ENDS
+
+* delta load RC with serial impedances
+.SUBCKT   Load_d_RC  L1 L2 L3
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=-1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++   pf=3
++   rser=1u ; add some damping for c,l's
+.PARAM
++ omega={2*pi*fn}
++ V={VN}
+*   Both PN1 "and" QN1 should never be zero
++   PN10=IF(PN1<=0,PQ0,PN1) 
++   PN20=IF(PN2<=0,PQ0,PN2) 
++   PN30=IF(PN3<=0,PQ0,PN3) 
++   QN10=IF(QN1>=0,PQ0,QN1) 
++   QN20=IF(QN2>=0,PQ0,QN2) 
++   QN30=IF(QN3>=0,PQ0,QN3) 
++ R1={V*V*PN10/(PN10*PN10+QN10*QN10)}
++ R2={V*V*PN20/(PN20*PN20+QN20*QN20)}
++ R3={V*V*PN30/(PN30*PN30+QN30*QN30)}
++ C1={IF(QN1>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
++ C2={IF(QN2>=0,(PN20*PN20+QN20*QN20)/(V*V*QN20*omega),-(PN20*PN20+QN20*QN20)/(V*V*QN20*omega))}
++ C3={IF(QN3>=0,(PN30*PN30+QN30*QN30)/(V*V*QN30*omega),-(PN30*PN30+QN30*QN30)/(V*V*QN30*omega))}
+RL1 L1 L1a {R1*pf}
+RL2 L2 L2a {R2*pf}
+RL3 L3 L3a {R3*pf}
+CL1 L1a L2 {C1/pf} Rser={rser}
+CL2 L2a L3 {C2/pf} Rser={rser}
+CL3 L3a L1 {C3/pf} Rser={rser}
+.ENDS
+
+* delta load RL with parallel impedances
+.SUBCKT   Load_d_RL_p  L1 L2 L3
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++   pf=3
++   rser=1u ; add some damping for c,l's
+.PARAM
++ omega={2*pi*fn}
++   V={VN} ;only D
++   PN10=IF(PN1<=0,PQ0,PN1)
++   PN20=IF(PN2<=0,PQ0,PN2)
++   PN30=IF(PN3<=0,PQ0,PN3)
++   QN10=IF(QN1<=0,PQ0,QN1)
++   QN20=IF(QN2<=0,PQ0,QN2)
++   QN30=IF(QN3<=0,PQ0,QN3)
++	R1={V*V/PN10}
++	R2={V*V/PN20}
++	R3={V*V/PN30}
++	L1={(V*V/QN10)/omega}
++	L2={(V*V/QN20)/omega}
++	L3={(V*V/QN30)/omega}
+RL1 L1 L2 {R1*pf}
+RL2 L2 L3 {R2*pf}
+RL3 L3 L1 {R3*pf}
+LL1 L1 L2 {L1*pf} IC=0 Rser={rser}
+LL2 L2 L3 {L2*pf} IC=0 Rser={rser}
+LL3 L3 L1 {L3*pf} IC=0 Rser={rser}
+.ENDS
+
+* delta load RL with parallel impedances
+* with soft swingin 
+.SUBCKT   Load_d_RL_p_exp  L1 L2 L3
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++   pf=3
++   r_x=0.1m
++   texp=50m
++   t_start=0.5s
++   IC1=0
++   IC2=0
++   IC3=0
+.PARAM
++ omega={2*pi*fn}
++   V={VN} ;only D
++   PN10=IF(PN1<=0,PQ0,PN1)
++   PN20=IF(PN2<=0,PQ0,PN2)
++   PN30=IF(PN3<=0,PQ0,PN3)
++   QN10=IF(QN1<=0,PQ0,QN1)
++   QN20=IF(QN2<=0,PQ0,QN2)
++   QN30=IF(QN3<=0,PQ0,QN3)
++	R1={V*V/PN10}
++	R2={V*V/PN20}
++	R3={V*V/PN30}
++   X1={(V*V/QN10)}
++   X2={(V*V/QN20)}
++   X3={(V*V/QN30)}
++   rser={X1*pf*r_x}
++	L1={X1/omega}
++	L2={X2/omega}
++	L3={X3/omega}
+*
+* Vexp
+EL1a L1a N VALUE={IF(time>t_Start,v(L1,L2)*(1-exp(-abs(time-t_Start)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+EL2a L2a N VALUE={IF(time>t_Start,v(L2,L3)*(1-exp(-abs(time-t_Start)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+EL3a L3a N VALUE={IF(time>t_Start,v(L3,L1)*(1-exp(-abs(time-t_Start)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+* R
+Gout1 L1 L2 VALUE={v(L1a,N)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+Gout2 L2 L3 VALUE={v(L2a,N)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+Gout3 L3 L1 VALUE={v(L3a,N)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+* L
+Gx 0 idt1 VALUE={v(L1a,N)/(L1*pf)} tripdv={tdv} tripdt={tdt} 
+Cx idt1 0 1 IC={IC1}
+Rx idt1 0 1e10
+Gy 0 idt2 VALUE={v(L2a,N)/(L2*pf)} tripdv={tdv} tripdt={tdt} 
+Cy idt2 0 1 IC={IC2}
+Ry idt2 0 1e10 
+Gz 0 idt3 VALUE={v(L3a,N)/(L3*pf)} tripdv={tdv} tripdt={tdt} 
+Cz idt3 0 1 IC={IC3}
+Rz idt3 0 1e10
+Gout4 L1 L2x VALUE={v(idt1)} tripdv={tdv} tripdt={tdt} rpar=1e12
+Gout5 L2 L3x VALUE={v(idt2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+Gout6 L3 L1x VALUE={v(idt3)} tripdv={tdv} tripdt={tdt} rpar=1e12
+* L rser  
+Rout1 L2x L2 {rser}
+Rout2 L3x L3 {rser}
+Rout3 L1x L1 {rser}
+Rgnd N 0 1e12
+.ENDS
+
+* delta load RC with parallel impedances
+.SUBCKT   Load_d_RC_p  L1 L2 L3
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=-1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++   pf=3
++   rser=1u ; add some damping for c,l's
+.PARAM
++ omega={2*pi*fn}
++   V={VN} ;only D
++   PN10=IF(PN1<=0,PQ0,PN1) 
++   PN20=IF(PN2<=0,PQ0,PN2) 
++   PN30=IF(PN3<=0,PQ0,PN3) 
++   QN10=IF(QN1>=0,PQ0,QN1) 
++   QN20=IF(QN2>=0,PQ0,QN2) 
++   QN30=IF(QN3>=0,PQ0,QN3) 
++	R1={V*V/PN10}
++	R2={V*V/PN20}
++	R3={V*V/PN30}                            
++	C1={IF(QN1>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
++	C2={IF(QN2>=0,QN20/(V*V*omega),-QN20/(V*V*omega))}
++	C3={IF(QN3>=0,QN30/(V*V*omega),-QN30/(V*V*omega))}
+RL1 L1 L2 {R1*pf}
+RL2 L2 L3 {R2*pf}
+RL3 L3 L1 {R3*pf}
+CL1 L1 L2 {C1/pf} Rser={rser}
+CL2 L2 L3 {C2/pf} Rser={rser}
+CL3 L3 L1 {C3/pf} Rser={rser}
+.ENDS
+
+
+* delta load R with ctrl node
+.SUBCKT   Load_d_R_ctrl  L1 L2 L3 ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++ pf=3
+.PARAM
++ omega={2*pi*fn}
++	R1={IF(PN1>0,VN*VN/PN1,VN*VN/PQ0)}
++	R2={IF(PN2>0,VN*VN/PN2,VN*VN/PQ0)}
++	R3={IF(PN3>0,VN*VN/PN3,VN*VN/PQ0)}
+Rctrl ctrl 0 1e12
+GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* delta load RL with serial impedances and ctrl node
+.SUBCKT   Load_d_RL_ctrl  L1 L2 L3 ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++ pf=3
++ rser=1u
+.PARAM
++ omega={2*pi*fn}
++ V={VN}
++   PN10=IF(PN1<=0,PQ0,PN1)
++   PN20=IF(PN2<=0,PQ0,PN2)
++   PN30=IF(PN3<=0,PQ0,PN3)
++   QN10=IF(QN1<=0,PQ0,QN1)
++   QN20=IF(QN2<=0,PQ0,QN2)
++   QN30=IF(QN3<=0,PQ0,QN3)
++	R1={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	R2={V*V*PN20/(PN20*PN20+QN20*QN20)}
++	R3={V*V*PN30/(PN30*PN30+QN30*QN30)}
++	L1={(V*V*QN10/(PN10*PN10+QN10*QN10))/omega}
++	L2={(V*V*QN20/(PN20*PN20+QN20*QN20))/omega}
++	L3={(V*V*QN30/(PN30*PN30+QN30*QN30))/omega}
+Rctrl ctrl 0 1e12
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+RL1 L1a L1b {rser}
+RL2 L2a L2b {rser}
+RL3 L3a L3b {rser}
+GLL1 L1b L2 VALUE={v(ctrl)*v(idt1)/(L1*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1b,L2)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2b L3 VALUE={v(ctrl)*v(idt2)/(L2*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2b,L3)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3b L1 VALUE={v(ctrl)*v(idt3)/(L3*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3b,L1)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+.ENDS
+
+* delta load RC with serial impedances and ctrl node
+.SUBCKT   Load_d_RC_ctrl  L1 L2 L3 ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=-1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++ pf=3
++ rser=1u
+.PARAM
++ omega={2*pi*fn}
++ V={VN}
++   PN10=IF(PN1<=0,PQ0,PN1) 
++   PN20=IF(PN2<=0,PQ0,PN2) 
++   PN30=IF(PN3<=0,PQ0,PN3) 
++   QN10=IF(QN1>=0,PQ0,QN1) 
++   QN20=IF(QN2>=0,PQ0,QN2) 
++   QN30=IF(QN3>=0,PQ0,QN3) 
++ R1={V*V*PN10/(PN10*PN10+QN10*QN10)}
++ R2={V*V*PN20/(PN20*PN20+QN20*QN20)}
++ R3={V*V*PN30/(PN30*PN30+QN30*QN30)}
++ C1={IF(QN1>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
++ C2={IF(QN2>=0,(PN20*PN20+QN20*QN20)/(V*V*QN20*omega),-(PN20*PN20+QN20*QN20)/(V*V*QN20*omega))}
++ C3={IF(QN3>=0,(PN30*PN30+QN30*QN30)/(V*V*QN30*omega),-(PN30*PN30+QN30*QN30)/(V*V*QN30*omega))}
+Rctrl ctrl 0 1e12
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+RC1 L1a L1b {rser}
+RC2 L2a L2b {rser}
+RC3 L3a L3b {rser}
+GCL1 L1b L2 VALUE={v(ctrl)*DDT(v(L1b,L2))*(C1/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b L3 VALUE={v(ctrl)*DDT(v(L2b,L3))*(C2/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b L1 VALUE={v(ctrl)*DDT(v(L3b,L1))*(C3/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+.ENDS
+
+* delta load RL with parallel impedances and ctrl node
+.SUBCKT   Load_d_RL_ctrl_p  L1 L2 L3 ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++ pf=3
++ rser=1u
+.PARAM
++ omega={2*pi*fn}
++   V={VN} ;only D
++   PN10=IF(PN1<=0,PQ0,PN1)
++   PN20=IF(PN2<=0,PQ0,PN2)
++   PN30=IF(PN3<=0,PQ0,PN3)
++   QN10=IF(QN1<=0,PQ0,QN1)
++   QN20=IF(QN2<=0,PQ0,QN2)
++   QN30=IF(QN3<=0,PQ0,QN3)
++	R1={V*V/PN10}
++	R2={V*V/PN20}
++	R3={V*V/PN30}
++	L1={(V*V/QN10)/omega}
++	L2={(V*V/QN20)/omega}
++	L3={(V*V/QN30)/omega}
+Rctrl ctrl 0 1e12
+GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+RL1 L1 L1a {rser}
+RL2 L2 L2a {rser}
+RL3 L3 L3a {rser}
+GLL1 L1a L2 VALUE={v(ctrl)*(v(idt1))/(L1*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1a,L2)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2a L3 VALUE={v(ctrl)*(v(idt2))/(L2*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2a,L3)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3a L1 VALUE={v(ctrl)*(v(idt3))/(L3*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3a,L1)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+.ENDS
+
+* delta load RC with parallel impedances and ctrl node
+.SUBCKT   Load_d_RC_ctrl_p  L1 L2 L3 ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++   P=1e6
++	PN1={P}	;
++	PN2={P}	;
++	PN3={P}	;
++   Q=-1e6
++	QN1={Q}	;
++	QN2={Q}	;
++	QN3={Q} ;
++ pf=3
++ rser=3
+.PARAM
++ omega={2*pi*fn}
++   V={VN} ;only D
++   PN10=IF(PN1<=0,PQ0,PN1) 
++   PN20=IF(PN2<=0,PQ0,PN2) 
++   PN30=IF(PN3<=0,PQ0,PN3) 
++   QN10=IF(QN1>=0,PQ0,QN1) 
++   QN20=IF(QN2>=0,PQ0,QN2) 
++   QN30=IF(QN3>=0,PQ0,QN3) 
++	R1={V*V/PN10}
++	R2={V*V/PN20}
++	R3={V*V/PN30}                            
++	C1={IF(QN1>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
++	C2={IF(QN2>=0,QN20/(V*V*omega),-QN20/(V*V*omega))}
++	C3={IF(QN3>=0,QN30/(V*V*omega),-QN30/(V*V*omega))}
+Rctrl ctrl 0 1e12
+GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+RC1 L1 L1b {rser}
+RC2 L2 L2b {rser}
+RC3 L3 L3b {rser}
+GCL1 L1b L2 VALUE={v(ctrl)*DDT(v(L1b,L2))*(C1/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12 
+GCL2 L2b L3 VALUE={v(ctrl)*DDT(v(L2b,L3))*(C2/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b L1 VALUE={v(ctrl)*DDT(v(L3b,L1))*(C3/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+.ENDS
+
+* delta load R with S=const
+.SUBCKT Load_d_R_const  L1 L2 L3
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Uhi=1.2
++ Ulo=0.8
+.PARAM
++ PN={P/3}
++ omega={2*pi*fn}
++	R={IF(P>0,VN*VN/PN,VN*VN/PQ0)}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L2 VALUE={v(L1,L2)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={v(L2,L3)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={v(L3,L1)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+* delta load RL with serial impedances and S=const
+.SUBCKT Load_d_RL_const  L1 L2 L3
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
+.PARAM
++ QN={Q/3} PN={P/3}
++ omega={2*pi*fn}
++ V={VN}
++ VN2={VN*VN}
++ P0=IF(P<=0,PQ0,PN)
++ Q0=IF(Q<=0,PQ0,QN)
++ R={V*V*P0/(P0*P0+Q0*Q0)}
++ L={(V*V*Q0/(P0*P0+Q0*Q0))/omega}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L1a VALUE={v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(L2,L2a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(L3,L3a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
+RL1 L1a L1b {rser}
+RL2 L2a L2b {rser}
+RL3 L3a L3b {rser}
+GLL1 L1b L2 VALUE={v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1b,L2)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2b L3 VALUE={v(idt2)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2b,L3)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3b L1 VALUE={v(idt3)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3b,L1)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+.ENDS
+
+* delta load RC with serial impedances and S=const 
+.SUBCKT Load_d_RC_const  L1 L2 L3
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=-1e6 ;should be negativ
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
+.PARAM
++ QN={Q/3} PN={P/3}
++ omega={2*pi*fn}
++ V={VN}
++ PN10=IF(P<=0,PQ0,PN) 
++ QN10=IF(Q>=0,PQ0,QN)  
++	R={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	C={IF(Q>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L1a VALUE={v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(L2,L2a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(L3,L3a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN^2/ua^2)
+RC1 L1a L1b {rser}
+RC2 L2a L2b {rser}
+RC3 L3a L3b {rser}
+GCL1 L1b L2 VALUE={DDT(v(L1b,L2))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b L3 VALUE={DDT(v(L2b,L3))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b L1 VALUE={DDT(v(L3b,L1))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+.ENDS
+
+
+* delta load RL with parallel impedances and S=const
+.SUBCKT Load_d_RL_const_p  L1 L2 L3
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
+.PARAM
++ QN={Q/3} PN={P/3}
++ omega={2*pi*fn}
++   V={VN} ;only D
++   PN10=IF(P<=0,PQ0,PN)
++   QN10=IF(Q<=0,PQ0,QN)
++	R={V*V/PN10}
++	L={(V*V/QN10)/omega}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L2 VALUE={v(L1,L2)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={v(L2,L3)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={v(L3,L1)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
+RL1 L1 L1a {rser}
+RL2 L2 L2a {rser}
+RL3 L3 L3a {rser}
+GLL1 L1a L2 VALUE={v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1a,L2)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2a L3 VALUE={v(idt2)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2a,L3)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3a L1 VALUE={v(idt3)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3a,L1)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+.ENDS
+
+* delta load RC with parallel impedances and S=const
+.SUBCKT Load_d_RC_const_p  L1 L2 L3
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=-1e6 ;should be negativ
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
+.PARAM
++ QN={Q/3} PN={P/3}
++ omega={2*pi*fn}
++   V={VN} ;only D
++   PN10=IF(P<=0,PQ0,PN) 
++   QN10=IF(Q>=0,PQ0,QN) 
++	R={V*V/PN10}                         
++	C={IF(Q>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L2 VALUE={v(L1,L2)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={v(L2,L3)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={v(L3,L1)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN^2/ua^2)
+RC1 L1 L1b {rser}
+RC2 L2 L2b {rser}
+RC3 L3 L3b {rser}
+GCL1 L1b L2 VALUE={DDT(v(L1b,L2))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b L3 VALUE={DDT(v(L2b,L3))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b L1 VALUE={DDT(v(L3b,L1))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+.ENDS
+
+
+* delta load R with I=const
+.SUBCKT Load_d_R_iconst  L1 L2 L3
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Uhi=1.2
++ Ulo=0.8
+.PARAM
++ PN={P/3}
++ omega={2*pi*fn}
++	R={IF(P>0,VN*VN/PN,VN*VN/PQ0)}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L2 VALUE={v(L1,L2)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={v(L2,L3)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={v(L3,L1)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* delta load RL with serial impedances and I=const
+.SUBCKT Load_d_RL_iconst  L1 L2 L3
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
+.PARAM
++ QN={Q/3} PN={P/3}
++ omega={2*pi*fn}
++ V={VN}
++ VN2={VN*VN}
++ P0=IF(P<=0,PQ0,PN)
++ Q0=IF(Q<=0,PQ0,QN)
++ R={V*V*P0/(P0*P0+Q0*Q0)}
++ L={(V*V*Q0/(P0*P0+Q0*Q0))/omega}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L1a VALUE={v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(L2,L2a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(L3,L3a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
+RL1 L1a L1b {rser}
+RL2 L2a L2b {rser}
+RL3 L3a L3b {rser}
+GLL1 L1b L2 VALUE={v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1b,L2)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2b L3 VALUE={v(idt2)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2b,L3)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3b L1 VALUE={v(idt3)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3b,L1)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+.ENDS
+
+* delta load RC with serial impedances and I=const 
+.SUBCKT Load_d_RC_iconst  L1 L2 L3
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=-1e6 ;should be negativ
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
+.PARAM
++ QN={Q/3} PN={P/3}
++ omega={2*pi*fn}
++ V={VN}
++ PN10=IF(P<=0,PQ0,PN) 
++ QN10=IF(Q>=0,PQ0,QN)  
++	R={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	C={IF(Q>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
++ VN2={VN*VN}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L1a VALUE={v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(L2,L2a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(L3,L3a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN^2/ua^2)
+RC1 L1a L1b {rser}
+RC2 L2a L2b {rser}
+RC3 L3a L3b {rser}
+GCL1 L1b L2 VALUE={DDT(v(L1b,L2))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b L3 VALUE={DDT(v(L2b,L3))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b L1 VALUE={DDT(v(L3b,L1))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+.ENDS
+
+* delta load RL with parallel impedances and I=const
+.SUBCKT Load_d_RL_iconst_p  L1 L2 L3
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
+.PARAM
++ QN={Q/3} PN={P/3}
++ omega={2*pi*fn}
++   V={VN} ;only D
++   PN10=IF(P<=0,PQ0,PN)
++   QN10=IF(Q<=0,PQ0,QN)
++	R={V*V/PN10}
++	L={(V*V/QN10)/omega}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L2 VALUE={v(L1,L2)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={v(L2,L3)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={v(L3,L1)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua/VN)
+RL1 L1 L1a {rser}
+RL2 L2 L2a {rser}
+RL3 L3 L3a {rser}
+GLL1 L1a L2 VALUE={v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1a,L2)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2a L3 VALUE={v(idt2)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2a,L3)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3a L1 VALUE={v(idt3)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3a,L1)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+.ENDS
+
+* delta load RC with parallel impedances and I=const 
+.SUBCKT Load_d_RC_iconst_p  L1 L2 L3
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=-1e6 ;should be negativ
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
+.PARAM
++ QN={Q/3} PN={P/3}
++ omega={2*pi*fn}
++   V={VN} ;only D
++   PN10=IF(P<=0,PQ0,PN) 
++   QN10=IF(Q>=0,PQ0,QN) 
++	R={V*V/PN10}                         
++	C={IF(Q>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L2 VALUE={v(L1,L2)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={v(L2,L3)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={v(L3,L1)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN/ua)
+RC1 L1 L1b {rser}
+RC2 L2 L2b {rser}
+RC3 L3 L3b {rser}
+GCL1 L1b L2 VALUE={DDT(v(L1b,L2))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b L3 VALUE={DDT(v(L2b,L3))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b L1 VALUE={DDT(v(L3b,L1))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+.ENDS
+
+* delta load R with S=const und ctrl node
+.SUBCKT Load_d_R_const_ctrl  L1 L2 L3 ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Uhi=1.2
++ Ulo=0.8
+.PARAM
++ PN={P/3}
++ omega={2*pi*fn}
++	R={IF(P>0,VN*VN/PN,VN*VN/PQ0)}
++ VN2={VN*VN}
+Rctrl ctrl 0 1e12
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+.ENDS
+
+* delta load RL with serial impedances and S=const and ctrl node
+.SUBCKT Load_d_RL_const_ctrl  L1 L2 L3 ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
+.PARAM
++ QN={Q/3} PN={P/3}
++ omega={2*pi*fn}
++ V={VN}
++ VN2={VN*VN}
++ P0=IF(P<=0,PQ0,PN)
++ Q0=IF(Q<=0,PQ0,QN)
++ R={V*V*P0/(P0*P0+Q0*Q0)}
++ L={(V*V*Q0/(P0*P0+Q0*Q0))/omega}
+Rctrl ctrl 0 1e12
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
+RL1 L1a L1b {rser}
+RL2 L2a L2b {rser}
+RL3 L3a L3b {rser}
+GLL1 L1b L2 VALUE={v(ctrl)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1b,L2)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2b L3 VALUE={v(ctrl)*v(idt2)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2b,L3)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3b L1 VALUE={v(ctrl)*v(idt3)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3b,L1)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+.ENDS
+
+* delta load RC with serial impedances and S=const and ctrl node
+.SUBCKT Load_d_RC_const_ctrl  L1 L2 L3 ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=-1e6 ;should be negativ
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
+.PARAM
++ QN={Q/3} PN={P/3}
++ omega={2*pi*fn}
++ V={VN}
++ PN10=IF(P<=0,PQ0,PN) 
++ QN10=IF(Q>=0,PQ0,QN)  
++	R={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	C={IF(Q>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
++ VN2={VN*VN}
+Rctrl ctrl 0 1e12
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN^2/ua^2)
+RC1 L1a L1b {rser}
+RC2 L2a L2b {rser}
+RC3 L3a L3b {rser}
+GCL1 L1b L2 VALUE={v(ctrl)*DDT(v(L1b,L2))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b L3 VALUE={v(ctrl)*DDT(v(L2b,L3))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b L1 VALUE={v(ctrl)*DDT(v(L3b,L1))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+.ENDS
+
+* delat load RL with parallel impedances and S=const and ctrl node
+.SUBCKT Load_d_RL_const_ctrl_p  L1 L2 L3 ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
+.PARAM
++ QN={Q/3} PN={P/3}
++ omega={2*pi*fn}
++   V={VN} ;only D
++   PN10=IF(P<=0,PQ0,PN)
++   QN10=IF(Q<=0,PQ0,QN)
++	R={V*V/PN10}
++	L={(V*V/QN10)/omega}
++ VN2={VN*VN}
+Rctrl ctrl 0 1e12
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
+RL1 L1 L1a {rser}
+RL2 L2 L2a {rser}
+RL3 L3 L3a {rser}
+GLL1 L1a L2 VALUE={v(ctrl)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1a,L2)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2a L3 VALUE={v(ctrl)*v(idt2)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2a,L3)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3a L1 VALUE={v(ctrl)*v(idt3)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3a,L1)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+.ENDS
+
+* delta load RC with parallel impedances and S=const and ctrl node
+.SUBCKT Load_d_RC_const_ctrl_p  L1 L2 L3 ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=-1e6 ;should be negativ
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
+.PARAM
++ QN={Q/3} PN={P/3}
++ omega={2*pi*fn}
++   V={VN} ;only D
++   PN10=IF(P<=0,PQ0,PN) 
++   QN10=IF(Q>=0,PQ0,QN) 
++	R={V*V/PN10}                         
++	C={IF(Q>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
++ VN2={VN*VN}
+Rctrl ctrl 0 1e12
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN^2/ua^2)
+RC1 L1 L1b {rser}
+RC2 L2 L2b {rser}
+RC3 L3 L3b {rser}
+GCL1 L1b L2 VALUE={v(ctrl)*DDT(v(L1b,L2))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b L3 VALUE={v(ctrl)*DDT(v(L2b,L3))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b L1 VALUE={v(ctrl)*DDT(v(L3b,L1))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+.ENDS
+
+* delta load R with I=const und ctrl node
+.SUBCKT Load_d_R_iconst_ctrl  L1 L2 L3 ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Uhi=1.2
++ Ulo=0.8
+.PARAM
++ PN={P/3}
++ omega={2*pi*fn}
++	R={IF(P>0,VN*VN/PN,VN*VN/PQ0)}
+Rctrl ctrl 0 1e12
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* delta load RL with serial impedances and I=const and ctrl node
+.SUBCKT Load_d_RL_iconst_ctrl  L1 L2 L3 ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
+.PARAM
++ QN={Q/3} PN={P/3}
++ omega={2*pi*fn}
++ V={VN}
++ VN2={VN*VN}
++ P0=IF(P<=0,PQ0,PN)
++ Q0=IF(Q<=0,PQ0,QN)
++ R={V*V*P0/(P0*P0+Q0*Q0)}
++ L={(V*V*Q0/(P0*P0+Q0*Q0))/omega}
+Rctrl ctrl 0 1e12
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
+RL1 L1a L1b {rser}
+RL2 L2a L2b {rser}
+RL3 L3a L3b {rser}
+GLL1 L1b L2 VALUE={v(ctrl)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1b,L2)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2b L3 VALUE={v(ctrl)*v(idt2)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2b,L3)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3b L1 VALUE={v(ctrl)*v(idt3)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3b,L1)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+.ENDS
+
+* delta load RC with serial impedances and I=const and ctrl node
+.SUBCKT Load_d_RC_iconst_ctrl  L1 L2 L3 ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=-1e6 ;should be negativ
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
+.PARAM
++ QN={Q/3} PN={P/3}
++ omega={2*pi*fn}
++ V={VN}
++ PN10=IF(P<=0,PQ0,PN) 
++ QN10=IF(Q>=0,PQ0,QN)  
++	R={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	C={IF(Q>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
++ VN2={VN*VN}
+Rctrl ctrl 0 1e12
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN^2/ua^2)
+RC1 L1a L1b {rser}
+RC2 L2a L2b {rser}
+RC3 L3a L3b {rser}
+GCL1 L1b L2 VALUE={v(ctrl)*DDT(v(L1b,L2))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b L3 VALUE={v(ctrl)*DDT(v(L2b,L3))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b L1 VALUE={v(ctrl)*DDT(v(L3b,L1))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+.ENDS
+
+* delta load RL with parallel impedances and I=const and ctrl node
+.SUBCKT Load_d_RL_iconst_ctrl_p  L1 L2 L3 ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
+.PARAM
++ QN={Q/3} PN={P/3}
++ omega={2*pi*fn}
++   V={VN} ;only D
++   PN10=IF(P<=0,PQ0,PN)
++   QN10=IF(Q<=0,PQ0,QN)
++	R={V*V/PN10}
++	L={(V*V/QN10)/omega}
+Rctrl ctrl 0 1e12
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua/VN)
+RL1 L1 L1a {rser}
+RL2 L2 L2a {rser}
+RL3 L3 L3a {rser}
+GLL1 L1a L2 VALUE={v(ctrl)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G1x 0 idt1 VALUE={v(L1a,L2)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+GLL2 L2a L3 VALUE={v(ctrl)*v(idt2)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G2x 0 idt2 VALUE={v(L2a,L3)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+GLL3 L3a L1 VALUE={v(ctrl)*v(idt3)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+G3x 0 idt3 VALUE={v(L3a,L1)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+.ENDS
+
+
+* delta load RC with parallel impedances and I=const and ctrl node
+.SUBCKT Load_d_RC_iconst_ctrl_p  L1 L2 L3 ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=-1e6 ;should be negativ
++ Uhi=1.2
++ Ulo=0.8
++ rser=1u
+.PARAM
++ QN={Q/3} PN={P/3}
++ omega={2*pi*fn}
++   V={VN} ;only D
++   PN10=IF(P<=0,PQ0,PN) 
++   QN10=IF(Q>=0,PQ0,QN) 
++	R={V*V/PN10}                         
++	C={IF(Q>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
+Rctrl ctrl 0 1e12
+* Measurement of V START (see also model B6_minmax)
+Ep out_p1 0 VALUE={MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700u
+R2 out_p out_n 28.55
+Eout ua1 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+* Measurement  END
+*
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN/ua)
+RC1 L1 L1b {rser}
+RC2 L2 L2b {rser}
+RC3 L3 L3b {rser}
+GCL1 L1b L2 VALUE={v(ctrl)*DDT(v(L1b,L2))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b L3 VALUE={v(ctrl)*DDT(v(L2b,L3))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b L1 VALUE={v(ctrl)*DDT(v(L3b,L1))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+.ENDS
+
+* 1 phase R impedance
+.SUBCKT   Load_1phase_R  L1 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=0
++   g=1e10
+.PARAM
++ V={VN/sqrt(3)}
++ R={IF(P>0,V*V/P,V*V/PQ0)}
+RL1 L1 N {R}
+RGND N 0 {g}
+.ENDS
+
+
+* 1phase RL with serial impedance
+.SUBCKT   Load_1phase_RL  L1 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ rser=1u ; add some damping
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++ P0=IF(P<=0,PQ0,P)
++ Q0=IF(Q<=0,PQ0,Q)
++ R={V*V*P0/(P0*P0+Q0*Q0)}
++ L={(V*V*Q0/(P0*P0+Q0*Q0))/omega}
+RL1 L1 L1a {R}
+LL1 L1a N {L} Rser={rser}
+RGND N 0 {g}
+.ENDS
+
+* 1 phase RC with serial impedance
+.SUBCKT   Load_1phase_RC  L1 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=-1e6
++ rser=1u ; add some damping
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++ PN10=IF(P<=0,PQ0,P) 
++ QN10=IF(Q>=0,PQ0,Q)  
++	R={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	C={IF(Q>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
+RL1 L1 L1a {R}
+CL1 L1a N {C} Rser={rser} 
+RGND N 0 {g}
+.ENDS
+
+* 1 phase RL with parallel impedance
+.SUBCKT   Load_1phase_RL_p  L1 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++ rser=1u ; add some damping
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,P)
++   QN10=IF(Q<=0,PQ0,Q)
++	R={V*V/PN10}
++	L={(V*V/QN10)/omega}
+RL1 L1 N {R}
+LL1 L1 N {L} Rser={rser}
+RGND N 0 {g}
+.ENDS
+
+* 1 phase RC with parallel impedance
+.SUBCKT   Load_1phase_RC_p  L1 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=-1e6
++ rser=1u ; add some damping
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,P) 
++   QN10=IF(Q>=0,PQ0,Q) 
++	R={V*V/PN10}                         
++	C={IF(Q>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
+RL1 L1 N {R}
+CL1 L1 N {C} Rser={rser} 
+RGND N 0 {g}
+.ENDS
+
+* 1 phase R impdeance with ctrl node
+.SUBCKT   Load_1phase_R_ctrl  L1 N ctrl
++	PARAMS:
++ VN=400;
++   fn={fn1} PQ0=1000
++	P=1e6	;
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++	R={IF(P>0,V*V/P,V*V/PQ0)}
+Rctrl ctrl 0 1e12
+GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/R} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+* 1 phase RL serial impedance with ctrl node
+.SUBCKT   Load_1phase_RL_ctrl  L1 N ctrl
++	PARAMS:
++ VN=400;
++   fn={fn1} PQ0=1000
++	P=1e6	;
++	Q=1e6 ;
++   rser=1u
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++ P0=IF(P<=0,PQ0,P)
++ Q0=IF(Q<=0,PQ0,Q)
++ R={V*V*P0/(P0*P0+Q0*Q0)}
++ L={(V*V*Q0/(P0*P0+Q0*Q0))/omega}
+Rctrl ctrl 0 1e12
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/R} tripdv={tdv} tripdt={tdt}
+RL1 L1a L1b {rser}
+GLL1 L1b N VALUE={v(ctrl)*v(idt1)/L} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(L1b,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+RGND N 0 {g}
+.ENDS
+
+
+* 1 phase RC serial impedance with ctrl node
+.SUBCKT   Load_1phase_RC_ctrl  L1 N ctrl
++	PARAMS:
++ VN=400;
++   fn={fn1} PQ0=1000
++	P=1e6	;
++	Q=-1e6 ;should be negativ
++   rser=1u
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++ PN10=IF(P<=0,PQ0,P) 
++ QN10=IF(Q>=0,PQ0,Q)  
++	R={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	C={IF(Q>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
+Rctrl ctrl 0 1e12
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/R} tripdv={tdv} tripdt={tdt}
+RC1 L1a L1b {rser}
+GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+* 1 phase RL parallel impedance 
+.SUBCKT   Load_1phase_RL_ctrl_p  L1 N ctrl
++	PARAMS:
++ VN=400;
++   fn={fn1} PQ0=1000
++	P=1e6	;
++	Q=1e6 ;
++   rser=1u
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,P)
++   QN10=IF(Q<=0,PQ0,Q)
++	R={V*V/PN10}
++	L={(V*V/QN10)/omega}
+Rctrl ctrl 0 1e12
+GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/R} tripdv={tdv} tripdt={tdt}
+RL1 L1 L1a {rser}
+GLL1 L1a N VALUE={v(ctrl)*v(idt1)/L} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(L1a,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+RGND N 0 {g}
+.ENDS
+
+
+* 1 phase RC parallel impedance with ctrl node
+.SUBCKT   Load_1phase_RC_ctrl_p  L1 N ctrl
++	PARAMS:
++ VN=400;
++   fn={fn1} PQ0=1000
++	P=1e6	;
++	Q=-1e6 ;should be negativ
++   rser=1u
++   g=1e10
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,P) 
++   QN10=IF(Q>=0,PQ0,Q) 
++	R={V*V/PN10}                         
++	C={IF(Q>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
+Rctrl ctrl 0 1e12
+GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/R} tripdv={tdv} tripdt={tdt}
+RC1 L1 L1b {rser}
+GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+* 1 phase RL serial impedance S=const
+.SUBCKT   Load_1phase_R_const  L1 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++   Ulo=0.7
++   Uhi=1.3
++ rser=1u
++   g=1e10
++ fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++   V={VN/sqrt(3)}
++ P0=IF(P<=0,PQ0,P)
++ R={V*V*P0/(P0*P0)}
++ VN2={VN*VN}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L1a VALUE={v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+* 1 phase RL serial impedance S=const
+.SUBCKT   Load_1phase_RL_const  L1 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++   Ulo=0.7
++   Uhi=1.3
++ rser=1u
++   g=1e10
++ fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++   V={VN/sqrt(3)}
++ P0=IF(P<=0,PQ0,P)
++ Q0=IF(Q<=0,PQ0,Q)
++ R={V*V*P0/(P0*P0+Q0*Q0)}
++ L={(V*V*Q0/(P0*P0+Q0*Q0))/omega}
++ VN2={VN*VN}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L1a VALUE={v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua/VN)
+RL1 L1a L1b {rser}
+GLL1 L1b N VALUE={v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(L1b,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+RGND N 0 {g}
+.ENDS
+
+* 1 phase RC serial impedance with S=const
+.SUBCKT   Load_1phase_RC_const  L1 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++   Ulo=0.7
++   Uhi=1.3
++ rser=1u
++   g=1e10
++ fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++   V={VN/sqrt(3)}
++ PN10=IF(P<=0,PQ0,P) 
++ QN10=IF(Q>=0,PQ0,Q)  
++	R={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	C={IF(Q>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
++ VN2={VN*VN}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L1a VALUE={v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST C
+RC1 L1a L1b {rser}
+* IC = C*d(U)/dt  C=C*(VN/ua)
+GCL1 L1b N VALUE={DDT(v(L1b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+* 1 phase load RL parallel impedance S=const
+.SUBCKT   Load_1phase_RL_const_p  L1 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++   Ulo=0.7
++   Uhi=1.3
++ rser=1u
++   g=1e10
++   fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++   V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,P)
++   QN10=IF(Q<=0,PQ0,Q)
++	R={V*V/PN10}
++	L={(V*V/QN10)/omega}
++   VN2={VN*VN}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 N VALUE={v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
+RL1 L1 L1a {rser}
+GLL1 L1a N VALUE={v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(L1a,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+RGND N 0 {g}
+.ENDS
+
+* 1 phase load RC parallel impedance S=const
+.SUBCKT   Load_1phase_RC_const_p  L1 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++   Ulo=0.7
++   Uhi=1.3
++ rser=1u
++   g=1e10
++   fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++   V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,P) 
++   QN10=IF(Q>=0,PQ0,Q) 
++	R={V*V/PN10}                         
++	C={IF(Q>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
++   VN2={VN*VN}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 N VALUE={v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST C
+RC1 L1 L1b {rser}
+* IC = C*d(U)/dt  C=C*(VN^2/ua^2)
+GCL1 L1b N VALUE={DDT(v(L1b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+* 1 phase R serial impedance I=const
+.SUBCKT   Load_1phase_R_iconst  L1 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++   Ulo=0.7
++   Uhi=1.3
++ rser=1u
++   g=1e10
++ fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++   V={VN/sqrt(3)}
++ R={IF(P>0,V*V/P,V*V/PQ0)}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L1a VALUE={v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST L
+RL1 L1a N {rser}
+RGND N 0 {g}
+.ENDS
+
+* 1 phase load RL serial impedance I=const
+.SUBCKT   Load_1phase_RL_iconst  L1 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++   Ulo=0.7
++   Uhi=1.3
++ rser=1u
++   g=1e10
++ fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++   V={VN/sqrt(3)}
++ P0=IF(P<=0,PQ0,P)
++ Q0=IF(Q<=0,PQ0,Q)
++ R={V*V*P0/(P0*P0+Q0*Q0)}
++ L={(V*V*Q0/(P0*P0+Q0*Q0))/omega}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L1a VALUE={v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua/VN)
+RL1 L1a L1b {rser}
+GLL1 L1b N VALUE={v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(L1b,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+RGND N 0 {g}
+.ENDS
+
+
+* 1 phase RC serial impedance with I=const
+.SUBCKT   Load_1phase_RC_iconst  L1 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++   Ulo=0.7
++   Uhi=1.3
++ rser=1u
++   g=1e10
++ fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++   V={VN/sqrt(3)}
++ PN10=IF(P<=0,PQ0,P) 
++ QN10=IF(Q>=0,PQ0,Q)  
++	R={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	C={IF(Q>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L1a VALUE={v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST C
+RC1 L1a L1b {rser}
+* IC = C*d(U)/dt  C=C*(VN/ua)
+GCL1 L1b N VALUE={DDT(v(L1b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+* 1 phase load RL parallel impedance I=const
+.SUBCKT   Load_1phase_RL_iconst_p  L1 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++   Ulo=0.7
++   Uhi=1.3
++ rser=1u
++   g=1e10
++ fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++   V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,P)
++   QN10=IF(Q<=0,PQ0,Q)
++	R={V*V/PN10}
++	L={(V*V/QN10)/omega}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 N VALUE={v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua/VN)
+RL1 L1 L1a {rser}
+GLL1 L1a N VALUE={v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(L1a,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+RGND N 0 {g}
+.ENDS
+
+* 1 phase RC parallel impedance with I=const
+.SUBCKT   Load_1phase_RC_iconst_p  L1 N
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++   Ulo=0.7
++   Uhi=1.3
++ rser=1u
++   g=1e10
++ fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++   V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,P) 
++   QN10=IF(Q>=0,PQ0,Q) 
++	R={V*V/PN10}                         
++	C={IF(Q>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 N VALUE={v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST C
+RC1 L1 L1b {rser}
+* IC = C*d(U)/dt  C=C*(VN/ua)
+GCL1 L1b N VALUE={DDT(v(L1b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+* 1 phase R serial impedance S=const with ctrl node
+.SUBCKT   Load_1phase_R_const_ctrl  L1 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++   Ulo=0.7
++   Uhi=1.3
++ rser=1u
++   g=1e10
++ fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++   V={VN/sqrt(3)}
++ R={IF(P>0,V*V/P,V*V/PQ0)}
++ VN2={VN*VN}
+Rctrl ctrl 0 1e12
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L1a VALUE={v(L1,L1a)*v(ctrl)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+RL1 L1a N {rser}
+RGND N 0 {g}
+.ENDS
+
+* 1 phase RL serial impedance S=const with ctrl node
+.SUBCKT   Load_1phase_RL_const_ctrl  L1 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++   Ulo=0.7
++   Uhi=1.3
++ rser=1u
++   g=1e10
++ fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++   V={VN/sqrt(3)}
++ P0=IF(P<=0,PQ0,P)
++ Q0=IF(Q<=0,PQ0,Q)
++ R={V*V*P0/(P0*P0+Q0*Q0)}
++ L={(V*V*Q0/(P0*P0+Q0*Q0))/omega}
++ VN2={VN*VN}
+Rctrl ctrl 0 1e12
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua/VN)
+RL1 L1a L1b {rser}
+GLL1 L1b N VALUE={v(ctrl)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(L1b,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+RGND N 0 {g}
+.ENDS
+
+* 1 phase RC serial impedance with S=const and ctrl node
+.SUBCKT   Load_1phase_RC_const_ctrl  L1 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++   Ulo=0.7
++   Uhi=1.3
++ rser=1u
++   g=1e10
++ fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++   V={VN/sqrt(3)}
++ PN10=IF(P<=0,PQ0,P) 
++ QN10=IF(Q>=0,PQ0,Q)  
++	R={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	C={IF(Q>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
++ VN2={VN*VN}
+Rctrl ctrl 0 1e12
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST C
+RC1 L1a L1b {rser}
+* IC = C*d(U)/dt  C=C*(VN/ua)
+GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+* 1 phase RL parallel impedance with S=const and ctrl node
+.SUBCKT   Load_1phase_RL_const_ctrl_p  L1 N ctrl
++	PARAMS:
++ VN=400;
++   fn={fn1} PQ0=1000
++	P=1e6	;
++	Q=1e6 ;
++   Ulo=0.7
++   Uhi=1.3
++   rser=1u
++   g=1e10
++ fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,P)
++   QN10=IF(Q<=0,PQ0,Q)
++	R={V*V/PN10}
++	L={(V*V/QN10)/omega}
++   VN2={VN*VN}
+Rctrl ctrl 0 1e12
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
+RL1 L1 L1a {rser}
+GLL1 L1a N VALUE={v(ctrl)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(L1a,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+RGND N 0 {g}
+.ENDS
+
+* 1 phase RC parallel impedance with S=const and ctrl node
+.SUBCKT   Load_1phase_RC_const_ctrl_p  L1 N ctrl
++	PARAMS:
++ VN=400;
++   fn={fn1} PQ0=1000
++	P=1e6	;
++	Q=1e6 ;
++   Ulo=0.7
++   Uhi=1.3
++   rser=1u
++   g=1e10
++ fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,P) 
++   QN10=IF(Q>=0,PQ0,Q) 
++	R={V*V/PN10}                         
++	C={IF(Q>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
++   VN2={VN*VN}
+Rctrl ctrl 0 1e12
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua^2/VN^2)
+GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN^2/ua^2)
+RC1 L1 L1b {rser}
+GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+* 1 phase R serial impedance I=const
+.SUBCKT   Load_1phase_R_iconst_ctrl  L1 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++   Ulo=0.7
++   Uhi=1.3
++ rser=1u
++   g=1e10
++ fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++   V={VN/sqrt(3)}
++ R={IF(P>0,V*V/P,V*V/PQ0)}
+Rctrl ctrl 0 1e12
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L1a VALUE={v(L1,L1a)*v(ctrl)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST L
+RL1 L1a N {rser}
+RGND N 0 {g}
+.ENDS
+
+
+* 1 phase RL serial impedance I=const with ctrl node
+.SUBCKT   Load_1phase_RL_iconst_ctrl  L1 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++   Ulo=0.7
++   Uhi=1.3
++ rser=1u
++   g=1e10
++ fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++   V={VN/sqrt(3)}
++ P0=IF(P<=0,PQ0,P)
++ Q0=IF(Q<=0,PQ0,Q)
++ R={V*V*P0/(P0*P0+Q0*Q0)}
++ L={(V*V*Q0/(P0*P0+Q0*Q0))/omega}
+Rctrl ctrl 0 1e12
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua/VN)
+RL1 L1a L1b {rser}
+GLL1 L1b N VALUE={v(ctrl)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(L1b,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+RGND N 0 {g}
+.ENDS
+
+
+* 1 phase RC serial impedance with I=const and ctrl node
+.SUBCKT   Load_1phase_RC_iconst_ctrl  L1 N ctrl
++	PARAMS:
++ VN=400;
++ fn={fn1} PQ0=1000
++ P=1e6
++ Q=1e6
++   Ulo=0.7
++   Uhi=1.3
++ rser=1u
++   g=1e10
++ fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++   V={VN/sqrt(3)}
++ PN10=IF(P<=0,PQ0,P) 
++ QN10=IF(Q>=0,PQ0,Q)  
++	R={V*V*PN10/(PN10*PN10+QN10*QN10)}
++	C={IF(Q>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
+Rctrl ctrl 0 1e12
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST C
+RC1 L1a L1b {rser}
+* IC = C*d(U)/dt  C=C*(VN/ua)
+GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+* 1 phase RL parallel impedance with I=const and ctrl node
+.SUBCKT   Load_1phase_RL_iconst_ctrl_p  L1 N ctrl
++	PARAMS:
++ VN=400;
++   fn={fn1} PQ0=1000
++	P=1e6	;
++	Q=1e6 ;
++   Ulo=0.7
++   Uhi=1.3
++   rser=1u
++   g=1e10
++   fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,P)
++   QN10=IF(Q<=0,PQ0,Q)
++	R={V*V/PN10}
++	L={(V*V/QN10)/omega}
+Rctrl ctrl 0 1e12
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST L
+* IL = 1/L * Int(U) dt  L=L*(ua/VN)
+RL1 L1 L1a {rser}
+GLL1 L1a N VALUE={v(ctrl)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(L1a,N)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+RGND N 0 {g}
+.ENDS
+
+* 1 phase RC parallel impedance with I=const and ctrl node
+.SUBCKT   Load_1phase_RC_iconst_ctrl_p  L1 N ctrl
++	PARAMS:
++ VN=400;
++   fn={fn1} PQ0=1000
++	P=1e6	;
++	Q=1e6 ;
++   Ulo=0.7
++   Uhi=1.3
++   rser=1u
++   g=1e10
++   fc=3 vfactor=sqrt(3)
+.PARAM
++ omega={2*pi*fn}
++ V={VN/sqrt(3)}
++   PN10=IF(P<=0,PQ0,P) 
++   QN10=IF(Q>=0,PQ0,Q) 
++	R={V*V/PN10}                         
++	C={IF(Q>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
+Rctrl ctrl 0 1e12
+Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
+Xvmeter L1 ua1 vmeter2
++ params: fc={fc} vfactor={vfactor}
+* CONST R
+* IR = U/R   R=R*(ua/VN)
+GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+* CONST C
+* IC = C*d(U)/dt  C=C*(VN/ua)
+RC1 L1 L1b {rser}
+GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt}
+RGND N 0 {g}
+.ENDS
+
+.subckt vmeter2 in out params: fc=3 b0=3 b1=3 lim=1g vfactor=1.73205
+Asq 0 in in 0 0 0 sq 0 ota vhigh={lim} rout=1 linear
+Adiv_lf _sq sq 0 0 0 0 div 0 ota vhigh={lim} rout=1g cout={1n/fc} linear
+Adiv 0 div out1 0 0 0 _sq 0 ota vhigh={lim} rout=1 linear
+Ab0 out1 div 0 0 0 0 1 0 ota vhigh={lim} vlow={-lim} cout={.5/pi/fc} rout=1g g={b0/b1} linear
+Ab1 out1 1 0 0 0 0 out1 0 ota vhigh={lim} vlow={-lim} cout={.5/pi/fc} rout=1g g={b1} linear
+Eout out 0 VALUE={v(out1)*vfactor} tripdv=1 tripdt=1 
+.ends vmeter2
+

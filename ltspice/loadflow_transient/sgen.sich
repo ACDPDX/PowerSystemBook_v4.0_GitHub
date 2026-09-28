@@ -1,0 +1,490 @@
+***********************************************************
+****	Library für DSG(Drehstromsynchrongenerator)    ****
+***********************************************************
+
+* Special thanks to Otto Justus for the models
+* Power units (synchronous generator)
+* Bei Schenkelpolfaktor=1 nimmt Spannung bei Last am Anfang zu
+* bzw. regelt Ma nach und dadurch steigt die Spannung
+* warum ist das ?
+
+* 400MW unit for isolated operation
+.SUBCKT Block1 U1 V1 W1 F1 M n GND
++	PARAMS:
++	UN_verkettet=20000
++	IN=11.5k
++	Pel=400e6
++	fN=50Hz
++	Kc=0.5
++	UE0=600V
++	IE0=2000A
++	p=2
++	Streuung=0.25
++	rcu=0.01
++	rbg=0.01
++	Schenkelpolfaktor=0.5
++	Daempferfaktor=0.01
++	err0=0
++   n0=0
++   J=100000
+.PARAM
++	UN={UN_verkettet/1.732}
++	ZN={UN/IN}
++	Rs={ZN*rcu}
++	omega_el={6.2832*fN}
++	g={IE0/((1+Streuung)*Kc*IN*1.414)}
++	Ls={Streuung*ZN/Kc/omega_el}
++	PsiN={1.414*UN/omega_el}
++	RE={UE0/IE0}
++	RD={Rs/Daempferfaktor}
++	ImNx={IE0/g}
++	ImNy={ImNx/Schenkelpolfaktor}
++	MN={Pel*(1-rbg-rcu)*p/omega_el}
+*	Wicklungsstroeme
+G1	U1	0	VALUE={v(isxS)+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G2	V1	0	VALUE={(-v(isxS)+v(isyS)*1.732)/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G3	W1	0	VALUE={(-v(isxS)-v(isyS)*1.732)/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+GiE	F1	0	VALUE={v(imx,iDx)*g} tripdv={tdv} tripdt={tdt}
+*	Spannungskomponenten
+EuxS	usxS	0	VALUE={(2*v(u1,u2)-v(v1,v2)-v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+EuyS	usyS	0	VALUE={(v(v1,v2)-v(w1,w2))/1.732} tripdv={tdv} tripdt={tdt}
+Eux	usx	0	VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+Euy	usy	0	VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt}
+Rgnd1 u2 v2 1m
+Rgnd2 v2 w2 1m
+Rgnd3 v2 GND 1m
+ErefL1 Uref_L1 0 VALUE={-1.414*UN*sin(2*3.14159*(fN*(TIME)))} tripdv={tdv} tripdt={tdt}
+*	Nullsystem
+Eu0	u_Null 0	VALUE={(v(u1,u2)+v(v1,v2)+v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+*Ei0	i_Null 0	VALUE={SDT(v(u_Null)-Rcu*v(i_null))/Ls} tripdv={tdv} tripdt={tdt} ;********************* Deleted
+Ei0	i_Null 0	VALUE={SDT(v(u_Null)-Rs*v(i_null))/Ls} tripdv={tdv} tripdt={tdt}
+*	Stromkomponenten
+EisxS		isxS	0 VALUE={v(isx)*cos(v(alpha))-v(isy)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+EisyS		isyS	0 VALUE={v(isy)*cos(v(alpha))+v(isx)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+*	magnetische Kopplung der Hauptachse mit Saettigung
+Gpsix		0	isx	VALUE={v(psisx)} tripdv={tdv} tripdt={tdt}
+Rsx		isx	0	{1/Ls}
+Gpsidx	isx	iDx	VALUE={v(psiDx)} tripdv={tdv} tripdt={tdt} ; *********  
+Rsdx		iDx	isx	{1/Ls}
+GpsiEx	iDx	imx	VALUE={v(psiE)} tripdv={tdv} tripdt={tdt} ; ie oder if ist iDx,imx !!!!
+RsEx		imx	iDx	{1/Ls}
+vphx		imx	imxa	0
+Eimx		imxa	0	VALUE={ImNx*(0.4*i(vphx)/PsiN+0.6*PWRS(i(vphx)/PsiN,7))} tripdv={tdv} tripdt={tdt}
+*	magnetische Kopplung der Querachse mit Saettigung
+Gpsiy		0	isy	VALUE={v(psisy)} tripdv={tdv} tripdt={tdt}
+Rsy		isy	0	{1/Ls} ; ********************************************************************* hier ist kein g vorhanden kürzt es sich weg ?
+Gpsidy	isy	imy	VALUE={v(psiDy)} tripdv={tdv} tripdt={tdt}
+Rsdy		imy	isy	{1/Ls}
+vphy		imy	imya	0
+Eimy		imya	0	VALUE={ImNy*(0.4*i(vphy)/PsiN+0.6*PWRS(i(vphy)/PsiN,7))} tripdv={tdv} tripdt={tdt}
+*	Flusskomponenten
+Epsi_sx	psisx	0
++VALUE={err0*PsiN+SDT(v(usx)-Rs*v(isx)+p*6.2832/60*v(n)*v(psisy))} tripdv={tdv} tripdt={tdt} ; ********************* OK
+Epsi_sy	psisy	0
++VALUE={SDT(v(usy)-Rs*v(isy)-p*6.2832/60*v(n)*v(psisx))} tripdv={tdv} tripdt={tdt} ; ****************** OK
+Epsi_Dx	psiDx	0	VALUE={err0*psiN+SDT(-RD*v(iDx,iSx))} tripdv={tdv} tripdt={tdt}
+Epsi_Dy	psiDy	0	VALUE={SDT(-RD*v(imy,isy))} tripdv={tdv} tripdt={tdt}
+Epsi_E	psiE	0
++VALUE={err0*psiN*(1+Streuung)+SDT(g*v(F1,0)-g*g*RE*v(imx,idx))} tripdv={tdv} tripdt={tdt} ;**************? err0 OK?
+Emi		Mi	0	VALUE={3/2*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
+* Reibung
+GRbg		0	Rbg	TABLE {v(n)} (-1,-1) (1,1)
+RRbg		Rbg	0	{MN*rbg}
+* Berechner alpha
+Ealpha	alpha	0	VALUE={SDT(v(n))*p/60*6.2832} tripdv={tdv} tripdt={tdt}
+* Berechner n
+En		n	0  VALUE={n0+60/6.2832/J*SDT(v(M)+v(Mi)-v(Rbg))} tripdv={tdv} tripdt={tdt}
+* Berechner f
+Ef      f   0  VALUE={v(n)*p/60} tripdv={tdv} tripdt={tdt}
+.ENDS ;
+*$
+
+* generic generator for isolated operation
+.SUBCKT DSG_Insel U1 V1 W1 F1 M n GND
++	PARAMS:
++	UN_verkettet=400V
++	IN=21A
++	Pel=12kW
++	fN=50Hz
++	Kc=0.5
++	UE0=48V
++	IE0=5A
++	p=2
++	Streuung=0.05
++	rcu=0.05
++	rbg=0.05
++	Schenkelpolfaktor=1
++	Daempferfaktor=1
++	err0=0
++   n0=0
++   J=1
+.PARAM
++	UN={UN_verkettet/1.732}
++	ZN={UN/IN}
++	Rs={ZN*rcu}
++	omega_el={6.2832*fN}
++	g={IE0/((1+Streuung)*Kc*IN*1.414)}
++	Ls={Streuung*ZN/Kc/omega_el}
++	PsiN={1.414*UN/omega_el}
++	RE={UE0/IE0}
++	RD={Rs/Daempferfaktor}
++	ImNx={IE0/g}
++	ImNy={ImNx/Schenkelpolfaktor}
++	MN={Pel*(1-rbg-rcu)*p/omega_el}
+*	Wicklungsstroeme
+G1	U1	0	VALUE={v(isxS)+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G2	V1	0	VALUE={(-v(isxS)+v(isyS)*1.732)/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G3	W1	0	VALUE={(-v(isxS)-v(isyS)*1.732)/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+GiE	F1	0	VALUE={v(imx,iDx)*g} tripdv={tdv} tripdt={tdt}
+*	Spannungskomponenten
+EuxS	usxS	0	VALUE={(2*v(u1,u2)-v(v1,v2)-v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+EuyS	usyS	0	VALUE={(v(v1,v2)-v(w1,w2))/1.732} tripdv={tdv} tripdt={tdt}
+Eux	usx	0	VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+Euy	usy	0	VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt}
+Rgnd1 u2 v2 1m
+Rgnd2 v2 w2 1m
+Rgnd3 v2 GND 1m
+ErefL1 Uref_L1 0 VALUE={-1.414*UN*sin(2*3.14159*(fN*(TIME)))} tripdv={tdv} tripdt={tdt}
+*	Nullsystem
+*Eu0	u_Null 0	VALUE={(v(u1,0)+v(v1,0)+v(w1,0))/3} tripdv={tdv} tripdt={tdt}
+Eu0	u_Null 0	VALUE={(v(u1,u2)+v(v1,v2)+v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+Ei0	i_Null 0	VALUE={SDT(v(u_Null)-Rs*v(i_null))/Ls} tripdv={tdv} tripdt={tdt}
+*	Stromkomponenten
+EisxS		isxS	0
++VALUE={v(isx)*cos(v(alpha))-v(isy)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+EisyS		isyS	0
++VALUE={v(isy)*cos(v(alpha))+v(isx)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+*	magnetische Kopplung der Hauptachse mit Saettigung
+Gpsix		0	isx	VALUE={v(psisx)} tripdv={tdv} tripdt={tdt}
+Rsx		isx	0	{1/Ls}
+Gpsidx	isx	iDx	VALUE={v(psiDx)} tripdv={tdv} tripdt={tdt}
+Rsdx		iDx	isx	{1/Ls}
+GpsiEx	iDx	imx	VALUE={v(psiE)} tripdv={tdv} tripdt={tdt}
+RsEx		imx	iDx	{1/Ls}
+vphx		imx	imxa	0
+Eimx		imxa	0	VALUE={ImNx*(0.4*i(vphx)/PsiN+0.6*PWRS(i(vphx)/PsiN,7))} tripdv={tdv} tripdt={tdt}
+*	magnetische Kopplung der Querachse mit Saettigung
+Gpsiy		0	isy	VALUE={v(psisy)} tripdv={tdv} tripdt={tdt}
+Rsy		isy	0	{1/Ls}
+Gpsidy	isy	imy	VALUE={v(psiDy)} tripdv={tdv} tripdt={tdt}
+Rsdy		imy	isy	{1/Ls}
+vphy		imy	imya	0
+Eimy		imya	0	VALUE={ImNy*(0.4*i(vphy)/PsiN+0.6*PWRS(i(vphy)/PsiN,7))} tripdv={tdv} tripdt={tdt}
+*	Flusskomponenten
+Epsi_sx	psisx	0
++VALUE={err0*PsiN+SDT(v(usx)-Rs*v(isx)+p*6.2832/60*v(n)*v(psisy))} tripdv={tdv} tripdt={tdt}
+Epsi_sy	psisy	0
++VALUE={SDT(v(usy)-Rs*v(isy)-p*6.2832/60*v(n)*v(psisx))} tripdv={tdv} tripdt={tdt}
+Epsi_Dx	psiDx	0	VALUE={err0*psiN+SDT(-RD*v(iDx,iSx))} tripdv={tdv} tripdt={tdt}
+Epsi_Dy	psiDy	0	VALUE={SDT(-RD*v(imy,isy))} tripdv={tdv} tripdt={tdt}
+Epsi_E	psiE	0
++VALUE={err0*psiN*(1+Streuung)+SDT(g*v(F1,0)-g*g*RE*v(imx,idx))} tripdv={tdv} tripdt={tdt}
+Emi		Mi	0	VALUE={3/2*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
+* Reibung
+GRbg		0	Rbg	TABLE {v(n)} (-1,-1) (1,1)
+RRbg		Rbg	0	{MN*rbg}
+* Berechner alpha
+Ealpha	alpha	0	VALUE={SDT(v(n))*p/60*6.2832} tripdv={tdv} tripdt={tdt}
+* Berechner n
+En		n	0  VALUE={n0+60/6.2832/J*SDT(v(M)+v(Mi)-v(Rbg))} tripdv={tdv} tripdt={tdt}
+* Berechner f
+Ef      f   0  VALUE={v(n)*p/60} tripdv={tdv} tripdt={tdt}
+.ENDS ;
+*$
+
+* 2tes model ist noch im Aufbau begriffen
+.SUBCKT DSG_Insel_2 U1 V1 W1 F1 M n GND
++	PARAMS:
++	UN_verkettet=16kV
++   SN=345e6
++   Xls=0.1144
++   Xlf=0.0916
++   Xlad=0.1175
++   Xlaq=0.0787
++   Xmd=0.5747
++   Xmq=0.3524
++   rs=0.00181
++   rf=0.000247
++   rad=0.00247
++   raq=0.00533
++   Xmds=0.5
++   Xmqs=0.3312
++   P=80
++   J=1e5
+.PARAM
++	UN={UN_verkettet/1.732}
++	ZN={UN/IN}
++	Rs={ZN*rcu}
++	omega_el={6.2832*fN}
++	g={IE0/((1+Streuung)*Kc*IN*1.414)}
++	Ls={Streuung*ZN/Kc/omega_el}
++	PsiN={1.414*UN/omega_el}
++	RE={UE0/IE0}
++	RD={Rs/Daempferfaktor}
++	ImNx={IE0/g}
++	ImNy={ImNx/Schenkelpolfaktor}
++	MN={Pel*(1-rbg-rcu)*p/omega_el}
+*	Wicklungsstroeme
+G1	U1	0	VALUE={v(isxS)+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G2	V1	0	VALUE={(-v(isxS)+v(isyS)*1.732)/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G3	W1	0	VALUE={(-v(isxS)-v(isyS)*1.732)/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+GiE	F1	0	VALUE={v(imx,iDx)*g} tripdv={tdv} tripdt={tdt}
+*	Spannungskomponenten
+EuxS	usxS	0	VALUE={(2*v(u1,u2)-v(v1,v2)-v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+EuyS	usyS	0	VALUE={(v(v1,v2)-v(w1,w2))/1.732} tripdv={tdv} tripdt={tdt}
+Eux	usx	0	VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+Euy	usy	0	VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt}
+Rgnd1 u2 v2 1m
+Rgnd2 v2 w2 1m
+Rgnd3 v2 GND 1m
+ErefL1 Uref_L1 0 VALUE={-1.414*UN*sin(2*3.14159*(fN*(TIME)))} tripdv={tdv} tripdt={tdt}
+*	Nullsystem
+*Eu0	u_Null 0	VALUE={(v(u1,0)+v(v1,0)+v(w1,0))/3} tripdv={tdv} tripdt={tdt}
+Eu0	u_Null 0	VALUE={(v(u1,u2)+v(v1,v2)+v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+Ei0	i_Null 0	VALUE={SDT(v(u_Null)-Rs*v(i_null))/Ls} tripdv={tdv} tripdt={tdt}
+*	Stromkomponenten
+EisxS		isxS	0
++VALUE={v(isx)*cos(v(alpha))-v(isy)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+EisyS		isyS	0
++VALUE={v(isy)*cos(v(alpha))+v(isx)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+* Magnetische Komponenten
+* isx = id
+* isy = iq
+* idsx
+
+
+
+*	magnetische Kopplung der Hauptachse mit Saettigung
+Gpsix		0	isx	VALUE={v(psisx)} tripdv={tdv} tripdt={tdt}
+Rsx		isx	0	{1/Ls}
+Gpsidx	isx	iDx	VALUE={v(psiDx)} tripdv={tdv} tripdt={tdt}
+Rsdx		iDx	isx	{1/Ls}
+GpsiEx	iDx	imx	VALUE={v(psiE)} tripdv={tdv} tripdt={tdt}
+RsEx		imx	iDx	{1/Ls}
+vphx		imx	imxa	0
+Eimx		imxa	0	VALUE={ImNx*(0.4*i(vphx)/PsiN+0.6*PWRS(i(vphx)/PsiN,7))} tripdv={tdv} tripdt={tdt}
+*	magnetische Kopplung der Querachse mit Saettigung
+Gpsiy		0	isy	VALUE={v(psisy)} tripdv={tdv} tripdt={tdt}
+Rsy		isy	0	{1/Ls}
+Gpsidy	isy	imy	VALUE={v(psiDy)} tripdv={tdv} tripdt={tdt}
+Rsdy		imy	isy	{1/Ls}
+vphy		imy	imya	0
+Eimy		imya	0	VALUE={ImNy*(0.4*i(vphy)/PsiN+0.6*PWRS(i(vphy)/PsiN,7))} tripdv={tdv} tripdt={tdt}
+*	Flusskomponenten
+Epsi_sx	psisx	0
++VALUE={err0*PsiN+SDT(v(usx)-Rs*v(isx)+p*6.2832/60*v(n)*v(psisy))} tripdv={tdv} tripdt={tdt}
+Epsi_sy	psisy	0
++VALUE={SDT(v(usy)-Rs*v(isy)-p*6.2832/60*v(n)*v(psisx))} tripdv={tdv} tripdt={tdt}
+Epsi_Dx	psiDx	0	VALUE={err0*psiN+SDT(-RD*v(iDx,iSx))} tripdv={tdv} tripdt={tdt}
+Epsi_Dy	psiDy	0	VALUE={SDT(-RD*v(imy,isy))} tripdv={tdv} tripdt={tdt}
+Epsi_E	psiE	0
++VALUE={err0*psiN*(1+Streuung)+SDT(g*v(F1,0)-g*g*RE*v(imx,idx))} tripdv={tdv} tripdt={tdt}
+Emi		Mi	0	VALUE={3/2*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
+* Reibung
+GRbg		0	Rbg	TABLE {v(n)} (-1,-1) (1,1)
+RRbg		Rbg	0	{MN*0.01}
+* Berechner alpha
+Ealpha	alpha	0	VALUE={SDT(v(n))*p/60*6.2832} tripdv={tdv} tripdt={tdt}
+* Berechner n
+En		n	0  VALUE={n0+60/6.2832/J*SDT(v(M)+v(Mi)-v(Rbg))} tripdv={tdv} tripdt={tdt}
+* Berechner f
+Ef      f   0  VALUE={v(n)*p/60} tripdv={tdv} tripdt={tdt}
+.ENDS ;
+*$
+
+* generic generator at fixed speed
+.SUBCKT DSG_fixe_Drehzahl U1 V1 W1 F1 M n GND
++	PARAMS:
++	UN_verkettet=400V
++	IN=21A
++	Pel=12kW
++	fN=50Hz
++	Kc=0.5
++	UE0=48V
++	IE0=5A
++	p=2
++	Streuung=0.05
++	rcu=0.05
++	rbg=0.05
++	Schenkelpolfaktor=1
++	Daempferfaktor=1
++	err0=0
++	n1=0
++	t_anlauf=2m
++	t_auslauf=2
++	t_betrieb=100
++	n_Turbine=1500
+.PARAM
++	UN={UN_verkettet/1.732}
++	ZN={UN/IN}
++	Rs={ZN*rcu}
++	omega_el={6.2832*fN}
++	g={IE0/((1+Streuung)*Kc*IN*1.414)}
++	Ls={Streuung*ZN/Kc/omega_el}
++	PsiN={1.414*UN/omega_el}
++	RE={UE0/IE0}
++	RD={Rs/Daempferfaktor}
++	ImNx={IE0/g}
++	ImNy={ImNx/Schenkelpolfaktor}
++	MN={Pel*(1-rbg-rcu)*p/omega_el}
+*	Wicklungsstroeme
+G1	U1	0	VALUE={v(isxS)+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G2	V1	0	VALUE={(-v(isxS)+v(isyS)*1.732)/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G3	W1	0	VALUE={(-v(isxS)-v(isyS)*1.732)/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+GiE	F1	0	VALUE={v(imx,iDx)*g}
+*	Spannungskomponenten
+EuxS	usxS	0	VALUE={(2*v(u1,u2)-v(v1,v2)-v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+EuyS	usyS	0	VALUE={(v(v1,v2)-v(w1,w2))/1.732} tripdv={tdv} tripdt={tdt}
+Eux	usx	0	VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+Euy	usy	0	VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt}
+Rgnd1 u2 v2 1m
+Rgnd2 v2 w2 1m
+Rgnd3 v2 GND 1m
+ErefL1 Uref_L1 0 VALUE={-1.414*UN*sin(2*3.14159*(fN*(TIME)))} tripdv={tdv} tripdt={tdt}
+*	Nullsystem
+Eu0	u_Null 0	VALUE={(v(u1,0)+v(v1,0)+v(w1,0))/3} tripdv={tdv} tripdt={tdt}
+Ei0	i_Null 0	VALUE={SDT(v(u_Null)-Rs*v(i_null))/Ls} tripdv={tdv} tripdt={tdt}
+
+Xipsi	F1  n  alpha  isxS isyS imx iDx usx usy Mi  DSG_i_Psi
++PARAMS: Ls={Ls}  ImNx={ImNx}  PsiN={PsiN}  ImNy={ImNy}  err0={err0}
++Streuung={Streuung}  RE={RE}  Rs={Rs}  RD={RD}  g={g}  p={p}
+
+Xmech	M  alpha  n   Mi DSG_Mechanik
++PARAMS: MN={MN} rbg={rbg} n_turbine={n_turbine}
++n1={n1}  t_anlauf={t_anlauf} t_auslauf={t_auslauf} t_betrieb={t_betrieb} p={p}
+.ENDS ;
+*$
+
+
+
+* 400MW generator at fixed speed
+.SUBCKT Block1_fixe_Drehzahl U1 V1 W1  F1  M  n GND
++	PARAMS:
++	UN_verkettet=20000
++	IN=11.5k
++	Pel=400e6
++	fN=50Hz
++	Kc=0.5
++	UE0=600V
++	IE0=2000A
++	p=2
++	Streuung=0.05
++	rcu=0.001
++	rbg=0.001
++	Schenkelpolfaktor=1
++	Daempferfaktor=1
++	err0=0
++	n1=0
++	t_anlauf=2m
++	t_auslauf=2
++	t_betrieb=2000
++	n_Turbine=1500
+.PARAM
++	UN={UN_verkettet/1.732}
++	ZN={UN/IN}
++	Rs={ZN*rcu}
++	omega_el={6.2832*fN}
++	g={IE0/((1+Streuung)*Kc*IN*1.414)}
++	Ls={Streuung*ZN/Kc/omega_el}
++	PsiN={1.414*UN/omega_el}
++	RE={UE0/IE0}
++	RD={Rs/Daempferfaktor}
++	ImNx={IE0/g}
++	ImNy={ImNx/Schenkelpolfaktor}
++	MN={Pel*(1-rbg-rcu)*p/omega_el}
+*	Currents of the windings
+G1	U1	0	VALUE={v(isxS)+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G2	V1	0	VALUE={(-v(isxS)+v(isyS)*1.732)/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G3	W1	0	VALUE={(-v(isxS)-v(isyS)*1.732)/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+GiE	F1	0	VALUE={v(imx,iDx)*g}
+*	Voltage components
+EuxS	usxS	0	VALUE={(2*v(u1,u2)-v(v1,v2)-v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+EuyS	usyS	0	VALUE={(v(v1,v2)-v(w1,w2))/1.732} tripdv={tdv} tripdt={tdt}
+Eux	usx	0	VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+Euy	usy	0	VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt}
+Rgnd1 u2 v2 1m
+Rgnd2 v2 w2 1m
+Rgnd3 v2 GND 1m
+ErefL1 Uref_L1 0 VALUE={-1.414*UN*sin(2*3.14159*(fN*(TIME)))} tripdv={tdv} tripdt={tdt}
+*	Nullsystem
+Eu0	u_Null 0	VALUE={(v(u1,0)+v(v1,0)+v(w1,0))/3} tripdv={tdv} tripdt={tdt}
+* -------------
+Ei0	i_Null 0	VALUE={SDT(v(u_Null)-Rs*v(i_null))/Ls} tripdv={tdv} tripdt={tdt}
+Xipsi	F1  n  alpha  isxS isyS imx iDx usx usy Mi  DSG_i_Psi
++PARAMS: Ls={Ls}  ImNx={ImNx}  PsiN={PsiN}  ImNy={ImNy}  err0={err0}
++Streuung={Streuung}  RE={RE}  Rs={Rs}  RD={RD}  g={g}  p={p}
+
+Xmech	M  alpha  n   Mi DSG_Mechanik
++PARAMS: MN={MN} rbg={rbg} n_turbine={n_turbine}
++n1={n1}  t_anlauf={t_anlauf} t_auslauf={t_auslauf} t_betrieb={t_betrieb} p={p}
+.ENDS  ;   DSG
+
+
+* flux systems
+.SUBCKT  DSG_i_Psi  F1  n  alpha isxS isyS imx iDx usx usy Mi
++PARAMS:  Ls=1  ImNx=1  PsiN=1  ImNy=1  err0=1   g=1  p=1
++Streuung=1  RE=1   Rs=1  RD=1
+*  Current components
+EisxS		isxS	0
++VALUE={v(isx)*cos(v(alpha))-v(isy)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+EisyS		isyS	0
++VALUE={v(isy)*cos(v(alpha))+v(isx)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+*	magnetic coupling of direct axis
+Gpsix		0	isx	VALUE={v(psisx)} tripdv={tdv} tripdt={tdt}
+Rsx		isx	0	{1/Ls}
+Gpsidx	isx	iDx	VALUE={v(psiDx)} tripdv={tdv} tripdt={tdt}
+Rsdx		iDx	isx	{1/Ls}
+GpsiEx	iDx	imx	VALUE={v(psiE)} tripdv={tdv} tripdt={tdt}
+* __________________
+RsEx		imx	iDx	{1/Ls}
+vphx		imx	imxa	0
+Eimx		imxa	0	VALUE={ImNx*(0.4*i(vphx)/PsiN+0.6*PWRS(i(vphx)/PsiN,7))} tripdv={tdv} tripdt={tdt}
+*	magnetic coupling of transverse axis
+Gpsiy		0	isy	VALUE={v(psisy)} tripdv={tdv} tripdt={tdt}
+Rsy		isy	0	{1/Ls}
+Gpsidy	isy	imy	VALUE={v(psiDy)} tripdv={tdv} tripdt={tdt}
+Rsdy		imy	isy	{1/Ls}
+vphy		imy	imya	0
+Eimy		imya	0	VALUE={ImNy*(0.4*i(vphy)/PsiN+0.6*PWRS(i(vphy)/PsiN,7))} tripdv={tdv} tripdt={tdt}
+*	flux components
+Epsi_sx	psisx	0
++VALUE={err0*PsiN+SDT(v(usx)-rs*v(isx)+p*6.2832/60*v(n)*v(psisy))} tripdv={tdv} tripdt={tdt}
+Epsi_sy	psisy	0
++VALUE={SDT(v(usy)-rs*v(isy)-p*6.2832/60*v(n)*v(psisx))} tripdv={tdv} tripdt={tdt}
+Epsi_Dx	psiDx	0	VALUE={err0*psiN+SDT(-RD*v(iDx,iSx))} tripdv={tdv} tripdt={tdt}
+Epsi_Dy	psiDy	0	VALUE={SDT(-RD*v(imy,isy))} tripdv={tdv} tripdt={tdt}
+Epsi_E	psiE	0
++VALUE={err0*psiN*(1+Streuung)+SDT(g*v(F1,0)-g*g*RE*v(imx,idx))} tripdv={tdv} tripdt={tdt}
+Emi		Mi	0	VALUE={3/2*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
+.ENDS   ;  DSG_i_Psi
+
+* mechanic system
+.SUBCKT  DSG_Mechanik   M  alpha  n  Mi
++PARAMS: MN=1  rbg=1
++n1=1  t_anlauf=1  t_auslauf=1  t_betrieb=1  n_turbine=1  p=1
+GRbg		0	Rbg	TABLE {v(n)} (-1,-1) (1,1)
+RRbg		Rbg	0	{MN*rbg}
+Rn		n	0	1k
+Ealpha	alpha	0	VALUE={SDT(v(n))*p/60*6.2832} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+*	Turbine
+V_Upulse         n 0
++PULSE {n1} {n_Turbine} 0  {t_anlauf} {t_auslauf} {t_betrieb} {1000*t_betrieb}
+.ENDS  ; DSG_Mechanik
+
+.SUBCKT DSG_U123_Uxy0 u1 u2 u3 usx usy u0 alpha
+bup up 0 v=0  
+buq uq 0 v=0
+bu0 u0 0 v=0
+.ENDS
+
+.SUBCKT DSG_Ixy0_I123 isx isy idx idy i0 i1 i2 i3 alpha 
+Rsx isx 0 1
+Rsy isy 0 1
+Rdx idx 0 1
+Rdy idy 0 1 
+Ba 0 i1 i=v(isx)*cos(alpha)-v(isy)*sin(alpha)
+Bb 0 i2 i=0
+Bc 0 i3 i=0
+.ENDS
+

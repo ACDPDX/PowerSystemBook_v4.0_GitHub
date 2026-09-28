@@ -1,0 +1,1233 @@
+
+********************************************
+* Impedance (new with hidden parameters R,L,XL for
+* simply inserting symmetric impedances !!!!!!)
+********************************************
+*********************************************
+* New hidden parameters R,L,XL 
+* can be used if R,L,XL are symmetric per phase
+* Also for the asymmetric case useful: eg.
+* R=x L=y R1=z This means:
+* R1=z R2=x R3=x L1=L2=L3=y  
+*********************************************
+
+
+.SUBCKT   Impedance  L1_1 L2_1 L3_1 L1_2 L2_2 L3_2
++	PARAMS:
++   R=0.5
++	R1={R}	;
++	R2={R}	;
++	R3={R}	;
++   L=0.001
++	L1={L}	;
++	L2={L}	;
++	L3={L}	;
++   fn={fn1}
++   XL=0
++   XL1={XL} ;if present L1 is ignored
++   XL2={XL}
++   XL3={XL}
++   length=1
++   IC1=0
++   IC2=0
++   IC3=0
++   g=1e12
+.PARAM
++   L11=IF(XL1>0,xl1/fn/2/pi,L1)
++   L22=IF(XL2>0,xl2/fn/2/pi,L2)
++   L33=IF(XL3>0,xl3/fn/2/pi,L3)
+RL1 L1_1 L1_1m {R1*length}
+RL2 L2_1 L2_1m {R2*length}
+RL3 L3_1 L3_1m {R3*length}
+LL1 L1_1m L1_2 {L11*length} rser=0 IC={IC1}
+LL2 L2_1m L2_2 {L22*length} rser=0 IC={IC2}
+LL3 L3_1m L3_2 {L33*length} rser=0 IC={IC3}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+.ENDS
+
+* skin dependent resistor for input R1,2,3=RDC
+* The model is obtained for a line with 3x630mm2 area
+* and a ResistanceDC=0.01438 (0.0431/3)
+* and the parameter where obtained by curveexpert pro
+* model works from 0.001Hz to 10kHz
+.SUBCKT Impedance_rf_10000Hz_3x630mm2_Alu L1_1 L2_1 L3_1 L1_2 L2_2 L3_2 fin
++ PARAMS:
++ R=0.01521
++ length=1
++ R50=0.01521 ; this is fix !!!!
++ a=2.715e-2
++ b=-1.3571e-2
++ c=1.814156e-5
++ d=0.998425
++ g=1e12
+* y=a+b*d**fin+c*fin
+ER1 rout1 0 VALUE={(R*length/R50)*(a+b*d**v(fin)+c*v(fin))} tripdv={tdv} tripdt={tdt}
+ER2 rout2 0 VALUE={(R*length/R50)*(a+b*d**v(fin)+c*v(fin))} tripdv={tdv} tripdt={tdt}
+ER3 rout3 0 VALUE={(R*length/R50)*(a+b*d**v(fin)+c*v(fin))} tripdv={tdv} tripdt={tdt}
+GI1 L1_1 L1_2  VALUE={V(L1_1,L1_2)/v(rout1)} tripdv={tdv} tripdt={tdt}
+GI2 L2_1 L2_2  VALUE={V(L2_1,L2_2)/v(rout2)} tripdv={tdv} tripdt={tdt}
+GI3 L3_1 L3_2  VALUE={V(L3_1,L3_2)/v(rout3)} tripdv={tdv} tripdt={tdt}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+Rfin fin 0 {g}
+.ENDS
+
+.SUBCKT Impedance_rf_10000Hz_3x630mm2_Alu_2 L1_1 L2_1 L3_1 L1_2 L2_2 L3_2 fin proz
++ PARAMS:
++ R=0.01521
++ length=1
++ R50=0.01521
++ a=2.715e-2
++ b=-1.3571e-2
++ c=1.814156e-5
++ d=0.998425
++ g=1e12
+* y=a+b*d**fin+c*fin
+ER1 rout1 0 VALUE={(R*length)*(1p+(100-v(proz))/100)} tripdv={tdv} tripdt={tdt}
+ER1a rout1f 0 VALUE={(R*length/R50)*(1p+(v(proz)/100))*(a+b*d**v(fin)+c*v(fin))} tripdv={tdv} tripdt={tdt}
+ER2 rout2 0 VALUE={(R*length)*(1p+(100-v(proz))/100)} tripdv={tdv} tripdt={tdt}
+ER2a rout2f 0 VALUE={(R*length/R50)*(1p+(v(proz)/100))*(a+b*d**v(fin)+c*v(fin))} tripdv={tdv} tripdt={tdt}
+ER3 rout3 0 VALUE={(R*length)*(1p+(100-v(proz))/100)} tripdv={tdv} tripdt={tdt}
+ER3a rout3f 0 VALUE={(R*length/R50)*(1p+(v(proz)/100))*(a+b*d**v(fin)+c*v(fin))} tripdv={tdv} tripdt={tdt}
+GI1 L1_1 L1_2  VALUE={V(L1_1,L1_2)/(v(rout1)+v(rout1f))} tripdv={tdv} tripdt={tdt}
+GI2 L2_1 L2_2  VALUE={V(L2_1,L2_2)/(v(rout2)+v(rout2f))} tripdv={tdv} tripdt={tdt}
+GI3 L3_1 L3_2  VALUE={V(L3_1,L3_2)/(v(rout3)+v(rout3f))} tripdv={tdv} tripdt={tdt}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+Rfin fin 0 {g}
+.ENDS
+
+
+* Derived from http://chemandy.com/calculators/round-wire-ac-resistance-calculator.htm
+.SUBCKT Impedance_rf_cable_20000_300mm2_Cu L1_1 L2_1 L3_1 L1_2 L2_2 L3_2 fin
++ PARAMS:
++ R=0.05742
++ length=1
++ R50=0.05742
++ a=4.853854e-3
++ b=-1.169677e+2
++ c=4.8769448e-1
++ g=1e12
+* model=a*(f-b)^c
+ER1 rout1 0 VALUE={(R*length/R50)*(a*(v(fin)-b)**c)} tripdv={tdv} tripdt={tdt}
+ER2 rout2 0 VALUE={(R*length/R50)*(a*(v(fin)-b)**c)} tripdv={tdv} tripdt={tdt}
+ER3 rout3 0 VALUE={(R*length/R50)*(a*(v(fin)-b)**c)} tripdv={tdv} tripdt={tdt}
+GI1 L1_1 L1_2  VALUE={V(L1_1,L1_2)/v(rout1)} tripdv={tdv} tripdt={tdt}
+GI2 L2_1 L2_2  VALUE={V(L2_1,L2_2)/v(rout2)} tripdv={tdv} tripdt={tdt}
+GI3 L3_1 L3_2  VALUE={V(L3_1,L3_2)/v(rout3)} tripdv={tdv} tripdt={tdt}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+Rfin fin 0 {g}
+.ENDS
+
+* Derived from http://chemandy.com/calculators/round-wire-ac-resistance-calculator.htm
+.SUBCKT Impedance_rf_cable_20000_500mm2_Cu L1_1 L2_1 L3_1 L1_2 L2_2 L3_2 fin
++ PARAMS:
++ R=0.03589
++ length=1
++ R50=0.03589
++ a=3.559871833E-3
++ b=-7.035808795E+1
++ c=4.9246711e-1
++ g=1e12
+* model=a*(f-b)^c
+ER1 rout1 0 VALUE={(R*length/R50)*(a*(v(fin)-b)**c)} tripdv={tdv} tripdt={tdt}
+ER2 rout2 0 VALUE={(R*length/R50)*(a*(v(fin)-b)**c)} tripdv={tdv} tripdt={tdt}
+ER3 rout3 0 VALUE={(R*length/R50)*(a*(v(fin)-b)**c)} tripdv={tdv} tripdt={tdt}
+GI1 L1_1 L1_2  VALUE={V(L1_1,L1_2)/v(rout1)} tripdv={tdv} tripdt={tdt}
+GI2 L2_1 L2_2  VALUE={V(L2_1,L2_2)/v(rout2)} tripdv={tdv} tripdt={tdt}
+GI3 L3_1 L3_2  VALUE={V(L3_1,L3_2)/v(rout3)} tripdv={tdv} tripdt={tdt}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+Rfin fin 0 {g}
+.ENDS
+
+* Derived from http://chemandy.com/calculators/round-wire-ac-resistance-calculator.htm
+.SUBCKT Impedance_rf_cable_20000_1200mm2_Cu L1_1 L2_1 L3_1 L1_2 L2_2 L3_2 fin
++ PARAMS:
++ R=0.01843
++ length=1
++ R50=0.01843
++ a=2.269367543617394E-03
++ b=-2.806911698663756E+01
++ c=4.931209224693475E-01
++ g=1e12
+* model=a*(f-b)^c
+ER1 rout1 0 VALUE={(R*length/R50)*(a*(v(fin)-b)**c)} tripdv={tdv} tripdt={tdt}
+ER2 rout2 0 VALUE={(R*length/R50)*(a*(v(fin)-b)**c)} tripdv={tdv} tripdt={tdt}
+ER3 rout3 0 VALUE={(R*length/R50)*(a*(v(fin)-b)**c)} tripdv={tdv} tripdt={tdt}
+GI1 L1_1 L1_2  VALUE={V(L1_1,L1_2)/v(rout1)} tripdv={tdv} tripdt={tdt}
+GI2 L2_1 L2_2  VALUE={V(L2_1,L2_2)/v(rout2)} tripdv={tdv} tripdt={tdt}
+GI3 L3_1 L3_2  VALUE={V(L3_1,L3_2)/v(rout3)} tripdv={tdv} tripdt={tdt}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+Rfin fin 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk  L1_1 L2_1 L3_1 L1_2 L2_2 L3_2
++	PARAMS:
++  SN=40e9
++  UN=400e3
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+RL2 L2_1 L2_1m {R*length}
+RL3 L3_1 L3_1m {R*length}
+LL1 L1_1m L1_2 {L*length} rser=0 IC=0
+LL2 L2_1m L2_2 {L*length} rser=0 IC=0
+LL3 L3_1m L3_2 {L*length} rser=0 IC=0
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_400V  L1_1 L2_1 L3_1 L1_2 L2_2 L3_2
++	PARAMS:
++  SN=35e6
++  UN=400
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+RL2 L2_1 L2_1m {R*length}
+RL3 L3_1 L3_1m {R*length}
+LL1 L1_1m L1_2 {L*length} rser=0 IC=0
+LL2 L2_1m L2_2 {L*length} rser=0 IC=0
+LL3 L3_1m L3_2 {L*length} rser=0 IC=0
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_10KV  L1_1 L2_1 L3_1 L1_2 L2_2 L3_2
++	PARAMS:
++  SN=430e6
++  UN=10e3
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+RL2 L2_1 L2_1m {R*length}
+RL3 L3_1 L3_1m {R*length}
+LL1 L1_1m L1_2 {L*length} rser=0 IC=0
+LL2 L2_1m L2_2 {L*length} rser=0 IC=0
+LL3 L3_1m L3_2 {L*length} rser=0 IC=0
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_20KV  L1_1 L2_1 L3_1 L1_2 L2_2 L3_2
++	PARAMS:
++  SN=870e6
++  UN=20e3
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+RL2 L2_1 L2_1m {R*length}
+RL3 L3_1 L3_1m {R*length}
+LL1 L1_1m L1_2 {L*length} rser=0 IC=0
+LL2 L2_1m L2_2 {L*length} rser=0 IC=0
+LL3 L3_1m L3_2 {L*length} rser=0 IC=0
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_120KV  L1_1 L2_1 L3_1 L1_2 L2_2 L3_2
++	PARAMS:
++  SN=8.3e9
++  UN=120e3
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+RL2 L2_1 L2_1m {R*length}
+RL3 L3_1 L3_1m {R*length}
+LL1 L1_1m L1_2 {L*length} rser=0 IC=0
+LL2 L2_1m L2_2 {L*length} rser=0 IC=0
+LL3 L3_1m L3_2 {L*length} rser=0 IC=0
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_230KV  L1_1 L2_1 L3_1 L1_2 L2_2 L3_2
++	PARAMS:
++  SN=25e9
++  UN=230e3
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+RL2 L2_1 L2_1m {R*length}
+RL3 L3_1 L3_1m {R*length}
+LL1 L1_1m L1_2 {L*length} rser=0 IC=0
+LL2 L2_1m L2_2 {L*length} rser=0 IC=0
+LL3 L3_1m L3_2 {L*length} rser=0 IC=0
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_400KV  L1_1 L2_1 L3_1 L1_2 L2_2 L3_2
++	PARAMS:
++  SN=40e9
++  UN=400e3
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+RL2 L2_1 L2_1m {R*length}
+RL3 L3_1 L3_1m {R*length}
+LL1 L1_1m L1_2 {L*length} rser=0 IC=0
+LL2 L2_1m L2_2 {L*length} rser=0 IC=0
+LL3 L3_1m L3_2 {L*length} rser=0 IC=0
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_750KV  L1_1 L2_1 L3_1 L1_2 L2_2 L3_2
++	PARAMS:
++  SN=82e9
++  UN=750e3
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+RL2 L2_1 L2_1m {R*length}
+RL3 L3_1 L3_1m {R*length}
+LL1 L1_1m L1_2 {L*length} rser=0 IC=0
+LL2 L2_1m L2_2 {L*length} rser=0 IC=0
+LL3 L3_1m L3_2 {L*length} rser=0 IC=0
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_1150KV  L1_1 L2_1 L3_1 L1_2 L2_2 L3_2
++	PARAMS:
++  SN=95e9
++  UN=1150e3
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+RL2 L2_1 L2_1m {R*length}
+RL3 L3_1 L3_1m {R*length}
+LL1 L1_1m L1_2 {L*length} rser=0 IC=0
+LL2 L2_1m L2_2 {L*length} rser=0 IC=0
+LL3 L3_1m L3_2 {L*length} rser=0 IC=0
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_1ph  L1_1 L1_2 
++	PARAMS:
++  SN=40e9
++  UN=400e3
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+LL1 L1_1m L1_2 {L*length} 
+Rgnd1 L1_1 0 {g}
+Rgnd4 L1_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_400V_1ph  L1_1 L1_2 
++	PARAMS:
++  SN=35e6
++  UN=400
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+LL1 L1_1m L1_2 {L*length} 
+Rgnd1 L1_1 0 {g}
+Rgnd4 L1_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_10KV_1ph  L1_1 L1_2
++	PARAMS:
++  SN=430e6
++  UN=10e3
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+LL1 L1_1m L1_2 {L*length} 
+Rgnd1 L1_1 0 {g}
+Rgnd4 L1_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_20KV_1ph  L1_1 L1_2
++	PARAMS:
++  SN=870e6
++  UN=20e3
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+LL1 L1_1m L1_2 {L*length} 
+Rgnd1 L1_1 0 {g}
+Rgnd4 L1_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_120KV_1ph  L1_1 L1_2
++	PARAMS:
++  SN=8.3e9
++  UN=120e3
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+LL1 L1_1m L1_2 {L*length} 
+Rgnd1 L1_1 0 {g}
+Rgnd4 L1_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_230KV_1ph  L1_1 L1_2
++	PARAMS:
++  SN=25e9
++  UN=230e3
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+LL1 L1_1m L1_2 {L*length} 
+Rgnd1 L1_1 0 {g}
+Rgnd4 L1_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_400KV_1ph  L1_1 L1_2
++	PARAMS:
++  SN=40e9
++  UN=400e3
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+LL1 L1_1m L1_2 {L*length} 
+Rgnd1 L1_1 0 {g}
+Rgnd4 L1_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_750KV_1ph  L1_1 L1_2
++	PARAMS:
++  SN=82e9
++  UN=750e3
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+LL1 L1_1m L1_2 {L*length} 
+Rgnd1 L1_1 0 {g}
+Rgnd4 L1_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_sk_1150KV_1ph  L1_1 L1_2
++	PARAMS:
++  SN=95e9
++  UN=1150e3
++  fn={fn1}
++  r_x=0.1
++  length=1
++  g=1e12
+.PARAM
++ ZN=UN*UN/SN
++ L=ZN/(2*3.14159*fN)
++ R=r_x*ZN
+RL1 L1_1 L1_1m {R*length}
+LL1 L1_1m L1_2 {L*length} 
+Rgnd1 L1_1 0 {g}
+Rgnd4 L1_2 0 {g}
+.ENDS
+
+
+.SUBCKT Impedance_parallel L1_1 L2_1 L3_1 L1_2 L2_2 L3_2
++	PARAMS:
++   R=0.5
++	R1={R}	;
++	R2={R}	;
++	R3={R}	;
++   L=0.001
++	L1={L}	;
++	L2={L}	;
++	L3={L}	;
++   fn={fn1}
++   XL=0
++   XL1={XL} ;if present L1 is ignored
++   XL2={XL}
++   XL3={XL}
++   length=1
++   IC1=0
++   IC2=0
++   IC3=0
++   g=1e12
+.PARAM
++   L11=IF(xl1>0,xl1/fn/2/pi,L1)
++   L22=IF(xl2>0,xl2/fn/2/pi,L2)
++   L33=IF(xl3>0,xl3/fn/2/pi,L3)
+RL1 L1_1 L1_2 {R1*length}
+RL2 L2_1 L2_2 {R2*length}
+RL3 L3_1 L3_2 {R3*length}
+LL1 L1_1 L1_2 {L11*length} rser=0 IC={IC1}
+LL2 L2_1 L2_2 {L22*length} rser=0 IC={IC2}
+LL3 L3_1 L3_2 {L33*length} rser=0 IC={IC3}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+.ENDS
+
+.SUBCKT Impedance_ctrl  L1_1 L2_1 L3_1 L1_2 L2_2 L3_2 ctrl
++	PARAMS:
++   R=0.5
++	R1={R}	;
++	R2={R}	;
++	R3={R}	;
++   L=0.001
++	L1={L}	;
++	L2={L}	;
++	L3={L}	;
++   fn={fn1}
++   XL=0
++   XL1={XL} ;if present L1 is ignored
++   XL2={XL}
++   XL3={XL}
++   length=1
++   psi_0r=0
++   psi_0s=0
++   psi_0t=0
++   g=1e12
+.PARAM
++   L11=IF(xl1>0,xl1/fn/2/pi,L1)
++   L22=IF(xl2>0,xl2/fn/2/pi,L2)
++   L33=IF(xl3>0,xl3/fn/2/pi,L3)
+Rctrl ctrl 0 1e12
+GRL1 L1_1 L1_1m VALUE={V(L1_1,L1_1m)/(R1*length*v(ctrl))} tripdv={tdv} tripdt={tdt}
+GRL2 L2_1 L2_1m VALUE={V(L2_1,L2_1m)/(R2*length*v(ctrl))} tripdv={tdv} tripdt={tdt}
+GRL3 L3_1 L3_1m VALUE={V(L3_1,L3_1m)/(R3*length*v(ctrl))} tripdv={tdv} tripdt={tdt}
+LL1 L1_1m L1_2 flux={psi_0r}+{L11}*x*{length}*v(ctrl)
+LL2 L2_1m L2_2 flux={psi_0s}+{L22}*x*{length}*v(ctrl)
+LL3 L3_1m L3_2 flux={psi_0t}+{L33}*x*{length}*v(ctrl)
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+.ENDS
+
+
+.SUBCKT Impedance_1phase  L1_1 L1_2
++	PARAMS:
++	R=0.5	;
++	L=0.001	;
++   fn={fn1}
++   XL=0
++   length=1
++   IC=0
++   g=1e12
+.PARAM
++   L1=IF(xl>0,xl/fn/2/pi,L)
+RL1 L1_1 L1_1m {R*length}
+LL1 L1_1m L1_2 {L1*length} rser=0 IC={IC}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+
+.SUBCKT Impedance_1phase_ctrl  L1_1 L1_2 ctrl
++	PARAMS:
++	R=0.5	;
++	L=0.001	;
++   fn={fn1}
++   XL=0
++   length=1
++   psi_0=0
++   g=1e12
+.PARAM
++   L1=IF(xl>0,xl/fn/2/pi,L)
+Rctrl ctrl 0 1e12
+GRL1 L1_1 L1_1m VALUE={V(L1_1,L1_1m)/(R*length*v(ctrl))} tripdv={tdv} tripdt={tdt}
+LL1 L1_1m L1_2 flux={psi_0}+{L1}*x*{length}*v(ctrl)
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+.SUBCKT R  L1_1 L1_2
++	PARAMS:
++	R=0.5	;
++ length=1
++ g=1e12
+RL1 L1_1 L1_2 {R*length}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+.SUBCKT L  L1_1 L1_2
++	PARAMS:
++	L=1	;
++   fn={fn1}
++   xl=0
++ length=1
++ rser=0
++ IC=0
++ g=1e12
+.PARAM
++   L1=IF(xl>0,xl/fn/2/pi,L)
+LL1 L1_1 L1_2 {L1*length} rser={rser} IC={IC}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+.SUBCKT R_exp  L1_1 L1_2
++	PARAMS:
++	R=1	;
++ length=1
++ TD=0
++ texp=25m
++ g=1e12
+Ein in1a in1b VALUE={IF(time>TD,v(L1_1,L1_2)*(1-exp(-abs(time-TD)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Gout L1_1 L1_2 VALUE={v(in1a,in1b)/(R*length)} tripdv={tdv} tripdt={tdt}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+.SUBCKT L_exp  L1_1 L1_2
++	PARAMS:
++	L=1	
++   fn={fn1}
++   xl=0
++ length=1
++ TD=0
++ rser=1e-6
++ texp=25m
++ g=1e12
+.PARAM
++   L1=IF(xl>0,xl/fn/2/pi,L)
++   rser1=IF(rser>0,rser,1e-6)
+Ein in1a in1b VALUE={IF(time>TD,v(L1_1,L1_2x)*(1-exp(-abs(time-TD)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Gx 0 idt1 VALUE={v(in1a,in1b)/(L1*length)} tripdv={tdv} tripdt={tdt} 
+Cx idt1 0 1
+Rx idt1 0 1e10
+Gout L1_1 L1_2x VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+Rser L1_2x L1_2 {rser1}
+Rx L1_2x 0 1e12
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+.SUBCKT L_int  L1_1 L1_2
++	PARAMS:
++	L=0.5	
++   fn={fn1}
++   xl=0
++ length=1
++ rser=1e-6
++ psi_0=0
++ g=1e12
+.PARAM
++   L1=IF(xl>0,xl/fn/2/pi,L)
++   rser1=IF(rser>0,rser,1e-6)
+GL1  L1_1 L1_2x VALUE={(psi_0+v(idt1))/(L1*length)}  tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(L1_1,L1_2x)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Rser L1_2x L1_2 {rser1}
+Rx L1_2x 0 1e12
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+.SUBCKT L_flux  L1_1 L1_2
++	PARAMS:
++	L=0.5	
++   fn={fn1}
++   xl=0
++ length=1
++ rser=1e-6
++ psi_0=0
++ g=1e12
+.PARAM
++   L1=IF(xl>0,xl/fn/2/pi,L)
++   rser1=IF(rser>0,rser,1e-6)
+LL1 L1_1 L1_2x flux={psi_0}+{L1*length}*x 
+Rser L1_2x L1_2 {rser1}
+Rx L1_2x 0 1e12
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+.SUBCKT C  L1_1 L1_2
++	PARAMS:
++	C=0.5	;
++   fn={fn1}
++   XC=0
++ length=1
++ IC=0
++ rser=0
++ g=1e12
+.PARAM
++   C1=IF(xc>0,1/(xc+1e-15)/fn/2/pi,C)
+CL1 L1_1 L1_2 {C1*length} rser={rser} IC={IC}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+.SUBCKT C_exp  L1_1 L1_2
++	PARAMS:
++	C=0.5	;
++   fn={fn1}
++   XC=0
++ length=1
++ rser=1e-6
++ TD=0
++ texp=25m
++ g=1e12
+.PARAM
++   C1=IF(xc>0,1/(xc+1e-15)/fn/2/pi,C)
++   rser1=IF(rser>0,rser,1e-6)
+Ein in1a in1b VALUE={IF(time>TD,v(L1_1,L1_2x)*(1-exp(-abs(time-TD)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Gout L1_1 L1_2x VALUE={DDT(v(in1a,in1b))*C1*length} tripdv={tdv} tripdt={tdt}
+Rser L1_2x L1_2 {rser1}
+Rx  L1_2x 0 1e12
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+
+.SUBCKT C_int  L1_1 L1_2
++	PARAMS:
++	C=0.5	;
++   fn={fn1}
++   XC=0
++ length=1
++ q_0=0
++ rser=1e-6
++ g=1e12
+.PARAM
++   C1=IF(xc>0,1/(xc+1e-15)/fn/2/pi,C)
++   rser1=IF(rser>0,rser,1e-6)
+EC1 L1_1 L1_x VALUE={(q_0+v(idt1))/(C1*length)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={i(vi)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Vi  L1_x L1_2x 0
+Rser L1_2x L1_2 {rser1}
+Rx  L1_2x 0 1e12
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+.SUBCKT C_q  L1_1 L1_2
++	PARAMS:
++	C=0.5	;
++   fn={fn1}
++   XC=0
++ length=1
++ rser=1e-6
++ q_0=0
++ g=1e12
+.PARAM
++   C1=IF(xc>0,1/(xc+1e-15)/fn/2/pi,C)
++   rser1=IF(rser>0,rser,1e-6)
+C1 L1_1 L1_2x q={q_0}+{C1*length}*x
+Rser L1_2x L1_2 {rser1}
+Rx  L1_2x 0 1e12
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+
+.SUBCKT R_ctrl  L1_1 L1_2 ctrl
++	PARAMS:
++	R=0.5	;
++ length=1
++ g=1e12
+Rctrl ctrl 0 1e12
+GRL1 L1_1 L1_2 VALUE={V(L1_1,L1_2)/(R*length*v(ctrl))} tripdv={tdv} tripdt={tdt}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+.SUBCKT L_ctrl  L1_1 L1_2 ctrl
++	PARAMS:
++	L=0.5	;
++   fn={fn1}
++   xl=0
++ length=1
++ psi_0=0
++ r_x=0.001
++ g=1e12
+.PARAM
++   L1=IF(xl>0,xl/fn/2/pi,L)
++   omega={2*fn*pi}
+* v(ctrl) in flux statement work's
+* but not in q statement of capacitance
+Rctrl ctrl 0 1e12
+LL1 L1_1 L1_2x flux={psi_0}+{L1}*x*{length}*v(ctrl)
+GR1 L1_2x L1_2 VALUE={v(L1_2x,L1_2)/(r_x*omega*L1*length)} tripdv={tdv} tripdt={tdt}
+Rx L1_2x 0 1e12
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+* C is controlled
+.SUBCKT C_ctrl  L1_1 L1_2 ctrl
++	PARAMS:
++	C=0.5	;
++   fn={fn1}
++   XC=0
++ length=1
++ q_0=0
++ r_x=0.001
++ g=1e12
+.PARAM
++   C1=IF(xc>0,1/(xc+1e-15)/fn/2/pi,C)
++ omega={2*fn*pi}
+Rctrl ctrl 0 1e12
+*EC1 L1_1 L1_x VALUE={(q_0+idt(i(vi)))/(C1*v(ctrl)*length)} tripdv={tdv} tripdt={tdt}
+*Vi  L1_x L1_2 0
+*v(ctrl) in Q statement doesn't work
+*worked in Ltspice IV
+CL1 L1_1 L1_2x Q={q_0}+{C1}*x*{length}*v(ctrl)
+GR1 L1_2x L1_2 VALUE={v(L1_2x,L1_2)/(r_x/omega/C1/v(ctrl)/length)} tripdv={tdv} tripdt={tdt}
+Rx L1_2x 0 1e12
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+* XC is controlled
+.SUBCKT C_XC_ctrl  L1_1 L1_2 ctrl
++	PARAMS:
++	C=0.5	;
++   fn={fn1}
++   XC=0
++ length=1
++ q_0=0
++ r_x=0.001
++ g=1e12
+.PARAM
++   C1=IF(xc>0,1/(xc+1e-15)/fn/2/pi,C)
++   omega={2*fn*pi}
+Rctrl ctrl 0 1e12
+*EC1 L1_1 L1_x VALUE={(q_0+idt(i(vi)))*v(ctrl)/(C1*length)} tripdv={tdv} tripdt={tdt}
+*Vi  L1_x L1_2 0
+* IMPORTANT: For fast simulation and sucessful simulation
+* add a small series resistance to the capacitance
+CL1 L1_1 L1_2x Q={q_0}+{C1}*x*{length}/v(ctrl)
+GR1 L1_2x L1_2 VALUE={v(L1_2x,L1_2)/(r_x*v(ctrl)*length/omega/C1)} tripdv={tdv} tripdt={tdt}
+Rx L1_2x 0 1e12
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+.SUBCKT R_ctrl_exp  L1_1 L1_2 ctrl
++	PARAMS:
++	R=1	;
++ length=1
++ TD=0
++ texp=25m
++ g=1e12
+Rctrl ctrl 0 1e12
+Ein in1a in1b VALUE={IF(time>TD,v(L1_1,L1_2)*(1-exp(-abs(time-TD)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Gout L1_1 L1_2 VALUE={v(in1a,in1b)/(R*length*v(ctrl))} tripdv={tdv} tripdt={tdt}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+
+* controlled with ctrl_pin and with soft swingin
+.SUBCKT L_ctrl_exp  L1_1 L1_2 ctrl
++	PARAMS:
++	L=0.5	;
++   fn={fn1}
++   xl=0
++ length=1
++ TD=0
++ texp=25m
++ g=1e12
++ r_x=0.001
+.PARAM
++   L1=IF(xl>0,xl/fn/2/pi,L)
++   omega={2*fn*pi}
+Rctrl ctrl 0 1e12
+Ein in1a in1b VALUE={IF(time>TD,v(L1_1,L1_2x)*(1-exp(-abs(time-TD)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Gx 0 idt1 VALUE={v(in1a,in1b)/(L1*length*v(ctrl))} tripdv={tdv} tripdt={tdt} 
+Cx idt1 0 1
+Rx idt1 0 1e10
+Gout L1_1 L1_2x VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+GR1 L1_2x L1_2 VALUE={v(L1_2x,L1_2)/(r_x*omega*L1*length)} tripdv={tdv} tripdt={tdt}
+Rx L1_2x 0 1e12 
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+* controlled with ctrl_pin and with soft swingin
+* C is controlled
+.SUBCKT C_ctrl_exp  L1_1 L1_2 ctrl
++	PARAMS:
++	C=0.5	;
++   fn={fn1}
++   XC=0
++ length=1
++ TD=0
++ texp=25m
++ g=1e12
++ r_x=0.001
+.PARAM
++   C1=IF(xc>0,1/(xc+1e-15)/fn/2/pi,C)
++   omega={2*fn*pi}
+Rctrl ctrl 0 1e12
+Ein in1a in1b VALUE={IF(time>TD,v(L1_1,L1_2x)*(1-exp(-abs(time-TD)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Gout L1_1 L1_2x VALUE={DDT(v(in1a,in1b))*C1*length*v(ctrl)} tripdv={tdv} tripdt={tdt}
+GR1 L1_2x L1_2 VALUE={v(L1_2x,L1_2)/(r_x/omega/C1/v(ctrl)/length)} tripdv={tdv} tripdt={tdt}
+Rx L1_2x 0 1e12
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+* skin dependant resistance off a overhead line
+* model works only till 10kHz
+* This frequency dependanet resistor model is derived from a 3*635mm2 400kV Tonnenmast (RDC=0.01438ohm) overhead line from ATP
+* For other lines(with other RDC values) the R value is in this model related to the 0.01521ohm resistance
+* I do not try if that makes any sense for other lines than the line above
+* but this model should rather show the
+* qualitative case than the quantitative one
+* The r(f) formula parameters were optimized by CurveExpert Pro
+* model: a+b*d^f+c*f
+* RDC=0.01438ohm
+* R50=0.01521ohm
+* R100=0.01617ohm
+* R500=0.03ohm
+* R1000=0.043ohm
+* R3500=0.07273ohm
+* R5000=0.1174ohm
+* R7500=0.1622ohm
+* R10000=0.2094ohm
+* The fin pin is used to input a frequency value e.g. Vf fin 0 pwl 0s 50 1s 50 1.1s 400
+* This frequency is than the one main frequeny e.g. 400Hz instead of 50Hz
+* For two frequenys at the same time use the model
+* Rf_10000Hz_3x630mm2_Alu_2 where you can input the percentage of e.g. 400Hz see below
+.SUBCKT Rf_10000Hz_3x630mm2_Alu L1_1 L1_2 fin
++ PARAMS: R=0.01521 length=1 g=1e12 R50=0.01521
++a =	2.71508424293378E-02
++b =	-1.35709971736223E-02
++c =	1.81415647078173E-05
++d =	9.98425329636548E-01
+Rfin fin 0 1e12
+ER rout 0 VALUE={(R*length/R50)*(a+b*d**v(fin)+c*v(fin))} tripdv={tdv} tripdt={tdt}
+G1 L1_1 L1_2 VALUE={V(L1_1,L1_2)/v(rout)} tripdv={tdv} tripdt={tdt}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+* fin: vfin fin 0 pwl 0s 50 1s 50 1.1s 400
+* proz: vpr proz 0 pwl 0s 100 1s 100 1.1s 50
+* This means: from 0s to 1s only 50Hz, from 1.1s on 50% 50Hz 50% 400Hz
+.SUBCKT Rf_10000Hz_3x630mm2_Alu_2 L1_1 L1_2 fin proz
++ PARAMS: R=0.01521 length=1 g=1e12 R50=0.01521 ; proz=percentage of higher harmonics
++a =	2.71508424293378E-02
++b =	-1.35709971736223E-02
++c =	1.81415647078173E-05
++d =	9.98425329636548E-01
+Rfin fin 0 1e12
+ER1 rout1 0 VALUE={(R*length)*(1p+(100-v(proz))/100)} tripdv={tdv} tripdt={tdt}
+ER2 rout2 0 VALUE={(R*length/R50)*(1p+(v(proz)/100))*(a+b*d**v(fin)+c*v(fin))} tripdv={tdv} tripdt={tdt}
+G1 L1_1 L1_2 VALUE={V(L1_1,L1_2)/(v(rout1)+v(rout2))} tripdv={tdv} tripdt={tdt}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+* Derived from http://chemandy.com/calculators/round-wire-ac-resistance-calculator.htm
+*1.0000000000000000E+00	5.5980000000000002E-02
+*2.0000000000000000E+01	5.6120000000000003E-02
+*5.0000000000000000E+01	5.7419999999999999E-02
+*1.0000000000000000E+02	6.1350000000000002E-02
+*5.0000000000000000E+02	1.0896000000000000E-01
+*1.0000000000000000E+03	1.4774999999999999E-01
+*3.5000000000000000E+03	2.6262000000000002E-01
+*5.0000000000000000E+03	3.1100000000000000E-01
+*7.0000000000000000E+03	3.7750000000000000E-01
+*1.0000000000000000E+04	4.3361000000000000E-01
+*2.0000000000000000E+04	6.0712999999999995E-01
+* model=a*(f-b)^c
+.SUBCKT Rf_Cable_20000Hz_300mm2_Cu L1_1 L1_2 fin
++ PARAMS: R=0.05742 length=1 g=1e12 R50=0.05742
++ a=4.853854e-3
++ b=-1.169677e+2
++ c=4.8769448e-1
+Rfin fin 0 1e12
+ER rout 0 VALUE={(R*length/R50)*(a*(v(fin)-b)**c)} tripdv={tdv} tripdt={tdt}
+G1 L1_1 L1_2 VALUE={V(L1_1,L1_2)/v(rout)} tripdv={tdv} tripdt={tdt}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+* Derived from http://chemandy.com/calculators/round-wire-ac-resistance-calculator.htm
+*1.0000000000000000E+00	3.3590000000000002E-02
+*2.0000000000000000E+01	3.3939999999999998E-02
+*5.0000000000000000E+01	3.5889999999999998E-02
+*1.0000000000000000E+02	4.1520000000000001E-02
+*5.0000000000000000E+02	8.1780000000000005E-02
+*1.0000000000000000E+03	1.1160000000000000E-01
+*3.5000000000000000E+03	2.0000000000000001E-01
+*5.0000000000000000E+03	2.3827000000000001E-01
+*7.0000000000000000E+03	2.8000000000000003E-01
+*1.0000000000000000E+04	3.3329999999999999E-01
+*2.0000000000000000E+04	4.6773999999999999E-01
+* model=a*(f-b)^c
+.SUBCKT Rf_Cable_20000Hz_500mm2_Cu L1_1 L1_2 fin
++ PARAMS: R=0.03589 length=1 g=1e12 R50=0.03589
++ a=3.559871833E-3
++ b=-7.035808795E+1
++ c=4.9246711e-1
+Rfin fin 0 1e12
+ER rout 0 VALUE={(R*length/R50)*(a*(v(fin)-b)**c)} tripdv={tdv} tripdt={tdt}
+G1 L1_1 L1_2 VALUE={V(L1_1,L1_2)/v(rout)} tripdv={tdv} tripdt={tdt}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+* Derived from http://chemandy.com/calculators/round-wire-ac-resistance-calculator.htm
+*1.0000000000000000E+00	1.4000000000000000E-02
+*2.0000000000000000E+01	1.4880000000000001E-02
+*5.0000000000000000E+01	1.8429999999999998E-02
+*1.0000000000000000E+02	2.4690000000000000E-02
+*5.0000000000000000E+02	5.0569999999999997E-02
+*1.0000000000000000E+03	6.9930000000000006E-02
+*3.5000000000000000E+03	1.2759999999999999E-01
+*5.0000000000000000E+03	1.5178000000000000E-01
+*7.0000000000000000E+03	1.7892000000000000E-01
+*1.0000000000000000E+04	2.1315000000000001E-01
+*2.0000000000000000E+04	2.9999999999999999E-01
+* model=a*(f-b)^c
+.SUBCKT Rf_Cable_20000Hz_1200mm2_Cu L1_1 L1_2 fin
++ PARAMS: R=0.01843 length=1 g=1e12 R50=0.01843
++ a=2.269367543617394E-03
++ b=-2.806911698663756E+01
++ c=4.931209224693475E-01
+Rfin fin 0 1e12
+ER rout 0 VALUE={(R*length/R50)*(a*(v(fin)-b)**c)} tripdv={tdv} tripdt={tdt}
+G1 L1_1 L1_2 VALUE={V(L1_1,L1_2)/v(rout)} tripdv={tdv} tripdt={tdt}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+* Compute 
+* self inductance by wxmaxima file:
+* coupled impedances.wxmx in the example folder
+* input: k's and symmetric inductances
+* output: self inductances and mutual inductances
+ 
+.subckt impedance_coupled L1_1 L2_1 L3_1 L1_2 L2_2 L3_2
++	PARAMS:
++   R=0.5
++	R1={R}	;
++	R2={R}	;
++	R3={R}	;
++   L=0.001
++	L1={L}	;
++	L2={L}	;
++	L3={L}	;
++   K=0.5
++   k12={k}
++   k13={k} 
++   k23={k} ; coupling 
++   fn={fn1}
++   XL=0
++   XL1={XL} ;if present L1 is ignored
++   XL2={XL}
++   XL3={XL}
++   length=1
++   g=1e12
+.PARAM
++   L11=length*IF(xl1>0,xl1/fn/2/pi,L1)
++   L22=length*IF(xl2>0,xl2/fn/2/pi,L2)
++   L33=length*IF(xl3>0,xl3/fn/2/pi,L3)
++   R11=length*R1
++   R22=length*R2
++   R33=length*R3
+L1 L1_1 L1_1x {L11}
+R1 L1_1x L1_2 {R11}
+L2 L2_1 L2_1x {L22}
+R2 L2_1x L2_2 {R22}
+L3 L3_1 L3_1x {L33}
+R3 L3_1x L3_2 {R33}
+K12 L1 L2 {k12}
+K13 L1 L3 {k13}
+K23 L2 L3 {k23}
+Rgnd1 L1_1 0 {g}
+Rgnd2 L2_1 0 {g}
+Rgnd3 L3_1 0 {g}
+Rgnd4 L1_2 0 {g}
+Rgnd5 L2_2 0 {g}
+Rgnd6 L3_2 0 {g}
+.ends
+
+.SUBCKT Impedance_Rtower  Spitze Fuss
++	PARAMS:
++	R=20	;
++	Z0=150	;
++   tau=160n
+Tspitze Spitze 0 Fuss 0 Z0={Z0} td={tau}
+Rtower Fuss 0 {R}
+.ENDS
+
+.SUBCKT Rsheat  in 
++	PARAMS:
++	R=0.5ohm
+R1 in 0 {R}
+.ENDS
+
+
+
+
+
+

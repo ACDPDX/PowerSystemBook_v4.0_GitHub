@@ -1,0 +1,200 @@
+Version 4
+SymbolType BLOCK
+LINE Normal -16 -112 -32 -112
+LINE Normal 16 -112 32 -112
+LINE Normal -16 -80 -32 -80
+LINE Normal 16 -80 32 -80
+LINE Normal -16 -48 -32 -48
+LINE Normal -16 -32 -32 -32
+LINE Normal -16 -16 -32 -16
+LINE Normal 16 -48 32 -48
+LINE Normal 16 -32 32 -32
+LINE Normal 16 -16 32 -16
+LINE Normal -16 -96 -32 -96
+LINE Normal 16 -96 32 -96
+LINE Normal 0 -101 0 -107
+LINE Normal -1 -106 0 -107
+LINE Normal 0 -107 -1 -106
+LINE Normal 1 -106 0 -107
+LINE Normal -1 -102 0 -101
+LINE Normal 0 -101 -1 -102
+LINE Normal 1 -102 0 -101
+LINE Normal 0 -85 0 -91
+LINE Normal -1 -90 0 -91
+LINE Normal 0 -91 -1 -90
+LINE Normal 1 -90 0 -91
+LINE Normal -1 -86 0 -85
+LINE Normal 0 -85 -1 -86
+LINE Normal 1 -86 0 -85
+LINE Normal 0 -37 0 -43
+LINE Normal -1 -42 0 -43
+LINE Normal 0 -43 -1 -42
+LINE Normal 1 -42 0 -43
+LINE Normal -1 -38 0 -37
+LINE Normal 0 -37 -1 -38
+LINE Normal 1 -38 0 -37
+LINE Normal 0 -21 0 -27
+LINE Normal -1 -26 0 -27
+LINE Normal 0 -27 -1 -26
+LINE Normal 1 -26 0 -27
+LINE Normal -1 -22 0 -21
+LINE Normal 0 -21 -1 -22
+LINE Normal 1 -22 0 -21
+LINE Normal 0 -57 0 -71
+LINE Normal -1 -70 0 -71
+LINE Normal 0 -71 -1 -70
+LINE Normal 1 -70 0 -71
+LINE Normal -1 -58 0 -57
+LINE Normal 0 -57 -1 -58
+LINE Normal 1 -58 0 -57
+LINE Normal 0 129 0 120
+LINE Normal 8 129 0 129
+LINE Normal -8 129 0 129
+LINE Normal 6 132 -6 132
+LINE Normal -22 -124 -26 -121
+LINE Normal -22 -116 -22 -124
+LINE Normal -16 16 -32 16
+LINE Normal 16 16 32 16
+LINE Normal -16 48 -32 48
+LINE Normal 16 48 32 48
+LINE Normal -16 80 -32 80
+LINE Normal -16 96 -32 96
+LINE Normal -16 112 -32 112
+LINE Normal 16 80 32 80
+LINE Normal 16 96 32 96
+LINE Normal 16 112 32 112
+LINE Normal -16 32 -32 32
+LINE Normal 16 32 32 32
+LINE Normal 0 27 0 21
+LINE Normal -1 22 0 21
+LINE Normal 0 21 -1 22
+LINE Normal 1 22 0 21
+LINE Normal -1 26 0 27
+LINE Normal 0 27 -1 26
+LINE Normal 1 26 0 27
+LINE Normal 0 43 0 37
+LINE Normal -1 38 0 37
+LINE Normal 0 37 -1 38
+LINE Normal 1 38 0 37
+LINE Normal -1 42 0 43
+LINE Normal 0 43 -1 42
+LINE Normal 1 42 0 43
+LINE Normal 0 91 0 85
+LINE Normal -1 86 0 85
+LINE Normal 0 85 -1 86
+LINE Normal 1 86 0 85
+LINE Normal -1 90 0 91
+LINE Normal 0 91 -1 90
+LINE Normal 1 90 0 91
+LINE Normal 0 107 0 101
+LINE Normal -1 102 0 101
+LINE Normal 0 101 -1 102
+LINE Normal 1 102 0 101
+LINE Normal -1 106 0 107
+LINE Normal 0 107 -1 106
+LINE Normal 1 106 0 107
+LINE Normal 0 71 0 57
+LINE Normal -1 58 0 57
+LINE Normal 0 57 -1 58
+LINE Normal 1 58 0 57
+LINE Normal -1 70 0 71
+LINE Normal 0 71 -1 70
+LINE Normal 1 70 0 71
+LINE Normal 0 7 0 -7
+LINE Normal -1 -6 0 -7
+LINE Normal 0 -7 -1 -6
+LINE Normal 1 -6 0 -7
+LINE Normal -1 6 0 7
+LINE Normal 0 7 -1 6
+LINE Normal 1 6 0 7
+LINE Normal 4 135 -4 135
+RECTANGLE Normal 16 -108 -16 -116
+RECTANGLE Normal 16 -92 -16 -100
+RECTANGLE Normal 16 -76 -16 -84
+RECTANGLE Normal 16 -44 -16 -52
+RECTANGLE Normal 16 -28 -16 -36
+RECTANGLE Normal 16 -12 -16 -20
+RECTANGLE Normal 16 20 -16 12
+RECTANGLE Normal 16 36 -16 28
+RECTANGLE Normal 16 52 -16 44
+RECTANGLE Normal 16 84 -16 76
+RECTANGLE Normal 16 100 -16 92
+RECTANGLE Normal 16 116 -16 108
+SYMATTR Prefix X
+SYMATTR SpiceModel line_4_coupled
+SYMATTR ModelFile line_coupled.lib
+SYMATTR Value R1=0.1 R2=0.1 R3=0.1 R4=0.1 R5=0.1 R6=0.1 R7=0.1 R8=0.1 R9=0.1 R10=0.1 R11=0.1 R12=0.1
+SYMATTR Value2 length=1 cl=1 g=1e12 fn={fn1}
+SYMATTR Description 4 coupled lines with ATP matrices
+PIN -32 -112 NONE 8
+PINATTR PinName IN1
+PINATTR SpiceOrder 1
+PIN -32 -96 NONE 8
+PINATTR PinName IN2
+PINATTR SpiceOrder 2
+PIN -32 -80 NONE 8
+PINATTR PinName IN3
+PINATTR SpiceOrder 3
+PIN -32 -48 NONE 8
+PINATTR PinName IN4
+PINATTR SpiceOrder 4
+PIN -32 -32 NONE 8
+PINATTR PinName IN5
+PINATTR SpiceOrder 5
+PIN -32 -16 NONE 8
+PINATTR PinName IN6
+PINATTR SpiceOrder 6
+PIN -32 16 NONE 8
+PINATTR PinName IN7
+PINATTR SpiceOrder 7
+PIN -32 32 NONE 8
+PINATTR PinName IN8
+PINATTR SpiceOrder 8
+PIN -32 48 NONE 8
+PINATTR PinName IN9
+PINATTR SpiceOrder 9
+PIN -32 80 NONE 8
+PINATTR PinName IN10
+PINATTR SpiceOrder 10
+PIN -32 96 NONE 8
+PINATTR PinName IN11
+PINATTR SpiceOrder 11
+PIN -32 112 NONE 8
+PINATTR PinName IN12
+PINATTR SpiceOrder 12
+PIN 32 -112 NONE 8
+PINATTR PinName OUT1
+PINATTR SpiceOrder 13
+PIN 32 -96 NONE 8
+PINATTR PinName OUT2
+PINATTR SpiceOrder 14
+PIN 32 -80 NONE 8
+PINATTR PinName OUT3
+PINATTR SpiceOrder 15
+PIN 32 -48 NONE 8
+PINATTR PinName OUT4
+PINATTR SpiceOrder 16
+PIN 32 -32 NONE 8
+PINATTR PinName OUT5
+PINATTR SpiceOrder 17
+PIN 32 -16 NONE 8
+PINATTR PinName OUT6
+PINATTR SpiceOrder 18
+PIN 32 16 NONE 8
+PINATTR PinName OUT7
+PINATTR SpiceOrder 19
+PIN 32 32 NONE 8
+PINATTR PinName OUT8
+PINATTR SpiceOrder 20
+PIN 32 48 NONE 8
+PINATTR PinName OUT9
+PINATTR SpiceOrder 21
+PIN 32 80 NONE 8
+PINATTR PinName OUT10
+PINATTR SpiceOrder 22
+PIN 32 96 NONE 8
+PINATTR PinName OUT11
+PINATTR SpiceOrder 23
+PIN 32 112 NONE 8
+PINATTR PinName OUT12
+PINATTR SpiceOrder 24

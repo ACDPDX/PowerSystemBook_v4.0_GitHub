@@ -1,0 +1,306 @@
+* Library of LTSPICE_util macromodels for load flow computation
+
+*  Copyright F.S., 2004 All Rights Reserved.
+*  But not responible for any
+*  damage caused by applying results from this computation
+* --------------------------------------------------
+*
+* --------------------------------------------------
+*  Revision:   V 1.0
+*  Author:   Friedrich Schmidt
+*  2.11.2004
+*  12.03.2004 vmeter
+*  10.11.2004 add model pmeter to measure power , rename load model to loads ( load and load2 symbol
+*             to loads and loads2 ) in order not to interact with the existent ltspice load,load2 model !
+*  11.11.2004 add a new multimeter model (vmag,imag,smag,p,q,phase_v,phase_i,phast_s)
+*  14.01.2005 make local funcs in phase_meter and multimeter global (comp. with ps2sp.pl)
+*----------------------------------------------------------------------------------------------------------
+*
+* fault_earth             ; fault-earth-connection
+*
+*
+* trafo2model             ; computes transformer model data from physical transformer data ( transformer model )
+* cbce2cl                 ; computes line to line cappacitance from cb and ce ( line model )
+* ameter                  ; amperemeter for current magnitude
+* ameter2                 ; amperemeter and phasemeter for current 
+* vmeter                  ; voltagemeter for voltage magnitude
+* pmeter				  ; powermeter for p and q and s
+* phase_meter             ; measurement of vmag, imag, vphase, iphase of a branch
+* multimeter	          ; 1 phase multimeter for voltage,current,power magnitude and phases ,real and imag power
+* bus_v                   ; bus with voltage magnitude (v1) and phase measurement
+* bus_v0                  ; bus with voltage magnitude (v0)
+* switch_on               ; switcher off->on (only for transienet analysis)
+* switch_off              ; switcher on->off (only for transient analysis) 
+* fault_earth             ; earth fault
+
+
+* start of lib
+
+.func tmp(a,b) (180/3.1415926535897935*atan((b)/(a)))
+.func tmp2(a,b)(if(0.5-b,(tmp(a,b)-180),(tmp(a,b))+180))
+.func ph2(a,b) (if(0.5-a,(if(0.5-b,((180/3.1415926535897935*atan((b)/(a)))-180),((180/3.1415926535897935*atan((b)/(a))))+180)),((180/3.1415926535897935*atan((b)/(a))))))
+*$
+
+* switch for (pseudo) transient simulation of network
+.SUBCKT switch_on_LF v1r v1i v2r v2i
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=10m toff=10m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.5
++vh=-0.4
+b1 st4 0 v=if(time>t_start,1,0) tripdv={TRIPDV} tripdt={TRIPDT} ; for switch on
+b2 st2 0 v=if(time>t_Stop,0,1) tripdv={TRIPDV} tripdt={TRIPDT} ; for switch off
+A1 st2 0 0 0 0 0 st3 0 OR tfall={toff} td=1n ; for switch off
+A2 st4 0 0 0 0 0 st5 0 OR trise={tsw} td=1n ; for switch on
+* Switches in series 
+S1 v1r v2rb st3 0 SWoff
+S2 v2rb v2r st5 0 SWon
+S3 v1i v2ib st3 0 SWoff
+S4 v2ib v2i st5 0 SWon
+.model SWon VSWITCH (Ron={ron} Roff={roff} Vt={vt} Vh={vh} Lser=0 Vser=0)
+.model SWoff VSWITCH (Ron={ron} Roff={roff} Vt={vt} Vh={vh} Lser=0 Vser=0)
+.ENDS
+
+
+.SUBCKT switch_off_LF v1r v1i v2r v2i
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=10m toff=10m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.5
++vh=-0.4
+b1 st4 0 v=if(time>t_start,1,0) tripdv={TRIPDV} tripdt={TRIPDT} ; for switch on
+b2 st2 0 v=if(time>t_Stop,0,1) tripdv={TRIPDV} tripdt={TRIPDT} ; for switch off
+A1 st2 0 0 0 0 0 st3 0 OR tfall={toff} td=1n ; for switch off
+A2 st4 0 0 0 0 0 st5 0 OR trise={tsw} td=1n ; for switch on
+* Switches in parallel
+S1 v1r v2r st3 0 SWoff
+S2 v1r v2r st5 0 SWon
+S3 v1i v2i st3 0 SWoff
+S4 v1i v2i st5 0 SWon
+.model SWon VSWITCH (Ron={ron} Roff={roff} Vt={vt} Vh={vh} Lser=0 Vser=0 )
+.model SWoff VSWITCH (Ron={ron} Roff={roff} Vt={vt} Vh={vh} Lser=0 Vser=0 )
+.ENDS
+
+.subckt bus_v_LF v1r v1i v1_m ph_v1_m
++params:
++ rgnd=1e8
++ vfactor=1.73205
+gv1m 0 v1_m value={vfactor*sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT} ;
+*gv1ph 0 ph_v1_m value = {ph2(v(v1r),v(v1i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT} ;
+gv1ph 0 ph_v1_m value = {(180/3.1415926535897935)*atan2(v(v1i),v(v1r))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT} ;
+Rgndr v1r 0 {rgnd}
+Rgndi v1i 0 {rgnd}
+.ends
+
+.subckt bus_v0_LF v1r v1i v0_m
++params:
++ rgnd=1e8
+gv0m 0 v0_m value={sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT} ;
+Rgndr v1r 0 {rgnd}
+Rgndi v1i 0 {rgnd}
+.ends
+
+.subckt fault_earth_LF v1r v1i
++ params:
++ on = 1
++ rgnd = 1e-5
++ roff = 1e10
+r12r v1r 0 {on*rgnd+(1-on)*roff}
+r12i v1i 0 {on*rgnd+(1-on)*roff}
+.ends
+
+
+.subckt ameter_LF v1r v1i v2r v2i i_m
++ params: 
++ rgnd=1e12
+ v12r v1r v2r 0v
+ v12i v1i v2i 0v
+ gimag 0  i_m value={sqrt(i(v12r)*i(v12r)+i(v12i)*i(v12i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+ rgnd1 v1r 0 {rgnd}
+ rgnd2 v1i 0 {rgnd}
+ rgnd3 v2r 0 {rgnd}
+ rgnd4 v2i 0 {rgnd} 
+.ends
+
+.subckt ameter2_LF v1r v1i v2r v2i i_m i_ph
++ params: 
++ rgnd=1e12
+ v12r v1r v2r 0v
+ v12i v1i v2i 0v
+ gimag 0  i_m value={sqrt(i(v12r)*i(v12r)+i(v12i)*i(v12i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+ gi1ph 0 i_ph value = {ph2(i(v12r),i(v12i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+ rgnd1 v1r 0 {rgnd}
+ rgnd2 v1i 0 {rgnd}
+ rgnd3 v2r 0 {rgnd}
+ rgnd4 v2i 0 {rgnd} 
+.ends
+
+*$
+*
+
+.subckt vmeter_LF v1r v1i v_m
++ params:
++ vfactor = {sqrt(3)}
++ rgnd=1e12
+ *v12r v1r v2r 0v
+ *v12i v1i v2i 0v
+ gvmag 0  v_m value={vfactor*sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+ rgnd1 v1r 0  {rgnd}
+ rgnd2 v1i 0 {rgnd}
+.ends
+
+.subckt vmeter2_LF v1r v1i v2r v2i v_m
++ params:
++ vfactor = {sqrt(3)}
++ rgnd=1e12
+ v12r v1r v2r 0v
+ v12i v1i v2i 0v
+ gvmag 0  v_m value={vfactor*sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+ rgnd1 v1r 0  {rgnd}
+ rgnd2 v1i 0 {rgnd}
+ rgnd3 v2r 0  {rgnd}
+ rgnd4 v2i 0 {rgnd}
+.ends
+*$
+
+* measures active power, reactive power, and apparent power
+.subckt pmeter_LF v1r v1i v2r v2i p_m q_m s_m
++ params:
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ rgnd = 1e12
+ vir  v1r  v2r  dc  0
+ vii  v1i  v2i  dc  0
+ gpm 0 p_m  value={(v(v1r)*i(vir)+v(v1i)*i(vii))*sfactor} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+ gqm 0 q_m  value={(v(v1i)*i(vir)-v(v1r)*i(vii))*sfactor} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+ gsm 0 s_m  value={sqrt(v(p_m)*v(p_m)+v(q_m)*v(q_m))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+ rgnd1 v1r 0  {rgnd}
+ rgnd2 v1i 0 {rgnd}
+ rgnd3 v2r 0 {rgnd}
+ rgnd4 v2i 0 {rgnd} 
+.ends
+*$
+*
+.subckt multimeter_LF v1r v1i v2r v2i v1_m i1_m s1_m p1_m q1_m v1_ph i1_ph s1_ph
++ params:
++ rin = 1e-5
++ rgnd = 1e12
++ vfactor = {sqrt(3)}
++ sfactor = 3
+ vi12r v1r v2r dc 0v
+ vi12i v1i v2i dc 0v
+ gv1mag_m 0  v1_m  value = {vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}  ;
+ gi1mag_m 0  i1_m  value = {sqrt(i(vi12r)*i(vi12r)+i(vi12i)*i(vi12i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}  ;
+ gpm 0 p1_m  value={(v(v1r)*i(vi12r)+v(v1i)*i(vi12i))*sfactor} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+ gqm 0 q1_m  value={(v(v1i)*i(vi12r)-v(v1r)*i(vi12i))*sfactor} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+ gsm 0 s1_m  value={sqrt(v(p1_m)*v(p1_m)+v(q1_m)*v(q1_m))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+ gv1ph 0 v1_ph value = {ph2(v(v1r),v(v1i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+ gi1ph 0 i1_ph value = {ph2(i(vi12r),i(vi12i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+ gs1ph 0 s1_ph value = {ph2(v(p1_m),v(q1_m))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+*gp2 0  p2_m value = {-(v(v2r)*i(vi12r)+v(v2i)*i(vi12i))*sfactor} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+*gq2 0  q2_m value = {-(v(v2i)*i(vi12r)-v(v2r)*i(vi12i))*sfactor} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+ rgnd1 v1r 0  {rgnd}
+ rgnd2 v1i 0 {rgnd}
+ rgnd3 v2r 0 {rgnd}
+ rgnd4 v2i 0 {rgnd} 
+.ends
+*$
+
+
+.subckt phase_meter_LF v1r v1i v2r v2i v1_m i1_m v1_ph i1_ph
++ params:
++ rin = 1e-5
++ rgnd = 1e12
++ vfactor = {sqrt(3)}
++ sfactor = 3
+ gi12r v1r v10 value = {(v(v1r)-v(v2r))/rin} tripdv={TRIPDV} tripdt={TRIPDT}
+ gi12i v1i v20 value = {(v(v1i)-v(v2i))/rin} tripdv={TRIPDV} tripdt={TRIPDT}
+ vi12r v10 v2r dc 0v
+ vi12i v20 v2i dc 0v
+ gv1mag_m  0 v1_m  value = {vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}  ;
+ gi1mag_m  0 i1_m  value = {sqrt(i(vi12r)*i(vi12r)+i(vi12i)*i(vi12i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}  ;
+ gv1ph 0 v1_ph value = {ph2(v(v1r),v(v1i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+ gi1ph 0 i1_ph value = {ph2(i(vi12r),i(vi12i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+*gs1mag_m  0 s1_m  value = {v(v1_m)*v(i1_m1) * sfactor/vfactor } rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}  ;
+*gi1mag_m  0 i1_m  value = {sqrt(i(vi12r)*i(vi12r)+i(vi12i)*i(vi12i))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}  ;
+*gp1 0  p1_m   value = {(v(v1r)*i(vi12r)+v(v1i)*i(vi12i))*sfactor} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+*gp2 0  p2_m   value = {-(v(v2r)*i(vi12r)+v(v2i)*i(vi12i))*sfactor} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+*gq1 0  q1_m   value = {(v(v1i)*i(vi12r)-v(v1r)*i(vi12i))*sfactor} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+*gq2 0  q2_m   value = {-(v(v2i)*i(vi12r)-v(v2r)*i(vi12i))*sfactor} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+ rgnd1 v1r 0  {rgnd}
+ rgnd2 v1i 0 {rgnd}
+ rgnd3 v2r 0 {rgnd}
+ rgnd4 v2i 0 {rgnd} 
+.ends
+*$
+
+
+*
+*
+* Help - Routine to compute transformer model from physical transformer data
+*
+.subckt Trafo2Model_LF ykros ykios y0ros y0ios inos inus xkos rkos rfeos xhos i0 ife imue
++ params:
++ UNos = 380000 ;
++ uen = 3.3333
++ SN = 300e6
++ VFe = 163.5e3
++ VCu = 540.0e3
++ ukn = 16.35e-2
++ I02IN = 0.085e-2
+.param ur = { vcu / SN }
+.param usigma = {sqrt(ukn*ukn-ur*ur)}
+.param zkros = {(UNos*UNos/SN)*ur}
+.param zkios = {(UNos*UNos/SN)*usigma}
+.param ykros = {zkros/(zkros*zkros+zkios*zkios)}
+.param ykios = {-zkios/(zkros*zkros+zkios*zkios)}
+.param y0ros = {VFe /(UNos*UNos)}
+.param y0ios = {(-SN/(UNos*UNos))*sqrt(I02IN*I02IN-(VFe*VFe/SN/SN))}
+******************************
+* Data for transformer model *
+******************************
+vkros  ykros 0 dc {ykros}
+vkios  ykios 0 dc {ykios}
+v0ros  y0ros 0 dc {y0ros}
+v0ios  y0ios 0 dc {y0ios}
+*
+**************************************
+* other interesting transformer-data *
+**************************************
+vinos  inos  0  dc {SN/UNos/sqrt(3)}   ; nominal current on primary side
+vinus  inus  0  dc {uen*SN/UNos/sqrt(3)} ; nominal current on secondary side
+vxkos  xkos   0  dc {usigma*UNos*UNos/SN} ; inductive part of short circuit impedance
+vrkos  rkos   0  dc {ur*UNos*UNos/SN}     ; ohmisch part of short circuit impedance -> cooper lost
+vrfeos rfeos  0  dc {UNos*UNos/VFe}       ; lost due to iron modelled as resistance
+vxhos  xhos   0  dc {UNos*UNos/(sqrt(I02IN*I02IN-(VFe*VFe/SN/SN))*SN)} ; magnetic field inductance
+gei0    0 i0     value = {I02IN*v(inos)} tripdv={TRIPDV} tripdt={TRIPDT} rpar=1   ; open circuit current = ife + imue
+geife   0 ife    value = {v(inos)*VFe/SN} tripdv={TRIPDV} tripdt={TRIPDT} rpar=1 ; current due to iron lost
+geimue  0 imue   value = {sqrt(v(i0)*v(i0)-v(ife)*v(ife))} tripdv={TRIPDV} rpar=1 tripdt={TRIPDT}  ; current to magnetize iron
+*
+.ends
+
+*$
+*
+* Help - routine for computing cl from cb und ce
+*
+.subckt cbce2cl_LF cl
++ params:
++ cb = 0
++ ce = 0
+  ge1 0  cl  value={(cb-ce)/3} tripdv={TRIPDV} tripdt={TRIPDT} rpar=1
+.ends
+
+* end of lfl library
+*$
+
+
+
+
+
+

@@ -1,0 +1,1388 @@
+* Many thanks to Prof. Otto Justus who let me use his model of DAM
+
+*NOTE:
+*Speed positiv: 
+*ML pos. is generator
+*ML neg. is motor
+*Speed negativ:
+*ML pos. is motor
+*ML neg. is generator
+*Always: 
+*Pcu+Pfe+Prgb+Pmech+Pnet=0 (Prbg=friction)
+
+
+
+* DAM model without nonlinear core and Pfe at input
+.SUBCKT DAM	U1 V1 W1  n	M	n1
++               PARAMS:
++               UN_verkettet=400V
++               IN=21A
++               cos_phiN=0.82
++               fN=50Hz
++               nN=1420
++               p=2
++               PN=9500W
++               Pfe=260W
++               I0rel=0.6
++               Ikrel=5
++               rbg=0.1
++               taumech=0.25
++               n0=1420
++               rem=0.05
+.PARAM
++               MN={PN*60/(2*pi)/nN}
++               Mrbg={MN*rbg}
++               UN={UN_verkettet/sqrt(3)}
++               Pel={3*UN*IN*cos_phiN}
++               Pcu={Pel-PN*(1+rbg)}
++               Rcu={Pcu/3/IN/IN/2}
++               Rfe={3*UN*UN/Pfe}
++               omega_el={(2*pi)*fN}
++               Lss={UN/Ikrel/IN/omega_el/2}
++               Ls={Lss}
++               Lr={Lss}
++               Rs={Rcu}
++               Rr={Rcu}
++               Lh={UN/I0rel/IN/omega_el-Ls}
++               J={taumech*MN/(2*pi)/nN*60}
++  PsiN={Un*sqrt(2)/omega_el}
++  Psi0={rem*PsiN*1.1}
++  Ien={UN*sqrt(2)/Lh/omega_el}
++  a=0.6
++  m=9
++  Mvz=1
+* Pmech+Pfe+Prbg+Pfe+Pnet=0
+GEP 0 Pnet  value={-v(pfe)+v(U1)*I(G1)+v(V1)*I(G2)+v(W1)*I(G3)} tripdv={tdv} tripdt={tdt}
+GEPm 0 Pmech  value={v(n)*Pi/30*v(M)*Mvz} tripdv={tdv} tripdt={tdt}
+GEPmi 0 Pmi  value={v(n)*Pi/30*v(Mi)} tripdv={tdv} tripdt={tdt}
+GEPrbg 0 Prbg  value={-v(n)*Pi/30*v(M_Rbg)} tripdv={tdv} tripdt={tdt}
+GEPcu 0 Pcu  value={-rs*(I(G1)*I(G1)+I(G2)*I(G2)+I(G3)*I(G3))-rr*(I(G1r)*I(G1r)+I(G2r)*I(G2r)+I(G3r)*I(G3r))} tripdv={tdv} tripdt={tdt}
+GEPfe 0 Pfe  value={-(Rfe*(I(Rfeu)*I(Rfeu)+I(Rfev)*I(Rfev)+I(Rfew)*I(Rfew)))} tripdv={tdv} tripdt={tdt}
+GEs 0 slip  value={(v(n1)-v(n))/v(n1)} tripdv={tdv} tripdt={tdt}
+RGEP Pnet 0 1
+RGEPm Pmech 0 1
+RGEPmi Pmi 0 1
+RGEPrbg Prbg 0 1
+RGEPcu Pcu 0 1
+RGEPfe Pfe 0 1
+RGEs slip 0 1
+*    Magnetfluesse
+Gpsx    0    psx    VALUE={v(usx)-Rs*v(isx)} tripdv={tdv} tripdt={tdt}
+Gpsy    0    psy    VALUE={v(usy)-Rs*v(isy)} tripdv={tdv} tripdt={tdt}
+Gprx    0    prx    VALUE={v(urx)-(Rr*v(irx)+p*(pi/30)*v(n)*v(pry))} tripdv={tdv} tripdt={tdt}
+Gpry    0    pry    VALUE={v(ury)-(Rr*v(iry)-p*(pi/30)*v(n)*v(prx))} tripdv={tdv} tripdt={tdt}
+*Gphx    0    phx    VALUE={-Rfe*v(ifex)} tripdv={tdv} tripdt={tdt}
+*Gphy    0    phy    VALUE={-Rfe*v(ifey)} tripdv={tdv} tripdt={tdt}
+Rpsx    psx    0    1MEG
+Rpsy    psy    0    1MEG
+Rprx    prx    0    1MEG
+Rpry    pry    0    1MEG
+Rphx    phx    0    1MEG
+Rphy    phy    0    1MEG
+Cpsx    psx    0    1    IC={Psi0}
+Cpsy    psy    0    1    IC=0
+Cprx    prx    0    1    IC={Psi0}
+Cpry    pry    0    1    IC=0
+Cphx    phx    0    1    IC={Psi0}
+Cphy    phy    0    1    IC=0
+*    Stroeme
+Gisx    0    isx    VALUE={Ls*v(isx)+v(LH3)*(v(isx)+v(irx))-v(psx)} tripdv={tdv} tripdt={tdt}
+Girx    0    irx    VALUE={Lr*v(irx)+v(LH3)*(v(isx)+v(irx))-v(prx)} tripdv={tdv} tripdt={tdt}
+*Gifex   0    ifex   VALUE={          v(LH3)*(v(isx)+v(irx)-v(phx)} tripdv={tdv} tripdt={tdt}
+Risx    isx    0    1MEG
+Rirx    irx    0    1MEG
+*Rifex   ifex   0    1MEG
+Gisy    0    isy    VALUE={Ls*v(isy)+v(LH3)*(v(isy)+v(iry))-v(psy)} tripdv={tdv} tripdt={tdt}
+Giry    0    iry    VALUE={Lr*v(iry)+v(LH3)*(v(isy)+v(iry))-v(pry)} tripdv={tdv} tripdt={tdt}
+*Gifey   0    ifey   VALUE={          v(LH3)*(v(isy)+v(iry)+v(ifey))-v(phy)} tripdv={tdv} tripdt={tdt}
+Risy    isy    0    1MEG
+Riry    iry    0    1MEG
+*Rifey   ifey   0    1MEG
+*    Reibungs-Moment
+Grbg    0   M_Rbg   TABLE { v(n) }  =  (-1,-1)  (1,1)
+Rrbg    M_Rbg   0   {Mrbg}
+*    inneres Drehmoment
+*Gm      0      mi    VALUE={3/2*p*(v(phy)*v(irx)-v(phx)*v(iry))} tripdv={tdv} tripdt={tdt}
+*Rm      mi      0    1
+GEmi  0    Mi   value={3/2*p*v(LH3)*(v(isy)*v(irx)-v(isx)*v(iry))} tripdv={tdv} tripdt={tdt}
+REmi  Mi   0    1
+*    Drehzahl n
+en n 0 value={n0+1/j*60/(2*pi)*V(VIDT0)} tripdv={tdv} tripdt={tdt}
+*ren n 0 1
+cidt0 vidt0 0 1
+gidt0 0 vidt0 value={V(MI)-V(M_RBG)+V(M)*Mvz} tripdv={tdv} tripdt={tdt}
+ridt0 0 vidt0 1e10
+GEn2	0	n1		VALUE={fN*60/p}  tripdv={tdv} tripdt={tdt}
+Ren2   n1   0       1
+Eomegam omegam 0 value={v(n)*pi/30} tripdv={tdv} tripdt={tdt}
+*Romegam omegam 0 1
+Galpha  0    alpha      VALUE={v(omegam)} tripdv={tdv} tripdt={tdt}
+Calpha  alpha    0      1    IC=0
+Ralpha  alpha    0  1e10
+*    Wicklungs-Stroeme
+G1    U1    U2    VALUE={v(isx)+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G2    V1    V2    VALUE={(-v(isx)+sqrt(3)*v(isy))/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G3    W1    W2    VALUE={(-v(isx)-sqrt(3)*v(isy))/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+RG1   U1    0    1e6
+RG2   V1    0    1e6
+RG3   W1    0    1e6
+RG11  U2 N2 1u
+RG12  V2 N2 1u
+RG13  W2 N2 1u
+RN2   N2 0  1e6
+Rfeu u1 0 {Rfe}
+Rfev v1 0 {Rfe}
+Rfew w1 0 {Rfe}
+*   WicklungsstrÃ¶me LÃ¤ufer
+G1r             X1              X2              VALUE={v(irx)+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+G2r             Y1              Y2              VALUE={(-v(irx)+v(iry)*sqrt(3))/2+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+G3r             Z1              Z2              VALUE={(-v(irx)-v(iry)*sqrt(3))/2+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+R1r  X2 X1 1u
+R2r  Y2 Y1 1u
+R3r  Z2 Z1 1u
+Rx X1 0 1e6
+Ry Y1 0 1e6
+Rz Z1 0 1e6
+*               Spannungskomponenten Stator
+Eux             usx             0               VALUE={(2*v(u1,u2)-v(v1,v2)-v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+Euy             usy             0               VALUE={(v(v1,v2)-v(w1,w2))/sqrt(3)} tripdv={tdv} tripdt={tdt}
+*               Spannungskomponenten LÃ¤ufer
+Eurx            urx             0               VALUE={(2*v(x1,x2)-v(y1,y2)-v(z1,z2))/3} tripdv={tdv} tripdt={tdt}
+Eury            ury             0               VALUE={(v(y1,y2)-v(z1,z2))/sqrt(3)} tripdv={tdv} tripdt={tdt}
+*               Nullsysteme Stator und Rotor
+Ei0   i_Null 0  VALUE={v(idt1)/Ls} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={(v(u1,u2)+v(v1,v2)+v(w1,w2))/3-Rs*v(i_null)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Eir0 ir_Null 0 VALUE={v(idt2)/Lr} tripdv={tdv} tripdt={tdt}
+G1y 0 idt2 VALUE={(v(x1,x2)+v(y1,y2)+v(z1,z2))/3-Rr*v(ir_null)} tripdv=1 tripdt=1
+C1y idt2 0 1
+R1y idt2 0 1e10
+*
+*    Berechung der fluss-abhaengigen Haupt-Induktivitaet
+Gpsi    0    psi     VALUE={ LIMIT(SQRT(v(prx)*v(prx)+v(pry)*v(pry)),-PsiN*10,PsiN*10) } tripdv={tdv} tripdt={tdt}
+Rpsi    psi     0    1
+GiE1    0    imy    VALUE={a*v(psi)/psiN+(1-a)*PWRS(v(psi)/psiN,m)} tripdv={tdv} tripdt={tdt}
+RiE     imy    0    {iEN}
+GLh3    0    Lh3    VALUE={v(psi)/v(imy)-Lr} tripdv={tdv} tripdt={tdt}
+RLh3    Lh3    0    1        ;    Haupt-Induktivitaet
+.ENDS 
+
+
+* DAM model without nonlinear core and Pfe at input
+* Speed is constant
+.SUBCKT DAM_fixed_speed	U1 V1 W1  n M	n1
++               PARAMS:
++               UN_verkettet=400V
++               IN=21A
++               cos_phiN=0.82
++               fN=50Hz
++               nN=1420
++               p=2
++               PN=9500W
++               Pfe=260W
++               I0rel=0.6
++               Ikrel=5
++               rbg=0.1
++               taumech=0.25
++               n0=1420
++               rem=0.05
+.PARAM
++               MN={PN*60/6.2832/nN}
++               Mrbg={MN*rbg}
++               UN={UN_verkettet/1.732}
++               Pel={3*UN*IN*cos_phiN}
++               Pcu={Pel-PN*(1+rbg)}
++               Rcu={Pcu/3/IN/IN/2}
++               Rfe={3*UN*UN/Pfe}
++               omega_el={6.2832*fN}
++               Lss={UN/Ikrel/IN/omega_el/2}
++               Ls={Lss}
++               Lr={Lss}
++               Rs={Rcu}
++               Rr={Rcu}
++               Lh={UN/I0rel/IN/omega_el-Ls}
++               J={taumech*MN/6.2832/nN*60}
++  PsiN={Un*sqrt(2)/omega_el}
++  Psi0={rem*PsiN*1.1}
++  Ien={UN*sqrt(2)/Lh/omega_el}
++  a=0.6
++  m=9
+* Pmech+Pfe+Prbg+Pfe+Pnet=0
+GEP 0 Pnet  value={-v(pfe)+v(U1)*I(G1)+v(V1)*I(G2)+v(W1)*I(G3)} tripdv={tdv} tripdt={tdt}
+GEPm 0 Pmech  value={v(n)*Pi/30*v(M)} tripdv={tdv} tripdt={tdt}
+GEPmi 0 Pmi  value={v(n)*Pi/30*v(Mi)} tripdv={tdv} tripdt={tdt}
+GEPrbg 0 Prbg  value={-v(n)*Pi/30*v(M_Rbg)} tripdv={tdv} tripdt={tdt}
+GEPcu 0 Pcu  value={-rs*(I(G1)*I(G1)+I(G2)*I(G2)+I(G3)*I(G3))-rr*(I(G1r)*I(G1r)+I(G2r)*I(G2r)+I(G3r)*I(G3r))} tripdv={tdv} tripdt={tdt}
+GEPfe 0 Pfe  value={-(Rfe*(I(Rfeu)*I(Rfeu)+I(Rfev)*I(Rfev)+I(Rfew)*I(Rfew)))} tripdv={tdv} tripdt={tdt}
+GEs 0 slip  value={(v(n1)-v(n))/v(n1)} tripdv={tdv} tripdt={tdt}
+GFreq 0 f value={n0/30}
+RGEP Pnet 0 1
+RGEPm Pmech 0 1
+RGEPmi Pmi 0 1
+RGEPrbg Prbg 0 1
+RGEPcu Pcu 0 1
+RGEPfe Pfe 0 1
+RGEs slip 0 1
+RFreq f  0  1
+*    Magnetfluesse
+Gpsx    0    psx    VALUE={v(usx)-Rs*v(isx)} tripdv={tdv} tripdt={tdt}
+Gpsy    0    psy    VALUE={v(usy)-Rs*v(isy)} tripdv={tdv} tripdt={tdt}
+Gprx    0    prx    VALUE={v(urx)-(Rr*v(irx)+p*0.10472*v(n)*v(pry))} tripdv={tdv} tripdt={tdt}
+Gpry    0    pry    VALUE={v(ury)-(Rr*v(iry)-p*0.10472*v(n)*v(prx))} tripdv={tdv} tripdt={tdt}
+*Gphx    0    phx    VALUE={-Rfe*v(ifex)} tripdv={tdv} tripdt={tdt}
+*Gphy    0    phy    VALUE={-Rfe*v(ifey)} tripdv={tdv} tripdt={tdt}
+Rpsx    psx    0    1MEG
+Rpsy    psy    0    1MEG
+Rprx    prx    0    1MEG
+Rpry    pry    0    1MEG
+Rphx    phx    0    1MEG
+Rphy    phy    0    1MEG
+Cpsx    psx    0    1    IC={Psi0}
+Cpsy    psy    0    1    IC=0
+Cprx    prx    0    1    IC={Psi0}
+Cpry    pry    0    1    IC=0
+Cphx    phx    0    1    IC={Psi0}
+Cphy    phy    0    1    IC=0
+*    Stroeme
+Gisx    0    isx    VALUE={Ls*v(isx)+v(LH3)*(v(isx)+v(irx))-v(psx)} tripdv={tdv} tripdt={tdt}
+Girx    0    irx    VALUE={Lr*v(irx)+v(LH3)*(v(isx)+v(irx))-v(prx)} tripdv={tdv} tripdt={tdt}
+*Gifex   0    ifex   VALUE={          v(LH3)*(v(isx)+v(irx)-v(phx)} tripdv={tdv} tripdt={tdt}
+Risx    isx    0    1MEG
+Rirx    irx    0    1MEG
+*Rifex   ifex   0    1MEG
+Gisy    0    isy    VALUE={Ls*v(isy)+v(LH3)*(v(isy)+v(iry))-v(psy)} tripdv={tdv} tripdt={tdt}
+Giry    0    iry    VALUE={Lr*v(iry)+v(LH3)*(v(isy)+v(iry))-v(pry)} tripdv={tdv} tripdt={tdt}
+*Gifey   0    ifey   VALUE={          v(LH3)*(v(isy)+v(iry)+v(ifey))-v(phy)} tripdv={tdv} tripdt={tdt}
+Risy    isy    0    1MEG
+Riry    iry    0    1MEG
+*Rifey   ifey   0    1MEG
+*    Reibungs-Moment
+Grbg    0   M_Rbg   TABLE { v(n) }  =  (-1,-1)  (1,1)
+Rrbg    M_Rbg   0   {Mrbg}
+*    inneres Drehmoment
+*Gm      0      mi    VALUE={3/2*p*(v(phy)*v(irx)-v(phx)*v(iry))} tripdv={tdv} tripdt={tdt}
+*Rm      mi      0    1
+GEmi  0    Mi     value={3/2*p*v(LH3)*(v(isy)*v(irx)-v(isx)*v(iry))} tripdv={tdv} tripdt={tdt}
+REmin Mi  0  1
+*    Drehzahl n
+Gmlast      0     M      VALUE={-v(mi)+v(M_Rbg)} tripdv={tdv} tripdt={tdt}
+Rmlast  M 0 1
+GEn  0  n value={n0} tripdv={tdv} tripdt={tdt}
+Ren  n  0 1
+GEn2 0  n1 value={fN*60/p} tripdv={tdv} tripdt={tdt}
+Ren2 n1 0 1
+Gomegam 0  omegam  value={v(n)*pi/30} tripdv={tdv} tripdt={tdt}
+Romegam omegam 0 1
+Galpha  0    alpha      VALUE={v(omegam)} tripdv={tdv} tripdt={tdt}
+Calpha  alpha    0      1    IC=0
+Ralpha  alpha    0  1e9
+*    Wicklungs-Stroeme
+G1    U1    U2    VALUE={v(isx)+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G2    V1    V2    VALUE={(-v(isx)+1.7320508*v(isy))/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G3    W1    W2    VALUE={(-v(isx)-1.7320508*v(isy))/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+RG1   U1    0    1e6
+RG2   V1    0    1e6
+RG3   W1    0    1e6
+RG11  U2 N2 1u
+RG12  V2 N2 1u
+RG13  W2 N2 1u
+RN2   N2 0 1e6
+Rfeu u1 0 {Rfe}
+Rfev v1 0 {Rfe}
+Rfew w1 0 {Rfe}
+*   WicklungsstrÃ¶me LÃ¤ufer
+G1r             X1              X2              VALUE={v(irx)+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+G2r             Y1              Y2              VALUE={(-v(irx)+v(iry)*1.732)/2+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+G3r             Z1              Z2              VALUE={(-v(irx)-v(iry)*1.732)/2+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+R1r  X2 X1 1u
+R2r  Y2 Y1 1u
+R3r  Z2 Z1 1u
+Rx X1 0 1e6
+Ry Y1 0 1e6
+Rz Z1 0 1e6
+*               Spannungskomponenten Stator
+Eux             usx             0               VALUE={(2*v(u1,u2)-v(v1,v2)-v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+Euy             usy             0               VALUE={(v(v1,v2)-v(w1,w2))/1.732} tripdv={tdv} tripdt={tdt}
+*               Spannungskomponenten LÃ¤ufer
+Eurx            urx             0               VALUE={(2*v(x1,x2)-v(y1,y2)-v(z1,z2))/3} tripdv={tdv} tripdt={tdt}
+Eury            ury             0               VALUE={(v(y1,y2)-v(z1,z2))/1.732} tripdv={tdv} tripdt={tdt}
+*               Nullsysteme Stator und Rotor
+Ei0   i_Null 0  VALUE={v(idt1)/Ls} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={(v(u1,u2)+v(v1,v2)+v(w1,w2))/3-Rs*v(i_null)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Eir0 ir_Null 0 VALUE={v(idt2)/Lr} tripdv={tdv} tripdt={tdt}
+G1y 0 idt2 VALUE={(v(x1,x2)+v(y1,y2)+v(z1,z2))/3-Rr*v(ir_null)} tripdv=1 tripdt=1
+C1y idt2 0 1
+R1y idt2 0 1e10
+*    Berechung der fluss-abhaengigen Haupt-Induktivitaet
+Gpsi    0    psi     VALUE={ SQRT(v(prx)*v(prx)+v(pry)*v(pry)) } tripdv={tdv} tripdt={tdt}
+Rpsi    psi     0    1
+GiE1    0    imy    VALUE={a*v(psi)/psiN+(1-a)*PWRS(v(psi)/psiN,m)} tripdv={tdv} tripdt={tdt}
+RiE     imy    0    {iEN}
+GLh3    0    Lh3    VALUE={v(psi)/v(imy)-Lr} tripdv={tdv} tripdt={tdt}
+RLh3    Lh3    0    1        ;    Haupt-Induktivitaet
+.ENDS 
+
+* DAM Model with nonlinear core
+* and with Pfe paralell to core
+* sometimes this model has problems with convergence
+.SUBCKT  DAM1   U1  V1  W1  n  M_Last  n1  
++               PARAMS:
++               UN_verkettet=400V
++               IN=21A
++               cos_phiN=0.82
++               fN=50Hz
++               nN=1420
++               p=2  
++               PN=9500W
++               Pfe=260W
++               I0rel=0.6
++               Ikrel=5
++               rbg=0.1
++               taumech=0.25
++               n0=0
++               rem=0.05
+.PARAM
++               MN={PN*60/6.2832/nN}
++               Mrbg={MN*rbg}
++               UN={UN_verkettet/1.732}
++               Pel={3*UN*IN*cos_phiN}
++               Pcu={Pel-PN*(1+rbg)}
++               Rcu={Pcu/3/IN/IN/2}
++               Rfe={3*UN*UN/Pfe}
++               omega_el={6.2832*fN}
++               Lss={UN/Ikrel/IN/omega_el/2}
++               Ls={Lss}
++               Lr={Lss}
++               Rs={Rcu}
++               Rr={Rcu}
++               Lh={UN/I0rel/IN/omega_el-Ls}
++               J={taumech*MN/6.2832/nN*60}
++  PsiN={Un*sqrt(2)/omega_el}
++  Psi0={rem*PsiN*1.1}
++  Ien={UN*sqrt(2)/Lh/omega_el}
++  a=0.6
++  m=9
++  Mvz=1
+* Pmech+Pfe+Prbg+Pfe+Pnet=0
+EP Pnet 0 value={v(U1)*I(G1)+v(V1)*I(G2)+v(W1)*I(G3)} tripdv={tdv} tripdt={tdt}
+EPm Pmech 0 value={v(n)*Pi/30*v(M_Last)*Mvz}  tripdv={tdv} tripdt={tdt}
+EPmi Pmi 0 value={v(n)*Pi/30*v(Mi)} tripdv={tdv} tripdt={tdt}
+EPrbg Prbg 0 value={-v(n)*Pi/30*v(M_Rbg)} tripdv={tdv} tripdt={tdt}
+EPcu Pcu 0 value={-rs*(I(G1)*I(G1)+I(G2)*I(G2)+I(G3)*I(G3))-rr*(I(G1r)*I(G1r)+I(G2r)*I(G2r)+I(G3r)*I(G3r))}  tripdv={tdv} tripdt={tdt}
+EPfe Pfe 0 value={-1.5*Rfe*(sqrt(v(ifex)*v(ifex)+v(ifey)*v(ifey)))*(sqrt(v(ifex)*v(ifex)+v(ifey)*v(ifey)))}  tripdv={tdv} tripdt={tdt}
+Es slip 0 value={(v(n1)-v(n))/v(n1)} tripdv={tdv} tripdt={tdt}
+*    Magnetfluesse    
+Gpsx    0    psx    VALUE={v(usx)-Rs*v(isx)} tripdv={tdv} tripdt={tdt}
+Gpsy    0    psy    VALUE={v(usy)-Rs*v(isy)} tripdv={tdv} tripdt={tdt}
+Gprx    0    prx    VALUE={v(urx)-(Rr*v(irx)+p*0.10472*v(n)*v(pry))} tripdv={tdv} tripdt={tdt}
+Gpry    0    pry    VALUE={v(ury)-(Rr*v(iry)-p*0.10472*v(n)*v(prx))} tripdv={tdv} tripdt={tdt}
+Gphx    0    phx    VALUE={-Rfe*v(ifex)} tripdv={tdv} tripdt={tdt}
+Gphy    0    phy    VALUE={-Rfe*v(ifey)} tripdv={tdv} tripdt={tdt}
+Rpsx    psx    0    1MEG
+Rpsy    psy    0    1MEG
+Rprx    prx    0    1MEG
+Rpry    pry    0    1MEG
+Rphx    phx    0    1MEG
+Rphy    phy    0    1MEG
+Cpsx    psx    0    1    IC={Psi0}
+Cpsy    psy    0    1    IC=0
+Cprx    prx    0    1    IC={Psi0}
+Cpry    pry    0    1    IC=0
+Cphx    phx    0    1    IC={Psi0}
+Cphy    phy    0    1    IC=0
+*    Stroeme
+Gisx    0    isx    VALUE={Ls*v(isx)+v(LH3)*(v(isx)+v(irx)+v(ifex))-v(psx)} tripdv={tdv} tripdt={tdt}
+Girx    0    irx    VALUE={Lr*v(irx)+v(LH3)*(v(isx)+v(irx)+v(ifex))-v(prx)} tripdv={tdv} tripdt={tdt}
+Gifex   0    ifex   VALUE={          v(LH3)*(v(isx)+v(irx)+v(ifex))-v(phx)} tripdv={tdv} tripdt={tdt}
+Risx    isx    0    1MEG
+Rirx    irx    0    1MEG
+Rifex   ifex   0    1MEG
+Gisy    0    isy    VALUE={Ls*v(isy)+v(LH3)*(v(isy)+v(iry)+v(ifey))-v(psy)} tripdv={tdv} tripdt={tdt}
+Giry    0    iry    VALUE={Lr*v(iry)+v(LH3)*(v(isy)+v(iry)+v(ifey))-v(pry)} tripdv={tdv} tripdt={tdt}
+Gifey   0    ifey   VALUE={          v(LH3)*(v(isy)+v(iry)+v(ifey))-v(phy)} tripdv={tdv} tripdt={tdt}
+Risy    isy    0    1MEG
+Riry    iry    0    1MEG
+Rifey   ifey   0    1MEG
+Eimx    imuex  0    Value={v(isx)+v(irx)+v(ifex)} tripdv={tdv} tripdt={tdt}
+Eimy    imuey  0    Value={v(isy)+v(iry)+v(ifey)} tripdv={tdv} tripdt={tdt}
+*    Reibungs-Moment
+Grbg    0   M_Rbg   TABLE { v(n) }  =  (-1,-1)  (1,1)    
+Rrbg    M_Rbg   0   {Mrbg}
+*    inneres Drehmoment
+Gm      0      mi    VALUE={3/2*p*(v(phy)*v(irx)-v(phx)*v(iry))} tripdv={tdv} tripdt={tdt}
+Rm      mi      0    1
+*Emi  Mi  0   value={3/2*p*v(LH3)*(v(isy)*v(irx)-v(isx)*v(iry))} tripdv={tdv} tripdt={tdt}
+*    Drehzahl n
+*Rlap                            M_last           0               1e9
+*En                              n               0               VALUE={n0+1/J*60/6.2832*SDT(v(Mi)+v(M_Rbg)+v(M_Last))} tripdv={tdv} tripdt={tdt}
+*En2                             n1              0               VALUE={fN*60/p} tripdv={tdv} tripdt={tdt}
+*    Drehzahl n
+Gn      0      n    VALUE={1/J*(v(mi)-v(M_Rbg)+v(M_Last)*Mvz)/0.10472} tripdv={tdv} tripdt={tdt}
+Cn      n      0    1    IC={n0}
+Rn      n      0    1MEG
+GEn1   0    n1    VALUE={60*fN/p} tripdv={tdv} tripdt={tdt}
+REn1   n1   0     1
+*
+GEomegam 0    omegam   value={v(n)*pi/30} tripdv={tdv} tripdt={tdt}
+REomegam omegam    0   1
+*
+Galpha  0    alpha      VALUE={v(omegam)} tripdv={tdv} tripdt={tdt}
+Calpha  alpha    0      1    IC=0
+Ralpha  alpha    0  1e9
+G1    U1    U2    VALUE={v(isx)+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G2    V1    V2    VALUE={(-v(isx)+1.7320508*v(isy))/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G3    W1    W2    VALUE={(-v(isx)-1.7320508*v(isy))/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+RG1   U1    0    1e6
+RG2   V1    0    1e6
+RG3   W1    0    1e6
+RG11  U2 N2 1u
+RG12  V2 N2 1u
+RG13  W2 N2 1u
+RN2   N2  0  1e6
+*   WicklungsstrÃ¶me LÃ¤ufer
+G1r             X1              X2              VALUE={v(irx)+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+G2r             Y1              Y2              VALUE={(-v(irx)+v(iry)*1.732)/2+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+G3r             Z1              Z2              VALUE={(-v(irx)-v(iry)*1.732)/2+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+R1r  X2 X1 1u
+R2r  Y2 Y1 1u
+R3r  Z2 Z1 1u
+Rx X1 0 1e6
+Ry Y1 0 1e6
+Rz Z1 0 1e6
+*               Spannungskomponenten Stator
+Eux             usx             0               VALUE={(2*v(u1,u2)-v(v1,v2)-v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+Euy             usy             0               VALUE={(v(v1,v2)-v(w1,w2))/1.732} tripdv={tdv} tripdt={tdt}
+*               Spannungskomponenten Läufer
+Eurx            urx             0               VALUE={(2*v(x1,x2)-v(y1,y2)-v(z1,z2))/3} tripdv={tdv} tripdt={tdt}
+Eury            ury             0               VALUE={(v(y1,y2)-v(z1,z2))/1.732} tripdv={tdv} tripdt={tdt}
+*               Nullsysteme Stator und Rotor
+Ei0   i_Null 0  VALUE={v(idt1)/Ls} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={(v(u1,u2)+v(v1,v2)+v(w1,w2))/3-Rs*v(i_null)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Eir0 ir_Null 0 VALUE={v(idt2)/Lr} tripdv={tdv} tripdt={tdt}
+G1y 0 idt2 VALUE={(v(x1,x2)+v(y1,y2)+v(z1,z2))/3-Rr*v(ir_null)} tripdv=1 tripdt=1
+C1y idt2 0 1
+R1y idt2 0 1e10
+*    Berechung der fluss-abhaengigen Haupt-Induktivitaet
+Gpsi    0    psi     VALUE={ SQRT(v(prx)*v(prx)+v(pry)*v(pry)) } tripdv={tdv} tripdt={tdt}
+Rpsi    psi     0    1
+GiE1    0    imy    VALUE={a*v(psi)/psiN+(1-a)*PWRS(v(psi)/psiN,m)} tripdv={tdv} tripdt={tdt}
+RiE     imy    0    {iEN}
+GLh3    0    Lh3    VALUE={v(psi)/v(imy)-Lr} tripdv={tdv} tripdt={tdt}
+RLh3    Lh3    0    1        ;    Haupt-Induktivitaet
+.ENDS   ;     Ende des SUBCIRCUIT's
+
+* Coordinate System change! examples with phi
+* For usx, isx change the names (e.g. prx) below !!
+* Drehfeld->Rotor
+*Eprxdr prxdr 0  value={v(prx)*cos(-314.6*t+p*v(alpha))+v(pry)*sin(-314.6*t+p*v(alpha))}
+*Eprydr prydr 0  value={-v(prx)*sin(-314.6*t+p*v(alpha))+v(pry)*cos(-314.6*t+p*v(alpha))}
+* Rotor->Drehfeld 
+*Eprxrd prxrd 0  value={v(prxdr)*cos(314.6*t-p*v(alpha))+v(prydr)*sin(314.6*t-p*v(alpha))}
+*Epryrd pryrd 0  value={-v(prxdr)*sin(314.6*t-p*v(alpha))+v(prydr)*cos(314.6*t-p*v(alpha))}
+* Drehfeld->Stator
+*Eprxds prxds 0  value={v(prx)*cos(-314.6*t-0*v(alpha))+v(pry)*sin(-314.6*t-0*v(alpha))}
+*Epryds pryds 0  value={-v(prx)*sin(-314.6*t-0*v(alpha))+v(pry)*cos(-314.6*t-0*v(alpha))}
+* Stator->Drehfeld 
+*Eprxsd prxsd 0  value={v(prxds)*cos(314.6*t-0*v(alpha))+v(pryds)*sin(314.6*t-0*v(alpha))}
+*Eprysd prysd 0  value={-v(prxds)*sin(314.6*t-0*v(alpha))+v(pryds)*cos(314.6*t-0*v(alpha))}
+* Stator->Rotor
+*Eprxsr prxsr 0  value={v(prxds)*cos(+p*v(alpha))+v(pryds)*sin(+p*v(alpha))}
+*Eprysr prysr 0  value={-v(prxds)*sin(+p*v(alpha))+v(pryds)*cos(+p*v(alpha))}
+* Rotor->Stator
+*Eprxrs prxrs 0  value={v(prxsr)*cos(-p*v(alpha))+v(prysr)*sin(-p*v(alpha))}
+*Epryrs pryrs 0  value={-v(prxsr)*sin(-p*v(alpha))+v(prysr)*cos(-p*v(alpha))}
+
+* DAM Model with nonlinear core
+* and with Pfe paralell to core
+* sometimes this model has problems with convergence
+* Speed is constant
+.SUBCKT  DAM1_fixed_speed   U1  V1  W1    n  M_Last n1   
++               PARAMS:
++               UN_verkettet=400V
++               IN=21A
++               cos_phiN=0.82
++               fN=50Hz
++               nN=1420
++               p=2  
++               PN=9500W
++               Pfe=260W
++               I0rel=0.6
++               Ikrel=5
++               rbg=0.1
++               taumech=0.25
++               n0=1420
++               rem=0.05
+.PARAM
++               MN={PN*60/6.2832/nN}
++               Mrbg={MN*rbg}
++               UN={UN_verkettet/1.732}
++               Pel={3*UN*IN*cos_phiN}
++               Pcu={Pel-PN*(1+rbg)}
++               Rcu={Pcu/3/IN/IN/2}
++               Rfe={3*UN*UN/Pfe}
++               omega_el={6.2832*fN}
++               Lss={UN/Ikrel/IN/omega_el/2}
++               Ls={Lss}
++               Lr={Lss}
++               Rs={Rcu}
++               Rr={Rcu}
++               Lh={UN/I0rel/IN/omega_el-Ls}
++               J={taumech*MN/6.2832/nN*60}
++  PsiN={Un*sqrt(2)/omega_el}
++  Psi0={rem*PsiN*1.1}
++  Ien={UN*sqrt(2)/Lh/omega_el}
++  a=0.6
++  m=9
+* Pmech+Pfe+Prbg+Pfe+Pnet=0
+GEP 0 Pnet value={v(U1)*I(G1)+v(V1)*I(G2)+v(W1)*I(G3)} tripdv={tdv} tripdt={tdt}
+GEPm 0 Pmech value={v(n)*Pi/30*v(M_Last)}  tripdv={tdv} tripdt={tdt}
+GEPmi 0 Pmi  value={v(n)*Pi/30*v(Mi)} tripdv={tdv} tripdt={tdt}
+GEPrbg 0 Prbg value={-v(n)*Pi/30*v(M_Rbg)} tripdv={tdv} tripdt={tdt}
+GEPcu 0 Pcu value={-rs*(I(G1)*I(G1)+I(G2)*I(G2)+I(G3)*I(G3))-rr*(I(G1r)*I(G1r)+I(G2r)*I(G2r)+I(G3r)*I(G3r))}  tripdv={tdv} tripdt={tdt}
+GEPfe 0 Pfe value={-1.5*Rfe*(sqrt(v(ifex)*v(ifex)+v(ifey)*v(ifey)))*(sqrt(v(ifex)*v(ifex)+v(ifey)*v(ifey)))}
+GEs 0 slip value={(v(n1)-v(n))/v(n1)} tripdv={tdv} tripdt={tdt}
+GFreq 0 f value={n0/30}
+RGEP Pnet 0 1
+RGEPm Pmech 0 1
+RGEPmi Pmi 0 1
+RGEPrbg Prbg 0 1
+RGEPcu Pcu 0 1
+RGEPfe Pfe 0 1
+RGEs slip 0 1
+RFreq f  0  1
+*    Magnetfluesse    
+Gpsx    0    psx    VALUE={v(usx)-Rs*v(isx)} tripdv={tdv} tripdt={tdt}
+Gpsy    0    psy    VALUE={v(usy)-Rs*v(isy)} tripdv={tdv} tripdt={tdt}
+Gprx    0    prx    VALUE={v(urx)-(Rr*v(irx)+p*0.10472*v(n)*v(pry))} tripdv={tdv} tripdt={tdt}
+Gpry    0    pry    VALUE={v(ury)-(Rr*v(iry)-p*0.10472*v(n)*v(prx))} tripdv={tdv} tripdt={tdt}
+Gphx    0    phx    VALUE={-Rfe*v(ifex)} tripdv={tdv} tripdt={tdt}
+Gphy    0    phy    VALUE={-Rfe*v(ifey)} tripdv={tdv} tripdt={tdt}
+Rpsx    psx    0    1MEG
+Rpsy    psy    0    1MEG
+Rprx    prx    0    1MEG
+Rpry    pry    0    1MEG
+Rphx    phx    0    1MEG
+Rphy    phy    0    1MEG
+Cpsx    psx    0    1    IC={Psi0}
+Cpsy    psy    0    1    IC=0
+Cprx    prx    0    1    IC={Psi0}
+Cpry    pry    0    1    IC=0
+Cphx    phx    0    1    IC={Psi0}
+Cphy    phy    0    1    IC=0
+*    Stroeme
+Gisx    0    isx    VALUE={Ls*v(isx)+v(LH3)*(v(isx)+v(irx)+v(ifex))-v(psx)} tripdv={tdv} tripdt={tdt}
+Girx    0    irx    VALUE={Lr*v(irx)+v(LH3)*(v(isx)+v(irx)+v(ifex))-v(prx)} tripdv={tdv} tripdt={tdt}
+Gifex   0    ifex   VALUE={          v(LH3)*(v(isx)+v(irx)+v(ifex))-v(phx)} tripdv={tdv} tripdt={tdt}
+Risx    isx    0    1MEG
+Rirx    irx    0    1MEG
+Rifex   ifex   0    1MEG
+Gisy    0    isy    VALUE={Ls*v(isy)+v(LH3)*(v(isy)+v(iry)+v(ifey))-v(psy)} tripdv={tdv} tripdt={tdt}
+Giry    0    iry    VALUE={Lr*v(iry)+v(LH3)*(v(isy)+v(iry)+v(ifey))-v(pry)} tripdv={tdv} tripdt={tdt}
+Gifey   0    ifey   VALUE={          v(LH3)*(v(isy)+v(iry)+v(ifey))-v(phy)} tripdv={tdv} tripdt={tdt}
+Risy    isy    0    1MEG
+Riry    iry    0    1MEG
+Rifey   ifey   0    1MEG
+Eimx    imuex  0    Value={v(isx)+v(irx)+v(ifex)} tripdv={tdv} tripdt={tdt}
+Eimy    imuey  0    Value={v(isy)+v(iry)+v(ifey)} tripdv={tdv} tripdt={tdt}
+*    Nullsystem
+*Gi_Null 0    i_Null VALUE={((v(U1,U2)+v(V1,V2)+v(W1,W2))/3-Rs*v(i_Null))/Ls} tripdv={tdv} tripdt={tdt}
+*Ci_Null i_Null  0   1         IC=0
+*Ri_Null i_Null  0   1MEG
+*    Reibungs-Moment
+Grbg    0   M_Rbg   TABLE { v(n) }  =  (-1,-1)  (1,1)    
+Rrbg    M_Rbg   0   {Mrbg}
+*    inneres Drehmoment
+Gm      0      mi    VALUE={3/2*p*(v(phy)*v(irx)-v(phx)*v(iry))} tripdv={tdv} tripdt={tdt}
+Rm      mi      0    1
+*Emi  Mi  0   value={3/2*p*v(LH3)*(v(isy)*v(irx)-v(isx)*v(iry))} tripdv={tdv} tripdt={tdt}
+*    Drehzahl n
+*    Drehzahl n
+GEmlast   0    M_Last   VALUE={-v(mi)+v(M_Rbg)} tripdv={tdv} tripdt={tdt}
+REmlast   M_Last    0   1
+GEn  0    n   value={n0} tripdv={tdv} tripdt={tdt}
+REn  n    0   1
+GEn2 0    n1  value={fN*60/p} tripdv={tdv} tripdt={tdt}
+REn2 n1   0   1
+GEomegam 0   omegam  value={v(n)*pi/30} tripdv={tdv} tripdt={tdt}
+REomegam omegam   0  1 
+Galpha  0    alpha      VALUE={v(omegam)} tripdv={tdv} tripdt={tdt}
+Calpha  alpha    0      1    IC=0
+Ralpha  alpha    0  1e9
+*    Wicklungs-Stroeme
+G1    U1    U2    VALUE={v(isx)+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G2    V1    V2    VALUE={(-v(isx)+1.7320508*v(isy))/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G3    W1    W2    VALUE={(-v(isx)-1.7320508*v(isy))/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+RG1   U1    0    1e6
+RG2   V1    0    1e6
+RG3   W1    0    1e6
+RG11  U2 N2 1u
+RG12  V2 N2 1u
+RG13  W2 N2 1u
+RN2   N2  0  1e6
+*   WicklungsstrÃ¶me LÃ¤ufer
+G1r             X1              X2              VALUE={v(irx)+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+G2r             Y1              Y2              VALUE={(-v(irx)+v(iry)*1.732)/2+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+G3r             Z1              Z2              VALUE={(-v(irx)-v(iry)*1.732)/2+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+R1r  X2 X1 1u
+R2r  Y2 Y1 1u
+R3r  Z2 Z1 1u
+Rx X1 0 1e6
+Ry Y1 0 1e6
+Rz Z1 0 1e6
+*               Spannungskomponenten Stator
+Eux             usx             0               VALUE={(2*v(u1,u2)-v(v1,v2)-v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+Euy             usy             0               VALUE={(v(v1,v2)-v(w1,w2))/1.732} tripdv={tdv} tripdt={tdt}
+*               Spannungskomponenten Läufer
+Eurx            urx             0               VALUE={(2*v(x1,x2)-v(y1,y2)-v(z1,z2))/3} tripdv={tdv} tripdt={tdt}
+Eury            ury             0               VALUE={(v(y1,y2)-v(z1,z2))/1.732} tripdv={tdv} tripdt={tdt}
+*               Nullsysteme Stator und Rotor
+Ei0   i_Null 0  VALUE={v(idt1)/Ls} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={(v(u1,u2)+v(v1,v2)+v(w1,w2))/3-Rs*v(i_null)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Eir0 ir_Null 0 VALUE={v(idt2)/Lr} tripdv={tdv} tripdt={tdt}
+G1y 0 idt2 VALUE={(v(x1,x2)+v(y1,y2)+v(z1,z2))/3-Rr*v(ir_null)} tripdv=1 tripdt=1
+C1y idt2 0 1
+R1y idt2 0 1e10
+*    Berechung der fluss-abhaengigen Haupt-Induktivitaet
+Gpsi    0    psi     VALUE={ (SQRT(v(prx)*v(prx)+v(pry)*v(pry))) } tripdv={tdv} tripdt={tdt}
+Rpsi    psi     0    1
+GiE1    0    imy    VALUE={a*v(psi)/psiN+(1-a)*PWRS(v(psi)/psiN,m)} tripdv={tdv} tripdt={tdt}
+RiE     imy    0    {iEN}
+GLh3    0    Lh3    VALUE={v(psi)/v(imy)-Lr} tripdv={tdv} tripdt={tdt}
+RLh3    Lh3    0    1        ;    Haupt-Induktivitaet
+.ENDS   ;     Ende des SUBCIRCUIT's
+
+* DAM Model with nonlinear core
+* and with Pfe situated at inputpins
+* and more output pins see below
+.SUBCKT DAM_9polig	U1 V1 W1 U2 V2 W2 X1 Y1 Z1 n M	n1
++               PARAMS:
++               UN_verkettet=400V
++               IN=21A
++               cos_phiN=0.82
++               fN=50Hz
++               nN=1420
++               p=2
++               PN=9500W
++               Pfe=260W
++               I0rel=0.6
++               Ikrel=5
++               rbg=0.1
++               taumech=0.25
++               n0=1420
++               rem=0.05
+.PARAM
++               MN={PN*60/(2*pi)/nN}
++               Mrbg={MN*rbg}
++               UN={UN_verkettet/sqrt(3)}
++               Pel={3*UN*IN*cos_phiN}
++               Pcu={Pel-PN*(1+rbg)}
++               Rcu={Pcu/3/IN/IN/2}
++               Rfe={3*UN*UN/Pfe}
++               omega_el={(2*pi)*fN}
++               Lss={UN/Ikrel/IN/omega_el/2}
++               Ls={Lss}
++               Lr={Lss}
++               Rs={Rcu}
++               Rr={Rcu}
++               Lh={UN/I0rel/IN/omega_el-Ls}
++               J={taumech*MN/(2*pi)/nN*60}
++  PsiN={Un*sqrt(2)/omega_el}
++  Psi0={rem*PsiN*1.1}
++  Ien={UN*sqrt(2)/Lh/omega_el}
++  a=0.6
++  m=9
++  Mvz=1
+* Pmech+Pfe+Prbg+Pfe+Pnet=0
+GEP 0 Pnet  value={-v(pfe)+v(U1)*I(G1)+v(V1)*I(G2)+v(W1)*I(G3)} tripdv={tdv} tripdt={tdt}
+GEPm 0 Pmech  value={v(n)*Pi/30*v(M)*Mvz} tripdv={tdv} tripdt={tdt}
+GEPmi 0 Pmi  value={v(n)*Pi/30*v(Mi)} tripdv={tdv} tripdt={tdt}
+GEPrbg 0 Prbg  value={-v(n)*Pi/30*v(M_Rbg)} tripdv={tdv} tripdt={tdt}
+GEPcu 0 Pcu  value={-rs*(I(G1)*I(G1)+I(G2)*I(G2)+I(G3)*I(G3))-rr*(I(G1r)*I(G1r)+I(G2r)*I(G2r)+I(G3r)*I(G3r))} tripdv={tdv} tripdt={tdt}
+GEPfe 0 Pfe  value={-(Rfe*(I(Rfeu)*I(Rfeu)+I(Rfev)*I(Rfev)+I(Rfew)*I(Rfew)))} tripdv={tdv} tripdt={tdt}
+GEs 0 slip  value={(v(n1)-v(n))/v(n1)} tripdv={tdv} tripdt={tdt}
+RGEP Pnet 0 1
+RGEPm Pmech 0 1
+RGEPmi Pmi 0 1
+RGEPrbg Prbg 0 1
+RGEPcu Pcu 0 1
+RGEPfe Pfe 0 1
+RGEs slip 0 1
+*    Magnetfluesse
+Gpsx    0    psx    VALUE={v(usx)-Rs*v(isx)} tripdv={tdv} tripdt={tdt}
+Gpsy    0    psy    VALUE={v(usy)-Rs*v(isy)} tripdv={tdv} tripdt={tdt}
+Gprx    0    prx    VALUE={v(urx)-(Rr*v(irx)+p*(pi/30)*v(n)*v(pry))} tripdv={tdv} tripdt={tdt}
+Gpry    0    pry    VALUE={v(ury)-(Rr*v(iry)-p*(pi/30)*v(n)*v(prx))} tripdv={tdv} tripdt={tdt}
+*Gphx    0    phx    VALUE={-Rfe*v(ifex)} tripdv={tdv} tripdt={tdt}
+*Gphy    0    phy    VALUE={-Rfe*v(ifey)} tripdv={tdv} tripdt={tdt}
+Rpsx    psx    0    1MEG
+Rpsy    psy    0    1MEG
+Rprx    prx    0    1MEG
+Rpry    pry    0    1MEG
+Rphx    phx    0    1MEG
+Rphy    phy    0    1MEG
+Cpsx    psx    0    1    IC={Psi0}
+Cpsy    psy    0    1    IC=0
+Cprx    prx    0    1    IC={Psi0}
+Cpry    pry    0    1    IC=0
+Cphx    phx    0    1    IC={Psi0}
+Cphy    phy    0    1    IC=0
+*    Stroeme
+Gisx    0    isx    VALUE={Ls*v(isx)+v(LH3)*(v(isx)+v(irx))-v(psx)} tripdv={tdv} tripdt={tdt}
+Girx    0    irx    VALUE={Lr*v(irx)+v(LH3)*(v(isx)+v(irx))-v(prx)} tripdv={tdv} tripdt={tdt}
+*Gifex   0    ifex   VALUE={          v(LH3)*(v(isx)+v(irx)-v(phx)} tripdv={tdv} tripdt={tdt}
+Risx    isx    0    1MEG
+Rirx    irx    0    1MEG
+*Rifex   ifex   0    1MEG
+Gisy    0    isy    VALUE={Ls*v(isy)+v(LH3)*(v(isy)+v(iry))-v(psy)} tripdv={tdv} tripdt={tdt}
+Giry    0    iry    VALUE={Lr*v(iry)+v(LH3)*(v(isy)+v(iry))-v(pry)} tripdv={tdv} tripdt={tdt}
+*Gifey   0    ifey   VALUE={          v(LH3)*(v(isy)+v(iry)+v(ifey))-v(phy)} tripdv={tdv} tripdt={tdt}
+Risy    isy    0    1MEG
+Riry    iry    0    1MEG
+*Rifey   ifey   0    1MEG
+*    Reibungs-Moment
+Grbg    0   M_Rbg   TABLE { v(n) }  =  (-1,-1)  (1,1)
+Rrbg    M_Rbg   0   {Mrbg}
+*    inneres Drehmoment
+*Gm      0      mi    VALUE={3/2*p*(v(phy)*v(irx)-v(phx)*v(iry))} tripdv={tdv} tripdt={tdt}
+*Rm      mi      0    1
+GEmi  0   Mi    value={3/2*p*v(LH3)*(v(isy)*v(irx)-v(isx)*v(iry))} tripdv={tdv} tripdt={tdt}
+REmi  Mi   0    1
+*    Drehzahl n
+gen 0 n value={n0+1/j*60/(2*pi)*V(VIDT0)} tripdv={tdv} tripdt={tdt}
+ren n 0 1
+cidt0 vidt0 0 1
+gidt0 0 vidt0 value={V(MI)-V(M_RBG)+V(M)*Mvz} tripdv={tdv} tripdt={tdt}
+ridt0 0 vidt0 1e10
+GEn2	0	n1		VALUE={fN*60/p}  tripdv={tdv} tripdt={tdt}
+REn2    n1  0   1
+Gomegam 0 omegam value={v(n)*pi/30} tripdv={tdv} tripdt={tdt}
+Romegam omegam 0 1
+Galpha  0    alpha      VALUE={v(omegam)} tripdv={tdv} tripdt={tdt}
+Calpha  alpha    0      1    IC=0
+Ralpha  alpha    0  1e9
+*    Wicklungs-Stroeme
+G1    U1    U2    VALUE={v(isx)+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G2    V1    V2    VALUE={(-v(isx)+sqrt(3)*v(isy))/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G3    W1    W2    VALUE={(-v(isx)-sqrt(3)*v(isy))/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+RG1   U1    0    1e6
+RG2   V1    0    1e6
+RG3   W1    0    1e6
+RG12   U2    0    1e6
+RG22   V2    0    1e6
+RG32   W2    0    1e6
+Rfeu u1 0 {Rfe}
+Rfev v1 0 {Rfe}
+Rfew w1 0 {Rfe}
+* Rotor windings currents
+G1r	X1	X2	VALUE={v(irxr)+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+G2r	Y1	Y2	VALUE={(-v(irxr)+v(iryr)*sqrt(3))/2+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+G3r	Z1	Z2	VALUE={(-v(irxr)-v(iryr)*sqrt(3))/2+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+R3r  X2  N2  1u
+R4r  Y2  N2  1u
+R9r  Z2  N2  1u
+RN2   N2  0  1e6
+R6r  X1  0  1e6
+R7r  Y1  0  1e6
+R8r  Z1  0  1e6
+*   Voltage components Stator
+GEux  0  usx   VALUE={(2*v(u1,u2)-v(v1,v2)-v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+REux  usx  0   1
+GEuy  0  usy   VALUE={(v(v1,v2)-v(w1,w2))/sqrt(3)} tripdv={tdv} tripdt={tdt}
+REuy  usy  0   1
+*	Voltage components Rotor
+GEurx	0  urx	VALUE={(2*v(x1,x2)-v(y1,y2)-v(z1,z2))/3} tripdv={tdv} tripdt={tdt}
+REurx   urx  0 1
+GEury	0  ury	VALUE={(v(y1,y2)-v(z1,z2))/sqrt(3)} tripdv={tdv} tripdt={tdt}
+REury   ury  0 1
+*   Current components rotor
+GEprxsr 0  irxr value={v(irx)*cos(+p*v(alpha))+v(iry)*sin(+p*v(alpha))} tripdv={tdv} tripdt={tdt}
+REprxsr irxr  0 1
+GEprysr 0  iryr value={-v(irx)*sin(+p*v(alpha))+v(iry)*cos(+p*v(alpha))} tripdv={tdv} tripdt={tdt}
+REprysr iryr  0 1 
+*               Nullsysteme Stator und Rotor
+Ei0   i_Null 0  VALUE={v(idt1)/Ls} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={(v(u1,u2)+v(v1,v2)+v(w1,w2))/3-Rs*v(i_null)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Eir0 ir_Null 0 VALUE={v(idt2)/Lr} tripdv={tdv} tripdt={tdt}
+G1y 0 idt2 VALUE={(v(x1,x2)+v(y1,y2)+v(z1,z2))/3-Rr*v(ir_null)} tripdv=1 tripdt=1
+C1y idt2 0 1
+R1y idt2 0 1e10
+*    Berechung der fluss-abhaengigen Haupt-Induktivitaet
+Gpsi    0    psi     VALUE={ SQRT(v(prx)*v(prx)+v(pry)*v(pry)) } tripdv={tdv} tripdt={tdt}
+Rpsi    psi     0    1
+GiE1    0    imy    VALUE={a*v(psi)/psiN+(1-a)*PWRS(v(psi)/psiN,m)} tripdv={tdv} tripdt={tdt}
+RiE     imy    0    {iEN}
+GLh3    0    Lh3    VALUE={v(psi)/v(imy)-Lr} tripdv={tdv} tripdt={tdt}
+RLh3    Lh3    0    1        ;    Haupt-Induktivitaet
+.ENDS ;  DAM
+
+* DAM Model with nonlinear core
+* and with Pfe situated at inputpins
+* and more output pins see below
+* and with constant speed
+.SUBCKT DAM_9polig_fixed_speed	U1 V1 W1 U2 V2 W2 X1 Y1 Z1 n	M	n1
++               PARAMS:
++               UN_verkettet=400V
++               IN=21A
++               cos_phiN=0.82
++               fN=50Hz
++               nN=1420
++               p=2
++               PN=9500W
++               Pfe=260W
++               I0rel=0.6
++               Ikrel=5
++               rbg=0.1
++               taumech=0.25
++               n0=1420
++               rem=0.05
+.PARAM
++               MN={PN*60/(2*pi)/nN}
++               Mrbg={MN*rbg}
++               UN={UN_verkettet/sqrt(3)}
++               Pel={3*UN*IN*cos_phiN}
++               Pcu={Pel-PN*(1+rbg)}
++               Rcu={Pcu/3/IN/IN/2}
++               Rfe={3*UN*UN/Pfe}
++               omega_el={(2*pi)*fN}
++               Lss={UN/Ikrel/IN/omega_el/2}
++               Ls={Lss}
++               Lr={Lss}
++               Rs={Rcu}
++               Rr={Rcu}
++               Lh={UN/I0rel/IN/omega_el-Ls}
++               J={taumech*MN/(2*pi)/nN*60}
++  PsiN={Un*sqrt(2)/omega_el}
++  Psi0={rem*PsiN*1.1}
++  Ien={UN*sqrt(2)/Lh/omega_el}
++  a=0.6
++  m=9
+* Pmech+Pfe+Prbg+Pfe+Pnet=0
+GEP 0 Pnet  value={-v(pfe)+v(U1)*I(G1)+v(V1)*I(G2)+v(W1)*I(G3)} tripdv={tdv} tripdt={tdt}
+GEPm 0 Pmech  value={v(n)*Pi/30*v(M)} tripdv={tdv} tripdt={tdt}
+GEPmi 0 Pmi  value={v(n)*Pi/30*v(Mi)} tripdv={tdv} tripdt={tdt}
+GEPrbg 0 Prbg  value={-v(n)*Pi/30*v(M_Rbg)} tripdv={tdv} tripdt={tdt}
+GEPcu 0 Pcu  value={-rs*(I(G1)*I(G1)+I(G2)*I(G2)+I(G3)*I(G3))-rr*(I(G1r)*I(G1r)+I(G2r)*I(G2r)+I(G3r)*I(G3r))} tripdv={tdv} tripdt={tdt}
+GEPfe 0 Pfe  value={-(Rfe*(I(Rfeu)*I(Rfeu)+I(Rfev)*I(Rfev)+I(Rfew)*I(Rfew)))} tripdv={tdv} tripdt={tdt}
+GEs 0 slip  value={(v(n1)-v(n))/v(n1)} tripdv={tdv} tripdt={tdt}
+GFreq 0 f value={n0/30}
+RGEP Pnet 0 1
+RGEPm Pmech 0 1
+RGEPmi Pmi 0 1
+RGEPrbg Prbg 0 1
+RGEPcu Pcu 0 1
+RGEPfe Pfe 0 1
+RGEs slip 0 1
+RFreq f  0  1
+*    Magnetfluesse
+Gpsx    0    psx    VALUE={v(usx)-Rs*v(isx)} tripdv={tdv} tripdt={tdt}
+Gpsy    0    psy    VALUE={v(usy)-Rs*v(isy)} tripdv={tdv} tripdt={tdt}
+Gprx    0    prx    VALUE={v(urx)-(Rr*v(irx)+p*(pi/30)*v(n)*v(pry))} tripdv={tdv} tripdt={tdt}
+Gpry    0    pry    VALUE={v(ury)-(Rr*v(iry)-p*(pi/30)*v(n)*v(prx))} tripdv={tdv} tripdt={tdt}
+*Gphx    0    phx    VALUE={-Rfe*v(ifex)} tripdv={tdv} tripdt={tdt}
+*Gphy    0    phy    VALUE={-Rfe*v(ifey)} tripdv={tdv} tripdt={tdt}
+Rpsx    psx    0    1MEG
+Rpsy    psy    0    1MEG
+Rprx    prx    0    1MEG
+Rpry    pry    0    1MEG
+Rphx    phx    0    1MEG
+Rphy    phy    0    1MEG
+Cpsx    psx    0    1    IC={Psi0}
+Cpsy    psy    0    1    IC=0
+Cprx    prx    0    1    IC={Psi0}
+Cpry    pry    0    1    IC=0
+Cphx    phx    0    1    IC={Psi0}
+Cphy    phy    0    1    IC=0
+*    Stroeme
+Gisx    0    isx    VALUE={Ls*v(isx)+v(LH3)*(v(isx)+v(irx))-v(psx)} tripdv={tdv} tripdt={tdt}
+Girx    0    irx    VALUE={Lr*v(irx)+v(LH3)*(v(isx)+v(irx))-v(prx)} tripdv={tdv} tripdt={tdt}
+*Gifex   0    ifex   VALUE={          v(LH3)*(v(isx)+v(irx)-v(phx)} tripdv={tdv} tripdt={tdt}
+Risx    isx    0    1MEG
+Rirx    irx    0    1MEG
+*Rifex   ifex   0    1MEG
+Gisy    0    isy    VALUE={Ls*v(isy)+v(LH3)*(v(isy)+v(iry))-v(psy)} tripdv={tdv} tripdt={tdt}
+Giry    0    iry    VALUE={Lr*v(iry)+v(LH3)*(v(isy)+v(iry))-v(pry)} tripdv={tdv} tripdt={tdt}
+*Gifey   0    ifey   VALUE={          v(LH3)*(v(isy)+v(iry)+v(ifey))-v(phy)} tripdv={tdv} tripdt={tdt}
+Risy    isy    0    1MEG
+Riry    iry    0    1MEG
+*Rifey   ifey   0    1MEG
+*    Reibungs-Moment
+Grbg    0   M_Rbg   TABLE { v(n) }  =  (-1,-1)  (1,1)
+Rrbg    M_Rbg   0   {Mrbg}
+*    inneres Drehmoment
+*Gm      0      mi    VALUE={3/2*p*(v(phy)*v(irx)-v(phx)*v(iry))} tripdv={tdv} tripdt={tdt}
+*Rm      mi      0    1
+GEmi  0    Mi    value={3/2*p*v(LH3)*(v(isy)*v(irx)-v(isx)*v(iry))} tripdv={tdv} tripdt={tdt}
+REmi  Mi   0     1
+*    Drehzahl n
+Gmlast    0  M   VALUE={-v(mi)+v(M_Rbg)} tripdv={tdv} tripdt={tdt}
+Rmlast  M 0 1
+GEn  0  n value={n0} tripdv={tdv} tripdt={tdt}
+Ren  n  0 1
+GEn2 0  n1 value={fN*60/p} tripdv={tdv} tripdt={tdt}
+Ren2 n1 0 1
+Gomegam 0  omegam  value={v(n)*pi/30} tripdv={tdv} tripdt={tdt}
+Romegam omegam 0 1
+Galpha  0    alpha      VALUE={v(omegam)} tripdv={tdv} tripdt={tdt}
+Calpha  alpha    0      1    IC=0
+Ralpha  alpha    0  1e9
+*    Wicklungs-Stroeme
+G1    U1    U2    VALUE={v(isx)+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G2    V1    V2    VALUE={(-v(isx)+sqrt(3)*v(isy))/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G3    W1    W2    VALUE={(-v(isx)-sqrt(3)*v(isy))/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+RG1   U1    0    1e6
+RG2   V1    0    1e6
+RG3   W1    0    1e6
+RG12   U2    0    1e6
+RG22   V2    0    1e6
+RG32   W2    0    1e6
+Rfeu u1 0 {Rfe}
+Rfev v1 0 {Rfe}
+Rfew w1 0 {Rfe}
+* Rotor windings currents
+G1r	X1	X2	VALUE={v(irxr)+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+G2r	Y1	Y2	VALUE={(-v(irxr)+v(iryr)*sqrt(3))/2+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+G3r	Z1	Z2	VALUE={(-v(irxr)-v(iryr)*sqrt(3))/2+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+R3r  X2  N2  1u
+R4r  Y2  N2  1u
+R9r  Z2  N2  1u
+RN2   N2  0  1e6
+R6r  X1  0  1e6
+R7r  Y1  0  1e6
+R8r  Z1  0  1e6
+*   Voltage components Stator
+GEux  0  usx   VALUE={(2*v(u1,u2)-v(v1,v2)-v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+REux  usx  0   1
+GEuy  0  usy   VALUE={(v(v1,v2)-v(w1,w2))/sqrt(3)} tripdv={tdv} tripdt={tdt}
+REuy  usy  0   1
+*	Voltage components Rotor
+GEurx	0  urx	VALUE={(2*v(x1,x2)-v(y1,y2)-v(z1,z2))/3} tripdv={tdv} tripdt={tdt}
+REurx   urx  0 1
+GEury	0  ury	VALUE={(v(y1,y2)-v(z1,z2))/sqrt(3)} tripdv={tdv} tripdt={tdt}
+REury   ury  0 1
+*   Current components rotor
+GEprxsr 0  irxr value={v(irx)*cos(+p*v(alpha))+v(iry)*sin(+p*v(alpha))} tripdv={tdv} tripdt={tdt}
+REprxsr irxr  0 1
+GEprysr 0  iryr value={-v(irx)*sin(+p*v(alpha))+v(iry)*cos(+p*v(alpha))} tripdv={tdv} tripdt={tdt}
+REprysr iryr  0 1 
+*               Nullsysteme Stator und Rotor
+Ei0   i_Null 0  VALUE={v(idt1)/Ls} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={(v(u1,u2)+v(v1,v2)+v(w1,w2))/3-Rs*v(i_null)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Eir0 ir_Null 0 VALUE={v(idt2)/Lr} tripdv={tdv} tripdt={tdt}
+G1y 0 idt2 VALUE={(v(x1,x2)+v(y1,y2)+v(z1,z2))/3-Rr*v(ir_null)} tripdv=1 tripdt=1
+C1y idt2 0 1
+R1y idt2 0 1e10
+*    Berechung der fluss-abhaengigen Haupt-Induktivitaet
+Gpsi    0    psi     VALUE={ LIMIT(SQRT(v(prx)*v(prx)+v(pry)*v(pry)),-PsiN*10,PsiN*10) } tripdv={tdv} tripdt={tdt}
+Rpsi    psi     0    1
+GiE1    0    imy    VALUE={a*v(psi)/psiN+(1-a)*PWRS(LIMIT(1p+v(psi)/psiN,-10,10),m)} tripdv={tdv} tripdt={tdt}
+RiE     imy    0    {iEN}
+GLh3    0    Lh3    VALUE={v(psi)/v(imy)-Lr} tripdv={tdv} tripdt={tdt}
+RLh3    Lh3    0    1        ;    Haupt-Induktivitaet
+.ENDS
+
+
+* DAM Model with nonlinear core
+* and with Pfe situated at inputpins
+* and more output pins see below
+* and with constant speed
+.SUBCKT DAM_9polig_fixed_speed_slipring	U1 V1 W1 U2 V2 W2 X1 Y1 Z1 n	M	n1
++               PARAMS:
++               UN_verkettet=400V
++               IN=21A
++               cos_phiN=0.82
++               fN=50Hz
++               nN=1420
++               p=2
++               PN=9500W
++               Pfe=260W
++               I0rel=0.6
++               Ikrel=5
++               rbg=0.1
++               taumech=0.25
++               n0=1420
++               rem=0.05
+.PARAM
++               MN={PN*60/(2*pi)/nN}
++               Mrbg={MN*rbg}
++               UN={UN_verkettet/sqrt(3)}
++               Pel={3*UN*IN*cos_phiN}
++               Pcu={Pel-PN*(1+rbg)}
++               Rcu={Pcu/3/IN/IN/2}
++               Rfe={3*UN*UN/Pfe}
++               omega_el={(2*pi)*fN}
++               Lss={UN/Ikrel/IN/omega_el/2}
++               Ls={Lss}
++               Lr={Lss}
++               Rs={Rcu}
++               Rr={Rcu}
++               Lh={UN/I0rel/IN/omega_el-Ls}
++               J={taumech*MN/(2*pi)/nN*60}
++  PsiN={Un*sqrt(2)/omega_el}
++  Psi0={rem*PsiN*1.1}
++  Ien={UN*sqrt(2)/Lh/omega_el}
++  a=0.6
++  m=9
+* Pmech+Pfe+Prbg+Pfe+Pnet=0
+GEP 0 Pnet  value={-v(pfe)+v(U1)*I(G1)+v(V1)*I(G2)+v(W1)*I(G3)} tripdv={tdv} tripdt={tdt}
+GEPm 0 Pmech  value={v(n)*Pi/30*v(M)} tripdv={tdv} tripdt={tdt}
+GEPmi 0 Pmi  value={v(n)*Pi/30*v(Mi)} tripdv={tdv} tripdt={tdt}
+GEPrbg 0 Prbg  value={-v(n)*Pi/30*v(M_Rbg)} tripdv={tdv} tripdt={tdt}
+GEPcu 0 Pcu  value={-rs*(I(G1)*I(G1)+I(G2)*I(G2)+I(G3)*I(G3))-rr*(I(G1r)*I(G1r)+I(G2r)*I(G2r)+I(G3r)*I(G3r))} tripdv={tdv} tripdt={tdt}
+GEPfe 0 Pfe  value={-(Rfe*(I(Rfeu)*I(Rfeu)+I(Rfev)*I(Rfev)+I(Rfew)*I(Rfew)))} tripdv={tdv} tripdt={tdt}
+GEs 0 slip  value={(v(n1)-v(n))/v(n1)} tripdv={tdv} tripdt={tdt}
+GFreq 0 f value={n0/30}
+RGEP Pnet 0 1
+RGEPm Pmech 0 1
+RGEPmi Pmi 0 1
+RGEPrbg Prbg 0 1
+RGEPcu Pcu 0 1
+RGEPfe Pfe 0 1
+RGEs slip 0 1
+RFreq f  0  1
+*    d-q-magnetix flux
+Gpsx    0    psx    VALUE={v(usx)-Rs*v(isx)} tripdv={tdv} tripdt={tdt}
+Gpsy    0    psy    VALUE={v(usy)-Rs*v(isy)} tripdv={tdv} tripdt={tdt}
+Gprx    0    prx    VALUE={v(urx)-(Rr*v(irx)+p*(pi/30)*v(n)*v(pry))} tripdv={tdv} tripdt={tdt}
+Gpry    0    pry    VALUE={v(ury)-(Rr*v(iry)-p*(pi/30)*v(n)*v(prx))} tripdv={tdv} tripdt={tdt}
+*Gphx    0    phx    VALUE={-Rfe*v(ifex)} tripdv={tdv} tripdt={tdt}
+*Gphy    0    phy    VALUE={-Rfe*v(ifey)} tripdv={tdv} tripdt={tdt}
+Rpsx    psx    0    1MEG
+Rpsy    psy    0    1MEG
+Rprx    prx    0    1MEG
+Rpry    pry    0    1MEG
+Rphx    phx    0    1MEG
+Rphy    phy    0    1MEG
+Cpsx    psx    0    1    IC={Psi0}
+Cpsy    psy    0    1    IC=0
+Cprx    prx    0    1    IC={Psi0}
+Cpry    pry    0    1    IC=0
+Cphx    phx    0    1    IC={Psi0}
+Cphy    phy    0    1    IC=0
+*    d-q-currents
+Gisx    0    isx    VALUE={Ls*v(isx)+v(LH3)*(v(isx)+v(irx))-v(psx)} tripdv={tdv} tripdt={tdt}
+Girx    0    irx    VALUE={Lr*v(irx)+v(LH3)*(v(isx)+v(irx))-v(prx)} tripdv={tdv} tripdt={tdt}
+*Gifex   0    ifex   VALUE={          v(LH3)*(v(isx)+v(irx)-v(phx)} tripdv={tdv} tripdt={tdt}
+Risx    isx    0    1MEG
+Rirx    irx    0    1MEG
+*Rifex   ifex   0    1MEG
+Gisy    0    isy    VALUE={Ls*v(isy)+v(LH3)*(v(isy)+v(iry))-v(psy)} tripdv={tdv} tripdt={tdt}
+Giry    0    iry    VALUE={Lr*v(iry)+v(LH3)*(v(isy)+v(iry))-v(pry)} tripdv={tdv} tripdt={tdt}
+*Gifey   0    ifey   VALUE={          v(LH3)*(v(isy)+v(iry)+v(ifey))-v(phy)} tripdv={tdv} tripdt={tdt}
+Risy    isy    0    1MEG
+Riry    iry    0    1MEG
+*Rifey   ifey   0    1MEG
+*    Friction torque
+Grbg    0   M_Rbg   TABLE { v(n) }  =  (-1,-1)  (1,1)
+Rrbg    M_Rbg   0   {Mrbg}
+*    inner torque
+*Gm      0      mi    VALUE={3/2*p*(v(phy)*v(irx)-v(phx)*v(iry))} tripdv={tdv} tripdt={tdt}
+*Rm      mi      0    1
+GEmi  0    Mi    value={3/2*p*v(LH3)*(v(isy)*v(irx)-v(isx)*v(iry))} tripdv={tdv} tripdt={tdt}
+REmi  Mi   0     1
+*    Speed n
+Gmlast    0  M   VALUE={-v(mi)+v(M_Rbg)} tripdv={tdv} tripdt={tdt}
+Rmlast  M 0 1
+GEn  0  n value={n0} tripdv={tdv} tripdt={tdt}
+Ren  n  0 1
+GEn2 0  n1 value={fN*60/p} tripdv={tdv} tripdt={tdt}
+Ren2 n1 0 1
+Gomegam 0  omegam  value={v(n)*pi/30} tripdv={tdv} tripdt={tdt}
+Romegam omegam 0 1
+Galpha  0    alpha      VALUE={v(omegam)} tripdv={tdv} tripdt={tdt}
+Calpha  alpha    0      1    IC=0
+Ralpha  alpha    0  1e9
+*    3~stator Winding currents
+G1    U1    U2    VALUE={v(isx)+v(is0)} tripdv={tdv} tripdt={tdt}
+G2    V1    V2    VALUE={(-v(isx)+sqrt(3)*v(isy))/2+v(is0)} tripdv={tdv} tripdt={tdt}
+G3    W1    W2    VALUE={(-v(isx)-sqrt(3)*v(isy))/2+v(is0)} tripdv={tdv} tripdt={tdt}
+RG1   U1    0    1e6
+RG2   V1    0    1e6
+RG3   W1    0    1e6
+RG12   U2    0    1e6
+RG22   V2    0    1e6
+RG32   W2    0    1e6
+Rfeu u1 0 {Rfe} ; iron lost resistance
+Rfev v1 0 {Rfe}
+Rfew w1 0 {Rfe}
+* Rotor windings currents
+G1r	X1a	X2a	VALUE={v(irx)+v(ir0)} tripdv={tdv} tripdt={tdt}
+G2r	Y1a	Y2a	VALUE={(-v(irx)+v(iry)*sqrt(3))/2+v(ir0)} tripdv={tdv} tripdt={tdt}
+G3r	Z1a	Z2a	VALUE={(-v(irx)-v(iry)*sqrt(3))/2+v(ir0)} tripdv={tdv} tripdt={tdt}
+Rx1 X1a 0 1e6
+Ry1 Y1a 0 1e6
+Rz1 Z1a 0 1e6
+R3r  X2a  N2  1u
+R4r  Y2a  N2  1u
+R9r  Z2a  N2  1u
+RN2  N2 0 1e6
+*   Voltage components Stator
+GEux  0  usx   VALUE={(2*v(u1,u2)-v(v1,v2)-v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+REux  usx  0   1
+GEuy  0  usy   VALUE={(v(v1,v2)-v(w1,w2))/sqrt(3)} tripdv={tdv} tripdt={tdt}
+REuy  usy  0   1
+*	Voltage components rotor
+Eurx	urx	0	VALUE={(2*v(x1a,x2a)-v(y1a,y2a)-v(z1a,z2a))/3} tripdv={tdv} tripdt={tdt}
+Eury	ury	0	VALUE={(v(y1a,y2a)-v(z1a,z2a))/sqrt(3)} tripdv={tdv} tripdt={tdt}
+Eur0    ur0   0  VALUE={(v(x1a,x2a)+v(y1a,y2a)+v(z1a,z2a))/3} tripdv={tdv} tripdt={tdt}
+
+*   Current components rotor
+*GEprxsr 0  irxr value={v(irx)*cos(+p*v(alpha))+v(iry)*sin(+p*v(alpha))}
+*REprxsr irxr  0 1
+*GEprysr 0  iryr value={-v(irx)*sin(+p*v(alpha))+v(iry)*cos(+p*v(alpha))}
+*REprysr iryr  0 1 
+*
+*               Nullsysteme Stator und Rotor
+Ei0  is0 0   VALUE={v(idt1)/Ls} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={(v(u1,u2)+v(v1,v2)+v(w1,w2))/3-Rs*v(is0)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Eir0 ir0 0 VALUE={v(idt2)/Lr} tripdv={tdv} tripdt={tdt}
+G1y 0 idt2 VALUE={(v(x1a,x2a)+v(y1a,y2a)+v(z1a,z2a))/3-Rr*v(ir0)} tripdv=1 tripdt=1
+C1y idt2 0 1
+R1y idt2 0 1e10
+*   Voltage components rotor : urxr uryr with rotor frequency
+Euxrr urxr 0  value={v(urx)*cos(+p*v(alpha))+v(ury)*sin(+p*v(alpha))} tripdv={tdv} tripdt={tdt}
+Euyrr uryr 0  value={-v(urx)*sin(+p*v(alpha))+v(ury)*cos(+p*v(alpha))} tripdv={tdv} tripdt={tdt}
+* 3~ voltage source with rotor frequency  
+EX1	X1b	0	VALUE={v(urxr)+v(ur0)} tripdv={tdv} tripdt={tdt}
+EY1	Y1b	0	VALUE={(-v(urxr)+v(uryr)*sqrt(3))/2+v(ur0)} tripdv={tdv} tripdt={tdt}
+EZ1	Z1b	0	VALUE={(-v(urxr)-v(uryr)*sqrt(3))/2+v(ur0)} tripdv={tdv} tripdt={tdt}
+* Current measurement for 3~ currents (load)
+V0X1  X1b  X1 0
+V0Y1  Y1b  Y1 0     
+V0Z1  Z1b  Z1 0
+* d-q-currents from/to 3~ voltage source
+Eurx1	irxx	0	VALUE={(2*i(V0X1)-i(V0Y1)-i(V0Z1))/3} tripdv={tdv} tripdt={tdt}
+Eury1	iryy	0	VALUE={(i(V0Y1)-i(V0Z1))/sqrt(3)} tripdv={tdv} tripdt={tdt}
+*Eur0  ir00  0  VALUE={(i(V0X1)+i(V0Y1)+i(V0Z1))/3} tripdv={tdv} tripdt={tdt}
+* now d-q-rotor-current translated to d-q-stator frequency 
+Eprxrs irxxx 0  value={v(irxx)*cos(-p*v(alpha))+v(iryy)*sin(-p*v(alpha))} tripdv={tdv} tripdt={tdt}
+Epryrs iryyy 0  value={-v(irxx)*sin(-p*v(alpha))+v(iryy)*cos(-p*v(alpha))} tripdv={tdv} tripdt={tdt}
+* d-q-current translated to 3~current with stator frequency
+Eirxxxu  irxxxu 0 VALUE={v(irxxx)+v(ir0)} tripdv={tdv} tripdt={tdt}
+Eirxxxv  irxxxv 0 VALUE={(-v(irxxx)+v(iryyy)*sqrt(3))/2+v(ir0)} tripdv={tdv} tripdt={tdt}
+Eirxxxw  irxxxw 0 VALUE={(-v(irxxx)-v(iryyy)*sqrt(3))/2+v(ir0)} tripdv={tdv} tripdt={tdt}
+* Put it to stator with statorfrequenz
+GIxx1 X1a 0 value={v(irxxxu)} tripdv={tdv} tripdt={tdt}
+GIxx2 Y1a 0 value={v(irxxxv)} tripdv={tdv} tripdt={tdt}
+GIxx3 Z1a 0 value={v(irxxxw)} tripdv={tdv} tripdt={tdt}
+*    computation nonlinear main inductance
+Gpsi    0    psi     VALUE={ LIMIT(SQRT(v(prx)*v(prx)+v(pry)*v(pry)),-PsiN*10,PsiN*10) } tripdv={tdv} tripdt={tdt}
+Rpsi    psi     0    1
+GiE1    0    imy    VALUE={a*v(psi)/psiN+(1-a)*PWRS(LIMIT(1p+v(psi)/psiN,-10,10),m)} tripdv={tdv} tripdt={tdt}
+RiE     imy    0    {iEN}
+GLh3    0    Lh3    VALUE={v(psi)/v(imy)-Lr} tripdv={tdv} tripdt={tdt}
+RLh3    Lh3    0    1        ;    Haupt-Induktivitaet
+.ENDS
+
+
+
+
+*
+* Minimal DAM model without nonlinear core
+.SUBCKT DAM_min	U1 V1 W1  n	M	n1
++               PARAMS:
++               UN_verkettet=400V
++               IN=21A
++               cos_phiN=0.82
++               fN=50Hz
++               nN=1420
++               p=2
++               PN=9500W
++               Pfe=260W
++               I0rel=0.6
++               Ikrel=5
++               rbg=0.1
++               taumech=0.25
++               n0=1420
+.PARAM
++               MN={PN*60/(2*pi)/nN}
++               Mrbg={MN*rbg}
++               UN={UN_verkettet/sqrt(3)}
++               Pel={3*UN*IN*cos_phiN}
++               Pcu={Pel-PN*(1+rbg)}
++               Rcu={Pcu/3/IN/IN/2}
++               Rfe={3*UN*UN/Pfe}
++               omega_el={(2*pi)*fN}
++               Lss={UN/Ikrel/IN/omega_el/2}
++               Ls={Lss}
++               Lr={Lss}
++               Rs={Rcu}
++               Rr={Rcu}
++               Lh3={UN/I0rel/IN/omega_el-Ls}
++               J={taumech*MN/(2*pi)/nN*60}
++               Mvz=1
+* Pmech+Pfe+Prbg+Pfe+Pnet=0
+GEP 0 Pnet  value={-v(pfe)+v(U1)*I(G1)+v(V1)*I(G2)+v(W1)*I(G3)} tripdv={tdv} tripdt={tdt}
+GEPm 0 Pmech  value={v(n)*Pi/30*v(M)*Mvz} tripdv={tdv} tripdt={tdt}
+GEPmi 0 Pmi  value={v(n)*Pi/30*v(Mi)} tripdv={tdv} tripdt={tdt}
+GEPrbg 0 Prbg  value={-v(n)*Pi/30*v(M_Rbg)} tripdv={tdv} tripdt={tdt}
+GEPcu 0 Pcu  value={-rs*(I(G1)*I(G1)+I(G2)*I(G2)+I(G3)*I(G3))-rr*(I(G1r)*I(G1r)+I(G2r)*I(G2r)+I(G3r)*I(G3r))} tripdv={tdv} tripdt={tdt}
+GEPfe 0 Pfe  value={-(Rfe*(I(Rfeu)*I(Rfeu)+I(Rfev)*I(Rfev)+I(Rfew)*I(Rfew)))} tripdv={tdv} tripdt={tdt}
+GEs 0 slip  value={(v(n1)-v(n))/v(n1)} tripdv={tdv} tripdt={tdt}
+RGEP Pnet 0 1
+RGEPm Pmech 0 1
+RGEPmi Pmi 0 1
+RGEPrbg Prbg 0 1
+RGEPcu Pcu 0 1
+RGEPfe Pfe 0 1
+RGEs slip 0 1
+*    Magnetfluesse
+Gpsx    0    psx    VALUE={v(usx)-Rs*v(isx)} tripdv={tdv} tripdt={tdt}
+Gpsy    0    psy    VALUE={v(usy)-Rs*v(isy)} tripdv={tdv} tripdt={tdt}
+Gprx    0    prx    VALUE={v(urx)-(Rr*v(irx)+p*(pi/30)*v(n)*v(pry))} tripdv={tdv} tripdt={tdt}
+Gpry    0    pry    VALUE={v(ury)-(Rr*v(iry)-p*(pi/30)*v(n)*v(prx))} tripdv={tdv} tripdt={tdt}
+*Gphx    0    phx    VALUE={-Rfe*v(ifex)} tripdv={tdv} tripdt={tdt}
+*Gphy    0    phy    VALUE={-Rfe*v(ifey)} tripdv={tdv} tripdt={tdt}
+Rpsx    psx    0    1MEG
+Rpsy    psy    0    1MEG
+Rprx    prx    0    1MEG
+Rpry    pry    0    1MEG
+Rphx    phx    0    1MEG
+Rphy    phy    0    1MEG
+Cpsx    psx    0    1    IC=0
+Cpsy    psy    0    1    IC=0
+Cprx    prx    0    1    IC=0
+Cpry    pry    0    1    IC=0
+Cphx    phx    0    1    IC=0
+Cphy    phy    0    1    IC=0
+*    Stroeme
+Gisx    0    isx    VALUE={Ls*v(isx)+LH3*(v(isx)+v(irx))-v(psx)} tripdv={tdv} tripdt={tdt}
+Girx    0    irx    VALUE={Lr*v(irx)+LH3*(v(isx)+v(irx))-v(prx)} tripdv={tdv} tripdt={tdt}
+*Gifex   0    ifex   VALUE={          LH3*(v(isx)+v(irx)-v(phx)} tripdv={tdv} tripdt={tdt}
+Risx    isx    0    1MEG
+Rirx    irx    0    1MEG
+*Rifex   ifex   0    1MEG
+Gisy    0    isy    VALUE={Ls*v(isy)+LH3*(v(isy)+v(iry))-v(psy)} tripdv={tdv} tripdt={tdt}
+Giry    0    iry    VALUE={Lr*v(iry)+LH3*(v(isy)+v(iry))-v(pry)} tripdv={tdv} tripdt={tdt}
+*Gifey   0    ifey   VALUE={          LH3*(v(isy)+v(iry)+v(ifey))-v(phy)} tripdv={tdv} tripdt={tdt}
+Risy    isy    0    1MEG
+Riry    iry    0    1MEG
+*Rifey   ifey   0    1MEG
+*    Reibungs-Moment
+Grbg    0   M_Rbg   TABLE { v(n) }  =  (-1,-1)  (1,1)
+Rrbg    M_Rbg   0   {Mrbg}
+*    inneres Drehmoment
+*Gm      0      mi    VALUE={3/2*p*(v(phy)*v(irx)-v(phx)*v(iry))} tripdv={tdv} tripdt={tdt}
+*Rm      mi      0    1
+GEmi  0    Mi   value={3/2*p*LH3*(v(isy)*v(irx)-v(isx)*v(iry))} tripdv={tdv} tripdt={tdt}
+REmi  Mi   0    1
+*    Drehzahl n
+gen 0 n value={n0+1/j*60/(2*pi)*V(VIDT0)} tripdv={tdv} tripdt={tdt}
+ren n 0 1
+cidt0 vidt0 0 1
+gidt0 0 vidt0 value={V(MI)-V(M_RBG)+V(M)*Mvz} tripdv={tdv} tripdt={tdt}
+ridt0 0 vidt0 1e10
+GEn2	0	n1		VALUE={fN*60/p}  tripdv={tdv} tripdt={tdt}
+Ren2   n1   0       1
+Gomegam 0 omegam value={v(n)*pi/30} tripdv={tdv} tripdt={tdt}
+Romegam omegam 0 1
+Galpha  0    alpha      VALUE={v(omegam)} tripdv={tdv} tripdt={tdt}
+Calpha  alpha    0      1    IC=0
+Ralpha  alpha    0  1e9
+*    Wicklungs-Stroeme
+G1    U1    U2    VALUE={v(isx)+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G2    V1    V2    VALUE={(-v(isx)+sqrt(3)*v(isy))/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G3    W1    W2    VALUE={(-v(isx)-sqrt(3)*v(isy))/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+RG1   U1    0    1e6
+RG2   V1    0    1e6
+RG3   W1    0    1e6
+RG11  U2 N2 1u
+RG12  V2 N2 1u
+RG13  W2 N2 1u
+RN2   N2 0 1e6
+Rfeu u1 0 {Rfe}
+Rfev v1 0 {Rfe}
+Rfew w1 0 {Rfe}
+*   WicklungsstrÃ¶me LÃ¤ufer
+G1r             X1              X2              VALUE={v(irx)+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+G2r             Y1              Y2              VALUE={(-v(irx)+v(iry)*sqrt(3))/2+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+G3r             Z1              Z2              VALUE={(-v(irx)-v(iry)*sqrt(3))/2+v(ir_Null)} tripdv={tdv} tripdt={tdt}
+R1r  X2 X1 1u
+R2r  Y2 Y1 1u
+R3r  Z2 Z1 1u
+Rx X1 0 1e6
+Ry Y1 0 1e6
+Rz Z1 0 1e6
+*               Spannungskomponenten Stator
+Eux             usx             0               VALUE={(2*v(u1,u2)-v(v1,v2)-v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+Euy             usy             0               VALUE={(v(v1,v2)-v(w1,w2))/sqrt(3)} tripdv={tdv} tripdt={tdt}
+*               Spannungskomponenten LÃ¤ufer
+Eurx            urx             0               VALUE={(2*v(x1,x2)-v(y1,y2)-v(z1,z2))/3} tripdv={tdv} tripdt={tdt}
+Eury            ury             0               VALUE={(v(y1,y2)-v(z1,z2))/sqrt(3)} tripdv={tdv} tripdt={tdt}
+*               Nullsysteme Stator und Rotor
+Ei0   i_Null 0  VALUE={v(idt1)/Ls} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={(v(u1,u2)+v(v1,v2)+v(w1,w2))/3-Rs*v(i_null)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Eir0 ir_Null 0 VALUE={v(idt2)/Lr} tripdv={tdv} tripdt={tdt}
+G1y 0 idt2 VALUE={(v(x1,x2)+v(y1,y2)+v(z1,z2))/3-Rr*v(ir_null)} tripdv=1 tripdt=1
+C1y idt2 0 1
+R1y idt2 0 1e10
+*    Berechung der fluss-abhaengigen Haupt-Induktivitaet
+*Gpsi    0    psi     VALUE={ LIMIT(SQRT(v(prx)*v(prx)+v(pry)*v(pry)),-PsiN*10,PsiN*10) } tripdv={tdv} tripdt={tdt}
+*Rpsi    psi     0    1
+*GiE1    0    imy    VALUE={a*v(psi)/psiN+(1-a)*PWRS(LIMIT(1p+v(psi)/psiN,-10,10),m)} tripdv={tdv} tripdt={tdt}
+*RiE     imy    0    {iEN}
+*GLh3    0    Lh3    VALUE={v(psi)/v(imy)-Lr} tripdv={tdv} tripdt={tdt}
+*RLh3    Lh3    0    1        ;    Haupt-Induktivitaet
+.ENDS 
+
+
+.SUBCKT DAMreg U1 V1 W1 nsoll n
++PARAMS: IN=21A I0rel=0.6 fn={fn1} p=2 nN=1420 Ikrel=5 Kp_rot=10 Kp_stat=1 Kp_i=10 Tn_rot=1 Tn_stat=200m Tn_i=100
+.PARAM
++	sigma={I0rel/Ikrel}
++	sN={1-p*nN/60/fN}
++	sk={2.5*sN}
++	a1={1/(sigma*sigma*sk*sk)/fN/fN}
++	a2={a1*sigma*sigma/4}
+
+*Frequenzregelung
+Ef2s	f2s 0	VALUE= {LIMIT(Kp_rot*p/60*(v(nsoll,n)+v(idt3)/Tn_rot),-0.3*fN,0.3*fN)}  tripdv={tdv} tripdt={tdt}
+G3x 0 idt3 VALUE={v(nsoll,n)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+Ef2	f2  0	VALUE= {(v(f1)-v(n)*p/60)} tripdv={tdv} tripdt={tdt}
+
+Ef1	f1  0	VALUE= {LIMIT(Kp_stat*(v(f2s,f2)+v(idt4)/Tn_stat),-1.2*fN,1.2*fN)} tripdv={tdv} tripdt={tdt}
+G4x 0 idt4 VALUE={v(f2s,f2)} tripdv=1 tripdt=1
+C4x idt4 0 1
+R4x idt4 0 1e10
+*Stromvorgabe i^2=f(f2)
+Eisq 	isq  0	VALUE= {(1+a1*v(f2)*v(f2))/(1+a2*v(f2)*v(f2))} tripdv={tdv} tripdt={tdt}
+
+*Oszillator mit geregelter Stromamplitude isa
+Eisa	isa  0  VALUE= {Kp_i*(v(isq,isS)+v(idt5)/Tn_i)} tripdv={tdv} tripdt={tdt}
+G5x 0 idt5 VALUE={v(isq,isS)} tripdv=1 tripdt=1
+C5x idt5 0 1
+R5x idt5 0 1e10
+EisS	isS  0  VALUE= {v(sinx)*v(sinx)+v(cosx)*v(cosx)} tripdv={tdv} tripdt={tdt}
+Ecosx	cosx 0  VALUE= {v(idt1)} tripdv={tdv} tripdt={tdt}
+Gx 0 idt1 VALUE={v(cosx)*v(isa)-v(sinx)*v(f1)*(2*pi)} tripdv=1 tripdt=1
+Cx idt1 0 1
+Rx idt1 0 1e10
+Esinx	sinx 0  VALUE= {v(idt2)+1m} tripdv={tdv} tripdt={tdt}
+Gy 0 idt2 VALUE={v(sinx)*v(isa)+v(cosx)*v(f1)*(2*pi)} tripdv=1 tripdt=1
+Cy idt2 0 1
+Ry idt2 0 1e10
+*vom Regler gesteuerte Stromquellen
+Gi1	0    U1 VALUE= {sqrt(2)*IN*I0rel*v(cosx)} tripdv={tdv} tripdt={tdt}
+RU1	U1   0  100k
+Gi2	0    V1 VALUE= {sqrt(2)*IN*I0rel*(-v(cosx)/2+(sqrt(3)/2)*v(sinx))} tripdv={tdv} tripdt={tdt}
+RV1	V1   0  100k
+Gi3	0    W1 VALUE= {sqrt(2)*IN*I0rel*(-v(cosx)/2-(sqrt(3)/2)*v(sinx))} tripdv={tdv} tripdt={tdt}
+RW1	W1   0  100k
+.ENDS ; SUBCKT DAMreg
+

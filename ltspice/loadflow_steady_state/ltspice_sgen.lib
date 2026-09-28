@@ -1,0 +1,247 @@
+* 400MW generator at fixed speed
+.SUBCKT Block1_fixe_Drehzahl_steadystate us usx usy  F1  M  n f vsoll 
++	PARAMS:
++	UN_verkettet=20000
++	IN=14.5k
++	Pel=400e6  ;UN_verkettet*IN*1.73205*cosphi of 0.8
++	fn={fn1}
++	Kc=0.5
++	UE0=600V ; Power of exciter = 0.25-5% * SN machine (smaller values for higher SN)
++	IE0=2000A
++	p=2
++	Streuung=0.05
++	rcu=0.01
++	rbg=0.001
++	Schenkelpolfaktor=1 ;(1=cylindrical pole 0.5=Salient pole)
++	err0=0
++	n1=1500
++	t_anlauf=2m
++	t_auslauf=2
++	t_betrieb=2000
++	n_Turbine=1500
++   a=0.9 ; Parameter for nonlinear noload line (should be about 0.9)
++   m=7
++   Kp_avr=0.01
++   Tn_avr=0.1
+.PARAM
++   a1={a};  Saturation parameter d-axis
++   m1={m};  Saturation parameter d-axis
++   a2={a1}; Saturation parameter q-axis
++   m2={m1}; Saturation parameter q-axis
++	UN={0.707*UN_verkettet/1.732}
++	ZN={UN/IN}
++	Rs={ZN*rcu}
++	omega_el={(2*pi)*fN}
++	g={IE0/((1+Streuung)*Kc*IN*sqrt(2))}
++	Ls={Streuung*ZN/Kc/omega_el}
++	PsiN={sqrt(2)*UN/omega_el}
++	RE={UE0/IE0}
++   LE={Ls} ; can be overwritten by setting this parameters on modelline
++	ImNx={IE0/g}
++	ImNy={ImNx/Schenkelpolfaktor}
++	MN={Pel*(1-rbg-rcu)*p/omega_el}
++   XD={UN/IN/Kc}
+Rf1 f1 0 1e12
+Rm  m  0 1e12
+Rn  n  0 1e12
+Rf  f  0 1e12
+Rus us 0 1e12
+Rxd xd 0 1e12
+Rusx usx 0 1e12
+Rusy usy 0 1e12
+Rvsoll vsoll 0 1e12
+Rp p 0 1e12
+Rq q 0 1e12
+*	magnetic field current
+GiE	F1	0	VALUE={v(imx,isx)*g}  tripdv={tdv} tripdt={tdt}
+* Berechner f (frequency)
+Ef      f   0  VALUE={v(n)*p/60} tripdv={tdv} tripdt={tdt}
+* Spannungskomponenten (Voltage components)
+Gisx  usx 0 value={v(isx)} tripdv={tdv} tripdt={tdt}
+Gisy  usy 0 value={v(isy)} tripdv={tdv} tripdt={tdt}
+* Loadangle
+Gtheta 0 theta VALUE={sqrt(2)*180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}  ;Lastwinkel!!!!
+Rtheta theta 0 1
+Ctheta theta 0 10u
+* voltage RMS of generator
+Ev Us 0 VALUE={1.73205*sqrt(v(usx)*v(usx)+v(usy)*v(usy))}  tripdv={tdv} tripdt={tdt}
+* Active power output of generator 
+Eap p 0 VALUE={3*(v(usx)*v(isx)+v(usy)*v(isy))}  tripdv={tdv} tripdt={tdt}
+* Reactive power output of generator 
+Eaq q 0 VALUE={3*(v(usy)*v(isx)-v(usx)*v(isy))}  tripdv={tdv} tripdt={tdt}
+* Xd of generator for cylindrical pole machine
+Exd xd 0 VALUE={Xd} tripdv={tdv} tripdt={tdt}
+* AVR voltage controller
+Xavr Us vsoll F1 en1 PI Kp={Kp_avr} Tn={Tn_avr} Min=200 Max=1200 init=600
+ven1 en1 0 pwl 0s 0 10m 1 
+Xmech	M  alpha  n   Mi DSG_Mechanik_steadystate
++PARAMS: MN={MN} rbg={rbg} n_turbine={n_turbine} n1={n1}  t_anlauf={t_anlauf} t_auslauf={t_auslauf} t_betrieb={t_betrieb} p={p}
+Xipsi	F1  n  alpha  isx isy imx usx usy i Mi  DSG_i_Psi_steadystate
++PARAMS: Ls={Ls} LE={LE}  ImNx={ImNx}  PsiN={PsiN}  ImNy={ImNy}  err0={err0}
++Streuung={Streuung}  RE={RE}  Rs={Rs}   g={g}  p={p} a1={a1} m1={m1} a2={a2} m2={m2} 
+.ENDS ;
+
+* flux systems
+.SUBCKT  DSG_i_Psi_steadystate  F1  n  alpha isx isy imx usx usy i Mi
++PARAMS:  Ls=1 LE=1 ImNx=1  PsiN=1  ImNy=1  err0=1   g=1  p=1 
++Streuung=1  RE=1   Rs=1   a1=0.9 m1=7 a2=0.9 m2=7 ; Parameter a for nonlinear noload line (should be about 0.9)
+*	magnetic coupling of direct axis
+Gpsix	0	isx	VALUE={v(psisx)} tripdv={tdv} tripdt={tdt}
+Rsx		isx	0	{1/Ls}
+GpsiEx	isx	imx	VALUE={v(psiE)} tripdv={tdv} tripdt={tdt} ; ie oder if ist iDx,imx !!!!
+RsEx		imx	isx	{1/LE}
+vphx		imx	imxa	0
+Eimx		imxa	0	VALUE={ImNx*(a1*i(vphx)/PsiN+(1-a1)*PWRS(i(vphx)/PsiN,m1))} tripdv={tdv} tripdt={tdt}
+*	magnetische Kopplung der Querachse mit Saettigung
+Gpsiy		0	isy	VALUE={v(psisy)} tripdv={tdv} tripdt={tdt}
+Rsy		isy	0	{1/Ls} ; ********************************************************************* hier ist kein
+vphy		isy	imya	0
+Eimy		imya	0	VALUE={ImNy*(a2*i(vphy)/PsiN+(1-a2)*PWRS(i(vphy)/PsiN,m2))} tripdv={tdv} tripdt={tdt}
+*	Flusskomponenten
+Epsi_sx	psisx	0  VALUE={err0*PsiN+SDT(v(usx)-Rs*v(isx)+p*(2*pi)/60*v(n)*v(psisy))} tripdv={tdv} tripdt={tdt} ; ********************* OK
+Epsi_sy	psisy	0  VALUE={SDT(v(usy)-Rs*v(isy)-p*(2*pi)/60*v(n)*v(psisx))} tripdv={tdv} tripdt={tdt} ; ****************** OK
+Epsi_E	psiE	0  VALUE={err0*psiN*(1+Streuung)+SDT(g*v(F1,0)-g*g*RE*v(imx,isx))} tripdv={tdv} tripdt={tdt} ;**************? err0 OK?
+* current RMS of generator
+* Berechner i
+Ei i 0 VALUE={sqrt(v(isx)*v(isx)+v(isy)*v(isy))}  tripdv={tdv} tripdt={tdt}
+Ri i 0 1e12
+Emi		Mi	0	VALUE={2*3/2*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
+.ENDS   ;  DSG_i_Psi
+
+* mechanic system
+.SUBCKT  DSG_Mechanik_steadystate   M  alpha  n  Mi
++PARAMS: MN=1  rbg=1
++n1=1  t_anlauf=1  t_auslauf=1  t_betrieb=1  n_turbine=1  p=1
+GRbg		0	Rbg	TABLE {v(n)} (-1,-1) (1,1)
+RRbg		Rbg	0	{MN*rbg}
+Rn		n	0	1k
+Ealpha	alpha	0	VALUE={SDT(v(n))*p/60*(2*pi)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+*	Turbine
+V_Upulse         n 0
++PULSE {n1} {n_Turbine} 0  {t_anlauf} {t_auslauf} {t_betrieb} {1000*t_betrieb}
+.ENDS  ; DSG_Mechanik
+
+
+* 400MW generator variable speed
+.SUBCKT Block1_variable_speed_steadystate us usx usy  F1  M  n f vsoll nsoll
++	PARAMS:
++	UN_verkettet=20000
++	IN=14.5k
++	Pel=400e6  ;UN_verkettet*IN*1.73205*cosphi of 0.8
++	fn={fn1}
++	Kc=0.5
++	UE0=600V ; Power of exciter = 0.25-5% * SN machine (smaller values for higher SN)
++	IE0=2000A
++	p=2
++	Streuung=0.05
++	rcu=0.01
++	rbg=0.001
++	Schenkelpolfaktor=1 ;(1=cylindrical pole 0.5=Salient pole)
++	err0=0
++   n0=1500 ;starts with 1500U/min
++   a=0.9 ; Parameter for nonlinear noload line (should be about 0.9)
++   m=7
++   tenable=1us
++   J=100000
++   Kp_avr=0.01
++   Tn_avr=0.1
++   Kp_speed=200000
++   Tn_speed=0.02
+.PARAM
++   a1={a};  Saturation parameter d-axis
++   m1={m};  Saturation parameter d-axis
++   a2={a1}; Saturation parameter q-axis
++   m2={m1}; Saturation parameter q-axis
++	UN={0.707*UN_verkettet/1.732}
++	ZN={UN/IN}
++	Rs={ZN*rcu}
++	omega_el={(2*pi)*fN}
++	g={IE0/((1+Streuung)*Kc*IN*sqrt(2))}
++	Ls={Streuung*ZN/Kc/omega_el}
++	PsiN={sqrt(2)*UN/omega_el}
++	RE={UE0/IE0}
++   LE={Ls} ; can be overwritten by setting this parameters on modelline
++	ImNx={IE0/g}
++	ImNy={ImNx/Schenkelpolfaktor}
++	MN={Pel*(1-rbg-rcu)*p/omega_el}
++   XD={UN/IN/Kc}
+Rf1 f1 0 1e12
+Rm  m  0 1e12
+Rn  n  0 1e12
+Rf  f  0 1e12
+Rus us 0 1e12
+Rxd xd 0 1e12
+Rusx usx 0 1e12
+Rusy usy 0 1e12
+Rvsoll vsoll 0 1e12
+Rnsoll nsoll 0 1e12
+Rp p 0 1e12
+Rq q 0 1e12
+*	magnetic field current
+GiE	F1	0	VALUE={v(imx,isx)*g}  tripdv={tdv} tripdt={tdt}
+* Spannungskomponenten (Voltage components)
+Gisx  usx 0 value={v(isx)} tripdv={tdv} tripdt={tdt}
+Gisy  usy 0 value={v(isy)} tripdv={tdv} tripdt={tdt}
+* Loadangle
+Gtheta 0 theta VALUE={sqrt(2)*180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}  ;Lastwinkel!!!!
+Rtheta theta 0 1
+Ctheta theta 0 10u
+* voltage RMS of generator
+Ev Us 0 VALUE={1.73205*sqrt(v(usx)*v(usx)+v(usy)*v(usy))}  tripdv={tdv} tripdt={tdt}
+* Active power output of generator commented because sometimes slows down the simulation extremly
+Eap p 0 VALUE={3*(v(usx)*v(isx)+v(usy)*v(isy))}  tripdv={tdv} tripdt={tdt}
+* Reactive power output of generator commented because sometimes slows down the simulation extremly
+Eaq q 0 VALUE={3*(v(usy)*v(isx)-v(usx)*v(isy))}  tripdv={tdv} tripdt={tdt}
+* Xd of generator for cylindrical pole machine
+Exd xd 0 VALUE={Xd} tripdv={tdv} tripdt={tdt}
+Gpsix	0	isx	VALUE={v(psisx)} tripdv={tdv} tripdt={tdt}
+Rsx		isx	0	{1/Ls}
+GpsiEx	isx	imx	VALUE={v(psiE)} tripdv={tdv} tripdt={tdt} ; ie oder if ist iDx,imx !!!!
+RsEx		imx	isx	{1/LE}
+vphx		imx	imxa	0
+Eimx		imxa	0	VALUE={ImNx*(a1*i(vphx)/PsiN+(1-a1)*PWRS(i(vphx)/PsiN,m1))} tripdv={tdv} tripdt={tdt}
+*	magnetische Kopplung der Querachse mit Saettigung
+Gpsiy		0	isy	VALUE={v(psisy)} tripdv={tdv} tripdt={tdt}
+Rsy		isy	0	{1/Ls} ; ********************************************************************* hier ist kein
+vphy		isy	imya	0
+Eimy		imya	0	VALUE={ImNy*(a2*i(vphy)/PsiN+(1-a2)*PWRS(i(vphy)/PsiN,m2))} tripdv={tdv} tripdt={tdt}
+*	Flusskomponenten
+Epsi_sx	psisx	0  VALUE={err0*PsiN+SDT(v(usx)-Rs*v(isx)+p*(2*pi)/60*v(n)*v(psisy))} tripdv={tdv} tripdt={tdt} ; ********************* OK
+Epsi_sy	psisy	0  VALUE={SDT(v(usy)-Rs*v(isy)-p*(2*pi)/60*v(n)*v(psisx))} tripdv={tdv} tripdt={tdt} ; ****************** OK
+Epsi_E	psiE	0  VALUE={err0*psiN*(1+Streuung)+SDT(g*v(F1,0)-g*g*RE*v(imx,isx))} tripdv={tdv} tripdt={tdt} ;**************? err0 OK?
+* current RMS of generator
+* Berechner f
+Ei i 0 VALUE={sqrt(v(isx)*v(isx)+v(isy)*v(isy))}  tripdv={tdv} tripdt={tdt}
+Ri i 0 1e12
+Emi		Mi	0	VALUE={2*3/2*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
+* Reibung
+GRbg		0	Rbg	TABLE {v(n)} (-1,-1) (1,1)
+RRbg		Rbg	0	{MN*rbg}
+* Berechner n (speed)
+En		n	0  VALUE={n0+60/(2*pi)/J*v(idt8)} tripdv={tdv} tripdt={tdt}
+* Berechner f (frequency)
+Ef      f   0  VALUE={v(n)*p/60} tripdv={tdv} tripdt={tdt}
+Gn1 0 idt8  VALUE={v(M)+v(Mi)-v(Rbg)} tripdv={tdv} tripdt={tdt}
+Cn1 idt8 0 1 IC=0
+Rn1 idt8 0 1e10
+* Speedcontroller
+Xspeed n nsoll M en2 PI_4a Kp={kp_speed} Tn={tn_speed} Min=0 Max={Pel*1.2/314.159*2} init=0
+ven2 en2 0 pwl 0s 0 10m 1 
+* AVR voltage controller
+Xavr Us vsoll F1 en1 PI_4a Kp={kp_avr} Tn={tn_avr} Min=200 Max=1200 init=600
+ven1 en1 0 pwl 0s 0 10m 1 
+.ENDS ;
+
+.SUBCKT PI_4a x w y enable
++PARAMS: Kp=1 Tn=1 Min=-15G Max=15G ic=0 init=0
+Rx x 0 1e12
+Rw w 0 1e12
+Renable enable 0 1e12
+R_R2        0 y  1e3
+E_y	        y 0 VALUE={init*(1-v(enable))+v(enable)*LIMIT(V(w,x)*Kp+V(int),Min,Max)} tripdv={tdv} tripdt={tdt}
+Gint       	0 int VALUE={v(enable)*V(w,x)*Kp * 1/Tn} tripdv={tdv} tripdt={tdt}
+Cint       	int 0 1 IC={IC}
+Rint       	int 0 1G
+.ENDS
+

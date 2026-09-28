@@ -1,0 +1,163 @@
+* My special thank to Emer. Prof. Dr. Otto Justus who
+* allowed me to use his models of transformer and synchronous generator
+
+* Transformer with z-Winding !!! = Trafoschenkel2
+
+.SUBCKT Trafo_gnd  1U  1V  1W  1N
++	PARAMS:
++	SN=10e6
++	U1Nenn=10kV
++	U20=10kV
++	fn={fn1}
++	N1=1000
++	uR=0.001
++	uX=0.179995
++	i0=0.002
++	p0=0.0005
++   a={0.3}
++   m=1
++   psi_0=0
++   psir=1
++   psis=-0.5
++   psit=-0.5
++   tpsi0=1000s
++   tpsid=0.1ms
++   ron=0.00001
+Xu	1WU	1N	1UV	1U	magn1	magn2	Trafoschenkel2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn/3}
++ U20={U20/3}
++ fN={fN}
++ N1={N1}
++ uR={uR*1.2}
++ uX={uX*1.2}
++ i0={i0}
++ p0={p0}
++ a={a} ; FS
++ m={m} ; FS
++ psi_0={psir*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
+Xv	1UV	1N	1VW	1V	magn1	magn2	Trafoschenkel2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn/3}
++ U20={U20/3}
++ fN={fN}
++ fN={fN}
++ N1={N1}
++ uR={uR*1.2}
++ uX={uX*1.2}
++ i0={i0}
++ p0={p0}
++ a={a} ; FS
++ m={m} ; FS
++ psi_0={psis*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
+Xw	1VW	1N	1WU	1W	magn1	magn2	Trafoschenkel2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn/3}
++ U20={U20/3}
++ fN={fN}
++ fN={fN}
++ N1={N1}
++ uR={uR*1.2}
++ uX={uX*1.2}
++ i0={i0}
++ p0={p0}
++ a={a} ; FS
++ m={m} ; FS
++ psi_0={psit*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
+*Rm	magn1	0	1MEG
+RGND1U 1U 0 1e10
+RGND1V 1V 0 1e10
+RGND1W 1W 0 1e10
+RGND2U 2U 0 1e10
+RGND2V 2V 0 1e10
+RGND2W 2W 0 1e10
+.ENDS
+
+.SUBCKT   Trafoschenkel2  1_1 1_2  2_1 2_2  magnP1 magnP2
++	PARAMS:
++	SN=10kVA
++	U1N=400V
++	U20=400V
++	fn={fn1}
++	N1=1000
++	uR=0.04
++	uX=0.08
++	i0=0.05
++	p0=0.005
++   a={0.3} ; FS
++   m={7} ; FS
++   psi_0=0 ; Remanenzparameter zwischen 0,1,-1
++   tpsi0=40ms
++   tpsid=0.1ms
++   ron=0.00001
+.PARAM
++	I1N={SN/U1N}
++	Z1N={U1N/I1N}
++	omegaN={(2*pi)*fN}
++	R1={Z1N*uR/2}
++	L1s={Z1N*uX/2/omegaN}
++	RFe={U1N*U1N/(p0*SN)}
++	N2={N1*U20/U1N}
++	R2={R1*N2/N1*N2/N1}
++   Xh={(U1N*U1N)/(SN*sqrt(i0*i0-p0*p0))} ;FS
++   iu={U1N/Xh} ;FS
++   ImyN={sqrt(2)*iu} ;FS
++	phiN={sqrt(2)*U1N/omegaN/N1}
++   a={a} ; FS
++   m={m} ; FS
+*	Wicklungsstroeme
+Gi1	1_1	1_2	VALUE={v(a,magnP1)/N1} tripdv={tdv} tripdt={tdt}
+Rpi1	1_1	1_2	1000MEG
+Gi2	2_1	2_2	VALUE={v(b,a)/N2} tripdv={tdv} tripdt={tdt}
+Rpi2	2_1	2_2	1000MEG
+*	Wicklungen
+X_W1	magnP1	a	1_1	1_2	WICKLUNG
++PARAMS:  R={R1}  N={N1}  Rphis={N1*N1/L1s} Psi_0={Psi_0*phiN} tpsi0={tpsi0} tpsid={tpsid} ron={ron}
+X_W2	a   b    2_1	2_2	WICKLUNG
++PARAMS:  R={R2}  N={N2}  Rphis={N1*N1/L1s} Psi_0={Psi_0*phiN} tpsi0={tpsi0} tpsid={tpsid} ron={ron}
+*	EisenSchenkel
+X_SCH	b	magnP2	SCHENKEL   PARAMS:
++	N={N1}  RFe={RFe}  ImyN={ImyN}
++	phiN={phiN}	a={a}   m={m}
+.ENDS
+***	Ende des SUBCIRCUITS Trafoschenkel2
+*$
+
+
+.SUBCKT WICKLUNG  ma  mb  ea  eb
++PARAMS:   R=1   N=1    Rphis=1 psi_0=0 tpsi0=1000s tpsid=0.1ms ron=0.00001 ;passt für 1ms Schaltzeit bei C mit 1Coulomb
+Gphi	ma	mb	VALUE={v(phi)} tripdv={tdv} tripdt={tdt}
+Rphis	ma	mb	{Rphis}
+Gp	0	phi	VALUE={(v(ea,eb)-R*v(mb,ma)/(N))/(N)} tripdv={tdv} tripdt={tdt}
+Cp phi 0 1 IC=0
+Vctrl ctrl 0 pwl 0s 0v {tpsi0+1p} 0v {tpsi0+tpsid+2p} 1V {tpsi0+2*tpsid+3p} 1v {tpsi0+3*tpsid+4p} 0v
+S1 phi phix ctrl 0 MS1
+.model MS1 SW(Ron={Ron} Roff=1e9 Vt=0.9 Vh=0.0 Lser=0 Vser=0)
+E1 phix 0 value={psi_0} tripdv={tdv} tripdt={tdt} ; das ist die Spannungsquelle mit psi_0 der den Kondensator Cp auflädt !!!
+Rp	phi	0	1000MEG
+.ENDS ;  Wicklung
+*$
+
+* 15b  Eisenschenkel
+*
+*
+.SUBCKT SCHENKEL  m1  m2
++PARAMS:   N=1  RFe=1  ImyN=1  a=1  phiN=1 m=9
+LRFe	m1	mh	{N*N/RFe} Rser=0  ; Rser=parasitic Value zur besseren Konvergenz
+vphi	mh	mh1	0
+rphi    mh  0 1e12 
+Eimy	mh1	m2
++VALUE={N*imyN*(a*i(vphi)/phiN+(1-a)*PWRS(i(vphi)/phiN,m))} tripdv={tdv} tripdt={tdt}
+.ENDS;  SCHENKEL
+*$
+
+

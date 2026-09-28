@@ -1,0 +1,57 @@
+* short circuit reactance
+*
+.subckt scr L1 L2 L3 L1_1 L2_1 L3_1 params: VN=10k IN=250 r_x=0.03 delta_un=5 fn={fn1}
+.param sd={vn*in*sqrt(3)}
+.param zd={(delta_un/100)*vn*vn/sd}
+.param r={r_x*zd}
+.param xl={sqrt(zd*zd-r*r)}
+.param l={xl/(2*pi*fn)}
+R1 L1 L1x {r}
+L1 L1x L1_1 {l}
+R2 L2 L2x {r}
+L2 L2x L2_1 {l}
+R3 L3 L3x {r}
+L3 L3x L3_1 {l}
+.ends
+
+.subckt scr_10kV_250A_5% L1 L2 L3 L1_1 L2_1 L3_1 params: VN=10k IN=250 r_x=0.03 delta_un=5 fn={fn1}
+.param sd={vn*in*sqrt(3)}
+.param zd={(delta_un/100)*vn*vn/sd}
+.param r={r_x*zd}
+.param xl={sqrt(zd*zd-r*r)}
+.param l={xl/(2*pi*fn)}
+R1 L1 L1x {r}
+L1 L1x L1_1 {l}
+R2 L2 L2x {r}
+L2 L2x L2_1 {l}
+R3 L3 L3x {r}
+L3 L3x L3_1 {l}
+.ends
+
+.subckt scr_10kV_250A_10% L1 L2 L3 L1_1 L2_1 L3_1 params: VN=10k IN=250 r_x=0.03 delta_un=10 fn={fn1}
+.param sd={vn*in*sqrt(3)}
+.param zd={(delta_un/100)*vn*vn/sd}
+.param r={r_x*zd}
+.param xl={sqrt(zd*zd-r*r)}
+.param l={xl/(2*pi*fn)}
+R1 L1 L1x {r}
+L1 L1x L1_1 {l}
+R2 L2 L2x {r}
+L2 L2x L2_1 {l}
+R3 L3 L3x {r}
+L3 L3x L3_1 {l}
+.ends
+
+.subckt scr_10kV_250A_3% L1 L2 L3 L1_1 L2_1 L3_1 params: VN=10k IN=250 r_x=0.03 delta_un=3 fn={fn1}
+.param sd={vn*in*sqrt(3)}
+.param zd={(delta_un/100)*vn*vn/sd}
+.param r={r_x*zd}
+.param xl={sqrt(zd*zd-r*r)}
+.param l={xl/(2*pi*fn)}
+R1 L1 L1x {r}
+L1 L1x L1_1 {l}
+R2 L2 L2x {r}
+L2 L2x L2_1 {l}
+R3 L3 L3x {r}
+L3 L3x L3_1 {l}
+.ends

@@ -1,0 +1,117 @@
+
+* The thyrisor model and the controller model originates from
+* the spicelab librairies from Prof. Heinemann
+* Special thanks to him that i can use his work !!!
+
+.SUBCKT  St_B6 G1 K1 G2 K2 G3 K3 G4 K4 G5 K5 G6 K6 alpha PARAMS:
++               Frequ=50Hz
++               tp=0.1m
++               hpulse=2
++               beta1=0
++               beta2=120
++               beta3=240
++               beta4=180
++               beta5=300
++               beta6=60
++               delta=60
++               n=0
+.PARAM          Fh={0.5*FREQU}
+.PARAM          w={pi/360}
+.PARAM          Tn={n/Frequ/12} 
+ 
+G1              0               Ka1             
++VALUE={STP(-SIN(2*pi*Fh*TIME-Pi/12- limit(v(alpha),0,178)*w-(beta1+n*30)*w)*SIN(2*pi*Fh*TIME-Pi/12-+
++ limit(v(alpha),0,178)*w-(beta1+n*30)*w-tp/2/10m*pi))+
++STP(-SIN(2*pi*Fh*TIME-Pi/12- limit(v(alpha),0,178)*w-(beta1+delta+n*30)*w)*SIN(2*pi*Fh*TIME-Pi/12-+
++ limit(v(alpha),0,178)*w-(beta1+delta+n*30)*w-tp/2/10m*pi))} tripdv=1 tripdt=1
+Rpulse1         Ka1             0               1
+Cpulse1         Ka1             0               10u IC=0
+Epulse1         G1              K1              VALUE={hpulse*v(Ka1)} tripdv=1 tripdt=1
+ 
+G2              0               Ka2             
++VALUE={STP(-SIN(2*pi*Fh*TIME-Pi/12- limit(v(alpha),0,178)*w-(beta2+n*30)*w)*SIN(2*pi*Fh*TIME-Pi/12-+
++ limit(v(alpha),0,178)*w-(beta2+n*30)*w-tp/2/10m*pi))+
++STP(-SIN(2*pi*Fh*TIME-Pi/12- limit(v(alpha),0,178)*w-(beta2+delta+n*30)*w)*SIN(2*pi*Fh*TIME-Pi/12-+
++ limit(v(alpha),0,178)*w-(beta2+delta+n*30)*w-tp/2/10m*pi))} tripdv=1 tripdt=1
+Rpulse2         Ka2             0               1
+Cpulse2         Ka2             0               10u IC=0
+Epulse2         G2              K2              VALUE={hpulse*v(Ka2)} tripdv=1 tripdt=1
+ 
+G3              0               Ka3             
++VALUE={STP(-SIN(2*pi*Fh*TIME-Pi/12- limit(v(alpha),0,178)*w-(beta3+n*30)*w)*SIN(2*pi*Fh*TIME-Pi/12-+
++ limit(v(alpha),0,178)*w-(beta3+n*30)*w-tp/2/10m*pi))+
++STP(-SIN(2*pi*Fh*TIME-Pi/12- limit(v(alpha),0,178)*w-(beta3+delta+n*30)*w)*SIN(2*pi*Fh*TIME-Pi/12-+
++ limit(v(alpha),0,178)*w-(beta3+delta+n*30)*w-tp/2/10m*pi))} tripdv=1 tripdt=1
+  
+Rpulse3         Ka3             0               1
+Cpulse3         Ka3             0               10u IC=0
+Epulse3         G3              K3              VALUE={hpulse*v(Ka3)} tripdv=1 tripdt=1
+ 
+G4              0               Ka4             
++VALUE={STP(-SIN(2*pi*Fh*TIME-Pi/12- limit(v(alpha),0,178)*w-(beta4+n*30)*w)*SIN(2*pi*Fh*TIME-Pi/12-+
++ limit(v(alpha),0,178)*w-(beta4+n*30)*w-tp/2/10m*pi))+
++STP(-SIN(2*pi*Fh*TIME-Pi/12- limit(v(alpha),0,178)*w-(beta4+delta+n*30)*w)*SIN(2*pi*Fh*TIME-Pi/12-+
++ limit(v(alpha),0,178)*w-(beta4+delta+n*30)*w-tp/2/10m*pi))} tripdv=1 tripdt=1
+Rpulse4         Ka4             0               1
+Cpulse4         Ka4             0               10u IC=0
+Epulse4         G4              K4              VALUE={hpulse*v(Ka4)} tripdv=1 tripdt=1
+ 
+G5              0               Ka5             
++VALUE={STP(-SIN(2*pi*Fh*TIME-Pi/12- limit(v(alpha),0,178)*w-(beta5+n*30)*w)*SIN(2*pi*Fh*TIME-Pi/12-+
++ limit(v(alpha),0,178)*w-(beta5+n*30)*w-tp/2/10m*pi))+
++STP(-SIN(2*pi*Fh*TIME-Pi/12- limit(v(alpha),0,178)*w-(beta5+delta+n*30)*w)*SIN(2*pi*Fh*TIME-Pi/12-+
++ limit(v(alpha),0,178)*w-(beta5+delta+n*30)*w-tp/2/10m*pi))} tripdv=1 tripdt=1
+Rpulse5         Ka5             0               1
+Cpulse5         Ka5             0               10u IC=0
+Epulse5         G5              K5              VALUE={hpulse*v(Ka5)} tripdv=1 tripdt=1
+ 
+G6              0               Ka6             
++VALUE={STP(-SIN(2*pi*Fh*TIME-Pi/12- limit(v(alpha),0,178)*w-(beta6+n*30)*w)*SIN(2*pi*Fh*TIME-Pi/12-+
++ limit(v(alpha),0,178)*w-(beta6+n*30)*w-tp/2/10m*pi))+
++STP(-SIN(2*pi*Fh*TIME-Pi/12- limit(v(alpha),0,178)*w-(beta6+delta+n*30)*w)*SIN(2*pi*Fh*TIME-Pi/12-+
++ limit(v(alpha),0,178)*w-(beta6+delta+n*30)*w-tp/2/10m*pi))} tripdv=1 tripdt=1
+Rpulse6         Ka6             0               1
+Cpulse6         Ka6             0               10u IC=0
+Epulse6         G6              K6              VALUE={hpulse*v(Ka6)} tripdv=1 tripdt=1
+ 
+.ENDS
+****  Ende des SUBCIRCUITS St_B6  *************************
+
+
+.SUBCKT Thyri_Lite_original Anode Gate Kathode PARAMS: tsw=100u ron=1e-1 roff=1e6 von=1 voff=0.1
+.MODEL Schliesser	VSWITCH Ron={Ron} Roff={Roff} Von={Von} Voff={Voff}
+Sch	Anode	GA	St	0	Schliesser
+Rgate	Gate	Kathode	1
+ViK	GA	Kathode	0V
+Csch	Anode	Kathode	50p	
+Gst	0	st	TABLE {(i(ViK)+v(Gate,Kathode)/20)} = (0,0) (0.05,1)
+Rst	st	0	1
+Cst	st	0	{tsw/5}	IC=0
+.ENDS
+
+.SUBCKT Thyri_Lite_400kV Anode Gate Kathode PARAMS: tsw=100u ron=1e-3 roff=1e9 von=1 voff=0.1
+.MODEL Schliesser	VSWITCH Ron={Ron} Roff={Roff} Von={Von} Voff={Voff}
+Sch	Anode	GA	St	0	Schliesser
+Rgate	Gate	Kathode	1
+ViK	GA	Kathode	0V
+Csch	Anode	Kathode	50p	
+Gst	0	st	TABLE {(i(ViK)+v(Gate,Kathode)/20)} = (0,0) (0.05,1)
+Rst	st	0	1
+Cst	st	0	{tsw/5}	IC=0
+.ENDS
+
+.SUBCKT Thyri_Lite Anode Gate Kathode PARAMS: tsw=100u ron=1e-1 roff=1e6 von=1 voff=0.1
+.MODEL Schliesser	VSWITCH Ron={Ron} Roff={Roff} Von={Von} Voff={Voff}
+Sch	Anode	GA	St	0	Schliesser
+Rgate	Gate	Kathode	1
+ViK	GA	Kathode	0V
+Csch	Anode	Kathode	50p	
+Gst	0	st	TABLE {(i(ViK)+v(Gate,Kathode)/20)} = (0,0) (0.05,1)
+Rst	st	0	1
+Cst	st	0	{tsw/5}	IC=0
+.ENDS
+
+
+
+
+

@@ -1,0 +1,37 @@
+Version 4
+SymbolType BLOCK
+LINE Normal 15 0 28 0
+LINE Normal 28 0 32 0
+LINE Normal -16 32 -16 0
+LINE Normal -8 10 16 -16
+LINE Normal -7 6 -8 10
+LINE Normal -8 10 -7 6
+LINE Normal -4 9 -8 10
+LINE Normal -16 -4 -16 4
+LINE Normal 15 -4 -16 -4
+LINE Normal 15 4 15 -4
+LINE Normal 15 4 15 4
+LINE Normal -16 4 15 4
+LINE Normal -21 9 -21 -9
+LINE Normal -21 9 -21 9
+LINE Normal -23 5 -21 9
+LINE Normal -19 5 -21 9
+LINE Normal -23 -6 -21 -9
+LINE Normal -19 -6 -21 -9
+SYMATTR Prefix X
+SYMATTR SpiceModel load_1phase_RL_const_ctrl
+SYMATTR Value VN=110k fn={fn1}
+SYMATTR ModelFile load.lib
+SYMATTR Value2 P=1e6 Q=1e6 PQ0=1e3
+SYMATTR Description one phase nonlinear constant load (P=const)
+SYMATTR SpiceLine rser=1m
+SYMATTR SpiceLine2 att=1000 f=50 tripdt=1u tripdv=100 off=1m tripdt2=10n vfactor=sqrt(3)
+PIN 32 0 NONE 8
+PINATTR PinName L1
+PINATTR SpiceOrder 1
+PIN -16 32 NONE 8
+PINATTR PinName N
+PINATTR SpiceOrder 2
+PIN 16 -16 NONE 8
+PINATTR PinName ctrl
+PINATTR SpiceOrder 3

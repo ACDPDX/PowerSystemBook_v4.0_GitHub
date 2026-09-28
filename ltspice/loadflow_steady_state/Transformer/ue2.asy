@@ -1,0 +1,70 @@
+Version 4
+SymbolType BLOCK
+LINE Normal -16 0 -32 0
+LINE Normal -16 16 -32 16
+LINE Normal -28 4 -36 -4
+LINE Normal -36 4 -28 -4
+LINE Normal -12 0 -16 0
+LINE Normal -12 16 -12 0
+LINE Normal -16 16 -12 16
+LINE Normal 0 8 -12 8
+LINE Normal 32 0 48 0
+LINE Normal 32 16 48 16
+LINE Normal 44 4 52 -4
+LINE Normal 52 4 44 -4
+LINE Normal 28 0 32 0
+LINE Normal 28 16 28 0
+LINE Normal 32 16 28 16
+LINE Normal 23 8 28 8
+LINE Normal -16 48 -32 48
+LINE Normal -16 64 -32 64
+LINE Normal -28 52 -36 44
+LINE Normal -36 52 -28 44
+LINE Normal -12 48 -16 48
+LINE Normal -12 64 -12 48
+LINE Normal -16 64 -12 64
+LINE Normal -7 56 -12 56
+LINE Normal 32 48 48 48
+LINE Normal 32 64 48 64
+LINE Normal 44 52 52 44
+LINE Normal 52 52 44 44
+LINE Normal 28 48 32 48
+LINE Normal 28 64 28 48
+LINE Normal 32 64 28 64
+LINE Normal 23 56 28 56
+LINE Normal 0 56 -12 56
+LINE Normal 16 56 23 56
+LINE Normal 16 8 23 8
+LINE Normal 8 61 8 5
+RECTANGLE Normal 4 56 0 8
+RECTANGLE Normal 12 56 16 8
+WINDOW 3 13 74 Center 2
+WINDOW 0 -1 -8 Left 2
+SYMATTR Value on=1 ue=1 l_=0 s_=0 stproz=1 phir=-0.5 phii=-0.866
+SYMATTR Prefix X
+SYMATTR SpiceModel ue2_LF
+SYMATTR ModelFile ltspice.lib
+PIN -32 0 NONE 8
+PINATTR PinName v1r
+PINATTR SpiceOrder 1
+PIN -32 16 NONE 8
+PINATTR PinName v1i
+PINATTR SpiceOrder 2
+PIN -32 48 NONE 8
+PINATTR PinName n1r
+PINATTR SpiceOrder 3
+PIN -32 64 NONE 8
+PINATTR PinName n1i
+PINATTR SpiceOrder 4
+PIN 48 0 NONE 8
+PINATTR PinName v2r
+PINATTR SpiceOrder 5
+PIN 48 16 NONE 8
+PINATTR PinName v2i
+PINATTR SpiceOrder 6
+PIN 48 48 NONE 8
+PINATTR PinName n2r
+PINATTR SpiceOrder 7
+PIN 48 64 NONE 8
+PINATTR PinName n2i
+PINATTR SpiceOrder 8

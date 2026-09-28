@@ -1,0 +1,523 @@
+***********************************************************
+****	Library for DSG(Drehstromsynchrongenerator)    ****
+***********************************************************
+
+* Special thanks to Otto Justus for the models
+* (synchronous generator and transformer)
+
+* from Version 1.78 on the following parameter defaults are new to synchronous machines models
+* a=0.9 and m=7
+* from Version 2 on saturation effect can be set for d and for q-axis different if you want
+* default is a1=a a2=a m1=m m2=m
+* The parameters a,m are for the nonlinear noload line of the generator
+* This parameters are for the saturation of the generator
+* If the a parameter is set to 0.9 the salient pole factor
+* can be set to 0.5 for salient pole machine (with kc=0.8-1)
+* and to 1 for the cylindrical pole machine (with kc=0.4-0.65)
+*
+* from Version 2.52 on the parameters LE, LDx, LDy L0, RDx, RDy, R0 can be set directly as parameters (x=d-axis,y=q-axis)
+* This is in accordance to the new parameter extraction routine in WxMaxima which
+* allows to compute LE, LDd, LDq RDx, RDy paramters from Datasheet (Xd,Xq,Xd',Xq',Xd'',.. Td0,Td', ...
+* If L0 and R0 not exists simply let these parameters free (automatically set to R0=Rs, L0=Ls)
+*
+* NOTE: The parameter Ie0 for the magnetizing current
+* has no effect on the simulation because he is always translated
+* to the secondary side by fixed g={IE0/((1+Streuung)*Kc*IN*sqrt(2))}
+* Ue0 has only the effect that at Ue0 the nominal voltage occurs
+*
+* HINT: All machines has a cosphi of 0.8
+* SN=UN*IN*sqrt(3) but
+* PN=SN*cosphi
+*  *******************************************************************************************************************************************
+
+* Synchronizing after 2s
+* avr on , controlling voltage after 2.5s
+* speed controller is on at the begin
+* after sync fixm on, speed controller off
+
+
+********************************************************
+.SUBCKT GEN_10000MW_400kV_PV 1U2 1V2 1W2 Verr1 M1 n GND1
+********************************************************
++ PARAMS:
++ Schenkelpolfaktor=0.5 Daempferfaktor=1 Streuung=0.05 rcu=0.01 rbg=1e-6 n0=1500 err0=1 p=2 a=0.9 m=7 Kc=0.8
++ nsoll=1500 vsoll=400000 n_kp=200000 n_Tn=0.05 f1_kp=0.03 f1_Tn=0.5
++ t_stop_avr=1e5 t_start_avr=1e6  t_start_fixerr=1e5 t_stop_fixerr=1e6 t_stop_nreg=2010ms t_start_nreg=1e6 t_start_fixm=2000m t_stop_fixm=1e6
++ t_sync=2000ms t_sync_off=1e6 t_enable_avr=2.5s  t_enablev_avr=2s t_start_gnd2=10e6 t_stop_gnd2=1e6
+.param cosphi=0.8
+.param J=1000000 UN_verkettet=400k IN={14.375k/cosphi} UE0=1000V IE0=2500A Pel=10000e6 ; PExciter ~ 0.25%*SN
+.param omega={2*pi*fn1}
+*************
+* Generator *
+*************
+
+RM1  M1  0  1e12
+XU1 u2 v2 w2 verr M n GND1 Block1 J={J} UN_verkettet={UN_verkettet} IN={IN} Kc={Kc} UE0={UE0} IE0={IE0} Pel={Pel} err0={err0} Schenkelpolfaktor={Schenkelpolfaktor} Daempferfaktor={Daempferfaktor} Streuung={Streuung} rcu={rcu} rbg={rbg} n0={n0} a={a} m={m}
+XU3 GND1 0 SW_1Phase_off_2a t_Stop={t_stop_gnd2} t_Start={t_start_gnd2} tsw=100u ron=0.01 roff=1e12
+
+***************
+* Transformer
+***************
+XU8 1u1 1v1 1w1 NC_01 u2 v2 w2 NC_02 Trafo3Yy6_ideal_2a l_=0 stproz=1 U1Nenn=400k U20=400k
+
+*****************
+* Sync-Schwitcher
+*****************
+
+XU10 1u1 1v1 1w1 1u2 1v2 1w2 SW_3Phase_2a t_Start={t_sync} t_Stop={t_sync_off} tsw=100u ron=0.01 roff=1e9
+
+****************************************
+* Speedcontroller PI Kp=200000 Tn=0.05
+****************************************
+
+XU2 n nsoll M2 en2 PI_2a Kp={n_kp} Tn={n_Tn} Min=0 Max={1.2*Pel*2/omega} init=0
+ven2 en2 0 pwl 0s 1 {t_stop_nreg} 1 {t_stop_nreg+100m} 0 {t_Start_nreg} 0 {t_Start_nreg+100m} 1
+vpwl  nsoll 0 pwl 0s {nsoll} 3s {nsoll}
+* Switcher to the speed controller
+XU12 M M2 SW_1Phase_off_2a t_Stop={t_stop_nreg} t_Start={t_start_nreg} tsw=100u ron=0.01 roff=1e9
+* Switcher to the external torque from outside (pwl-source)
+XU6 M M1 SW_1Phase_2a t_Start={t_start_fixm} t_Stop={t_stop_fixm} tsw=100u ron=0.01 roff=1e9
+
+************************************
+* AVR (automatic voltage controller)
+************************************
+
+XU19 u2 v2 w2 vsoll verr2 en1 enV avr2_50Hz_2c Kp={f1_kp} Tn={f1_Tn} Min={UE0/3} Max={2.5*UE0} U1Nenn={UN_verkettet} tripdt2=100n verr0={UE0} vfactor=1.73205
+ven1 en1 0 pwl 0s 0v {t_enable_avr} 0v {t_enable_avr+100m} 1
+venV enV 0 pwl 0s 0v {t_enablev_avr} 0v {t_enablev_avr+100m} 1
+vsoll vsoll 0 pwl 0s {vsoll}
+* Switcher to the AVR
+XU20 verr verr2 SW_1Phase_off_2a t_Start={t_start_avr} t_Stop={t_stop_avr} tsw=100u ron=0.01m roff=1e9
+* Switcher to the external magnetic field regulation (pwl source)
+XU21 verr verr1 SW_1Phase_2a t_Stop={t_stop_fixerr} t_Start={t_start_fixerr} tsw=100u ron=0.01m roff=1e9
+.ENDS
+
+*******************************************************
+.SUBCKT GEN_400MW_115kV_PV 1U2 1V2 1W2 Verr1 M1 n GND1
+*******************************************************
++ PARAMS:
++ Schenkelpolfaktor=0.5 Daempferfaktor=1 Streuung=0.05 rcu=0.01 rbg=1e-6 n0=1500 err0=1 p=2 a=0.9 m=7 Kc=0.8
++ nsoll=1500 vsoll=115000 n_kp=200000 n_Tn=0.05 f1_kp=0.03 f1_Tn=0.5
++ t_stop_avr=1e5 t_start_avr=1e6  t_start_fixerr=1e5 t_stop_fixerr=1e6 t_stop_nreg=2010ms t_start_nreg=1e6 t_start_fixm=2000m t_stop_fixm=1e6
++ t_sync=2000ms t_sync_off=1e6 t_enable_avr=2.5s  t_enablev_avr=2s t_start_gnd2=10e6 t_stop_gnd2=1e6
+.param cosphi=0.8
+.param J=100000 UN_verkettet=115k IN={2000/cosphi} UE0=600V IE0=2000A Pel=400e6
+.param omega={2*pi*fn1}
+*************
+* Generator *
+*************
+
+RM1  M1  0  1e10
+XU1 u2 v2 w2 verr M n GND1 Block1 J={J} UN_verkettet={UN_verkettet} IN={IN} Kc={Kc} UE0={UE0} IE0={IE0} Pel={Pel} err0={err0}   Schenkelpolfaktor={Schenkelpolfaktor} Daempferfaktor={Daempferfaktor} Streuung={Streuung} rcu={rcu} rbg={rbg} n0={n0} a={a} m={m}
+XU3 GND1 0 SW_1Phase_off_2a t_Stop={t_stop_gnd2} t_Start={t_start_gnd2} tsw=100u ron=0.01 roff=1e12
+
+***************
+* Transformer
+***************
+XU8 1u1 1v1 1w1 NC_01 u2 v2 w2 NC_02 Trafo3Yy6_ideal_2a l_=0 stproz=1 U1Nenn=115k U20=115k
+
+*****************
+* Sync-Schwitcher
+*****************
+
+XU10 1u1 1v1 1w1 1u2 1v2 1w2 SW_3Phase_2a t_Start={t_sync} t_Stop={t_sync_off} tsw=100u ron=0.01 roff=1e9
+
+****************************************
+* Speedcontroller PI Kp=200000 Tn=0.05
+****************************************
+
+XU2 n nsoll M2 en2 PI_2a Kp={n_kp} Tn={n_Tn} Min=0 Max={1.2*Pel*2/omega} init=0
+ven2 en2 0 pwl 0s 1 {t_stop_nreg} 1 {t_stop_nreg+100m} 0 {t_Start_nreg} 0 {t_Start_nreg+100m} 1
+vpwl  nsoll 0 pwl 0s {nsoll} 3s {nsoll}
+* Switcher to the speed controller
+XU12 M M2 SW_1Phase_off_2a t_Stop={t_stop_nreg} t_Start={t_start_nreg} tsw=100u ron=0.01 roff=1e9
+* Switcher to the external torque from outside (pwl-source)
+XU6 M M1 SW_1Phase_2a t_Start={t_start_fixm} t_Stop={t_stop_fixm} tsw=100u ron=0.01 roff=1e9
+
+************************************
+* AVR (automatic voltage controller)
+************************************
+
+XU19 u2 v2 w2 vsoll verr2 en1 enV avr2_50Hz_2c Kp={f1_kp} Tn={f1_Tn} Min={UE0/3} Max={2.5*UE0} U1Nenn={UN_verkettet} tripdt2=100n verr0={UE0} vfactor=1.73205
+ven1 en1 0 pwl 0s 0v {t_enable_avr} 0v {t_enable_avr+100m} 1
+venV enV 0 pwl 0s 0v {t_enablev_avr} 0v {t_enablev_avr+100m} 1
+vsoll vsoll 0 pwl 0s {vsoll}
+* Switcher to the AVR
+XU20 verr verr2 SW_1Phase_off_2a t_Start={t_start_avr} t_Stop={t_stop_avr} tsw=100u ron=0.01m roff=1e9
+* Switcher to the external magnetic field regulation (pwl source)
+XU21 verr verr1 SW_1Phase_2a t_Stop={t_stop_fixerr} t_Start={t_start_fixerr} tsw=100u ron=0.01m roff=1e9
+.ENDS
+
+
+
+* 400MW unit for isolated operation
+.SUBCKT Block1 U1 V1 W1 F1 M n GND1
++	PARAMS:
++	UN_verkettet=20000
++	IN=14.5k
++	Pel=400e6  ;UN_verkettet*IN*1.73205*cosphi of 0.8
++	fn={fn1}
++	Kc=0.8
++	UE0=600V ; ; Power of exciter = 0.25-5% * SN machine (smaller values for higher SN) in this case 0.6% by 600V and 2.5*IE0
++	IE0=2000A
++	p=2
++	Streuung=0.05 ;
++	rcu=0.01
++	rbg=0.001
++	Schenkelpolfaktor=1; (1=Vollpol 0.5=Schenkelpol)
++	Daempferfaktor=1
++	err0=0
++   n0=1500 ;starts with 1500U/min
++   taumech=6.23
++   a=0.9
++   m=7
+.PARAM
++   a1={a};  Saturation parameter d-axis
++   m1={m};  Saturation parameter d-axis
++   a2={a1}; Saturation parameter q-axis
++   m2={m1}; Saturation parameter q-axis
++	UN={UN_verkettet/1.732}
++	ZN={UN/IN}
++	Rs={ZN*rcu}
++	omega_el={(2*pi)*fN}
++	g={IE0/((1+Streuung)*Kc*IN*sqrt(2))}
++	Ls={Streuung*ZN/Kc/omega_el}
++	PsiN={sqrt(2)*UN/omega_el}
++	RE={UE0/IE0}
++	RD={Rs/Daempferfaktor}
++   RDx={RD} ; can be overwritten by setting this parameters on modelline
++   RDy={RD} ; can be overwritten by setting this parameters on modelline
++   LDx={Ls} ; can be overwritten by setting this parameters on modelline
++   LDy={Ls} ; can be overwritten by setting this parameters on modelline
++   LE={Ls} ; can be overwritten by setting this parameters on modelline
++   R0={Rs} ; can be overwritten by setting this parameters on modelline
++   L0={Ls} ; can be overwritten by setting this parameters on modelline (X0 is 0.03-0.1 p.u)
++	ImNx={IE0/g}
++	ImNy={ImNx/Schenkelpolfaktor}
++	MN={Pel*(1-rbg-rcu)*p/omega_el}
++   J={p*taumech*MN/omega_el}
+*	Wicklungsstroeme
+Rf1 f1 0 1e12
+Rm  m  0 1e12
+Rn  n  0 1e12
+Ri  i  0 1e12
+Rf  f  0 1e12
+Rus us 0 1e12
+G1	U1	U2	VALUE={v(isxS)+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G2	V1	V2	VALUE={(-v(isxS)+v(isyS)*1.732)/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G3	W1	W2	VALUE={(-v(isxS)-v(isyS)*1.732)/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+GiE	F1	0	VALUE={v(imx,iDx)*g} tripdv={tdv} tripdt={tdt}
+*	Spannungskomponenten
+EuxS	usxS	0	VALUE={(2*v(u1,u2)-v(v1,v2)-v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+EuyS	usyS	0	VALUE={(v(v1,v2)-v(w1,w2))/1.732} tripdv={tdv} tripdt={tdt}
+Eux	usx	0	VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+Euy	usy	0	VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt}
+Rgnd1 u2 v2 1u
+Rgnd2 v2 w2 1u
+Rgnd3 v2 GND1 1u
+Rgnd4 GND1 0 1e10
+*	Nullsystem
+Eu0	u_Null 0	   VALUE={(v(u1,u2)+v(v1,v2)+v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+Ei0	i_Null 0	   VALUE={v(idt8)/L0} tripdv={tdv} tripdt={tdt}
+G8x 0 idt8  VALUE={v(u_Null)-R0*v(i_null)} tripdv={tdv} tripdt={tdt}
+C8x idt8 0 1 IC=0
+R8x idt8 0 1e10
+*	Stromkomponenten
+EisxS		isxS	0 VALUE={v(isx)*cos(v(alpha))-v(isy)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+EisyS		isyS	0 VALUE={v(isy)*cos(v(alpha))+v(isx)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+*	magnetische Kopplung der Hauptachse mit Saettigung
+Gpsix		0	isx	VALUE={v(psisx)} tripdv={tdv} tripdt={tdt}
+Rsx		isx	0	{1/Ls}
+Gpsidx	isx	iDx	VALUE={v(psiDx)} tripdv={tdv} tripdt={tdt} ; *********
+Rsdx		iDx	isx	{1/LDx}
+GpsiEx	iDx	imx	VALUE={v(psiE)} tripdv={tdv} tripdt={tdt} ; ie oder if ist iDx,imx !!!!
+RsEx		imx	iDx	{1/LE}
+vphx		imx	imxa	0
+Eimx		imxa	0	VALUE={ImNx*(a1*i(vphx)/PsiN+(1-a1)*PWRS(i(vphx)/PsiN,m1))} tripdv={tdv} tripdt={tdt}
+*	magnetische Kopplung der Querachse mit Saettigung
+Gpsiy		0	isy	VALUE={v(psisy)} tripdv={tdv} tripdt={tdt}
+Rsy		isy	0	{1/Ls} ;
+Gpsidy	isy	imy	VALUE={v(psiDy)} tripdv={tdv} tripdt={tdt}
+Rsdy		imy	isy	{1/LDy}
+vphy		imy	imya	0
+Eimy		imya	0	VALUE={ImNy*(a2*i(vphy)/PsiN+(1-a2)*PWRS(i(vphy)/PsiN,m2))} tripdv={tdv} tripdt={tdt}
+*	Flusskomponenten
+Epsi_sx	psisx	0  VALUE={err0*PsiN+v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={v(usx)-Rs*v(isx)+p*(2*pi)/60*v(n)*v(psisy)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC=0
+R1x idt1 0 1e10
+Epsi_sy	psisy	0  VALUE={v(idt2)} tripdv={tdv} tripdt={tdt}
+G2x 0 idt2  VALUE={v(usy)-Rs*v(isy)-p*(2*pi)/60*v(n)*v(psisx)} tripdv={tdv} tripdt={tdt}
+C2x idt2 0 1 IC=0
+R2x idt2 0 1e10
+Epsi_Dx	psiDx	0  VALUE={err0*psiN+v(idt3)} tripdv={tdv} tripdt={tdt}
+G3x 0 idt3  VALUE={-RDx*v(iDx,iSx)} tripdv={tdv} tripdt={tdt}
+C3x idt3 0 1 IC=0
+R3x idt3 0 1e10
+Epsi_Dy	psiDy	0  VALUE={v(idt4)} tripdv={tdv} tripdt={tdt}
+G4x 0 idt4  VALUE={-RDy*v(imy,isy)} tripdv={tdv} tripdt={tdt}
+C4x idt4 0 1 IC=0
+R4x idt4 0 1e10
+Epsi_E	psiE	0  VALUE={err0*psiN*(1+Streuung)+v(idt5)} tripdv={tdv} tripdt={tdt}
+G5x 0 idt5  VALUE={g*v(F1,0)-g*g*RE*v(imx,idx)} tripdv={tdv} tripdt={tdt}
+C5x idt5 0 1 IC=0
+R5x idt5 0 1e10
+*
+Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}  ;load angle
+Rtheta theta 0 1
+Ctheta theta 0 10u
+* current RMS of generator
+Ei i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))}  tripdv={tdv} tripdt={tdt}
+* voltage RMS of generator
+Ev Us 0 VALUE={1.73205/sqrt(2)*sqrt(v(usx)*v(usx)+v(usy)*v(usy))}  tripdv={tdv} tripdt={tdt}
+* Active power output of generator commented because sometimes slows down the simulation extremly
+* Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
+* Reactive power output of generator commented because sometimes slows down the simulation extremly
+* Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
+*
+Emi		Mi	0	VALUE={3/2*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
+* Reibung
+GRbg		0	Rbg	TABLE {v(n)} (-1,-1) (1,1)
+RRbg		Rbg	0	{MN*rbg}
+* Berechner alpha
+Ealpha	alpha	0	VALUE={v(idt6)*p/60*(2*pi)} tripdv={tdv} tripdt={tdt}
+G6x 0 idt6  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
+C6x idt6 0 1 IC=0
+R6x idt6 0 1e10
+* Berechner n
+En		n	0  VALUE={n0+60/(2*pi)/J*v(idt7)} tripdv={tdv} tripdt={tdt}
+G7x 0 idt7  VALUE={v(M)+v(Mi)-v(Rbg)} tripdv={tdv} tripdt={tdt}
+C7x idt7 0 1 IC=0
+R7x idt7 0 1e10
+* Berechner f
+Ef      f   0  VALUE={v(n)*p/60} tripdv={tdv} tripdt={tdt}
+.ENDS ;
+*$
+
+
+
+* fixerregung ein / avr aus
+* drehzahlregler ein / fixm aus
+*
+.SUBCKT DSG_12KW_400V_400V_mit_Trafo 1U2 1V2 1W2 Verr1 M1 n GND1
++ PARAMS: Schenkelpolfaktor=0.5 Daempferfaktor=1 Streuung=0.05 rcu=0.05 rbg=0.05 n0=1500 err0=0 p=2 a=0.9 m=7 Kc=0.8
++ nsoll=1500 vsoll=400
++ t_start_avr=1s t_stop_avr=1e6 t_start_fixerr=1e6 t_stop_fixerr=1.1s t_stop_nreg=1e5 t_start_nreg=1e6 t_start_fixm=1e5 t_stop_fixm=1e6
++ t_sync=0ms t_sync_off=1e6 t_enable_avr=1.5s  t_enablev_avr=0.51s t_start_gnd2=10e6 t_stop_gnd2=1e6
+.param cosphi=0.8
+.param J=1 UN_verkettet=400V IN={17.3/cosphi}  UE0=48V IE0=5A Pel=12e3
+*************
+* Generator *
+*************
+RM1  M1  0  1e10
+XU1 u2 v2 w2 verr M n GND1 Block1 J={J} UN_verkettet={UN_verkettet} IN={IN} Kc={Kc} UE0={UE0} IE0={IE0} Pel={Pel} Schenkelpolfaktor={Schenkelpolfaktor} Daempferfaktor={Daempferfaktor} Streuung={Streuung} rcu={rcu} rbg={rbg} n0={n0} err0={err0} a={a} m={m}
+XU3 GND1 0 SW_1Phase_off t_Stop={t_stop_gnd2} t_Start={t_start_gnd2} tsw=100u ron=0.01 roff=1e9
+***************
+* Transformer nearly without lost
+***************
+XU8 1u1 1v1 1w1 NC_01 u2 v2 w2 NC_02 Trafo3Yy6_simple SN=12k ur=0.0001 ux=0.001 i0=0.0005 p0=0.00001 l_=0 stproz=1 middle=0 psi_0=0 tpsi0=1000 tpsid=0.1m ron=0.00001
+***************
+* Sync-Schalter
+***************
+XU10 1u1 1v1 1w1 1u2 1v2 1w2 SW_3Phase t_Start={t_sync} t_Stop={t_sync_off} tsw=100u ron=0.01 roff=1e9
+********************
+* Drehzahlregler PI
+********************
+XU2 n nsoll M2 en2 PI Kp=1 Tn=0.1 Min=0 Max=77 init=0
+ven2 en2 0 pwl 0s 1 {t_stop_nreg} 1 {t_stop_nreg+100m} 0 {t_Start_nreg} 0 {t_Start_nreg+100m} 1
+vpwl  nsoll 0 pwl 0s {nsoll} 3s {nsoll}
+* Zu Drehzahlregler
+XU12 M M2 SW_1Phase_off t_Stop={t_stop_nreg} t_Start={t_start_nreg} tsw=100u ron=0.01 roff=1e9
+* Fixes Drehmoment von aussen (Schalter und pwl-Source)
+XU6 M M1 SW_1Phase t_Start={t_start_fixm} t_Stop={t_stop_fixm} tsw=100u ron=0.01 roff=1e9
+*******
+* AVR
+*******
+XU19 u2 v2 w2 vsoll verr2 en1 enV avr Kp=1 Tn=0.05 Min=24 Max={2.5*UE0} U1Nenn={UN_verkettet} tripdt2=100n verr0=48V vfactor=1.73205
+ven1 en1 0 pwl 0s 0v {t_enable_avr} 0v {t_enable_avr+100m} 1
+venV enV 0 pwl 0s 0v {t_enablev_avr} 0v {t_enablev_avr+100m} 1
+vsoll vsoll 0 pwl 0s {vsoll}
+XU20 verr verr2 SW_1Phase t_Start={t_start_avr} t_Stop={t_stop_avr} tsw=100u ron=0.01m roff=1e9
+* fixe Erregung von aussen (Schalter und pwl-source)
+XU21 verr verr1 SW_1Phase_off t_Stop={t_stop_fixerr} t_Start={t_start_fixerr} tsw=100u ron=0.01m roff=1e9
+.ENDS
+
+* fixerregung ein / avr aus
+* drehzahlregler ein / fixm aus
+*
+.SUBCKT DSG_12kW_400V_400V_ohne_Trafo 1U2 1V2 1W2 Verr1 M1 n GND1
++ PARAMS: Schenkelpolfaktor=0.5 Daempferfaktor=1 Streuung=0.05 rcu=0.05 rbg=0.05 n0=1500 err0=1 p=2 a=0.9 m=7 kc=0.8
++ nsoll=1500 vsoll=400
++ t_start_avr=1s t_stop_avr=1e6 t_start_fixerr=1e6 t_stop_fixerr=1.1s t_stop_nreg=1e5 t_start_nreg=1e6 t_start_fixm=1e5 t_stop_fixm=1e6
++ t_enable_avr=1.5s  t_enablev_avr=0.51s t_start_gnd2=10e6 t_stop_gnd2=1e6
+.param cosphi=0.8
+.param J=1 UN_verkettet=400V IN={17.3/cosphi}  UE0=48V IE0=5A Pel=12e3
+*************
+* Generator *
+*************
+RM1  M1  0  1e10
+XU1 1u2 1v2 1w2 verr M n GND1 Block1 J={J} UN_verkettet={UN_verkettet} IN={IN} Kc={Kc} UE0={UE0} IE0={IE0} Pel={Pel} Schenkelpolfaktor={Schenkelpolfaktor} Daempferfaktor={Daempferfaktor} Streuung={Streuung} rcu={rcu} rbg={rbg} n0={n0} err0={err0} a={a} m={m}
+XU3 GND1 0 SW_1Phase_off t_Stop={t_stop_gnd2} t_Start={t_start_gnd2} tsw=100u ron=0.01 roff=1e9
+********************
+* Drehzahlregler PI
+********************
+XU2 n nsoll M2 en2 PI Kp=1 Tn=0.1 Min=0 Max=77 init=0
+ven2 en2 0 pwl 0s 1 {t_stop_nreg} 1 {t_stop_nreg+100m} 0 {t_Start_nreg} 0 {t_Start_nreg+100m} 1
+vpwl  nsoll 0 pwl 0s {nsoll} 3s {nsoll}
+* Zu Drehzahlregler
+XU12 M M2 SW_1Phase_off t_Stop={t_stop_nreg} t_Start={t_start_nreg} tsw=100u ron=0.01 roff=1e9
+* Fixes Drehmoment von aussen (Schalter und pwl-Source)
+XU6 M M1 SW_1Phase t_Start={t_start_fixm} t_Stop={t_stop_fixm} tsw=100u ron=0.01 roff=1e9
+*******
+* AVR
+*******
+XU19 u2 v2 w2 vsoll verr2 en1 enV avr Kp=1 Tn=0.05 Min=24 Max={2.5*UE0} U1Nenn={UN_verkettet} tripdt2=100n verr0=48V vfactor=1.73205
+ven1 en1 0 pwl 0s 0v {t_enable_avr} 0v {t_enable_avr+100m} 1
+venV enV 0 pwl 0s 0v {t_enablev_avr} 0v {t_enablev_avr+100m} 1
+vsoll vsoll 0 pwl 0s {vsoll}
+XU20 verr verr2 SW_1Phase t_Start={t_start_avr} t_Stop={t_stop_avr} tsw=100u ron=0.01m roff=1e9
+* fixe Erregung von aussen (Schalter und pwl-source)
+XU21 verr verr1 SW_1Phase_off t_Stop={t_stop_fixerr} t_Start={t_start_fixerr} tsw=100u ron=0.01m roff=1e9
+.ENDS
+
+.SUBCKT Trafo3Yy6_ideal_2a  1U  1V  1W  1N  2U  2V  2W  2N
++	PARAMS:
++	U1Nenn=400V
++	U20=400V
++   k=1
++   N1=1000
++   l_=0
++   stproz=1
++   ueN={U1Nenn/U20}
++   ue={ueN+ueN*l_*stproz/100}
+.param N1={N1} N2={N1/ue} 
+* YY0
+*Xu 1U 1N 2U 2N N1N2_Yy params: N1={N1} N2={N2} k={k}
+*Xv 1V 1N 2V 2N N1N2_Yy params: N1={N1} N2={N2} k={k}
+*Xw 1W 1N 2W 2N N1N2_Yy params: N1={N1} N2={N2} k={k}
+* YY6
+Xu 1U 1N 2N 2U N1N2_Yy_2a params: N1={N1} N2={N2} k={k}
+Xv 1V 1N 2N 2V N1N2_Yy_2a params: N1={N1} N2={N2} k={k}
+Xw 1W 1N 2N 2W N1N2_Yy_2a params: N1={N1} N2={N2} k={k}
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+.ENDS
+
+* ideal transformer 1 phase with coupling factor k
+.subckt N1N2_Yy_2a in1 in2 out1 out2
++params: N1=1 N2=1 k=1
+.param ue={N1/N2}
+G1 0 M in1 in2 1
+G2 0 M out1 out2 {-1/k*ue}
+G3 in1 in2 M 0 1
+G4 out1 out2 M 0 {-1/k*ue}
+R2 M 0 1e12
+Rin1 in1 0 1e12
+Rin2 in2 0 1e12
+Rout1 out1 0 1e12
+Rout2 out2 0 1e12
+.ends
+
+.SUBCKT PI_2a x w y enable
++PARAMS: Kp=1 Tn=1 Min=-15G Max=15G ic=0 init=0
+Rx x 0 1e12
+Rw w 0 1e12
+Renable enable 0 1e12
+R_R2        0 y  1e3
+E_y	        y 0 VALUE={init*(1-v(enable))+v(enable)*LIMIT(V(w,x)*Kp+V(int),Min,Max)} tripdv={tdv} tripdt={tdt}
+Gint       	0 int VALUE={v(enable)*V(w,x)*Kp * 1/Tn} tripdv={tdv} tripdt={tdt}
+Cint       	int 0 1 IC={IC}
+Rint       	int 0 1G
+.ENDS
+
+.SUBCKT AVR2_50Hz_2c L1 L2 L3 w y enable enable2
++PARAMS: Kp=0.01 Tn=0.1 Min=200 Max=1800 verr0=600 fc=3
+* Measurement with RMS from @vlad
+* 100Hz Filter for RMS ouput: https://rf-tools.com/lc-filter/
+Rl1 l1 0 1e12
+Rl2 l2 0 1e12
+Rl3 l3 0 1e12
+Rw w 0 1e12
+Ry y 0 1e12
+Renable enable 0 1e12
+Renable2 enable2 0 1e12
+Rl1e l1e 0 1e12
+L1 L1rms1 L1rms 225.6mH
+C1 L1rms1 L1rms 11.25uF
+L2 L1rms L1rms2 22.51H
+C2 L1rms2 0 112.8n
+R1 L1rms 0 1000ohm
+XU4 L1e L1rms1 RMS_2c fc={fc} b0=1 b1=3
+Een L1e 0 VALUE={V(L1)*v(enable2)} tripdv={tdv} tripdt={tdt}
+Eout x 0 VALUE={v(L1rms)*1.73205} tripdv={tdv} tripdt={tdt}
+* ReglerVALUE={}  tripdv={tdv} tripdt={tdt}
+R_R2        0 y  1k
+E_y	        y 0 VALUE={verr0*(1-v(enable))+v(enable)*LIMIT(V(w,x)*Kp+V(int)+verr0,Min,Max)} tripdv={tdv} tripdt={tdt}
+* Integrator
+Gint       	0 int VALUE={v(enable)*V(w,x)*Kp * 1/Tn} tripdv={tdv} tripdt={tdt}
+Cint       	int 0 1 IC=0
+Rint       	int 0 1G
+.ENDS
+
+.subckt RMS_2c in out params: fc=100 b0=3 b1=3 lim=1g
+.param rgnd=1e12
+* Squarer
+Asq 0 in in 0 0 0 sq 0 ota vhigh={lim} rout=1 linear
+* Divider:
+Adiv_lf _sq sq 0 0 0 0 div 0 ota vhigh={lim} rout=1g cout={1n/fc} linear
+Adiv 0 div out 0 0 0 _sq 0 ota vhigh={lim} rout=1 linear
+* Two stage amplifiers: for lowpass filtering
+Ab0 out div 0 0 0 0 1 0 ota vhigh={lim} vlow={-lim} cout={.5/pi/fc} rout=1g g={b0/b1} linear
+Ab1 out 1 0 0 0 0 out 0 ota vhigh={lim} vlow={-lim} cout={.5/pi/fc} rout=1g g={b1} linear
+Rout out 0 {Rgnd}
+.ends RMS_2a
+
+.SUBCKT Sw_3Phase_2a in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
+Vsw ctrl 0 PWL(0s 0v {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0 )
+S1 in1 out1 ctrl 0 MS1
+S2 in2 out2 ctrl 0 MS1
+S3 in3 out3 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+
+.SUBCKT Sw_1Phase_2a in1 out1
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
+Vsw ctrl 0 PWL (0s 0  {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0 )
+S1 in1 out1 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={vt} Vh={vh} Lser=0 Vser=0)
+.ENDS
+
+.SUBCKT Sw_1Phase_off_2a in1 out1
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=10m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.5
++vh=-0.4
+Vsw1 ctrl 0 PWL(0s 1 {t_Stop+1p} 1 {t_Stop+toff+2p} 0 {t_Start+3p} 0 {t_Start+tsw+4p} 1 )
+S1 in1 out1 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+
+

@@ -1,0 +1,756 @@
+* Model of a simple surge arrestor (spark gap arrestor) = Überspannungsableiter mit Funkenstrecke
+* Model of MOV = voltage dependent resistor = Überpannungsableiter (from the ltspice yahoo group)
+
+* spark gap:
+
+* http://www.spectrum-soft.com/news/winter99/sparkgap.shtm
+* http://www.intusoft.com/nlhtm/nl50.htm#SPARKGAPMODELING
+
+* This macromodel was derived based on an article by Christophe Basso titled "SPICE model simulates spark-gap arrestor" which appears in * the July 3, 1997 issue of EDN. This model does not simulate the glow transition of a spark-gap. There are seven parameters for this
+* macro. The parameters are defined as follows:
+
+
+* vthres = voltage at which the sparkgap strikes
+* varc = voltage across the sparkgap once struck
+* isus = Sustaining current under which th arc is stopped
+* rneg = negative resistance once struck (I set it to 1 instead of -1 because energy have to be >0 not <0 !!!)
+* lpl = lead inductance
+* rpl = flux loss associated with lpl
+* cpar = Gap inductance
+* carc = Arc capacitance
+* cthresh = switcher capacitance of R,C network for smoother on/off transition (convergence)
+* ron = on resistance of switcher 
+* roff = off resistance of switcher 
+
+* set the parameter values above to your needs
+* the parameters of the following models are only set
+* with rudimentary values !!!!!!!!
+* Especially the table source values have to be set to appropriate values 
+* of the data sheet of your arrester
+
+* NOTE: sparkgap models often laks of convergence !!!!!
+* use MOV instead 
+
+* resistance of surge arrester is not dependent of volt/us 
+.SUBCKT SPARK 1 2 params: vthres=90 varc=10 isus=500m rneg=-1 lpl=130n rpl=2.5k cpar=1p carc=3p
++ tfall=10u trise=10u cthresh=0.1p ron=0.1 roff=1g ioff=100m
+.param rparsw=1e12
+VDUM1 1 10 0
+LPL1 10 11 {lpl} rser=0
+RPL1 10 11 {rpl}
+CPAR1 1 2 {cpar}
+RLEAK1 1 2 {rparsw}
+RNEG1 11 17 {rneg}
+DTRK1 12 17 DCLAMP
+DSRK2 12 16 DCLAMP
+CARC1 1 16 {carc}
+* G-SWITCH
+G1 16 2 VALUE={v(16,2)*v(13)}  tripdv={tdv} tripdt={tdt}
+R5 16 2 {rparsw} 
+* Changed to SW switch
+*S1 16 2 13a 0 switch
+*a1 13 0 0 0 0 0 13a 0 or trise={trise} tfall={tfall}
+*.model switch SW (vt=0.5 vh=-0.4 ron=10 roff=1e9) 
+* SWITCH END
+* Switch control input
+*BARC 15 0 v=if(ABS(V(1,2))>{vthres},10,if(ABS(I(VDUM1))>{isus},10,{goff})) tripdv={tdv} tripdt={tdt}
+BARC 15 0 v=if((ABS(V(1,2))>{vthres}),{1/ron},if(((DDT(ABS(I(VDUM1)))>0 & ABS(I(VDUM1))>ioff) | (ABS(I(VDUM1))>({isus}))),{1/ron},{1/roff}))  tripdv={tripdv} tripdt={tdt}
+RDEL 15 13 10
+CDEL 13 0 {cthresh} ; change this for convergence
+* Switch control input end
+.model DCLAMP D BV={varc}
+.ENDS
+
+
+* Now with SW-switch instead of G-switch
+* Here you can choose ron and roff !!
+.SUBCKT SPARK_test 1 2 params: vthres=90 varc=10 isus=500m rneg=-1 lpl=130n rpl=2.5k cpar=1p carc=3p
++ trise=10u tfall=10u cthresh=0.01p roff=1e9 ron=1e-1 ioff=100m
+.param goff={1/roff} 
+.param gon={1/ron} 
+.param rparsw=1e12
+VDUM1 1 10 0
+LPL1 10 11 {lpl} rser=0
+RPL1 10 11 {rpl}
+CPAR1 1 2 {cpar}
+RLEAK1 1 2 {rparsw}
+RNEG1 11 17 {rneg}
+DTRK1 12 17 DCLAMP
+DSRK2 12 16 DCLAMP
+CARC1 1 16 {carc}
+* G-SWITCH
+* G-SWITCH
+*G1 16 2 VALUE={v(16,2)*v(13)}  tripdv={tdv} tripdt={tdt}
+R5 16 2 {rparsw} 
+* Changed to SW switch
+S1 16 2 13a 0 switch
+a1 13 0 0 0 0 0 13a 0 or trise={trise} tfall={tfall}
+.model switch SW (vt=0.9 vh=-0.4 ron={ron} roff={roff}) 
+* SWITCH END
+* Switch control input
+*BARC 15 0 v=if(ABS(V(1,2))>{vthres},10,if(ABS(I(VDUM1))>{isus},10,{goff})) tripdv={tdv} tripdt={tdt}
+*BARC 15 0 v=if((ABS(V(1,2))>{vthres}),10,if(((DDT(ABS(I(VDUM1)))>0 & ABS(I(VDUM1))>ioff) | (ABS(I(VDUM1))>({isus}))),10,goff))  tripdv={tripdv} tripdt={tdt}
+BARC 15 0 v=if((ABS(V(1,2))>{vthres}),1,if(((DDT(ABS(I(VDUM1)))>0 & ABS(I(VDUM1))>ioff) | (ABS(I(VDUM1))>({isus}))),1,0))  tripdv={tripdv} tripdt={tdt}
+RDEL 15 13 10
+CDEL 13 0 {cthresh}
+* Switch control input end
+.model DCLAMP D BV={varc}
+.ENDS
+
+.SUBCKT SWITCH a b c 
+s1 a b c 0 sw1
+.model sw1 SW (ron=0.01 roff=1e12 vt=1 vh=0)
+.ENDS
+
+
+
+* input of b4 TABLE is v/us output is a corresponding voltage threshhold factor 
+* vthresh2 = vthresh + vthresh*factor 
+* if vthresh is higher the sparkgap trip is only at a
+* The table values can be taken from the VIgnition/dv/dt curves of a spark-gap data sheet
+* The offset produced by the Vthres*V(Ion) product represents the fact that the gas within the spark-gap
+* needs a certain amount of time to ionize so that faster transients will reach a higher voltage before the
+* gas is ionized and the spark-gap trips. 
+* currently the table is filled only till 100V/us but table can be expanded to your needs
+* 
+.SUBCKT SPARK2 1 2 params: vthres=90 varc=10 isus=500m rneg=-1 lpl=130n rpl=2.5k cpar=1p carc=3p 
++ trise=10u cthresh=10000p tfall=10u fact=1 ron=0.1 roff=1e9 ioff=100m
+.param goff={1/roff} 
+.param gon={1/ron} 
+.param rparsw=1e12
+VDUM1 1 10 0
+LPL1 10 11 {lpl} rser=0
+RPL1 10 11 {rpl}
+CPAR1 1 2 {cpar}
+RLEAK1 1 2 {rparsw}
+RNEG1 11 17 {rneg}
+DTRK1 12 17 DCLAMP
+DSRK2 12 16 DCLAMP
+CARC1 1 16 {carc}
+* G-SWITCH
+G1 16 2 VALUE={v(16,2)*v(13)}  tripdv={tdv} tripdt={tdt}
+* Changed to SW switch
+*S1 16 2 13a 0 switch
+*a1 13 0 0 0 0 0 13a 0 or trise={trise} tfall={tfall}
+*.model switch SW (vt=0.9 vh=-0.4 ron=1e-3 roff=1e6) 
+R5 16 2 {rparsw} 
+* SWITCH END
+* Switch control input
+*BARC 15 0 v=if(ABS(V(1,2))>v(thresh),10,if(ABS(I(VDUM1))>{isus},10,{goff})) tripdv={tdv} tripdt={tdt}
+BARC 15 0 v=if((ABS(V(1,2))>v(thresh)),gon,if(((DDT(ABS(I(VDUM1)))>0 & ABS(I(VDUM1))>ioff) | (ABS(I(VDUM1))>({isus}))),gon,{goff}))  tripdv={tripdv} tripdt={tdt}
+RDEL 15 13 10
+CDEL 13 0 {cthresh} ; added 
+* Switch control input end 
+E3 thresh 0 VALUE={Vthres+(Vthres*v(ion))} tripdv={tdv} tripdt={tdt} 
+b4 ion 0 v=TABLE(v(in)*fact,0,0,1U,.5565M,10M,1M,100M,86M,1,217M,10,521M,100,956M)
+E9 in 0 VALUE={abs(V(dvdt))} tripdv={tdv} tripdt={tdt}
+E8 dvdt 0 VALUE={100*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff
+E5 x 0 VALUE={V(1,2)} tripdv={tdv} tripdt={tdt}
+C4 x dif 1u
+R6 dif y 1e6
+E6 y 0 VALUE={-100e6*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff end
+.model DCLAMP D BV={varc}
+.ENDS
+
+* Now with SW-switch instead of G-switch
+* Here you can choose ron and roff 
+.SUBCKT SPARK2_test 1 2 params: vthres=90 varc=10 isus=500m rneg=-1 lpl=130n rpl=2.5k cpar=1p carc=3p 
++ trise=10u tfall=10u cthresh=0.01p fact=1 roff=1e9 ron=1e-1 ioff=100m 
+.param goff={1/roff} 
+.param gon={1/ron}
+.param rparsw=1e12
+VDUM1 1 10 0
+LPL1 10 11 {lpl} rser=0
+RPL1 10 11 {rpl}
+CPAR1 1 2 {cpar}
+RLEAK1 1 2 {rparsw}
+RNEG1 11 17 {rneg}
+DTRK1 12 17 DCLAMP
+DSRK2 12 16 DCLAMP
+CARC1 1 16 {carc}
+* G-SWITCH
+*G1 16 2 VALUE={v(16,2)*v(13)}  tripdv={tdv} tripdt={tdt}
+* Changed to SW switch
+S1 16 2 13a 0 switch
+a1 13 0 0 0 0 0 13a 0 or trise={trise} tfall={tfall}
+.model switch SW (vt=0.5 vh=-0.4 ron={ron} roff={roff}) 
+R5 16 2 {rparsw}
+* SWITCH END
+* Switch control input
+*BARC 15 0 v=if(ABS(V(1,2))>v(thresh),10,if(ABS(I(VDUM1))>{isus},10,{goff})) tripdv={tdv} tripdt={tdt}
+BARC 15 0 v=if((ABS(V(1,2))>v(thresh)),1,if(((DDT(ABS(I(VDUM1)))>0 & ABS(I(VDUM1))>ioff) | (ABS(I(VDUM1))>({isus}))),1,0))  tripdv={tripdv} tripdt={tdt}
+RDEL 15 13 10
+CDEL 13 0 {cthresh} ; added 
+* Switch control input end 
+E3 thresh 0 VALUE={Vthres+(Vthres*v(ion))} tripdv={tdv} tripdt={tdt} 
+b4 ion 0 v=TABLE(v(in)*fact,0,0,1U,.5565M,10M,1M,100M,86M,1,217M,10,521M,100,956M)
+E9 in 0 VALUE={abs(V(dvdt))} tripdv={tdv} tripdt={tdt}
+E8 dvdt 0 VALUE={100*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff
+E5 x 0 VALUE={V(1,2)} tripdv={tdv} tripdt={tdt}
+C4 x dif 1u
+R6 dif y 1e6
+E6 y 0 VALUE={-100e6*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff end
+.model DCLAMP D BV={varc}
+.ENDS
+
+
+* New Testmodel with digitally controlled switch
+* instead of gswitch 
+* vthresh = voltage at which the sparkgap start to fire
+* varc = arc voltage when sparkgap strikes to his on state
+* isus = if sparkgap is on and current is lower isus the spark gap goes to his off state again
+* ron = sparkgap on resistance
+* roff = sparkgap off resistance
+* trise = switching rise time (for soft switching on)
+* tfall = switching fall time (for soft switching off - set higher if voltage spike at switchoff occur)
+* ioff = should be >10 times the sparkgap off state current = Max. VoltageAtSparkGap/roff but much smaller than isus
+*        ( if the sparkgap is off than res1-pin should be zeroed )  
+* fact = Since the TABLE voltage source is designed for a 100V sparkgap: some scaling factor
+*        for higher spark gap voltages - but of course always change the E4-TABLE source directly if you have your sparkgap data availlable 
+  
+.SUBCKT SPARK2a_test 1 2 params: vthres=90 varc=10 isus=500m rneg=-1 lpl=130n rpl=2.5k cpar=1p carc=3p 
++ trise=10u tfall=10u fact=1 roff=1e9 ron=1e-1 ioff=100m
+.param rparsw=1e12
+VDUM1 1 10 0
+LPL1 10 11 {lpl} rser=0
+RPL1 10 11 {rpl}
+CPAR1 1 2 {cpar}
+RLEAK1 1 2 {rparsw}
+RNEG1 11 17 {rneg}
+DTRK1 12 17 DCLAMP
+DSRK2 12 16 DCLAMP
+CARC1 1 16 {carc}
+* G-SWITCH
+*G1 16 2 VALUE={v(16,2)*v(13)}  tripdv={tdv} tripdt={tdt}
+* Changed to SW switch
+S1 16 2 13a 0 switch
+a1 13 0 0 0 0 0 13a 0 or trise={trise} tfall={tfall}
+.model switch SW (vt=0.5 vh=-0.4 ron={ron} roff={roff}) 
+R5 16 2 {rparsw}
+* SWITCH END
+* Switch CONTROL
+*** set if voltage at the sparkgap greater than v(thresh) = ON state of sparkgap 
+e1 set 0 value={ ABS(V(1,2)) > v(thresh) }
+* gives reset only if sparkgap current is much greater than off state current (sparkgap is ON!!) 
+* and on state current is actually decreasing AND ... 
+* ... AND if on state current goes under isus 
+e2 res 0 value={ DDT(ABS(I(VDUM1)))<0 & ABS(I(VDUM1))<isus & ABS(I(VDUM1))>ioff }
+A2 set reset 0 0 0 0 13 0 SRFLOP
+A3 13 0 0 0 0 0 N015 0 BUF td={2*trise}
+A4 0 res 0 N015 0 0 reset 0 AND
+* Switch CONTROL end 
+E3 thresh 0 VALUE={Vthres+(Vthres*v(ion))} tripdv={tdv} tripdt={tdt} 
+b4 ion 0 v=TABLE(v(in)*fact,0,0,1U,.5565M,10M,1M,100M,86M,1,217M,10,521M,100,956M)
+E9 in 0 VALUE={abs(V(dvdt))} tripdv={tdv} tripdt={tdt}
+E8 dvdt 0 VALUE={100*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff
+E5 x 0 VALUE={V(1,2)} tripdv={tdv} tripdt={tdt}
+C4 x dif 1u
+R6 dif y 1e6
+E6 y 0 VALUE={-100e6*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff end
+.model DCLAMP D BV={varc}
+.ENDS
+
+
+.SUBCKT SPARK_90V 1 2 params: vthres=90 varc=10 isus=500m rneg=-1 lpl=130n rpl=2.5k cpar=1p carc=3p 
++ trise=10u tfall=10u cthresh=10p fact=1 roff=1e9 ron=1e-1 ioff=100m
+.param goff={1/roff} 
+.param gon={1/ron}
+.param rparsw=1e12 
+VDUM1 1 10 0
+LPL1 10 11 {lpl} rser=0
+RPL1 10 11 {rpl}
+CPAR1 1 2 {cpar}
+RLEAK1 1 2 {rparsw}
+RNEG1 11 17 {rneg}
+DTRK1 12 17 DCLAMP
+DSRK2 12 16 DCLAMP
+CARC1 1 16 {carc}
+* G-SWITCH
+G1 16 2 VALUE={v(16,2)*v(13)}  tripdv={tdv} tripdt={tdt}
+* Changed to SW switch
+*S1 16 2 13a 0 switch
+*a1 13 0 0 0 0 0 13a 0 or trise={trise} tfall={tfall}
+*.model switch SW (vt=0.9 vh=-0.4 ron=1e-3 roff=1e6) 
+R5 16 2 {rparsw} 
+* SWITCH END
+* Switch control input
+*BARC 15 0 v=if(ABS(V(1,2))>v(thresh),10,if(ABS(I(VDUM1))>{isus},10,{goff})) tripdv={tdv} tripdt={tdt}
+BARC 15 0 v=if((ABS(V(1,2))>v(thresh)),gon,if(((DDT(ABS(I(VDUM1)))>0 & ABS(I(VDUM1))>ioff) | (ABS(I(VDUM1))>({isus}))),gon,goff))  tripdv={tripdv} tripdt={tdt}
+RDEL 15 13 10
+CDEL 13 0 {cthresh}
+* Switch control input end 
+E3 thresh 0 VALUE={Vthres+(Vthres*v(ion))} tripdv={tdv} tripdt={tdt} 
+* Bei schnelleren Wellen spricht der Überspannungsableiter später an !!!
+* Bei 20kV statt 200V -> V/100
+*b4 ion 0 v=TABLE(v(in),0,0,1U,0.005565M,10M,0.01M,100M,0.86M,1,2.17M,10,5.21M,100,9.56M)
+*b4 ion 0 v=TABLE(v(in),0,0,1U,{.5565M*fact},10M,{1M*fact},100M,{86M*fact},1,{217M*fact},10,{521M*fact},100,{956M*fact},1000,{1.5*fact},10000,{2*fact},100000,{2.5*fact},1e6,{3*fact}) tripdv={tripdv} tripdt={tdt}
+b4 ion 0 v=TABLE(v(in)*fact,0,0,1U,{.5565M},10M,{1M},100M,{86M},1,{217M},10,{521M},100,{956M},1000,{2},10000,{4},100000,{8},1e6,{16}) tripdv={tripdv} tripdt={tdt}
+E9 in 0 VALUE={abs(V(dvdt))} tripdv={tdv} tripdt={tdt}
+E8 dvdt 0 VALUE={100*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff
+E5 x 0 VALUE={V(1,2)} tripdv={tdv} tripdt={tdt}
+C4 x dif 1u
+R6 dif y 1e6
+E6 y 0 VALUE={-100e6*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff end
+.model DCLAMP D BV={varc} 
+.ENDS
+
+.SUBCKT SPARK_90V_test 1 2 params: vthres=90 varc=10 isus=500m rneg=-1 lpl=130n rpl=2.5k cpar=1p carc=3p 
++ trise=1p td=0 tfall=1u cthresh=10p fact=1 roff=1e9 ron=1e-1 ioff=100m
+.param goff={1/roff} 
+.param gon={1/ron}
+.param rparsw=1e12
+VDUM1 1 10 0
+LPL1 10 11 {lpl} rser=0
+RPL1 10 11 {rpl}
+CPAR1 1 2 {cpar}
+RLEAK1 1 2 {rparsw}
+RNEG1 11 17 {rneg}
+DTRK1 12 17 DCLAMP
+DSRK2 12 16 DCLAMP
+CARC1 1 16 {carc}
+* G-SWITCH
+*G1 16 2 VALUE={v(16,2)*v(13)}  tripdv={tdv} tripdt={tdt}
+* Changed to SW switch
+S1 16 2 13a 0 switch
+a1 13 0 0 0 0 0 13a 0 or trise={trise} tfall={tfall} td={td}
+.model switch SW (vt=0.5 vh=-0.4 ron={ron} roff={roff}) 
+R5 16 2 {rparsw}
+* SWITCH END
+* Switch control input
+BARC 15 0 v=if((ABS(V(1,2))>v(thresh)),1,if(((DDT(ABS(I(VDUM1)))>0 & ABS(I(VDUM1))>ioff) | (ABS(I(VDUM1))>({isus}))),1,0))  tripdv={tripdv} tripdt={tdt}
+RDEL 15 13 10
+CDEL 13 0 {cthresh}
+* Switch control input end 
+E3 thresh 0 VALUE={Vthres+(Vthres*v(ion))} tripdv={tdv} tripdt={tdt} 
+* Bei schnelleren Wellen spricht der Überspannungsableiter später an !!!
+* Bei 20kV statt 200V -> V/100
+*b4 ion 0 v=TABLE(v(in),0,0,1U,0.005565M,10M,0.01M,100M,0.86M,1,2.17M,10,5.21M,100,9.56M)
+*b4 ion 0 v=TABLE(v(in),0,0,1U,{.5565M*fact},10M,{1M*fact},100M,{86M*fact},1,{217M*fact},10,{521M*fact},100,{956M*fact},1000,{1.5*fact},10000,{2*fact},100000,{2.5*fact},1e6,{3*fact}) tripdv={tripdv} tripdt={tdt}
+b4 ion 0 v=TABLE(v(in)*fact,0,0,1U,{.5565M},10M,{1M},100M,{86M},1,{217M},10,{521M},100,{956M},1000,{2},10000,{4},100000,{8},1e6,{16}) tripdv={tripdv} tripdt={tdt}
+E9 in 0 VALUE={abs(V(dvdt))} tripdv={tdv} tripdt={tdt}
+E8 dvdt 0 VALUE={100*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff
+E5 x 0 VALUE={V(1,2)} tripdv={tdv} tripdt={tdt}
+C4 x dif 1u
+R6 dif y 1e6
+E6 y 0 VALUE={-100e6*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff end
+.model DCLAMP D BV={varc} 
+.ENDS
+
+* vthres of surge arrester is dependent of volt/us (see table b4)
+* set fact parameter to your needs
+* or change b4 TABLE directly according to data sheet 
+* you can set varc and isus to your needs
+.SUBCKT SPARK_400V 1 2 params: vthres={400*1.7} varc=10 isus=10m rneg=-1 lpl=130n rpl=2.5k cpar=1p carc=3p 
++ trise=10u cthresh=10000p fact={100/vthres} ron=0.1 roff=1e9 tfall=10u ioff=100m 
+.param goff={1/roff} 
+.param gon={1/ron} 
+.param rparsw=1e12
+VDUM1 1 10 0
+LPL1 10 11 {lpl} rser=0
+RPL1 10 11 {rpl}
+CPAR1 1 2 {cpar}
+RLEAK1 1 2 {rparsw}
+RNEG1 11 17 {rneg}
+DTRK1 12 17 DCLAMP
+DSRK2 12 16 DCLAMP
+CARC1 1 16 {carc}
+* G-SWITCH
+G1 16 2 VALUE={v(16,2)*v(13)}  tripdv={tdv} tripdt={tdt}
+* Changed to SW switch
+*S1 16 2 13a 0 switch
+*a1 13 0 0 0 0 0 13a 0 or trise={trise} tfall={tfall}
+*.model switch SW (vt=0.9 vh=-0.4 ron=1e-3 roff=1e6) 
+R5 16 2 {rparsw} 
+* SWITCH END
+* Switch control input
+*BARC 15 0 v=if(ABS(V(1,2))>v(thresh),10,if(ABS(I(VDUM1))>{isus},10,{goff})) tripdv={tdv} tripdt={tdt}
+BARC 15 0 v=if((ABS(V(1,2))>v(thresh)),gon,if(((DDT(ABS(I(VDUM1)))>0 & ABS(I(VDUM1))>ioff) | (ABS(I(VDUM1))>({isus}))),gon,{goff}))  tripdv={tripdv} tripdt={tdt}
+RDEL 15 13 10
+CDEL 13 0 {cthresh}
+* Switch control input end 
+E3 thresh 0 VALUE={Vthres+(Vthres*v(ion))} tripdv={tdv} tripdt={tdt} 
+* Bei schnelleren Wellen spricht der Überspannungsableiter später an !!!
+* Bei 20kV statt 200V -> V/100
+*b4 ion 0 v=TABLE(v(in),0,0,1U,0.005565M,10M,0.01M,100M,0.86M,1,2.17M,10,5.21M,100,9.56M)
+*b4 ion 0 v=TABLE(v(in),0,0,1U,{.5565M*fact},10M,{1M*fact},100M,{86M*fact},1,{217M*fact},10,{521M*fact},100,{956M*fact},1000,{1.5*fact},10000,{2*fact},100000,{2.5*fact},1e6,{3*fact}) tripdv={tripdv} tripdt={tdt}
+b4 ion 0 v=TABLE(v(in)*fact,0,0,1U,{.5565M},10M,{1M},100M,{86M},1,{217M},10,{521M},100,{956M},1000,{2},10000,{4},100000,{8},1e6,{16}) tripdv={tripdv} tripdt={tdt}
+E9 in 0 VALUE={abs(V(dvdt))} tripdv={tdv} tripdt={tdt}
+E8 dvdt 0 VALUE={100*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff
+E5 x 0 VALUE={V(1,2)} tripdv={tdv} tripdt={tdt}
+C4 x dif 1u
+R6 dif y 1e6
+E6 y 0 VALUE={-100e6*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff end
+.model DCLAMP D BV={varc} 
+.ENDS
+
+* vthres of surge arrester is dependent of volt/us (see table b4)
+* set fact parameter to your needs
+* or change b4 TABLE directly according to data sheet 
+* you can set varc and isus to your needs
+.SUBCKT SPARK_10kV 1 2 params: vthres={10k*1.7} varc=6000 isus=5 rneg=-1 lpl=130n rpl=2.5k cpar=1p carc=3p 
++ tfall=10u trise=10u cthresh=10000p ron=0.1 roff=1e9 ioff=100m fact={100/vthres}
+.param goff={1/roff} 
+.param gon={1/ron} 
+.param rparsw=1e15
+VDUM1 1 10 0
+LPL1 10 11 {lpl} rser=0
+RPL1 10 11 {rpl}
+CPAR1 1 2 {cpar}
+RLEAK1 1 2 {rparsw}
+RNEG1 11 17 {rneg}
+DTRK1 12 17 DCLAMP
+DSRK2 12 16 DCLAMP
+CARC1 1 16 {carc}
+* G-SWITCH
+G1 16 2 VALUE={v(16,2)*v(13)}  tripdv={tdv} tripdt={tdt}
+* Changed to SW switch
+*S1 16 2 13a 0 switch
+*a1 13 0 0 0 0 0 13a 0 or trise={trise} tfall={tfall}
+*.model switch SW (vt=0.9 vh=-0.4 ron=1e-3 roff=1e6) 
+R5 16 2 {rparsw} 
+* SWITCH END
+* Switch control input
+*BARC 15 0 v=if(ABS(V(1,2))>v(thresh),10,if(ABS(I(VDUM1))>{isus},10,{goff})) tripdv={tdv} tripdt={tdt}
+BARC 15 0 v=if((ABS(V(1,2))>v(thresh)),gon,if(((DDT(ABS(I(VDUM1)))>0 & ABS(I(VDUM1))>ioff) | (ABS(I(VDUM1))>({isus}))),gon,{goff}))  tripdv={tripdv} tripdt={tdt}
+RDEL 15 13 10
+CDEL 13 0 {cthresh}
+* Switch control input end 
+E3 thresh 0 VALUE={Vthres+(Vthres*v(ion))} tripdv={tdv} tripdt={tdt} 
+* Bei schnelleren Wellen spricht der Überspannungsableiter später an !!!
+* Bei 20kV statt 200V -> V/100
+*b4 ion 0 v=TABLE(v(in),0,0,1U,0.005565M,10M,0.01M,100M,0.86M,1,2.17M,10,5.21M,100,9.56M)
+*b4 ion 0 v=TABLE(v(in),0,0,1U,{.5565M*fact},10M,{1M*fact},100M,{86M*fact},1,{217M*fact},10,{521M*fact},100,{956M*fact},1000,{1.5*fact},10000,{2*fact},100000,{2.5*fact},1e6,{3*fact}) tripdv={tripdv} tripdt={tdt}
+b4 ion 0 v=TABLE(v(in)*fact,0,0,1U,{.5565M},10M,{1M},100M,{86M},1,{217M},10,{521M},100,{956M},1000,{2},10000,{4},100000,{8},1e6,{16}) tripdv={tripdv} tripdt={tdt}
+E9 in 0 VALUE={abs(V(dvdt))} tripdv={tdv} tripdt={tdt}
+E8 dvdt 0 VALUE={100*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff
+E5 x 0 VALUE={V(1,2)} tripdv={tdv} tripdt={tdt}
+C4 x dif 1u
+R6 dif y 1e6
+E6 y 0 VALUE={-100e6*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff end
+.model DCLAMP D BV={varc} 
+.ENDS
+
+* Limited integrator with reset 
+.subckt SDTx in out reset  
++PARAMS: min=-1e10 max=1e10 Ci=10m ron=1e-6 roff=1e6 
+G1 0 out VALUE={if(time>0,V(in)*Ci*(((V(in)>0 & V(out)<max))|((V(in)<0)&(V(out)>min))),0)} tripdv=1 tripdt=1
+S1 out 0 reset 0 SW1 
+C1 out 0 {Ci}
+.model SW1 VSWITCH (Ron={Ron} Roff={Roff} Von=0.9 Voff=0.1)
+.ends
+
+.subckt risefall in out params: trise=100m tfall=100m 
+Erise inx 0 VALUE={  IF(   v(in)>0.5&v(out)<=1,  1/trise,   IF  (v(in)<0.5&v(out)>=0,  -1/tfall  ,0 ))   }  tripdv=1 tripdt=1
+Xint inx out reset SDTx params: min=0 max=1
+Rout out 0 1e6
+Rreset reset 0 1e6
+.ends
+
+* vthres of surge arrester is dependent of volt/us (see table b4)
+* set fact parameter to your needs
+* or change b4 TABLE directly according to data sheet 
+* you can set varc and isus to your needs
+.SUBCKT SPARK_20kV 1 2 params: vthres={20k*1.7} varc=8000 isus=10 rneg=-1 lpl=130n rpl=2.5k cpar=1p carc=3p 
++ trise=10u cthresh=10000p ron=0.1 roff=1e9 tfall=10u ioff=100m fact={100/vthres}
+.param goff={1/roff} 
+.param gon={1/ron} 
+.param rparsw=1e15
+VDUM1 1 10 0
+LPL1 10 11 {lpl} rser=0
+RPL1 10 11 {rpl}
+CPAR1 1 2 {cpar}
+RLEAK1 1 2 {rparsw}
+RNEG1 11 17 {rneg}
+DTRK1 12 17 DCLAMP
+DSRK2 12 16 DCLAMP
+CARC1 1 16 {carc}
+* G-SWITCH
+G1 16 2 VALUE={v(16,2)*v(13)}  tripdv={tdv} tripdt={tdt}
+* Changed to SW switch
+*S1 16 2 13a 0 switch
+*a1 13 0 0 0 0 0 13a 0 or trise={trise} tfall={tfall}
+*.model switch SW (vt=0.9 vh=-0.4 ron=1e-3 roff=1e6) 
+R5 16 2 {rparsw}
+* SWITCH END
+* Switch control input
+*BARC 15 0 v=if(ABS(V(1,2))>v(thresh),10,if(ABS(I(VDUM1))>{isus},10,{goff})) tripdv={tdv} tripdt={tdt}
+BARC 15 0 v=if((ABS(V(1,2))>v(thresh)),gon,if(((DDT(ABS(I(VDUM1)))>0 & ABS(I(VDUM1))>ioff) | (ABS(I(VDUM1))>({isus}))),gon,{goff}))  tripdv={tripdv} tripdt={tdt}
+RDEL 15 13 10
+CDEL 13 0 {cthresh}
+* Switch control input end 
+E3 thresh 0 VALUE={Vthres+(Vthres*v(ion))} tripdv={tdv} tripdt={tdt} 
+* Bei schnelleren Wellen spricht der Überspannungsableiter später an !!!
+* Bei 20kV statt 200V -> V/100
+*b4 ion 0 v=TABLE(v(in),0,0,1U,0.005565M,10M,0.01M,100M,0.86M,1,2.17M,10,5.21M,100,9.56M)
+*b4 ion 0 v=TABLE(v(in),0,0,1U,{.5565M*fact},10M,{1M*fact},100M,{86M*fact},1,{217M*fact},10,{521M*fact},100,{956M*fact},1000,{1.5*fact},10000,{2*fact},100000,{2.5*fact},1e6,{3*fact}) tripdv={tripdv} tripdt={tdt}
+b4 ion 0 v=TABLE(v(in)*fact,0,0,1U,{.5565M},10M,{1M},100M,{86M},1,{217M},10,{521M},100,{956M},1000,{2},10000,{4},100000,{8},1e6,{16}) tripdv={tripdv} tripdt={tdt}
+E9 in 0 VALUE={abs(V(dvdt))} tripdv={tdv} tripdt={tdt}
+E8 dvdt 0 VALUE={100*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff
+E5 x 0 VALUE={V(1,2)} tripdv={tdv} tripdt={tdt}
+C4 x dif 1u
+R6 dif y 1e6
+E6 y 0 VALUE={-100e6*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff end
+.model DCLAMP D BV={varc}
+.ENDS
+
+* vthres of surge arrester is dependent of volt/us (see table b4)
+* set fact parameter to your needs
+* or change b4 TABLE directly according to data sheet 
+* you can set varc and isus to your needs
+.SUBCKT SPARK_110kV 1 2 params: vthres={110k*1.7} varc=5000 isus=40 rneg=-1 lpl=130n rpl=2.5k cpar=1p carc=3p
++ trise=10u cthresh=10000p ron=0.1 roff=1e9 tfall=10u ioff=100m fact={100/vthres}
+.param goff={1/roff} 
+.param gon={1/ron} 
+.param rparsw=1e15
+VDUM1 1 10 0
+LPL1 10 11 {lpl} rser=0
+RPL1 10 11 {rpl}
+CPAR1 1 2 {cpar}
+RLEAK1 1 2 {rparsw}
+RNEG1 11 17 {rneg}
+DTRK1 12 17 DCLAMP
+DSRK2 12 16 DCLAMP
+CARC1 1 16 {carc}
+* G-SWITCH
+G1 16 2 VALUE={v(16,2)*v(13)}  tripdv={tdv} tripdt={tdt}
+* Changed to SW switch
+*S1 16 2 13a 0 switch
+*a1 13 0 0 0 0 0 13a 0 or trise={trise} tfall={tfall}
+*.model switch SW (vt=0.9 vh=-0.4 ron=1e-3 roff=1e6) 
+R5 16 2 {rparsw} 
+* SWITCH END
+* Switch control input
+*BARC 15 0 v=if(ABS(V(1,2))>v(thresh),10,if(ABS(I(VDUM1))>{isus},10,{goff})) tripdv={tdv} tripdt={tdt}
+BARC 15 0 v=if((ABS(V(1,2))>v(thresh)),gon,if(((DDT(ABS(I(VDUM1)))>0 & ABS(I(VDUM1))>ioff) | (ABS(I(VDUM1))>({isus}))),gon,{goff}))  tripdv={tripdv} tripdt={tdt}
+RDEL 15 13 10
+CDEL 13 0 {cthresh}
+* Switch control input end 
+E3 thresh 0 VALUE={Vthres+(Vthres*v(ion))} tripdv={tdv} tripdt={tdt} 
+* Bei schnelleren Wellen spricht der Überspannungsableiter später an !!!
+* Bei 20kV statt 200V -> V/100
+*b4 ion 0 v=TABLE(v(in),0,0,1U,0.005565M,10M,0.01M,100M,0.86M,1,2.17M,10,5.21M,100,9.56M)
+*b4 ion 0 v=TABLE(v(in),0,0,1U,{.5565M*fact},10M,{1M*fact},100M,{86M*fact},1,{217M*fact},10,{521M*fact},100,{956M*fact},1000,{1.5*fact},10000,{2*fact},100000,{2.5*fact},1e6,{3*fact}) tripdv={tripdv} tripdt={tdt}
+b4 ion 0 v=TABLE(v(in)*fact,0,0,1U,{.5565M},10M,{1M},100M,{86M},1,{217M},10,{521M},100,{956M},1000,{2},10000,{4},100000,{8},1e6,{16}) tripdv={tripdv} tripdt={tdt}
+E9 in 0 VALUE={abs(V(dvdt))} tripdv={tdv} tripdt={tdt}
+E8 dvdt 0 VALUE={100*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff
+E5 x 0 VALUE={V(1,2)} tripdv={tdv} tripdt={tdt}
+C4 x dif 1u
+R6 dif y 1e6
+E6 y 0 VALUE={-100e6*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff end
+.model DCLAMP D BV={varc}
+.ENDS
+
+* vthres of surge arrester is dependent of volt/us (see table b4)
+* set fact parameter to your needs
+* or change b4 TABLE directly according to data sheet 
+* you can set varc and isus to your needs
+.SUBCKT SPARK_220kV 1 2 params: vthres={220k*1.7} varc=10000 isus=200 rneg=-1 lpl=130n rpl=2.5k cpar=1p carc=3p 
++ trise=10u cthresh=10000p ron=0.1 roff=1e9 tfall=10u ioff=100m fact={100/vthres}
+.param goff={1/roff} 
+.param gon={1/ron} 
+.param rparsw=1e15
+VDUM1 1 10 0
+LPL1 10 11 {lpl} rser=0
+RPL1 10 11 {rpl}
+CPAR1 1 2 {cpar}
+RLEAK1 1 2 {rparsw}
+RNEG1 11 17 {rneg}
+DTRK1 12 17 DCLAMP
+DSRK2 12 16 DCLAMP
+CARC1 1 16 {carc}
+* G-SWITCH
+G1 16 2 VALUE={v(16,2)*v(13)}  tripdv={tdv} tripdt={tdt}
+* Changed to SW switch
+*S1 16 2 13a 0 switch
+*a1 13 0 0 0 0 0 13a 0 or trise={trise} tfall={tfall}
+*.model switch SW (vt=0.9 vh=-0.4 ron=1e-3 roff=1e6) 
+R5 16 2 {rparsw} 
+* SWITCH END
+* Switch control input
+*BARC 15 0 v=if(ABS(V(1,2))>v(thresh),10,if(ABS(I(VDUM1))>{isus},10,{goff})) tripdv={tdv} tripdt={tdt}
+BARC 15 0 v=if((ABS(V(1,2))>v(thresh)),gon,if(((DDT(ABS(I(VDUM1)))>0 & ABS(I(VDUM1))>ioff) | (ABS(I(VDUM1))>({isus}))),gon,{goff}))  tripdv={tripdv} tripdt={tdt}
+RDEL 15 13 10
+CDEL 13 0 {cthresh}
+* Switch control input end 
+E3 thresh 0 VALUE={Vthres+(Vthres*v(ion))} tripdv={tdv} tripdt={tdt} 
+* Bei schnelleren Wellen spricht der Überspannungsableiter später an !!!
+* Bei 20kV statt 200V -> V/100
+*b4 ion 0 v=TABLE(v(in),0,0,1U,0.005565M,10M,0.01M,100M,0.86M,1,2.17M,10,5.21M,100,9.56M)
+*b4 ion 0 v=TABLE(v(in),0,0,1U,{.5565M*fact},10M,{1M*fact},100M,{86M*fact},1,{217M*fact},10,{521M*fact},100,{956M*fact},1000,{1.5*fact},10000,{2*fact},100000,{2.5*fact},1e6,{3*fact}) tripdv={tripdv} tripdt={tdt}
+b4 ion 0 v=TABLE(v(in)*fact,0,0,1U,{.5565M},10M,{1M},100M,{86M},1,{217M},10,{521M},100,{956M},1000,{2},10000,{4},100000,{8},1e6,{16}) tripdv={tripdv} tripdt={tdt}
+E9 in 0 VALUE={abs(V(dvdt))} tripdv={tdv} tripdt={tdt}
+E8 dvdt 0 VALUE={100*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff
+E5 x 0 VALUE={V(1,2)} tripdv={tdv} tripdt={tdt}
+C4 x dif 1u
+R6 dif y 1e6
+E6 y 0 VALUE={-100e6*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff end
+.model DCLAMP D BV={varc}
+.ENDS
+
+* vthres of surge arrester is dependent of volt/us (see table b4)
+* set fact parameter to your needs
+* or change b4 TABLE directly according to data sheet 
+* you can set varc and isus to your needs
+.SUBCKT SPARK_380kV 1 2 params: vthres={380k*1.7} varc=10000 isus=200 rneg=-1 lpl=130n rpl=2.5k cpar=1p carc=3p 
++ trise=10u cthresh=10000p ron=0.1 roff=1e9 tfall=10u ioff=100m fact={100/vthres} 
+.param goff={1/roff} 
+.param gon={1/ron}
+.param rparsw=1e15 
+VDUM1 1 10 0
+LPL1 10 11 {lpl} rser=0
+RPL1 10 11 {rpl}
+CPAR1 1 2 {cpar}
+RLEAK1 1 2 {rparsw}
+RNEG1 11 17 {rneg}
+DTRK1 12 17 DCLAMP
+DSRK2 12 16 DCLAMP
+CARC1 1 16 {carc}
+* G-SWITCH
+G1 16 2 VALUE={v(16,2)*v(13)}  tripdv={tdv} tripdt={tdt}
+* Changed to SW switch
+*s1 16 2 13a 0 switch
+*a1 13 0 0 0 0 0 13a 0 or trise={trise} tfall={tfall}
+*.model switch SW (vt=0.9 vh=-0.4 ron=1e-3 roff=1e6) 
+R5 16 2 {rparsw} 
+* SWITCH END
+* Switch control input
+*BARC 15 0 v=if(ABS(V(1,2))>v(thresh),10,if(ABS(I(VDUM1))>{isus},10,{goff})) tripdv={tdv} tripdt={tdt}
+BARC 15 0 v=if((ABS(V(1,2))>v(thresh)),gon,if(((DDT(ABS(I(VDUM1)))>0 & ABS(I(VDUM1))>ioff) | (ABS(I(VDUM1))>({isus}))),gon,{goff}))  tripdv={tripdv} tripdt={tdt}
+RDEL 15 13 10
+CDEL 13 0 {cthresh}
+* Switch control input end 
+E3 thresh 0 VALUE={Vthres+(Vthres*v(ion))} tripdv={tdv} tripdt={tdt} 
+* Bei schnelleren Wellen spricht der Überspannungsableiter später an !!!
+* Bei 20kV statt 200V -> V/100
+*b4 ion 0 v=TABLE(v(in),0,0,1U,0.005565M,10M,0.01M,100M,0.86M,1,2.17M,10,5.21M,100,9.56M)
+*b4 ion 0 v=TABLE(v(in),0,0,1U,{.5565M*fact},10M,{1M*fact},100M,{86M*fact},1,{217M*fact},10,{521M*fact},100,{956M*fact},1000,{1.5*fact},10000,{2*fact},100000,{2.5*fact},1e6,{3*fact}) tripdv={tripdv} tripdt={tdt}
+b4 ion 0 v=TABLE(v(in)*fact,0,0,1U,{.5565M},10M,{1M},100M,{86M},1,{217M},10,{521M},100,{956M},1000,{2},10000,{4},100000,{8},1e6,{16}) tripdv={tripdv} tripdt={tdt}
+E9 in 0 VALUE={abs(V(dvdt))} tripdv={tdv} tripdt={tdt}
+E8 dvdt 0 VALUE={100*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff
+E5 x 0 VALUE={V(1,2)} tripdv={tdv} tripdt={tdt}
+C4 x dif 1u
+R6 dif y 1e6
+E6 y 0 VALUE={-100e6*v(dif)} tripdv={tdv} tripdt={tdt}
+* Diff end
+.model DCLAMP D BV={varc}
+.ENDS
+
+* Another model at the ltspice Yahoo group
+* Voltage dependent resistor (varistor)
+
+* External node designations
+* Node 1 -> A terminal
+* Node 2 -> B terminal
+* VBO is the turn-on threshold at
+* which the device conducts 1mA.
+*************************************************
+
+* if Vr smaller 0.71 1ma before VBO, exponent should be higher
+* if Vr higher 0.71 1ma after VBO, exponent should be smaller
+* if Vr=0.71 1ma at VBO
+.SUBCKT mov 1 2 ; base generic
++PARAMS: VBO=10 Vr=0.71 exp=20
+.param Vratio={VBO/Vr} 
+B1 1 2 I=if(V(1, 2)-0.5, (V(1, 2) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+B2 2 1 I=if(V(2, 1)-0.5, (V(2, 1) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT mov_400V 1 2 ;2xVN/1.73205
++PARAMS: VBO=461V Vr=1.2 exp=17
+.param Vratio={VBO/Vr} 
+B1 1 2 I=if(V(1, 2)-0.5, (V(1, 2) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+B2 2 1 I=if(V(2, 1)-0.5, (V(2, 1) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT mov_10kV 1 2 ;2xVN/1.73205
++PARAMS: VBO=12kV Vr=1.2 exp=17
+.param Vratio={VBO/Vr} 
+B1 1 2 I=if(V(1, 2)-0.5, (V(1, 2) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+B2 2 1 I=if(V(2, 1)-0.5, (V(2, 1) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT mov_20kV 1 2 ;2xVN/1.73205
++PARAMS: VBO=23kV Vr=1.2 exp=17
+.param Vratio={VBO/Vr} 
+B1 1 2 I=if(V(1, 2)-0.5, (V(1, 2) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+B2 2 1 I=if(V(2, 1)-0.5, (V(2, 1) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT mov_110kV 1 2 ;2xVN/1.73205
++PARAMS: VBO=127kV Vr=1.2 exp=17
+.param Vratio={VBO/Vr} 
+B1 1 2 I=if(V(1, 2)-0.5, (V(1, 2) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+B2 2 1 I=if(V(2, 1)-0.5, (V(2, 1) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT mov_120kV 1 2 ;2xVN/1.73205
++PARAMS: VBO=138kV Vr=1.2 exp=17
+.param Vratio={VBO/Vr} 
+B1 1 2 I=if(V(1, 2)-0.5, (V(1, 2) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+B2 2 1 I=if(V(2, 1)-0.5, (V(2, 1) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT mov_220kV 1 2 ;2xVN/1.73205
++PARAMS: VBO=254kV Vr=1.2 exp=17
+.param Vratio={VBO/Vr} 
+B1 1 2 I=if(V(1, 2)-0.5, (V(1, 2) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+B2 2 1 I=if(V(2, 1)-0.5, (V(2, 1) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT mov_230kV 1 2 ;2xVN/1.73205
++PARAMS: VBO=265kV Vr=1.2 exp=17
+.param Vratio={VBO/Vr} 
+B1 1 2 I=if(V(1, 2)-0.5, (V(1, 2) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+B2 2 1 I=if(V(2, 1)-0.5, (V(2, 1) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT mov_380kV 1 2 ;2xVN/1.73205
++PARAMS: VBO=439kV Vr=1.2 exp=17
+.param Vratio={VBO/Vr} 
+B1 1 2 I=if(V(1, 2)-0.5, (V(1, 2) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+B2 2 1 I=if(V(2, 1)-0.5, (V(2, 1) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT mov_400kV 1 2 ;2xVN/1.73205
++PARAMS: VBO=461kV Vr=1.2 exp=17
+.param Vratio={VBO/Vr} 
+B1 1 2 I=if(V(1, 2)-0.5, (V(1, 2) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+B2 2 1 I=if(V(2, 1)-0.5, (V(2, 1) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT mov_750kV 1 2 ;2xVN/1.73205
++PARAMS: VBO=866kV Vr=1.2 exp=17
+.param Vratio={VBO/Vr} 
+B1 1 2 I=if(V(1, 2)-0.5, (V(1, 2) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+B2 2 1 I=if(V(2, 1)-0.5, (V(2, 1) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT mov_1150kV 1 2 ;2xVN/1.73205
++PARAMS: VBO=1327kV Vr=1.2 exp=17
+.param Vratio={VBO/Vr} 
+B1 1 2 I=if(V(1, 2)-0.5, (V(1, 2) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+B2 2 1 I=if(V(2, 1)-0.5, (V(2, 1) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+.ENDS
+
+;$SpiceType=MCAPSPICE

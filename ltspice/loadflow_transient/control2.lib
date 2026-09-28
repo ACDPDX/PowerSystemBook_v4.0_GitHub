@@ -1,0 +1,1276 @@
+*****************************************************************
+* some code for the controllers is from Robert Heinemann
+*****************************************************************
+
+
+.SUBCKT softlimit in out params: lolimit=-5 uplimit=5 soft=0.2
+.func Uplim(x,y,z) if(y-x<z,y-z*exp((y-x-z)/z),x)
+.func Dnlim(x,y,z) if(x-y<z,y+z*exp((x-y-z)/z),x)
+.func Softlim(x,neg,pos,z) Uplim(Dnlim(x,neg,z),pos,z)
+ eout out 0 value={Softlim(v(in),lolimit,uplimit,soft)}
+.ENDS
+
+
+.SUBCKT Gain2 in out
++ Params: k=1
+Eout out 0 VALUE={k*v(in)} tripdv={tdv} tripdt={tdt}
+Rin in 0 1e12
+Rout out 0 1e12
+.ENDS
+
+.SUBCKT Laplace_1_s1 in out
++ params: ic=0
+Eout out 0 VALUE={v(idt1)}
+Gx1 0  idt1  value={v(in)}
+Cx1 idt1 0 1
+Rx1 idt1 0 1e10
+Rin in 0 1e12
+Rout out 0 1e12
+.ENDS
+
+.SUBCKT Laplace_1_s in out
++ params: ic=0
+Eout1 out1 0 in 0 LAPLACE={1/(s+1e-12)}
+Eout out 0 VALUE={v(out1)+ic} tripdv={tdv} tripdt={tdt}
+Rin in 0 1e12
+Rout out 0 1e12
+.ENDS
+
+.SUBCKT 1_z1 in out
++ params: Ts=0.02
+Eout out 0 VALUE={delay(v(in),Ts)} tripdv={tdv} tripdt={tdt}
+Rin in 0 1e12
+Rout out 0 1e12
+.ENDS
+
+.SUBCKT 1_z in out
++ params: Ts=1m
+T1 in 0 out 0 Z0=1 TD={Ts}
+Rin in 0 1e12
+Rout out 0 1e12
+.ENDS
+
+.SUBCKT S-TransferFunction6 in out
++ Params: a5=0 a4=0 a3=0 a2=0 a1=0 a0=0 b5=0 b4=0 b3=0 b2=0 b1=0 b0=0
++ ic1=0 ic2=0 ic3=0 ic4=0 ic5=0 ic6=0
+* a6=1 a6*s6+a5*s5+a4*s4+a3*s3+a2*s2+a1*s+a0 = b5*s5+b4*s4+b3*s3+b2*s2+b1*s+b0
+* Tf (Ys/us) = b/a
+* The highest s-order parameter a has to be 1 !!!!
+* If not divide all b and a parameters with it
+Ex1 x1 0 Value={SDT(v(x2),ic1)} tripdv={tdv} tripdt={tdt}
+Ex2 x2 0 Value={SDT(v(x3),ic2)} tripdv={tdv} tripdt={tdt}
+Ex3 x3 0 Value={SDT(v(x4),ic3)} tripdv={tdv} tripdt={tdt}
+Ex4 x4 0 Value={SDT(v(x5),ic4)} tripdv={tdv} tripdt={tdt}
+Ex5 x5 0 Value={SDT(v(x6),ic5)} tripdv={tdv} tripdt={tdt}
+Ex6 x6 0 Value={SDT(-a0*v(x1)-a1*v(x2)-a2*v(x3)-a3*v(x4)-a4*v(x5)-a5*v(x6)+v(in))} tripdv={tdv} tripdt={tdt}
+Eout out 0 Value={b0*v(x1)+b1*v(x2)+b2*v(x3)+b3*v(x4)+b4*v(x5)+b5*v(x6)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT S-TransferFunction5 in out
++ Params:  a4=0 a3=0 a2=0 a1=0 a0=0 b4=0 b3=0 b2=0 b1=0 b0=0
++ ic1=0 ic2=0 ic3=0 ic4=0 ic5=0
+* a5=1 a5*s5+a4*s4+a3*s3+a2*s2+a1*s+a0 = b4*s4+b3*s3+b2*s2+b1*s+b0
+* Tf (Ys/us) = b/a
+* The highest s-order parameter a has to be 1 !!!!
+* If not divide all b and a parameters with it
+Ex1 x1 0 Value={SDT(v(x2),ic1)} tripdv={tdv} tripdt={tdt}
+Ex2 x2 0 Value={SDT(v(x3),ic2)} tripdv={tdv} tripdt={tdt}
+Ex3 x3 0 Value={SDT(v(x4),ic3)} tripdv={tdv} tripdt={tdt}
+Ex4 x4 0 Value={SDT(v(x5),ic4)} tripdv={tdv} tripdt={tdt}
+Ex5 x5 0 Value={SDT(-a0*v(x1)-a1*v(x2)-a2*v(x3)-a3*v(x4)-a4*v(x5)+v(in))} tripdv={tdv} tripdt={tdt}
+Eout out 0 Value={b0*v(x1)+b1*v(x2)+b2*v(x3)+b3*v(x4)+b4*v(x5)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT S-TransferFunction4 in out
++ Params:  a3=0 a2=0 a1=0 a0=0 b3=0 b2=0 b1=0 b0=0
++ ic1=0 ic2=0 ic3=0 ic4=0
+* a4=1 a4*s4+a3*s3+a2*s2+a1*s+a0 = b3*s3+b2*s2+b1*s+b0
+* Tf (Ys/us) = b/a
+* The highest s-order parameter a has to be 1 !!!!
+* If not divide all b and a parameters with it
+Ex1 x1 0 Value={SDT(v(x2),ic1)} tripdv={tdv} tripdt={tdt}
+Ex2 x2 0 Value={SDT(v(x3),ic2)} tripdv={tdv} tripdt={tdt}
+Ex3 x3 0 Value={SDT(v(x4),ic3)} tripdv={tdv} tripdt={tdt}
+Ex4 x4 0 Value={SDT(-a0*v(x1)-a1*v(x2)-a2*v(x3)-a3*v(x4)+v(in))} tripdv={tdv} tripdt={tdt}
+Eout out 0 Value={b0*v(x1)+b1*v(x2)+b2*v(x3)+b3*v(x4)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT S-TransferFunction3 in out
++ Params: a3=1 a2=0 a1=0 a0=0 b2=0 b1=0 b0=0
++ ic1=0 ic2=0 ic3=0
+* a3=1 a3*s3+a2*s2+a1*s+a0 = b2*s2+b1*s+b0
+* Tf (Ys/us) = b/a
+* The highest s-order parameter a has to be 1 !!!!
+* If not divide all b and a parameters with it
+Ex1 x1 0 Value={SDT(v(x2),ic1)} tripdv={tdv} tripdt={tdt}
+Ex2 x2 0 Value={SDT(v(x3),ic2)} tripdv={tdv} tripdt={tdt}
+Ex3 x3 0 Value={SDT(-a0*v(x1)-a1*v(x2)-a2*v(x3)+v(in))} tripdv={tdv} tripdt={tdt}
+Eout out 0 Value={b0*v(x1)+b1*v(x2)+b2*v(x3)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT S-TransferFunction2 in out
++ Params:  a1=0 a0=0 b1=0 b0=0
++ ic1=0 ic2=0
+* a2=1 a2*s2+a1*s+a0 = b1*s+b0
+* Tf (Ys/us) = b/a
+* The highest s-order parameter a has to be 1 !!!!
+* If not divide all b and a parameters with it
+Ex1 x1 0 Value={SDT(v(x2),ic1)} tripdv={tdv} tripdt={tdt}
+Ex2 x2 0 Value={SDT(-a0*v(x1)-a1*v(x2)+v(in))} tripdv={tdv} tripdt={tdt}
+Eout out 0 Value={b0*v(x1)+b1*v(x2)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT S-TransferFunction1 in out
++ Params:   a0=0 b0=0
++ ic1=0
+* a1=1 a1*s+a0 = b0
+* Tf (Ys/us) = b/a
+* The highest s-order parameter a has to be 1 !!!!
+* If not divide all b and a parameters with it
+Ex1 x1 0 Value={SDT(-a0*v(x1)+v(in))} tripdv={tdv} tripdt={tdt}
+Eout out 0 Value={b0*v(x1)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT Z-Transferfunction6 in out
+* Ts=sampling time
+* a6=1 fix
++ Params: a0=0 a1=0 a2=0 a3=0 a4=0 a5=0 b0=1 b1=0 b2=0 b3=0 b4=0 b5=0 Ts=1
+E1_SUM 2 0 Value={1*v(in)-A0*v(5)-A1*v(4)-A2*v(3)-A3*v(4)-A4*v(5)-A5*v(6)} tripdv={tdv} tripdt={tdt}
+E2_SUM out 0 Value={B0*v(5)+B1*v(4)+B2*v(3)+B3*v(4)+B4*v(5)+B5*v(6)} tripdv={tdv} tripdt={tdt}
+T1 2 0 3 0 Z0=1 TD={Ts}
+T2 3 0 4 0 Z0=1 TD={Ts}
+T3 4 0 5 0 Z0=1 TD={Ts}
+T4 5 0 6 0 Z0=1 TD={Ts}
+T5 6 0 7 0 Z0=1 TD={Ts}
+T6 7 0 8 0 Z0=1 TD={Ts}
+R0 8 0 1
+R3 1 0 100Meg
+R2 out 0 100Meg
+.ENDS
+
+.SUBCKT Z-Transferfunction5 in out
+* Ts=sampling time
+* a5=1 fix
++ Params: a0=0 a1=0 a2=0 a3=0 a4=0 b0=1 b1=0 b2=0 b3=0 b4=0 Ts=1
+E1_SUM 2 0 Value={1*v(in)-A0*v(5)-A1*v(4)-A2*v(3)-A3*v(4)-A4*v(5)} tripdv={tdv} tripdt={tdt}
+E2_SUM out 0 Value={B0*v(5)+B1*v(4)+B2*v(3)+B3*v(4)+B4*v(5)} tripdv={tdv} tripdt={tdt}
+T1 2 0 3 0 Z0=1 TD={Ts}
+T2 3 0 4 0 Z0=1 TD={Ts}
+T3 4 0 5 0 Z0=1 TD={Ts}
+T4 5 0 6 0 Z0=1 TD={Ts}
+T5 6 0 7 0 Z0=1 TD={Ts}
+R0 7 0 1
+R3 1 0 100Meg
+R2 out 0 100Meg
+.ENDS
+
+.SUBCKT Z-Transferfunction4 in out
+* Ts=sampling time
+* a4=1 fix
++ Params: a0=0 a1=0 a2=0 a3=0 b0=1 b1=0 b2=0 b3=0 Ts=1
+E1_SUM 2 0 Value={1*v(in)-A0*v(5)-A1*v(4)-A2*v(3)-A3*v(4)} tripdv={tdv} tripdt={tdt}
+E2_SUM out 0 Value={B0*v(5)+B1*v(4)+B2*v(3)+B3*v(4)} tripdv={tdv} tripdt={tdt}
+T1 2 0 3 0 Z0=1 TD={Ts}
+T2 3 0 4 0 Z0=1 TD={Ts}
+T3 4 0 5 0 Z0=1 TD={Ts}
+T4 5 0 6 0 Z0=1 TD={Ts}
+R0 6 0 1
+R3 1 0 100Meg
+R2 out 0 100Meg
+.ENDS
+
+.SUBCKT Z-Transferfunction3 in out
+* Ts=sampling time
+* a3=1 fix
++ Params: a0=0 a1=0 a2=0 b0=1 b1=0 b2=0 Ts=1
+E1_SUM 2 0 Value={1*v(in)-A0*v(5)-A1*v(4)-A2*v(3)} tripdv={tdv} tripdt={tdt}
+E2_SUM out 0 Value={B0*v(5)+B1*v(4)+B2*v(3)} tripdv={tdv} tripdt={tdt}
+T1 2 0 3 0 Z0=1 TD={Ts}
+T2 3 0 4 0 Z0=1 TD={Ts}
+T3 4 0 5 0 Z0=1 TD={Ts}
+R0 5 0 1
+R3 1 0 100Meg
+R2 out 0 100Meg
+.ENDS
+
+.SUBCKT Z-Transferfunction2 in out
+* Ts=sampling time
+* a2=1 fix
++ Params: a0=0 a1=0 b0=1 b1=0 Ts=1
+E1_SUM 2 0 Value={1*v(in)-A0*v(5)-A1*v(4)} tripdv={tdv} tripdt={tdt}
+E2_SUM out 0 Value={B0*v(5)+B1*v(4)} tripdv={tdv} tripdt={tdt}
+T1 2 0 3 0 Z0=1 TD={Ts}
+T2 3 0 4 0 Z0=1 TD={Ts}
+R0 4 0 1
+R3 1 0 100Meg
+R2 out 0 100Meg
+.ENDS
+
+
+.SUBCKT Z-Transferfunction1 in out
+* Ts=sampling time
+* a1=1 fix
++ Params: a0=0 b0=1 Ts=1
+E1_SUM 2 0 Value={1*v(in)-A0*v(5)} tripdv={tdv} tripdt={tdt}
+E2_SUM out 0 Value={B0*v(5)} tripdv={tdv} tripdt={tdt}
+T1 2 0 3 0 Z0=1 TD={Ts}
+R0 3 0 1
+R3 1 0 100Meg
+R2 out 0 100Meg
+.ENDS
+
+**************************************************
+* Proportional/integral controller with
+* new switch off integration if y limit reached
+**************************************************
+* init: if V(w,x)=0 init should be the starting value
+* new switch off integration if y limit reached
+*$
+* Tn=kp/ki
+.SUBCKT PI_limit x w y enable
++PARAMS: Kp=1 Tn=1 Min=-15G Max=15G ic=0 init=0
+Rx x 0 1e12
+Rw w 0 1e12
+Renable enable 0 1e12
+R_R2        0 y  1k
+Ey   y    0  VALUE={init*(1-v(enable))+v(enable)*LIMIT((v(a)+V(w,x)*Kp),min,max)} tripdv={tdv} tripdt={tdt}
+Eq   a    0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={V(x1)*((V(x1)>0&V(y)<max)|((V(x1)<0)&V(y)>min))} tripdv=1 tripdt=1
+C1x idt1 0 1 IC={ic}
+R1x idt1 0 1e10
+Ex   x1    0  VALUE={v(enable)*(V(w,x)*Kp*1/Tn)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* Tn=kp/ki
+.SUBCKT PI_limit_awu x w y enable
++PARAMS: Kp=1 Tn=1 Kaw=1 Min=-15G Max=15G ic=0 init=0
+Rx x 0 1e12
+Rw w 0 1e12
+Eint int 0 VALUE={V(w,x)*Kp+V(int1)} tripdv={tdv} tripdt={tdt}
+Elim y  0  VALUE={init*(1-v(enable))+v(enable)*LIMIT(V(int),min,max)} tripdv={tdv} tripdt={tdt}
+Eawu  awu 0 VALUE={kaw*v(int,y)} tripdv={tdv} tripdt={tdt}
+Gint       	0 int1 VALUE={v(enable)*(V(w)-V(x)-V(awu))*Kp * 1/Tn} tripdv={tdv} tripdt={tdt}
+Cint       	int1 0 1 IC={IC}
+Rint       	int1 0 1G
+.ENDS
+
+* Tn=kp/ki
+.SUBCKT PI_limit_kp_ki x w y enable
++PARAMS: Kp=1 Ki=1 Min=-15G Max=15G ic=0 init=0
+Rx x 0 1e12
+Rw w 0 1e12
+Renable enable 0 1e12
+R_R2        0 y  1k
+Ey   y    0  VALUE={init*(1-v(enable))+v(enable)*LIMIT((v(a)+V(w,x)*Kp),min,max)} tripdv={tdv} tripdt={tdt}
+Eq   a    0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={V(x1)*((V(x1)>0&V(y)<max)|((V(x1)<0)&V(y)>min))} tripdv=1 tripdt=1
+C1x idt1 0 1 IC={ic}
+R1x idt1 0 1e10
+Ex   x1    0  VALUE={v(enable)*(V(w,x)*Ki)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* Tn=kp/ki
+.SUBCKT PI_limit_awu_kp_ki x w y enable
++PARAMS: Kp=1 Ki=1 Kaw=1 Min=-15G Max=15G ic=0 init=0
+Rx x 0 1e12
+Rw w 0 1e12
+Eint int 0 VALUE={V(w,x)*Kp+V(int1)} tripdv={tdv} tripdt={tdt}
+Elim y  0  VALUE={init*(1-v(enable))+v(enable)*LIMIT(V(int),min,max)} tripdv={tdv} tripdt={tdt}
+Eawu  awu 0 VALUE={kaw*v(int,y)} tripdv={tdv} tripdt={tdt}
+Gint       	0 int1 VALUE={v(enable)*(V(w)-V(x)-V(awu))*Ki} tripdv={tdv} tripdt={tdt}
+Cint       	int1 0 1 IC={IC}
+Rint       	int1 0 1G
+.ENDS
+
+.SUBCKT I_limit_awu x w y enable
++PARAMS: Ki=100 Kaw=1 Min=-15G Max=15G ic=0 init=0
+Rx x 0 1e12
+Rw w 0 1e12
+*Eint int 0 VALUE={V(w,x)*Kp+V(int1)} tripdv={tdv} tripdt={tdt}
+Elim y  0  VALUE={init*(1-v(enable))+v(enable)*LIMIT(V(int1),min,max)} tripdv={tdv} tripdt={tdt}
+Eawu  awu 0 VALUE={kaw*v(int1,y)} tripdv={tdv} tripdt={tdt}
+Gint       	0 int1 VALUE={v(enable)*(V(w)-V(x)-V(awu))*Ki} tripdv={tdv} tripdt={tdt}
+Cint       	int1 0 1 IC={IC}
+Rint       	int1 0 1G
+.ENDS
+
+
+* Tn=kp/ki
+.SUBCKT PI_ctrl_limit x w y Kp Tn LimUp LimLo enable
++PARAMS: IC=0 init=0
+Rx x 0 1e12
+Rw w 0 1e12
+Renable enable 0 1e12
+Rkp kp 0 1e12
+RTn tn 0 1e12
+Rlimup limup 0 1e12
+Rlimlo limlo 0 1e12
+R_R2 0    y  1k
+Ey   y    0  VALUE={init*(1-v(enable))+v(enable)*LIMIT((v(a)+V(w,x)*v(Kp)),v(limlo),v(limup))} tripdv={tdv} tripdt={tdt}
+Eq   a    0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={V(x1)*((V(x1)>0&V(y)<v(limup))|((V(x1)<0)&V(y)>v(limlo)))} tripdv=1 tripdt=1
+C1x idt1 0  1 IC={ic}
+R1x idt1 0 1e10
+Ex   x1    0  VALUE={v(enable)*(V(w,x)*v(Kp)*1/v(Tn))} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+* Tn=kp/ki
+.SUBCKT PI x w y enable
++PARAMS: Kp=1 Tn=1 Min=-15G Max=15G ic=0 init=0
+Rx x 0 1e12
+Rw w 0 1e12
+Renable enable 0 1e12
+R_R2        0 y  1e3
+E_y	        y 0 VALUE={init*(1-v(enable))+v(enable)*LIMIT(V(w,x)*Kp+V(int),Min,Max)} tripdv={tdv} tripdt={tdt}
+Gint       	0 int VALUE={v(enable)*V(w,x)*Kp * 1/Tn} tripdv={tdv} tripdt={tdt}
+Cint       	int 0 1 IC={IC}
+Rint       	int 0 1G
+.ENDS
+*$
+* Proportional/integral controller with controlling node
+* init: if V(w,x)=0 init should be the starting value
+* Tn=kp/ki
+.SUBCKT PI_ctrl x w y Kp Tn LimUp LimLo enable
++PARAMS: IC=0 init=0
+Rx x 0 1e12
+Rw w 0 1e12
+Renable enable 0 1e12
+Rkp kp 0 1e12
+RTn tn 0 1e12
+Rlimup limup 0 1e12
+Rlimlo limlo 0 1e12
+R_R2         	0 y  1k
+E_y	        y 0 VALUE={init*(1-v(enable))+v(enable)*LIMIT(V(w,x)*v(Kp)+V(int),v(LimLo),v(LimUp))} tripdv={tdv} tripdt={tdt}
+Gint       	0 int VALUE={v(enable)*V(w,x)*V(Kp) * 1/V(Tn)}  tripdv={tdv} tripdt={tdt}
+Cint       	int 0 1 IC={IC}
+Rint       	int 0 1G
+.ENDS
+*$
+* PT1 Strecke
+.SUBCKT PT1 x  y
++PARAMS: Kp=1 T1=1
+Rx y 0 1e12
+Ry x 0 1e12
+E1	y	0  Value={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={(Kp*v(x)-v(y))/T1} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+.ENDS
+*$
+* PT2 Strecke
+.SUBCKT PT2 x y
++PARAMS: Kp=1 T=1 D=0.5
+.param omega0={1/T}
+Rx y 0 1e12
+Ry x 0 1e12
+E1	a	0 	Value={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={omega0*omega0*(Kp*v(x)-v(y))} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+E2	y	0	Value={v(idt2)} tripdv={tdv} tripdt={tdt}
+G1y 0 idt2 VALUE={v(a)-2*D*omega0*v(y)} tripdv=1 tripdt=1
+C1y idt2 0 1
+R1y idt2 0 1e10
+.ENDS
+*$
+* DT1 Strecke
+.SUBCKT DT1 x y
++PARAMS: Kd=1 T1=1
+Rx x 0 1e12
+Ry y 0 1e12
+E1	y	0 	Value={Kd*DDT(v(x))-T1*DDT(v(y))} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+* IT1 Strecke
+.SUBCKT IT1 x y
++PARAMS: Ki=1 T1=1
+Rx x 0 1e12
+Ry y 0 1e12
+E1	y	0 	Value={v(idt1)-T1*DDT(v(y))} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={Ki*v(x)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+.ENDS
+*$
+* P Strecke
+.SUBCKT P x y
++PARAMS: Kp=1
+Rx x 0 1e12
+Ry y 0 1e12
+Eout 	y 	0 	VALUE {V(x)*Kp} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+* I Strecke
+.SUBCKT I x y
++PARAMS: Ki=1
+Rx x 0 1e12
+Ry y 0 1e12
+Eout   y  0 VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={V(x)/Ki} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+.ENDS
+*$
+* Time delay Strecke
+.SUBCKT TD in out
++PARAMS: Kp=1 TD=100m
+Rx in 0 1e12
+Ry out 0 1e12
+T1      1 	0 	out 0 	Z0=50 TD={TD}
+E1      1 	0 	VALUE {V(in)*Kp} tripdv={tdv} tripdt={tdt}
+R1      out 0  	50
+.ENDS
+*$
+.SUBCKT P_Regulator x w y enable
++PARAMS: Kp=1 Min=-15G Max=15G init=0
+Rx x 0 1e12
+Ry y 0 1e12
+Rw w 0 1e12
+Renable enable 0 1e12
+E1       	y 0 VALUE {LIMIT(Kp*V(w,x),Min,Max)} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+* new switch off integration if y limit reached
+.SUBCKT I_Regulator x w y enable
++PARAMS: Ki=1 Min=-15G Max=15G init=0
+Rx x 0 1e12
+Ry y 0 1e12
+Rw w 0 1e12
+Renable enable 0 1e12
+* controller ******************************************************************
+Ey   y    0  VALUE {init*(1-v(enable))+v(enable)*v(a)} tripdv={tdv} tripdt={tdt}
+Eq   a    0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={V(x1)*((V(x1)>0&V(y)<max)|((V(x1)<0)&V(y)>min))} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Ex   x1    0  VALUE={v(enable)*v(w,x)*Ki} tripdv={tdv} tripdt={tdt}
+*******************************************************************************
+.ENDS
+*$
+*** From file C:\MC12\LIBRARY\VO_Integral_Controller_with_limits.mac
+.SUBCKT I_Regulator2  x w y enable
++PARAMS: KI=1000 INIT=0 MIN=-2G MAX=2G
+X2 1 0 out VO_INTEGRATOR_WITH_LIMITS
++PARAMS: R1=1k R2=1e15 R3=1k C2=1000n C3=40P MAX={max} MIN={min} IC=0
+E1 1 0 VALUE = {-(v(W)-v(X))*ki/1k*v(ENABLE)} tripdv={tdv} tripdt={tdt}
+E2 y 0 VALUE = {init*(1-v(ENABLE))+v(ENABLE)*(v(OUT))} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+*
+*** From file C:\MC12\LIBRARY\VO_Integrator_with_Limits.mac
+.SUBCKT VO_INTEGRATOR_WITH_LIMITS  in- in+ out
++PARAMS: R1=1K R2=1E15 R3=1K C2=1000N C3=40P MAX=10 MIN=-10 IC=0
+R1 in- P2 {R1}
+R3 in+ 0 {R3}
+R2 P2 out {R2}
+RISOL out 0 100Meg
+C2 P2 out {C2}
+RIN P2 in+ 100Meg
+G2 P3 0 VALUE = {20000000uA*TANH((V(in+)-V(P2))/52mV)} tripdv={tdv} tripdt={tdt}
+R4 P3 0 260k
+E5 out 0 VALUE =
++ {(max+min)/2+(max-min)/2*tanh((-1000*v(P3)-(max+min)/2)/((max-min)/2))} tripdv={tdv} tripdt={tdt}
+C3 P3 out {C3}
+.ENDS VO_INTEGRATOR_WITH_LIMITS
+*$
+.SUBCKT PD_Regulator x w y enable
++PARAMS: Tv=1 Kp=1 Tn=0.1 Min=-15G Max=15G init=0
+Rx x 0 1e12
+Ry y 0 1e12
+Rw w 0 1e12
+Renable enable 0 1e12
+R_R2        0 y  1k
+Ey   y    0  VALUE {init*(1-v(enable))+v(enable)*LIMIT((Kp*v(w,x)+v(b)),min,max)} tripdv={tdv} tripdt={tdt}
+Eb   b     0  VALUE={kp*Tv*DDT(v(w,x))}
+.ENDS
+*$
+.SUBCKT PD_T1_Regulator_old x w y enable
++PARAMS: Tv=1 Kp=1 T1=0.1 Min=-15G Max=15G init=0
+Rx x 0 1e12
+Ry y 0 1e12
+Rw w 0 1e12
+Renable enable 0 1e12
+E1      a 	0	VALUE={v(enable)*v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={(v(w,x)*Kp-v(y))/T1} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Ey		y	0	Value={init*(1-v(enable))+v(enable)*limit(Kp*Tv/T1*v(w,x)+v(a),Min,Max)} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+* new switch off integration if y limit reached
+.SUBCKT PD_T1_Regulator x w y enable
++PARAMS: Tv=1 Kp=1 T1=0.1 Min=-15G Max=15G init=0
+Rx x 0 1e12
+Ry y 0 1e12
+Rw w 0 1e12
+Renable enable 0 1e12
+R_R2        0 y  1k
+Ey   y    0  VALUE {init*(1-v(enable))+v(enable)*LIMIT((Kp*Tv/T1*v(w,x)+v(a)),min,max)} tripdv={tdv} tripdt={tdt}
+Eq   a    0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={V(x1)*((V(x1)>0&V(y)<max)|((V(x1)<0)&V(y)>min))} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Ex   x1    0  VALUE={v(enable)*((v(w,x)*Kp-v(y))/T1)} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+* new switch off integration if y limit reached
+.SUBCKT PID_Regulator x w y enable
++PARAMS: Tv=1 Kp=1 Tn=0.1 Min=-15G Max=15G init=0
+Rx x 0 1e12
+Ry y 0 1e12
+Rw w 0 1e12
+Renable enable 0 1e12
+R_R2        0 y  1k
+Ey   y    0  VALUE {init*(1-v(enable))+v(enable)*LIMIT((Kp*v(w,x)+v(a)+v(b)),min,max)} tripdv={tdv} tripdt={tdt}
+Eq   a    0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={V(x1)*((V(x1)>0&V(y)<max)|((V(x1)<0)&V(y)>min))} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Ex   x1    0  VALUE={v(enable)*(v(w,x)*kp/Tn)} tripdv={tdv} tripdt={tdt}
+Eb   b     0  VALUE={kp*Tv*Limit(DDT(v(w,x)),min,max)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* Tn=kp/ki Kd=Kp*Tv
+.SUBCKT PID_Regulator_kp_ki_kd x w y enable
++PARAMS: Tv=1 Kp=1 Tn=0.1 Min=-15G Max=15G init=0
+Rx x 0 1e12
+Ry y 0 1e12
+Rw w 0 1e12
+Renable enable 0 1e12
+R_R2        0 y  1k
+Ey   y    0  VALUE {init*(1-v(enable))+v(enable)*LIMIT((Kp*v(w,x)+v(a)+v(b)),min,max)} tripdv={tdv} tripdt={tdt}
+Eq   a    0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={V(x1)*((V(x1)>0&V(y)<max)|((V(x1)<0)&V(y)>min))} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Ex   x1    0  VALUE={v(enable)*(v(w,x)*ki)} tripdv={tdv} tripdt={tdt}
+Eb   b     0  VALUE={kd*Limit(DDT(v(w,x)),min,max)} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+.SUBCKT PID_T1_Regulator_old x w y enable
++PARAMS: Tv=1 Tn=1 Kp=1 T1=0.1 Min=-15g Max=15g init=0
+Rx x 0 1e12
+Ry y 0 1e12
+Rw w 0 1e12
+Renable enable 0 1e12
+Ey	y	0	Value={init*(1-v(enable))+v(enable)*LIMIT(v(b)+Kp*(T1+Tv)/T1*v(w,x),Min,Max)} tripdv={tdv} tripdt={tdt}
+E1	a   0	Value={v(enable)*v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={Kp/Tn/T1*v(w,x)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+E2	b	0	Value={v(enable)*v(idt2)} tripdv={tdv} tripdt={tdt}
+G1y 0 idt2 VALUE={Kp*(T1+Tn)/Tn/T1*v(w,x)+v(a)-1/T1*v(y)} tripdv=1 tripdt=1
+C1y idt2 0 1
+R1y idt2 0 1e10
+.ENDS
+*$
+* new switch off integration if y limit reached
+.SUBCKT PID_T1_Regulator x w y enable
++PARAMS: Tv=1 Tn=1 Kp=1 T1=0.1 Min=-15g Max=15g init=0
+Rx x 0 1e12
+Ry y 0 1e12
+Rw w 0 1e12
+Renable enable 0 1e12
+R_R2        0 y  1k
+Ey   y    0  VALUE {init*(1-v(enable))+v(enable)*LIMIT((v(b)+Kp*(T1+Tv)/T1*v(w,x)),min,max)} tripdv={tdv} tripdt={tdt}
+Eq   a    0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={V(x1)*((V(x1)>0&V(y)<max)|((V(x1)<0)&V(y)>min))} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Eb   b    0  VALUE={v(idt2)} tripdv={tdv} tripdt={tdt}
+G1y 0 idt2 VALUE={V(x2)*((V(x2)>0&V(y)<max)|((V(x2)<0)&V(y)>min))} tripdv=1 tripdt=1
+C1y idt2 0 1
+R1y idt2 0 1e10
+Ex   x1    0  VALUE={v(enable)*(Kp/Tn/T1*v(w,x))} tripdv={tdv} tripdt={tdt}
+Ex2  x2    0  VALUE={v(enable)*(Kp*(T1+Tn)/Tn/T1*v(w,x)+v(a)-1/T1*v(y))} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+.SUBCKT IDT in out
++ params: ic=0 inadd=0 inmult=1 outadd=0 outmult=1
+Rin in 0 1e12
+Rout out 0 1e12
+Eidt out 0 VALUE={outadd+outmult*v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(in)*inmult+inadd} tripdv=1 tripdt=1
+C1x idt1 0 1 IC={ic}
+R1x idt1 0 1e10
+.ENDS
+*$
+.SUBCKT DDT in out inadd=0 inmult=1 outadd=0 outmult=1
+Rin in 0 1e12
+Gddt 0 out VALUE={outadd+outmult*DDT(v(in)*inmult+inadd)} tripdv={tdv} tripdt={tdt}
+Rddt out 0 1
+.ENDS
+*$
+.subckt SDTX in out params: ic=0
+G1 0 out VALUE={v(in)} tripdv={tdv} tripdt={tdt}
+R1 out 0 1e9
+C1 out 0 1 ic={ic}
+.ends
+*$
+.subckt DDTX in out params: ic=0
+G1 0 out VALUE={v(in)} tripdv={tdv} tripdt={tdt}
+R1 out 0 1e9
+L1 out 0 1 ic={ic} rser=0
+.ends
+*$
+.SUBCKT SDT in out
++ params: ic=0 inadd=0 inmult=1 outadd=0 outmult=1
+Rin in 0 1e12
+Rout out 0 1e12
+Ein in1 0 VALUE={v(in)*inmult+inadd} tripdv={tdv} tripdt={tdt}
+Xsdt in1 out1 SDTX params: ic={ic}
+Esdt out 0 VALUE={outadd+outmult*v(out1)} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+.subckt SDT_limit in out
++PARAMS: min=-1e10 max=1e10 Ci=1 rmax=1e9 ic=0
+G1 0 out VALUE={if(time>0,V(in)*Ci*(((V(in)>0 & V(out)<max))|((V(in)<0)&(V(out)>min))),0)} tripdv={tdv} tripdt={tdt}
+R1 out 0 {rmax}
+C1 out 0 {Ci} ic={ic}
+.ends
+*$
+.subckt SDT_limit_reset in out reset
++PARAMS: min=-1e10 max=1e10 Ci=1 ron=1e-6 roff=1e6
+G1 0 out VALUE={if(time>0,V(in)*Ci*(((V(in)>0 & V(out)<max))|((V(in)<0)&(V(out)>min))),0)} tripdv={tdv} tripdt={tdt}
+S1 out 0 reset 0 SW1
+C1 out 0 {Ci} ic={ic}
+.model SW1 VSWITCH (Ron={Ron} Roff={Roff} Von=0.9 Voff=0.1)
+.ends
+*$
+
+.SUBCKT AVG  in out params: 
+** AVG only works with "UIC" = disable operating point simulation at start
+e1 out 0 value={V(VIDT0)/TIME} tripdv={tdv} tripdt={tdt}
+cidt0 vidt0 0 1
+gidt0 0 vidt0 value={V(IN)}
+ridt0 0 vidt0 1e10
+* To prevent floating nodes
+Rout out 0 1e12
+.ENDS AVG
+
+
+.subckt AVGM  in out params: fc=3 b0=1 b1=3
+C1 1 0 {.5/pi/fc}
+C2 out 0 {.5/pi/fc}
+G1 0 1 VALUE = {(v(IN)-v(OUT))*{b0/b1}} tripdv=1 tripdt=1
+G2 out 0 1 out {-b1}
+* To prevent floating nodes
+Rout out 0 1e12
+R1 1 0 1e12
+.ends
+
+*$
+.subckt AVGM2 1 8 params:td=1ms f1=0.1429
+E1 2  0 VALUE={delay(v(1),td)}
+E2 3  0 VALUE={delay(v(2),td)}
+E3 4  0 VALUE={delay(v(3),td)}
+E4 5  0 VALUE={delay(v(4),td)}
+E5 6  0 VALUE={delay(v(5),td)}
+E6 7  0 VALUE={delay(v(6),td)}
+*
+Eout 8 0 VALUE={v(1)*f1+v(2)*f1+v(3)*f1+v(4)*f1+v(5)*f1+v(6)*f1+v(7)*f1} tripdv=1 tripdt=1
+R0 7 0 1
+R1 1 0 100e6
+R2 8 0 100e6
+.ends
+*$
+.subckt AVGM3 1 8 params:td=1ms f1=0.1429
+T1 1 0  2 0 Z0=1 TD={td}
+T2 2 0  3 0 Z0=1 TD={td}
+T3 3 0  4 0 Z0=1 TD={td}
+T4 4 0  5 0 Z0=1 TD={td}
+T5 5 0  6 0 Z0=1 TD={td}
+T6 6 0  7 0 Z0=1 TD={td}
+*
+Eout 8 0 VALUE={v(1)*f1+v(2)*f1+v(3)*f1+v(4)*f1+v(5)*f1+v(6)*f1+v(7)*f1} tripdv=1 tripdt=1
+R0 7 0 1
+R1 1 0 100e6
+R2 8 0 100e6
+.ends
+*$
+* very simple automatic voltage regulator for the synchronous generator model with enable input
+.SUBCKT AVR L1 L2 L3 w y enable enable2
++PARAMS: Kp=0.01 Tn=0.1 Min=200 Max=1800 verr0=600
+* Measurement with MINMAX
+Rl1 l1 0 1e12
+Rl2 l2 0 1e12
+Rl3 l3 0 1e12
+Rw w 0 1e12
+Ry y 0 1e12
+Renable enable 0 1e12
+Renable2 enable2 0 1e12
+Ep out_p1 0 VALUE={v(enable2)*MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={v(enable2)*MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700µ
+R2 out_p out_n 28.55
+Eout x 0 VALUE={abs(v(out_p,out_n))} tripdv={tdv} tripdt={tdt}
+* ReglerVALUE={}  tripdv={tdv} tripdt={tdt}
+R_R2        0 y  1k
+E_y	        y 0 VALUE={verr0*(1-v(enable))+v(enable)*LIMIT(V(w,x)*Kp+V(int)+verr0,Min,Max)} tripdv={tdv} tripdt={tdt}
+* Integrator
+Gint       	0 int VALUE={v(enable)*V(w,x)*Kp * 1/Tn} tripdv={tdv} tripdt={tdt}
+Cint       	int 0 1 IC=0
+Rint       	int 0 1G
+.ENDS
+*$
+* very simple automatic voltage regulator for the synchronous generator model
+* with diodes bridge
+.SUBCKT AVR1 L1 L2 L3 w y enable enable2
+* x w y
++PARAMS: Kp=0.01 Tn=0.1 Min=200 Max=1800 verr0=600 U1Nenn=110k
+* Measurement with B6
+.param ue={400/U1Nenn}
+Rl1 l1 0 1e12
+Rl2 l2 0 1e12
+Rl3 l3 0 1e12
+Rw w 0 1e12
+Ry y 0 1e12
+Renable enable 0 1e12
+Renable2 enable2 0 1e12
+E11 R1 0  VALUE={v(enable2)*V(L1)*ue} tripdv={tdv} tripdt={tdt}
+E12 S1 0 VALUE={v(enable2)*V(L2)*ue} tripdv={tdv} tripdt={tdt}
+E13 T1 0 VALUE={v(enable2)*V(L3)*ue} tripdv={tdv} tripdt={tdt}
+D1 rd posd diode_std
+D2 sd posd diode_std
+D3 td posd diode_std
+D4 out_n rd diode_std
+D5 out_n sd diode_std
+D6 out_n td diode_std
+C1 out_p out_n 4700µ
+R3 R1 rd 0.2
+R4 S1 sd 0.2
+R5 T1 td 0.2
+R1 out_p out_n 16
+R2 posd out_p 10
+Eout x 0 VALUE={abs(v(out_p,out_n))/(ue*0.8165)} tripdv={tdv} tripdt={tdt}
+.model diode_std D
+* Regler
+R_R2        0 y  1k
+E_y	        y 0 VALUE={verr0*(1-v(enable))+v(enable)*LIMIT(V(w,x)*Kp+V(int)+verr0,Min,Max)} tripdv={tdv} tripdt={tdt}
+* Integrator
+Gint       	0 int VALUE={v(enable)*V(w,x)*Kp * 1/Tn} tripdv={tdv} tripdt={tdt}
+Cint       	int 0 1 IC=0
+Rint       	int 0 1G
+.ENDS
+*$
+
+.subckt static n1 f0 s0 m1 params:fn=50 p=2 pmin=0 pmax=400e6 
+.param omegamech={2*pi*fn/p}
+Esys fsys 0 value={v(n1)*p/60} tripdv=1 tripdt=1
+Ep p 0 value={pmin+LIMIT((v(f0)-v(fsys))*v(s0),0,pmax-pmin)} tripdv=1 tripdt=1
+Em m1 0 value={v(p)/omegamech} tripdv=1 tripdt=1
+.ends
+
+.subckt RMS1a in out params: fc=100 b0=3 b1=3 lim=1g
+.param rgnd=1e12
+* Squarer
+Asq 0 in in 0 0 0 sq 0 ota vhigh={lim} rout=1 linear
+* Divider:
+Adiv_lf _sq sq 0 0 0 0 div 0 ota vhigh={lim} rout=1g cout={1n/fc} linear
+Adiv 0 div out 0 0 0 _sq 0 ota vhigh={lim} rout=1 linear
+* Two stage amplifiers: for lowpass filtering
+Ab0 out div 0 0 0 0 1 0 ota vhigh={lim} vlow={-lim} cout={.5/pi/fc} rout=1g g={b0/b1} linear
+Ab1 out 1 0 0 0 0 out 0 ota vhigh={lim} vlow={-lim} cout={.5/pi/fc} rout=1g g={b1} linear
+Rout out 0 {Rgnd}
+.ends RMS1
+
+.SUBCKT RMS2a v+ rms params: T=20ms tenable=1us
+Gcu 0 V value={v(V+,0)}  tripdv={tdv} tripdt={tdt}
+Ru  V 0 1
+Cu  V 0 {T/1Meg}IC=0
+Evu V1  0 value={if(time>tenable,v(V),0)}  tripdv={tdv} tripdt={tdt}
+Tvu V1  0 V2  0 Z0=75 TD={T}
+R2u V2  0 75
+Grmsu 0 rms  value={sqrt(v(idt1)/T)*STP(time-T)}  tripdv={tdv} tripdt={tdt}
+R4u rms  0 1
+Gx1 0  idt1  value={pwr(v(V1),2)-pwr(v(V2),2)}
+Cx1 idt1 0 1
+Rx1 idt1 0 1e10
+.ENDS
+
+.SUBCKT RMS3a in out params: fc=3 b0=1 b1=3 
+C1 1 0 {.5/pi/fc}
+C2 outx 0 {.5/pi/fc}
+G1 0 1 VALUE = {(v(IN)^2/(v(OUTx)+1e-12)-v(OUTx))*{b0/b1}} tripdv={tdv} tripdt={tdt}
+G2 outx 0 1 outx {-b1} 
+R1 outx 0 1e12
+Eout out 0 value={abs(v(outx))} tripdv={tdv} tripdt={tdt}
+R2 1 0 1e12
+R3 in 0 1e12
+RG2 1 out 1G ;added at g2 
+.ENDS RMS3a
+
+* very simple automatic voltage regulator for the synchronous generator model with enable input
+* with new RMS meter code from @vlad
+* NEW: now with second stage AVR RMS output for smoothing
+
+.SUBCKT AVR2 L1 L2 L3 w y enable enable2
++PARAMS: Kp=0.01 Tn=0.1 Min=200 Max=1800 verr0=600 fc=3
+* Measurement with RMS from @vlad
+Rl1 l1 0 1e12
+Rl2 l2 0 1e12
+Rl3 l3 0 1e12
+Rw w 0 1e12
+Ry y 0 1e12
+Renable enable 0 1e12
+Renable2 enable2 0 1e12
+Rl1e l1e 0 1e12
+XU4 L1e L1rms RMS1a fc={fc} b0=1 b1=3
+XU5 L1rms L1rms1 RMS1a fc={fc} bo=1 b1=3
+Een L1e 0 VALUE={V(L1)*v(enable2)} tripdv={tdv} tripdt={tdt}
+Eout x 0 VALUE={abs(v(L1rms1)*1.73205)} tripdv={tdv} tripdt={tdt}
+* ReglerVALUE={}  tripdv={tdv} tripdt={tdt}
+R_R2        0 y  1k
+E_y	        y 0 VALUE={verr0*(1-v(enable))+v(enable)*LIMIT(V(w,x)*Kp+V(int)+verr0,Min,Max)} tripdv={tdv} tripdt={tdt}
+* Integrator
+Gint       	0 int VALUE={v(enable)*V(w,x)*Kp * 1/Tn} tripdv={tdv} tripdt={tdt}
+Cint       	int 0 1 IC=0
+Rint       	int 0 1G
+.ENDS
+
+.subckt enable_t in out enable params:init=100 
+Eout out 0 value={v(in)*v(enable)+init*(1-v(enable))} tripdv={tdv} tripdt={tdt}
+.ends
+*$
+
+* f1_kp=0.01 f1_Tn=0.1  with RMS from heinemann
+.SUBCKT AVR3 L1 L2 L3 w y enable enablev 
++PARAMS: Kp=0.01 Tn=0.1 Min=200 Max=1800 verr0=600 fc=3.
+Rl1 l1 0 1e12
+Rl2 l2 0 1e12
+Rl3 l3 0 1e12 
+Rw w 0 1e12
+Ry y 0 1e12
+Renable enable 0 1e12
+Renable2 enablev 0 1e12
+Rl1e L1e 0 1e12
+XU4 L1e L1rms RMS2a T=20ms tenable=1u
+Een L1e 0 VALUE={V(L1)*v(enablev)*1.73205} tripdv={tdv} tripdt={tdt}
+Gout 0 x VALUE={abs(v(L1rms))} tripdv={tdv} tripdt={tdt}
+Rout x 0 1 
+* Regler
+Ey   y   0   VALUE {verr0*(1-v(enable))+v(enable)*LIMIT((v(a)+V(w,x)*Kp+verr0),min,max)} tripdv={tdv} tripdt={tdt}
+Eq	a 0	VALUE={v(idt1)}  tripdv={tdv} tripdt={tdt}
+Gi0 0 idt1  VALUE={V(x1)*((V(x1)>0&V(y)<max)|((V(x1)<0)&V(y)>min))} tripdv={tdv} tripdt={tdt}
+Ci0 idt1 0 1 IC=0
+Ri0 idt1 0 1e10
+Ex   x1    0  VALUE={v(enable)*(V(w,x)*Kp*1/Tn)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* f1_kp=0.01 f1_Tn=0.1  with RMS from @vlad
+.SUBCKT AVR4 L1 L2 L3 w y enable enablev 
++PARAMS: Kp=0.01 Tn=0.1 Min=200 Max=1800 verr0=600 fc=3.
+Rl1 l1 0 1e12
+Rl2 l2 0 1e12
+Rl3 l3 0 1e12 
+Rw w 0 1e12
+Ry y 0 1e12
+Renable enable 0 1e12
+Renable2 enablev 0 1e12
+Rl1e L1e 0 1e12
+XU4 L1e L1rms RMS3a fc={fc} b0=1 b1=3
+* test: second stage RMS added for smoothing 
+*XU5 L1rms L1rms2 RMS fc={fc} b0=1 b1=3
+Een L1e 0 VALUE={V(L1)*v(enablev)*1.73205} tripdv={tdv} tripdt={tdt}
+* test: second stage RMS added for smoothing
+* Gout 0 x VALUE={v(L1rms2)}
+Gout 0 x VALUE={abs(v(L1rms))} tripdv={tdv} tripdt={tdt}
+Rout x 0 1 
+* Regler
+Ey   y   0   VALUE {verr0*(1-v(enable))+v(enable)*LIMIT((v(a)+V(w,x)*Kp+verr0),min,max)} tripdv={tdv} tripdt={tdt}
+Eq	a 0	VALUE={v(idt1)}  tripdv={tdv} tripdt={tdt}
+Gi0 0 idt1  VALUE={V(x1)*((V(x1)>0&V(y)<max)|((V(x1)<0)&V(y)>min))} tripdv={tdv} tripdt={tdt}
+Ci0 idt1 0 1 IC=0
+Ri0 idt1 0 1e10
+Ex   x1    0  VALUE={v(enable)*(V(w,x)*Kp*1/Tn)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* very simple automatic voltage regulator for the synchronous generator model with enable input
+* with new RMS meter code from @vlad
+* and 100Hz (95-105Hz) LC filter order 2
+.SUBCKT AVR2_50Hz L1 L2 L3 w y enable enable2
++PARAMS: Kp=0.01 Tn=0.1 Min=200 Max=1800 verr0=600 fc=3
+* Measurement with RMS from @vlad
+* 100Hz Filter for RMS ouput: https://rf-tools.com/lc-filter/
+Rl1 l1 0 1e12
+Rl2 l2 0 1e12
+Rl3 l3 0 1e12
+Rw w 0 1e12
+Ry y 0 1e12
+Renable enable 0 1e12
+Renable2 enable2 0 1e12
+Rl1e l1e 0 1e12
+L1 L1rms1 L1rms 225.6mH
+C1 L1rms1 L1rms 11.25uF
+L2 L1rms L1rms2 22.51H
+C2 L1rms2 0 112.8n
+R1 L1rms 0 1000ohm
+XU4 L1e L1rms1 RMS1a fc={fc} b0=1 b1=3
+Een L1e 0 VALUE={V(L1)*v(enable2)} tripdv={tdv} tripdt={tdt}
+Eout x 0 VALUE={abs(v(L1rms)*1.73205)} tripdv={tdv} tripdt={tdt}
+* ReglerVALUE={}  tripdv={tdv} tripdt={tdt}
+R_R2        0 y  1k
+E_y	        y 0 VALUE={verr0*(1-v(enable))+v(enable)*LIMIT(V(w,x)*Kp+V(int)+verr0,Min,Max)} tripdv={tdv} tripdt={tdt}
+* Integrator
+Gint       	0 int VALUE={v(enable)*V(w,x)*Kp * 1/Tn} tripdv={tdv} tripdt={tdt}
+Cint       	int 0 1 IC=0
+Rint       	int 0 1G
+.ENDS
+*$
+
+
+
+* very simple automatic voltage regulator for the synchronous generator model with enable input
+* with new RMS meter code from @vlad
+* and 120Hz LC filter order 2
+.SUBCKT AVR2_60Hz L1 L2 L3 w y enable enable2
++PARAMS: Kp=0.01 Tn=0.1 Min=200 Max=1800 verr0=600 fc=3
+* Measurement with RMS from @vlad
+Rl1 l1 0 1e12
+Rl2 l2 0 1e12
+Rl3 l3 0 1e12
+Rw w 0 1e12
+Ry y 0 1e12
+Renable enable 0 1e12
+Renable2 enable2 0 1e12
+Rl1e l1e 0 1e12
+XU4 L1e L1rms1 RMS1a fc={fc} b0=1 b1=3
+Een L1e 0 VALUE={V(L1)*v(enable2)} tripdv={tdv} tripdt={tdt}
+* 120Hz (115-125Hz) LC Filter for RMS https://rf-tools.com/lc-filter/
+L1 L1rms1 L1rms 156.6m
+C1 L1rms1 L1rms 11.25u
+L2 L1rms L1rms2 22.51H
+C2 L1rms2 0 78.29nF
+R1 L1rms 0 1000ohm
+Eout x 0 VALUE={abs(v(L1rms)*1.73205)} tripdv={tdv} tripdt={tdt}
+* ReglerVALUE={}  tripdv={tdv} tripdt={tdt}
+R_R2        0 y  1k
+E_y	        y 0 VALUE={verr0*(1-v(enable))+v(enable)*LIMIT(V(w,x)*Kp+V(int)+verr0,Min,Max)} tripdv={tdv} tripdt={tdt}
+* Integrator
+Gint       	0 int VALUE={v(enable)*V(w,x)*Kp * 1/Tn} tripdv={tdv} tripdt={tdt}
+Cint       	int 0 1 IC=0
+Rint       	int 0 1G
+.ENDS
+*$
+
+
+* very simple automatic voltage regulator for the synchronous generator model with enable input
+* new switch off integration if y limit reached
+.SUBCKT AVR_limit L1 L2 L3 w y enable enable2
++PARAMS: Kp=0.01 Tn=0.1 Min=200 Max=1800 verr0=600
+* Measurement with MINMAX
+Rl1 l1 0 1e12
+Rl2 l2 0 1e12
+Rl3 l3 0 1e12
+Rw w 0 1e12
+Ry y 0 1e12
+Renable enable 0 1e12
+Renable2 enable2 0 1e12
+Ep out_p1 0 VALUE={v(enable2)*MAX(V(L1),MAX(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={v(enable2)*MIN(V(L1),MIN(V(L2),V(L3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700µ
+R2 out_p out_n 28.55
+Eout x 0 VALUE={abs(v(out_p,out_n))} tripdv={tdv} tripdt={tdt}
+* ReglerVALUE={}  tripdv={tdv} tripdt={tdt}
+R_R2        0 y  1k
+Ey   y    0  VALUE {verr0*(1-v(enable))+v(enable)*LIMIT((v(a)+V(w,x)*Kp+verr0),min,max)} tripdv={tdv} tripdt={tdt}
+Eq   a    0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={V(x1)*((V(x1)>0&V(y)<max)|((V(x1)<0)&V(y)>min))} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Ex   x1    0  VALUE={v(enable)*(V(w,x)*Kp*1/Tn)} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+
+
+* very simple automatic voltage regulator for the synchronous generator model
+* with diodes bridge
+* new switch off integration if y limit reached
+.SUBCKT AVR1_limit L1 L2 L3 w y enable enable2
+* x w y
++PARAMS: Kp=0.01 Tn=0.1 Min=200 Max=1800 verr0=600 U1Nenn=110k
+* Measurement with B6
+.param ue={400/U1Nenn}
+Rl1 l1 0 1e12
+Rl2 l2 0 1e12
+Rl3 l3 0 1e12
+Rw w 0 1e12
+Ry y 0 1e12
+Renable enable 0 1e12
+Renable2 enable2 0 1e12
+E11 R1 0  VALUE={v(enable2)*V(L1)*ue} tripdv={tdv} tripdt={tdt}
+E12 S1 0 VALUE={v(enable2)*V(L2)*ue} tripdv={tdv} tripdt={tdt}
+E13 T1 0 VALUE={v(enable2)*V(L3)*ue} tripdv={tdv} tripdt={tdt}
+D1 rd posd diode_std
+D2 sd posd diode_std
+D3 td posd diode_std
+D4 out_n rd diode_std
+D5 out_n sd diode_std
+D6 out_n td diode_std
+C1 out_p out_n 4700µ
+R3 R1 rd 0.2
+R4 S1 sd 0.2
+R5 T1 td 0.2
+R1 out_p out_n 16
+R2 posd out_p 10
+Eout x 0 VALUE={abs(v(out_p,out_n))/(ue*0.8165)} tripdv={tdv} tripdt={tdt}
+.model diode_std D
+* Regler
+R_R2        0 y  1k
+Ey   y    0  VALUE {verr0*(1-v(enable))+v(enable)*LIMIT((v(a)+V(w,x)*Kp+verr0),min,max)} tripdv={tdv} tripdt={tdt}
+Eq   a    0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={V(x1)*((V(x1)>0&V(y)<max)|((V(x1)<0)&V(y)>min))} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Ex   x1    0  VALUE={v(enable)*(V(w,x)*Kp*1/Tn)} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+
+
+* very simple automatic voltage regulator for the synchronous generator model with enable input
+* with new RMS meter code from @vlad
+* new switch off integration if y limit reached
+.SUBCKT AVR2_limit L1 L2 L3 w y enable enable2
++PARAMS: Kp=0.01 Tn=0.1 Min=200 Max=1800 verr0=600 fc=3
+* Measurement with RMS from @vlad
+Rl1 l1 0 1e12
+Rl2 l2 0 1e12
+Rl3 l3 0 1e12
+Rw w 0 1e12
+Ry y 0 1e12
+Renable enable 0 1e12
+Renable2 enable2 0 1e12
+Rl1e l1e 0 1e12
+XU4 L1e L1rms RMS1a fc={fc} b0=1 b1=3
+Een L1e 0 VALUE={V(L1)*v(enable2)} tripdv={tdv} tripdt={tdt}
+Eout x 0 VALUE={abs(v(L1rms)*1.73205)} tripdv={tdv} tripdt={tdt}
+* ReglerVALUE={}  tripdv={tdv} tripdt={tdt}
+R_R2        0 y  1k
+Ey   y    0  VALUE {verr0*(1-v(enable))+v(enable)*LIMIT((v(a)+V(w,x)*Kp+verr0),min,max)} tripdv={tdv} tripdt={tdt}
+Eq   a    0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={V(x1)*((V(x1)>0&V(y)<max)|((V(x1)<0)&V(y)>min))} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Ex   x1    0  VALUE={v(enable)*(V(w,x)*Kp*1/Tn)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* Choose filter 1,5,10,40Hz_lp
+.SUBCKT AVR2_limit_filter L1 L2 L3 w y enable enable2
++PARAMS: Kp=0.01 Tn=0.1 Min=200 Max=1800 verr0=600 fc=3 Filter="10Hz_lp"
+* Measurement with RMS from @vlad
+Rl1 l1 0 1e12
+Rl2 l2 0 1e12
+Rl3 l3 0 1e12
+Rw w 0 1e12
+Ry y 0 1e12
+Renable enable 0 1e12
+Renable2 enable2 0 1e12
+Rl1e l1e 0 1e12
+XU4 L1e L1rms RMS1a fc={fc} b0=1 b1=3
+Xfilter L1rms L1rms2 {Filter} 
+Een L1e 0 VALUE={V(L1)*v(enable2)} tripdv={tdv} tripdt={tdt}
+Eout x 0 VALUE={abs(v(L1rms2))*1.73205} tripdv={tdv} tripdt={tdt}
+* ReglerVALUE={}  tripdv={tdv} tripdt={tdt}
+R_R2        0 y  1k
+Ey   y    0  VALUE {verr0*(1-v(enable))+v(enable)*LIMIT((v(a)+V(w,x)*Kp+verr0),min,max)} tripdv={tdv} tripdt={tdt}
+Eq   a    0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={V(x1)*((V(x1)>0&V(y)<max)|((V(x1)<0)&V(y)>min))} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Ex   x1    0  VALUE={v(enable)*(V(w,x)*Kp*1/Tn)} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+* Lowpass
+
+
+.subckt 40Hz_lp in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv=1 tripdt=1
+L1 in1 out 5.305H
+C1 in1 0 5.968uF
+C3 out 0 1.989uF
+R1 out 0 1000ohm
+.ends
+
+* Lowpass
+.subckt 10Hz_lp in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv=1 tripdt=1
+L1 in1 out 21.22H
+C1 in1 0 23.87uF
+C3 out 0 7.958uF
+R1 out 0 1000ohm
+.ends
+
+.subckt 1Hz_Lp in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv=1 tripdt=1
+L1 in1 out 212.2H
+C1 in1 0 238.7uF
+C3 out 0 79.58uF
+R1 out 0 1000ohm
+.ends
+
+.subckt 0Hz_Lp in out params: tenable=1u
+* Butterworth filter
+E1 out 0 VALUE={IF(time>tenable,v(in),0)} tripdv=1 tripdt=1
+.ends
+
+* Lowpass
+.subckt 5Hz_lp in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv=1 tripdt=1
+L1 in1 out 42.44H
+C1 in1 0 47.75uF
+C3 out 0 15.92uF
+R1 out 0 1000ohm
+.ends
+
+* very simple automatic voltage regulator for the synchronous generator model with enable input
+* with new RMS meter code from @vlad
+* and 100Hz (95-105Hz) LC filter order 2
+.SUBCKT AVR2_50Hz_limit L1 L2 L3 w y enable enable2
++PARAMS: Kp=0.01 Tn=0.1 Min=200 Max=1800 verr0=600 fc=3
+Rl1 l1 0 1e12
+Rl2 l2 0 1e12
+Rl3 l3 0 1e12
+Rw w 0 1e12
+Ry y 0 1e12
+Renable enable 0 1e12
+Renable2 enable2 0 1e12
+Rl1e l1e 0 1e12
+* Measurement with RMS from @vlad
+XU4 L1e L1rms1 RMS1a fc={fc} b0=1 b1=3
+Een L1e 0 VALUE={V(L1)*v(enable2)} tripdv={tdv} tripdt={tdt}
+* 100Hz Filter for RMS ouput: https://rf-tools.com/lc-filter/
+L1 L1rms1 L1rms 225.6mH
+C1 L1rms1 L1rms 11.25uF
+L2 L1rms L1rms2 22.51H
+C2 L1rms2 0 112.8n
+R1 L1rms 0 1000ohm
+Eout x 0 VALUE={abs(v(L1rms)*1.73205*v(enable2))} tripdv={tdv} tripdt={tdt}
+* ReglerVALUE={}  tripdv={tdv} tripdt={tdt}
+R_R2        0 y  1k
+Ey   y    0  VALUE {verr0*(1-v(enable))+v(enable)*LIMIT((v(a)+V(w,x)*Kp+verr0),min,max)} tripdv={tdv} tripdt={tdt}
+Eq   a    0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={V(x1)*((V(x1)>0&V(y)<max)|((V(x1)<0)&V(y)>min))} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Ex   x1    0  VALUE={v(enable)*(V(w,x)*Kp*1/Tn)} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+
+
+
+* very simple automatic voltage regulator for the synchronous generator model with enable input
+* with new RMS meter code from @vlad
+* and 120Hz LC filter order 2
+* new switch off integration if y limit reached
+.SUBCKT AVR2_60Hz_limit L1 L2 L3 w y enable enable2
++PARAMS: Kp=0.01 Tn=0.1 Min=200 Max=1800 verr0=600 fc=3
+Rl1 l1 0 1e12
+Rl2 l2 0 1e12
+Rl3 l3 0 1e12
+Rw w 0 1e12
+Ry y 0 1e12
+Renable enable 0 1e12
+Renable2 enable2 0 1e12
+Rl1e l1e 0 1e12
+* Measurement with RMS from @vlad
+XU4 L1e L1rms1 RMS1a fc={fc} b0=1 b1=3
+Een L1e 0 VALUE={V(L1)*v(enable2)} tripdv={tdv} tripdt={tdt}
+* 120Hz (115-125Hz) LC Filter for RMS https://rf-tools.com/lc-filter/
+L1 L1rms1 L1rms 156.6m
+C1 L1rms1 L1rms 11.25u
+L2 L1rms L1rms2 22.51H
+C2 L1rms2 0 78.29nF
+R1 L1rms 0 1000ohm
+Eout x 0 VALUE={abs(v(L1rms)*1.73205)} tripdv={tdv} tripdt={tdt}
+* ReglerVALUE={}  tripdv={tdv} tripdt={tdt}
+R_R2        0 y  1k
+Ey   y    0  VALUE {verr0*(1-v(enable))+v(enable)*LIMIT((v(a)+V(w,x)*Kp+verr0),min,max)} tripdv={tdv} tripdt={tdt}
+Eq   a    0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={V(x1)*((V(x1)>0&V(y)<max)|((V(x1)<0)&V(y)>min))} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Ex   x1    0  VALUE={v(enable)*(V(w,x)*Kp*1/Tn)} tripdv={tdv} tripdt={tdt}
+.ENDS
+*$
+
+
+* Reset=disable -> enable=0
+* very simple synchronizing unit for the synchronous generator model
+.SUBCKT syncgen L1_n L2_n L3_n L1_g L2_g L3_g n fdif vdif Q0 Q1 sync enable
++ PARAMS: p=2 fn={fn1} fdif=50m vdif=1k
+Efdif fdif 0 VALUE={fN-(v(n)*p/60)}  tripdv={tdv} tripdt={tdt}
+Evdif1 vdif1 0 VALUE={abs(v(L1_n)-v(L1_g))}  tripdv={tdv} tripdt={tdt}
+Evdif2 vdif2 0 VALUE={abs(v(L2_n)-v(L2_g))}  tripdv={tdv} tripdt={tdt}
+Evdif3 vdif3 0 VALUE={abs(v(L3_n)-v(L3_g))}  tripdv={tdv} tripdt={tdt}
+* Measurement with MINMAX
+Ep vdif 0 VALUE={MAX(V(vdif1),MAX(V(vdif2),V(vdif3)))} tripdv={tdv} tripdt={tdt}
+Esync1 sync1 0 VALUE={IF(abs(v(fdif))<fdif & v(vdif)<vdif & v(enable),1,0)} tripdv={tdv} tripdt={tdt}
+* Selbsthalteschaltung
+E1 1 0 VALUE={1*v(enable)} tripdv={tdv} tripdt={tdt}
+R1 sync 0 1k
+S1 1 sync sync1 0 MS1
+S2 1 sync sync 0 MS1
+.model MS1 SW(Ron=0.01 Roff=1e9 Vt=0.9 Vh=0 Lser=0 Vser=0)
+*
+EQ0 Q0 0 VALUE={inv(v(sync))}  tripdv={tdv} tripdt={tdt}
+EQ1 Q1 0 VALUE={v(sync)}  tripdv={tdv} tripdt={tdt}
+RQ0 Q0 0 1e12
+RQ1 Q1 0 1e12
+Rfdif fdif 0 1e12
+Rvdif vdif 0 1e12
+Rsync sync 0 1e12
+Renable enable 0 1e12
+Rn n 0 1e12
+RL1_n L1_n 0 1e12
+RL2_n L2_n 0 1e12
+RL3_n L3_n 0 1e12
+RL1_g L1_g 0 1e12
+RL2_g L2_g 0 1e12
+RL3_g L3_g 0 1e12
+.ENDS
+*$
+
+
+* Reset=disable -> enable=0
+* very simple synchronizing unit for the synchronous generator model
+.SUBCKT syncgen2 L1_n L2_n L3_n L1_g L2_g L3_g n2 n1 fdif vdif Q0 Q1 sync enable
++ PARAMS: p=2 fdif=50m vdif=1k
+Efdif fdif 0 VALUE={(v(n1)-v(n2))*p/60}  tripdv={tdv} tripdt={tdt}
+Evdif1 vdif1 0 VALUE={abs(v(L1_n)-v(L1_g))}  tripdv={tdv} tripdt={tdt}
+Evdif2 vdif2 0 VALUE={abs(v(L2_n)-v(L2_g))}  tripdv={tdv} tripdt={tdt}
+Evdif3 vdif3 0 VALUE={abs(v(L3_n)-v(L3_g))}  tripdv={tdv} tripdt={tdt}
+* Measurement with MINMAX
+Ep vdif 0 VALUE={MAX(V(vdif1),MAX(V(vdif2),V(vdif3)))} tripdv={tdv} tripdt={tdt}
+Esync1 sync1 0 VALUE={IF(abs(v(fdif))<fdif & v(vdif)<vdif & v(enable),1,0)} tripdv={tdv} tripdt={tdt}
+* Selbsthalteschaltung
+E1 1 0 VALUE={1*v(enable)} tripdv={tdv} tripdt={tdt}
+R1 sync 0 1k
+S1 1 sync sync1 0 MS1
+S2 1 sync sync 0 MS1
+.model MS1 SW(Ron=0.01 Roff=1e9 Vt=0.9 Vh=0 Lser=0 Vser=0)
+*
+EQ0 Q0 0 VALUE={inv(v(sync))} tripdv={tdv} tripdt={tdt}
+EQ1 Q1 0 VALUE={v(sync)} tripdv={tdv} tripdt={tdt}
+RQ0 Q0 0 1e12
+RQ1 Q1 0 1e12
+Rfdif fdif 0 1e12
+Rvdif vdif 0 1e12
+Rsync sync 0 1e12
+Renable enable 0 1e12
+Rn2 n2 0 1e12
+Rn1 n1 0 1e12
+RL1_n L1_n 0 1e12
+RL2_n L2_n 0 1e12
+RL3_n L3_n 0 1e12
+RL1_g L1_g 0 1e12
+RL2_g L2_g 0 1e12
+RL3_g L3_g 0 1e12
+.ENDS
+;$SpiceType=MCAPSPICE
+*$

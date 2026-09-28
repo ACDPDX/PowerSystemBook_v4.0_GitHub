@@ -1,0 +1,281 @@
+*********************************************************************************************************
+* L_Fe     linear 1phase inductance with lost
+* L_Fe_psi nonlinear 1phase inductance with lost and initial condition (residual flux) at t=0
+* L_Fe_psi_0  nonlinear 1phase inductance with lost and initial condition at any time t=x
+* L_psi        nonlinear 1phase inductance with lost and with initial condition (residual flux)
+**********************************************************************************************************
+* Wicklung      Winding with initial condition at t=0
+* Wicklung_psi  Winding with initial condition at any t=x
+* Schenkel      Iron limb
+
+
+*$
+.SUBCKT L_Fe	1	2
++PARAMS:
++L=100mH
++init=0
++fn={fn1}
++rcu_rel=1u
++pfe_rel=0.01
+.PARAM
++Rcu={rcu_rel*(2*pi)*fN*L}
++Rfe={1/pfe_rel*(2*pi)*fN*L}
+Rcu	1	1a	{Rcu}
+Lint	1a	2	{L}	IC={init}
+Rfe	1a	2	{Rfe}
+.Ends
+*$
+*
+
+
+*	at least two of the 3 parameters LN , UN, or IN have to be >0 !
+*	at three parameters LN is ignored!
+*	at AC analysis inductance is linear;
+.SUBCKT   L_Fe_psi  1_1 1_2
++	PARAMS:
++	LN=0	;	Nominal inductance
++	UN=0	;	Nominal voltage
++	IN=0	;	Nominal current
++	fn={fn1}	;	Nominal frequency
++	rcu_rel=0.1	; relative. copper lost = Rcu /(UN/IN)
++	pfe_rel=0.01	; relative. ironlost =Pfe/(UN*IN)
++	a=0.3		; Degree of linearity  0 < a <= 1
++   m=7         ; Degree of nonlinearity
++   psi_0=0     ; 1=residual flux, 0=no residual flux
++   N=1000      ; Windings
+.PARAM
++	Lz ={IF(LN != 0 & UN != 0 & IN != 0 , 0 , LN)}
++	U1N={IF(Lz != 0 & IN != 0 , {(2*pi)*fN*Lz*IN}, UN)}
++	I1N={IF(Lz != 0 & UN != 0 , {UN/(2*pi)/fN/Lz}, IN)}
++	Rcu={rcu_rel*U1N/I1N}
++	Rfe={1/pfe_rel*U1N/I1N}
++	phiN={sqrt(2)*U1N/(2*pi)/fN/N}
++	imyN={sqrt(2)*I1N}
+*	Current of the windings
+Gi	1_1	1_2	VALUE={v(a)/N} tripdv={tdv} tripdt={tdt}
+Rpi	1_1	1_2	1000MEG
+*   Winding
+X_W	0	a	1_1	1_2	Wicklung
++PARAMS: R={Rcu}  N={N}    Rphis=1E9  psi_0={psi_0*phiN}
+*   Iron limb
+X_Sch	a	0	Schenkel
++PARAMS: imyN={imyN} phiN={phiN}  Rfe={Rfe}  a={a} m={m} N={N}
+.ENDS
+***	Ende des SUBCIRCUITS L_Fe_psi
+
+.SUBCKT   L_Fe_psi_ctrl  1_1 1_2 ctrl 
++	PARAMS:
++	LN=0	;	Nominal inductance
++	UN=0	;	Nominal voltage
++	IN=0	;	Nominal current
++	fn={fn1}	;	Nominal frequency
++	rcu_rel=0.1	; relative. copper lost = Rcu /(UN/IN)
++	pfe_rel=0.01	; relative. ironlost =Pfe/(UN*IN)
++	a=0.3		; Degree of linearity  0 < a <= 1
++   m=7         ; Degree of nonlinearity
++   psi_0=0     ; 1=residual flux, 0=no residual flux
++   N=1000      ; Windings
+.PARAM
++	Lz ={IF(LN != 0 & UN != 0 & IN != 0 , 0 , LN)}
++	U1N={IF(Lz != 0 & IN != 0 , {(2*pi)*fN*Lz*IN}, UN)}
++	I1N={IF(Lz != 0 & UN != 0 , {UN/(2*pi)/fN/Lz}, IN)}
++	Rcu={rcu_rel*U1N/I1N}
++	Rfe={1/pfe_rel*U1N/I1N}
++	phiN={sqrt(2)*U1N/(2*pi)/fN/N}
++	imyN={sqrt(2)*I1N}
+*	Current of the windings
+Rctrl ctrl 0 1e12
+Gi	1_1	1_2	VALUE={v(a)/N} tripdv={tdv} tripdt={tdt}
+Rpi	1_1	1_2	1000MEG
+*   Winding
+X_W	0	a	1_1	1_2	ctrl Wicklung_ctrl
++PARAMS: R={Rcu}  N={N}    Rphis=1E9  psi_0={psi_0*phiN}
+*   Iron limb
+X_Sch	a	0	ctrl Schenkel_ctrl
++PARAMS: imyN={imyN} phiN={phiN}  Rfe={Rfe}  a={a} m={m} N={N}
+.ENDS
+***	Ende des SUBCIRCUITS L_Fe_psi_ctrl
+
+
+.SUBCKT   L_Fe_psi_0  1_1 1_2
++	PARAMS:
++	LN=0	;
++	UN=0	;
++	IN=0	;
++	fn={fn1}	;
++	rcu_rel=0.1	;
++	pfe_rel=0.01
++	a=0.3		;
++   m=7         ;
++   psi_0=0     ;
++   N=1000      ;
++   ron=0.00001 ; time constant ron*c for charging the integrator for the residual flux
++   tpsid=0.1ms   ; time constant ron*c for charging the integrator for the residual flux
++   tpsi0=1000s  ; starting time for charging the integrator of the flux
+.PARAM
++	Lz ={IF(LN != 0 & UN != 0 & IN != 0 , 0 , LN)}
++	U1N={IF(Lz != 0 & IN != 0 , {(2*pi)*fN*Lz*IN}, UN)}
++	I1N={IF(Lz != 0 & UN != 0 , {UN/(2*pi)/fN/Lz}, IN)}
++	Rcu={rcu_rel*U1N/I1N}
++	Rfe={1/pfe_rel*U1N/I1N}
++	phiN={sqrt(2)*U1N/(2*pi)/fN/N}
++	imyN={sqrt(2)*I1N}
+*	Current
+Gi	1_1	1_2	VALUE={v(a)/N} tripdv={tdv} tripdt={tdt}
+Rpi	1_1	1_2	1000MEG
+*   Winding
+X_W	0	a	1_1	1_2	Wicklung_psi
++PARAMS: R={Rcu}  N={N}    Rphis=1E9  psi_0={psi_0*phiN} tpsi0={tpsi0} tpsid={tpsid} ron={ron}
+*   Iron limb
+X_Sch	a	0	Schenkel
++PARAMS: imyN={imyN} phiN={phiN}  Rfe={Rfe}  a={a} m={m} N={N}
+.ENDS
+***	Ende des SUBCIRCUITS L_Fe_psi
+
+
+.SUBCKT   L_Fe_psi_0_ctrl  1_1 1_2 ctrl
++	PARAMS:
++	LN=0	;
++	UN=0	;
++	IN=0	;
++	fn={fn1}	;
++	rcu_rel=0.1	;
++	pfe_rel=0.01
++	a=0.3		;
++   m=7         ;
++   psi_0=0     ;
++   N=1000      ;
++   ron=0.00001 ; time constant ron*c for charging the integrator for the residual flux
++   tpsid=0.1ms   ; time constant ron*c for charging the integrator for the residual flux
++   tpsi0=1000s  ; starting time for charging the integrator of the flux
+.PARAM
++	Lz ={IF(LN != 0 & UN != 0 & IN != 0 , 0 , LN)}
++	U1N={IF(Lz != 0 & IN != 0 , {(2*pi)*fN*Lz*IN}, UN)}
++	I1N={IF(Lz != 0 & UN != 0 , {UN/(2*pi)/fN/Lz}, IN)}
++	Rcu={rcu_rel*U1N/I1N}
++	Rfe={1/pfe_rel*U1N/I1N}
++	phiN={sqrt(2)*U1N/(2*pi)/fN/N}
++	imyN={sqrt(2)*I1N}
+*	Current
+Rctrl ctrl 0 1e12
+Gi	1_1	1_2	VALUE={v(a)/(N*v(ctrl))} tripdv={tdv} tripdt={tdt}
+Rpi	1_1	1_2	1000MEG
+*   Winding
+X_W	0	a	1_1	1_2	ctrl Wicklung_psi_0_ctrl
++PARAMS: R={Rcu}  N={N}    Rphis=1E9  psi_0={psi_0*phiN} tpsi0={tpsi0} tpsid={tpsid} ron={ron}
+*   Iron limb
+X_Sch	a	0  ctrl Schenkel_ctrl
++PARAMS: imyN={imyN} phiN={phiN}  Rfe={Rfe}  a={a} m={m} N={N}
+.ENDS
+***	Ende des SUBCIRCUITS L_Fe_psi
+
+
+.SUBCKT   L_psi  1 2
++	PARAMS:
++	LN=1700	;
++   Lsigma={40/314.159} ; leakage inductance
++	UN={400k/sqrt(3)} ;
++	fn={fn1}	;
++	a=0.3		;
++   m=7         ;
++   psi_0=0     ;
++   N=1000      ;
+.PARAM
++   omega={2*pi*fn}
++   I1N={UN/omega/LN}
++   phiN={sqrt(2)*UN/omega/N} ; phiN=PsiN/N
++   imyN={sqrt(2)*I1N}
++   phi_0={psi_0*phiN} ; residual flux parameter
++   rsigma={N*N/Lsigma}
+* Wicklungsstrom
+Gi	1 2	VALUE={v(a)/N} tripdv={tdv} tripdt={tdt} ; v(a) = Theta1 = N*i1 = N*imy, Theta1+Theta-my=0
+* Wicklung
+Ephi phi 0 VALUE={phi_0+v(idt1)/N} tripdv={tdv} tripdt={tdt} ; Phi(und volle Remanenz)
+G1x 0 idt1 VALUE={v(1,2)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Gphi 0 a VALUE={v(phi)} tripdv={tdv} tripdt={tdt} ; Phi als Strom im magn. Kreis
+Rphis 0 a {rsigma} ; Parallel zur Stromquelle für Streufluss
+*Eisenschenkel
+* magn. voltage drop on RM = Theta-my = N*imy
+* Rm is approx N*N/LN for the settled case, at the transient case Rm and L are strong dependent of flux
+* Rm = Thetha-my / Phi
+Etheta a a1 VALUE={N*imyN*(a*(i(vphi)/phiN)+(1-a)*(i(vphi)/phiN)**m)}  tripdv={tdv} tripdt={tdt}
+vphi a1 0 0 ; Measurement of phi
+.ENDS
+***	Ende des SUBCIRCUITS L_psi
+
+
+*$
+* 15a  Wicklung
+*
+
+.SUBCKT WICKLUNG  ma  mb  ea  eb
++PARAMS:   R=1   N=1    Rphis=1 Psi_0=0
+Gphi	ma	mb	VALUE={v(phi)} tripdv={tdv} tripdt={tdt}
+Rphis	ma	mb	{Rphis}
+Gp	0	phi	VALUE={(v(ea,eb)-R*v(mb,ma)/N)/N} tripdv={tdv} tripdt={tdt}
+Cp	phi	0	1 IC={Psi_0}
+Rp	phi	0	1000MEG
+.ENDS ;  Wicklung
+
+.SUBCKT WICKLUNG_psi  ma  mb  ea  eb
++PARAMS:   R=1   N=1    Rphis=1 psi_0=0 tpsi0=20ms tpsid=0.1ms ron=0.00001 ;ok for 0.1ms switching time at C=1Coulomb
+Gphi	ma	mb	VALUE={v(phi)} tripdv={tdv} tripdt={tdt}
+Rphis	ma	mb	{Rphis}
+Gp	0	phi	VALUE={(v(ea,eb)-R*v(mb,ma)/(N))/(N)} tripdv={tdv} tripdt={tdt}
+Cp phi 0 1 IC=0
+Vctrl ctrl 0 pwl 0s 0v {tpsi0+1p} 0v {tpsi0+tpsid+2p} 1V {tpsi0+2*tpsid+3p} 1v {tpsi0+3*tpsid+4p} 0v
+S1 phi phix ctrl 0 MS1
+.model MS1 SW(Ron={Ron} Roff=1e9 Vt=0.9 Vh=0.0 Lser=0 Vser=0)
+E1 phix 0 value={psi_0} tripdv={tdv} tripdt={tdt} ; This is the voltage source for loading the flux integrator with residual flux
+Rp	phi	0	1000MEG
+.ENDS ;  Wicklung
+*$
+
+.SUBCKT WICKLUNG_ctrl  ma  mb  ea  eb ctrl
++PARAMS:   R=1   N=1    Rphis=1 psi_0=0
+Gphi	ma	mb	VALUE={v(phi)} tripdv={tdv} tripdt={tdt}
+Gphis	ma	mb	VALUE={v(ma,mb)/(Rphis*v(ctrl)*v(ctrl))} tripdv={tdv} tripdt={tdt}
+Gp	0	phi	VALUE={(v(ea,eb)-R*v(ctrl)*v(mb,ma)/(N*v(ctrl)))/(N*v(ctrl))} tripdv={tdv} tripdt={tdt}
+Cp	phi	0	1    IC={psi_0}
+Rp	phi	0	1000MEG
+.ENDS ;  Wicklung
+
+
+.SUBCKT WICKLUNG_psi_0_ctrl  ma  mb  ea  eb ctrl
++PARAMS:   R=1   N=1    Rphis=1 psi_0=0 tpsi0=20ms tpsid=0.1ms ron=0.00001
+Gphi	ma	mb	VALUE={v(phi)} tripdv={tdv} tripdt={tdt}
+Gphis	ma	mb	VALUE={v(ma,mb)/(Rphis*v(ctrl)*v(ctrl))} tripdv={tdv} tripdt={tdt}
+Gp	0	phi	VALUE={(v(ea,eb)-R*v(ctrl)*v(mb,ma)/(N*v(ctrl)))/(N*v(ctrl))} tripdv={tdv} tripdt={tdt}
+Cp phi 0 1 IC=0
+Vctrl ctrl 0 pwl 0s 0v {tpsi0+1p} 0v {tpsi0+tpsid+2p} 1V {tpsi0+2*tpsid+3p} 1v {tpsi0+3*tpsid+4p} 0v
+S1 phi phix sctrl 0 MS1
+.model MS1 SW(Ron={Ron} Roff=1e9 Vt=0.9 Vh=0.0 Lser=0 Vser=0)
+E1 phix 0 value={psi_0} tripdv={tdv} tripdt={tdt}
+Rp	phi	0	1000MEG
+.ENDS ;  Wicklung
+
+
+* 15b  Eisenschenkel
+
+.SUBCKT SCHENKEL  m1  m2
++PARAMS:   N=1  RFe=1  ImyN=1  a=1  phiN=1 m=9
+LRFe	m1	mh	{N*N/RFe} Rser={0.001m*N*N/RFe}  ; Rser=parasitic value for better convergence
+* Rfe
+vphi	mh	mh1	0
+rphi    mh  0 1e12 
+Eimy	mh1	m2
++VALUE={N*imyN*(a*i(vphi)/phiN+(1-a)*PWRS(i(vphi)/phiN,m))} tripdv={tdv} tripdt={tdt}
+.ENDS;  SCHENKEL
+
+* NEW: Schenkel with ctrl pin !!!!!
+.SUBCKT SCHENKEL_ctrl  m1  m2 ctrl 
++PARAMS:   N=1  RFe=1  ImyN=1  a=1  phiN=1 m=9
+LRFe	m1	mh	flux={x*((N*N*v(ctrl)*v(ctrl))/RFe)} Rser={0.001m*N*N/RFe}  ; Rser=parasitic value for better convergence  
+* Rfe
+vphi	mh	mh1	0
+rphi    mh  0 1e12 
+Eimy	mh1	m2
++VALUE={(N*v(ctrl)*sqrt(v(ctrl)))*imyN*(a*i(vphi)/phiN+(1-a)*PWRS(i(vphi)/phiN,m))} tripdv={tdv} tripdt={tdt}
+.ENDS;  SCHENKEL

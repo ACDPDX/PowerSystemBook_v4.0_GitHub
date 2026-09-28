@@ -1,0 +1,2780 @@
+* Library of LTSPICE macromodels for load flow computation
+
+*  Copyright F.S., 2003, 2004, 2005 All Rights Reserved.
+*  But not responible for any
+*  damage caused by applying results from this computation
+* --------------------------------------------------
+*
+* --------------------------------------------------
+*  Version:   V 2.0
+*  Author:   Friedrich Schmidt
+*  20.02.2003 first version
+*  01.01.2004 second version
+*  08.02.2004 trafo_Yd5 ...
+*  23.02.2004 vri_3phase
+*  01.03.2004 scr,peterson,load, (test:pv_slack)
+*  30.03.2004 trafo_Yy0,Yd5,Yz5 ideal
+*  30.10.2004 add tripdt tripdv parameter for behavioral sources
+*  20.12.2004 small changes at the loads model ( multiple lines for LIMIT() -> more readily )
+*  02.01.2005 nominal voltage as parameter now vn ( loads, peterson, scr, c_batt, l_batt, impedance_pqv , scr , iri_slack_pqv )
+*  07.01.2005 corrected some lost v param values in .param expressions -> change to vn
+*  10.01.2005 corrected a formula with vfactor in the peterson-model
+*  xx.xx.2023 adding additional pv-elements
+*-----------------------------------------------------------------------------------------------------------------------------------------
+*
+* generic line_LF            ; line
+* generic constpower_LF      ; constant power
+* generic constpower_boot_LF ; constant power with additional multiplier nodes
+* generic impedance_LF       ; serial impedance r,xl,xc
+* generic impedance_pqv_LF   ; serial impedance r,x from p,q and vn
+* generic impedance_iv_LF    ; serial impedance r,x from ir,ii and vn
+* generic impedance_sk_LF    ; serial impedance is computed via v and sk
+* generic impedance_III_LF   ; parallel impedance r,xl,xc
+* generic pv_slack           ; pv-slack with p-controller qmin and qmax per hand (good convergence but no automatic limit q calculation)
+* generic pv_slack_LF        ; pv-slack with P,Vmag as input, experimental with convergence issues
+* generic pv_slack_LF2       ; pv-slack with P,Vmag as input, experimental with convergence issues
+* generic pv_slack_LF3       ; pv-slack with P,Vmag as input, use this by default for better convergence
+* generic iri_slack_LF       ; current source with constant real and imag parts (ir,ii)
+* generic iri_slack_pqv_LF   ; current source with p,q,vn input instead of ir,ii input
+* generic vri_slack_LF       ; voltage source with constant real and imag parts
+* generic vri_slack_n_LF     ; voltage source with neutral-line pins
+* generic vri_slack_te_LF    ; voltage source based on thevinen equivalent current source
+* generic vri_slack_te_n_LF  ; like vri_slack_te but with additional neutral-line pins
+* generic iri_slack2_LF      ; current source with constant imag and phase parts
+* generic vri_slack2_LF      ; voltage source with constant vmag and phase parts
+* generic vri_slack2_n_LF    ; voltage source with constant vmag and phase parts and neutral line
+* generic vri_slack2_te_LF   ; voltage source based on thevenin equivalent current source
+* generic vri_slack2_te_n_LF ; like vri_slack2_te but with additional neutral-line pins
+* generic vri_3phase_n_LF    ; 3 phase vri_slack with neutral pin
+* generic loads_LF	         ; load  k=0 impedance, k=1 constcurrent, k=2 constpower
+* generic petersen_LF        ; to limit earth-fault current on lines
+* generic pv_slack_LF_2_3    ; input p and magnitude of v, output Q and vr,vi
+* generic scr_LF             ; short circuit reactance -> to limit short circuit current on lines
+* generic transformer_LF     ; transformer with additional voltage setter on primary side
+* generic transformer_extd_LF; transformer with differential input and complex translation
+*					factor
+* generic trafo_Yd5_LF	     ; three phase transformer primary side star, secondary side
+*				      trinagle
+* generic trafo_Yy0_LF		 ;three phase transformer primary side star, secondary side
+*				      star
+* generic trafo_Yz5_LF       ;three phase transformer primary side star, secondary side
+*				      z
+* generic trafo_Yd5_ideal_LF ; three phase transformer primary side star, secondary side
+*				      trinagle
+* generic trafo_Yy0_ideal_LF ;three phase transformer primary side star, secondary side
+*				      star
+* generic trafo_Yz5_ideal_LF ;three phase transformer primary side star, secondary side
+*				      z
+* generic l1l2k12_LF         ; one phase inductive coupling ( standard spice3 K-device like )
+* generic ue_LF       ; alternative ideal one phase inductive coupling
+* generic c_batt_LF          ; Condensator batterie for voltage regulation
+* generic l_batt_LF          ; Inductance batterie for voltage regulation
+* generic z_r_LF             ; simple R
+* generic z_xl_LF            ; simple Xl
+* generic z_xc_LF            ; simple Xc
+* regulating transformer voltage and phase (for compatibility with same models in the transient toolbox):
+* generic trafo_tap_l_LF     ; voltage regulated transformer taping (connect it to the high voltage side)
+* generic trafo_tap_s_LF     ; phase regulated transformer 60degrees (connect it to the high voltage side)
+* generic trafo_tap_q_LF     ; phase regulated transformer 90degrees (connect it to the high voltage side)
+*
+* start of lib
+*
+* Global parameters
+*
+* the ratio rmax/ should not be to high ( numerical problems may occur )
+* since absolute values in the high energy domain ( voltage ) is about 1e6 the rmax parameter also is high
+* ( about 1e12 ) the corresponding rmin parameter can be about 1e-3
+
+
+.PARAM tripdv=1 tripdt=1
+
+* With P-Controller and with manual limit useful for .op simulations !!!
+* if lower q-limit reached: set by hand lim_min=1 (now the model works like the nonlinear load model with q=qmin)
+* if upper q-limit reached: set by hand lim_max=1 (now the model works like the nonlinear load model with q=qmax)
+* if lim_min=0 and lim_max=0 the model acts as a pv-element with automatic computing q
+.subckt pv_slack v1r v1i v1_m p1_m q1_m
++ params:
++ vmag=400k p=-100e6 qinit=10e6 qflo=-10 qfup=10 lim_max=0 lim_min=0 kp=100 vfactor=1.73205 sfactor=3.0 uout=1
++ ilolimit=-100e9 iuplimit=100e9
+.param on0={IF(lim_max>0 | lim_min>0,0,1)}
+.param on1=lim_max
+.param on2=lim_min
+gq     0    qf  value={(v(v1_m)-vmag)*Kp} tripdv={TRIPDV} tripdt={TRIPDT}
+*gq     0    qf  value={UpLim(DnLim((v(v1_m)-vmag)*Kp,-14, 1e-2), 10,1e-2)} tripdv={TRIPDV} tripdt={TRIPDT}
+rq     qf   0  1
+*******************************************************************************
+vss    ss    0    1 ; aditional voltage for source stepping convergence
+gi1r   v1r   v10  Value = {LIMIT( (((p*v(ss)*v(ss))*on0/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
++                           (((qinit*v(ss)*v(ss))*v(qf)*on0/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)),ilolimit,iuplimit) } tripdv={TRIPDV} tripdt={TRIPDT}
+gi1i   v1i   v20  Value = {LIMIT( ((-(qinit*v(ss)*v(ss))*v(qf)*on0/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
++                           (((p*v(ss)*v(ss))*on0/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)),ilolimit,iuplimit) } tripdv={TRIPDV} tripdt={TRIPDT}
+
+gi1r1   v1r   v10  Value = {LIMIT( (((p*v(ss)*v(ss))*on1/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
++                           (((qinit*v(ss)*v(ss))*qfup*on1/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)),ilolimit,iuplimit) }  tripdv={TRIPDV} tripdt={TRIPDT}
+gi1i1   v1i   v20  Value = {LIMIT( ((-(qinit*v(ss)*v(ss))*qfup*on1/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
++                           (((p*v(ss)*v(ss))*on1/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)),ilolimit,iuplimit) } tripdv={TRIPDV} tripdt={TRIPDT}
+
+gi1r2   v1r   v10  Value = {LIMIT( (((p*v(ss)*v(ss))*on2/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
++                           (((qinit*v(ss)*v(ss))*qflo*on2/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)),ilolimit,iuplimit) } tripdv={TRIPDV} tripdt={TRIPDT}
+gi1i2   v1i   v20  Value = {LIMIT( ((-(qinit*v(ss)*v(ss))*qflo*on2/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
++                           (((p*v(ss)*v(ss))*on2/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)),ilolimit,iuplimit) } tripdv={TRIPDV} tripdt={TRIPDT}
+vi1r   v10   0    dc 0v;   currentmeter
+vi1i   v20   0    dc 0v;   currentmeter
+ev1mag_m   v1_m  0  value = {uout*vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+ep1   p1_m   0    value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+eq1   q1_m   0    value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+eiabs_m i_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))} tripdv={TRIPDV} tripdt={TRIPDT} ; abs. current
+es1mag_m  s_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i_m) * sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+rvm v1_m 0  1e12
+rpm p1_m 0  1e12
+rqm q1_m 0 1e12
+rim i_m 0 1e12
+rsm s_m 0 1e12
+rmax1   v1r  0  1e12
+rmax2   v1i  0  1e12
+.ends
+
+
+
+
+* pv_slack without sgn() function
+* P=vr*ir+vi*ii
+* V=sqrt(vr*vr+vi*vi)
+* vr=(P*ir +/- ii*sqrt((V*V*(ir*ir+ii*ii))-P*P))/(ir*ir+ii*ii) + for delivering Q - for consuming Q
+* vi=(P*ii -/+ ir*sqrt((V*V*(ir*ir+ii*ii))-P*P))/(ir*ir+ii*ii) - for delivering Q + for consuming Q
+* This model has q-limits and has good convergence
+* In this model only the negative q output is used (Solution 1)
+* To let the model only output negative q values
+* The q-limit is changed internally from qlo,qup to
+* qmin,qmax which are now negative to zero. To let the pv element only output negative
+* q values a l_batt element is switched to the pv-element
+* and so the pv-element is forced to output only negative values
+* This all make the convergence much better as in the q-signed valued
+* case
+* NOTE: If Qmin/Qmax is reached the Q ouput is a bit voltage dependent
+* If you don't want this go to pv_slack_LF3 model
+
+.subckt pv_slack_LF v1r v1i v_m p_m q_mx
++ params:
++ on=1 ; not used
++ vmag = 1
++ p = 0
++ qlo=-100e6
++ qup=50e6
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ ilolim=-100e9
++ iuplim=100e9
++ uout=1
+.param p1 = {p/sfactor}
+.param v1 = {vmag/vfactor}
+.param fact=0
+.param fact2={fact+1}
+.param qmin={(qlo-qup)*fact2}
+.param qmax={(qlo-qup)*fact}
+.param qlbatt={-qmin+qlo}
+  v1 ss 0 1 ; for source stepping
+* l_batt to ensure only negative q output of the PV slack
+  xLoad  v1r v1i v2_m q2_m l_batt_LF params: on={on} q={qlbatt} vn={vmag} vfactor={vfactor} sfactor={sfactor}
+* PQ output of the slack
+  gi1r   v1r   v10  Value = {LIMIT( ((p*v(ss)*v(ss)*on/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
+  +                           ((v(q_m)*v(ss)*v(ss)*on/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)),ilolim,iuplim) } tripdv={TRIPDV} tripdt={TRIPDT} ; i1r
+  gi1i   v1i   v20  Value = {LIMIT( ((-v(q_m)*v(ss)*v(ss)*on/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
+  +                           ((p*v(ss)*v(ss)*on/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)),ilolim,iuplim) } tripdv={TRIPDV} tripdt={TRIPDT} ; i1i
+  vi1r   v10   0    dc 0v;   currentmeter
+  vi1i   v20   0    dc 0v;   currentmeter
+* now the equations : with v1r1 and with v1i1 -> q_m1(q_m) is computed, and this is the input for the constpower element above
+  gv1r  0   v1r1  value =  {on*((p1*v(ss)*v(ss)*i(vi1r)+i(vi1i)*sqrt((v1*v(ss))**2*(i(vi1r)**2+i(vi1i)**2)-(p1*v(ss)*v(ss))**2))/(i(vi1r)**2+i(vi1i)**2)+1e-10)} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT} ; real volt output
+  gv1i  0   v1i1  value =  {on*((p1*v(ss)*v(ss)*i(vi1i)-i(vi1r)*sqrt((v1*v(ss))**2*(i(vi1r)**2+i(vi1i)**2)-(p1*v(ss)*v(ss))**2))/(i(vi1r)**2+i(vi1i)**2)+1e-10)} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT} ; imag volt output
+  gqlim 0 q_m value={on*limit(v(q_m1),qmin,qmax)} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+  gq    0 q_m1 value = {(v(v1i1)*i(vi1r)-v(v1r1)*i(vi1i))*sfactor} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}  ; imag power
+  * measurement stuff
+  ev v_m  0 value = {uout*vfactor*sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i_m)} tripdv={TRIPDV} tripdt={TRIPDT} ; abs. voltage
+  ep p_m  0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}  ; real power
+  eqmx  q_mx 0 value={v(q_m)+v(q2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  eiabs_m i_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))} tripdv={TRIPDV} tripdt={TRIPDT} ; abs. current
+  es1mag_m  s_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i_m) * sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  rvm v_m 0  1e12
+  rpm p_m 0  1e12
+  rqmx q_mx 0 1e12
+  rim i_m 0 1e12
+  rsm s_m 0 1e12
+  rmax1   v1r  0  1e12
+  rmax2   v1i  0  1e12
+.ends
+
+* pv_slack with sgn() function for q
+* This model converges often not for positive Q output
+* Therefore use instead PV_slack_LF and LF3 model !!!!!!
+* which convert qlo,qup to only negative Q values qmin...0
+* P=vr*ir+vi*ii
+* V=sqrt(vr*vr+vi*vi)
+* vr=(P*ir +/- ii*sqrt((V*V*(ir*ir+ii*ii))-P*P))/(ir*ir+ii*ii) + for delivering Q - for consuming Q
+* vi=(P*ii -/+ ir*sqrt((V*V*(ir*ir+ii*ii))-P*P))/(ir*ir+ii*ii) - for delivering Q + for consuming Q
+* experimental! better use pv_slack_LF3 for better convergence
+
+.subckt pv_slack_LF2 v1r v1i v_m p_m q_m
++ params:
++ on=1
++ vmag = 1
++ p = 0
++ qlo=-100e6
++ qup=50e6
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ ilolim=-100e9
++ iuplim=100e9
++ uout=1
+.param p1 = {p/sfactor}
+.param v1 = {vmag/vfactor}
+  v1 ss 0 1 ; for source stepping; const p,q output
+  gi1r   v1r   v10  Value = {LIMIT( ((p*v(ss)*v(ss)*on/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
+  +                           ((v(q_m)*v(ss)*v(ss)*on/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)),ilolim,iuplim) } tripdv={TRIPDV} tripdt={TRIPDT} ; i1r
+  gi1i   v1i   v20  Value = {LIMIT( ((-v(q_m)*v(ss)*v(ss)*on/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
+  +                           ((p*v(ss)*v(ss)*on/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)),ilolim,iuplim) } tripdv={TRIPDV} tripdt={TRIPDT} ; i1i
+  vi1r   v10   0    dc 0v;   currentmeter
+  vi1i   v20   0    dc 0v;   currentmeter
+* now the equations : with v1r1 and with v1i1 q_m1(q_m) is computed
+  gv1r  0   v1r1  value =  {on*((p1*v(ss)*v(ss)*i(vi1r)-i(vi1i)*sgn(v(q_m))*sqrt((v1*v(ss))**2*(i(vi1r)**2+i(vi1i)**2)-(p1*v(ss)*v(ss))**2))/(i(vi1r)**2+i(vi1i)**2)+1e-10)} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT} ; real volt output
+  gv1i  0   v1i1  value =  {on*((p1*v(ss)*v(ss)*i(vi1i)+i(vi1r)*sgn(v(q_m))*sqrt((v1*v(ss))**2*(i(vi1r)**2+i(vi1i)**2)-(p1*v(ss)*v(ss))**2))/(i(vi1r)**2+i(vi1i)**2)+1e-10)} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT} ; imag volt output
+  gq 0  q_m1 value = {(v(v1i1)*i(vi1r)-v(v1r1)*i(vi1i))*sfactor} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}  ; imag power
+  * measurement stuff
+  evm  v_m 0 value = {uout*vfactor*sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*(1-uout)*v(i_m)} tripdv={TRIPDV} tripdt={TRIPDT} ; abs. voltage
+  epm  p_m 0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}  ; real power
+  eqlim q_m 0 value={on*limit(v(q_m1),qlo,qup)} tripdv={TRIPDV} tripdt={TRIPDT}
+  eiabs_m i_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))} tripdv={TRIPDV} tripdt={TRIPDT} ; abs. current
+  es1mag_m  s_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i_m) * sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  rvm  v_m 0 1e12
+  rpm  p_m 0 1e12
+  rqm  q_m 0 1e12
+  rim i_m 0 1e12
+  rsm s_m 0 1e12
+  rmax1   v1r  0  1e12
+  rmax2   v1i  0  1e12
+.ends
+
+*********************************************************************
+* pv_slack without sgn() function -> THIS SHOULD BE THE DEFAULT SLACK
+*********************************************************************
+* P=vr*ir+vi*ii
+* V=sqrt(vr*vr+vi*vi) -> follows: the signed version
+****************************************************************************************************
+* vr=(P*ir +/- ii*sqrt((V*V*(ir*ir+ii*ii))-P*P))/(ir*ir+ii*ii) + for delivering Q - for consuming Q
+* vi=(P*ii -/+ ir*sqrt((V*V*(ir*ir+ii*ii))-P*P))/(ir*ir+ii*ii) - for delivering Q + for consuming Q
+****************************************************************************************************
+* This model has q-limits and has good convergence
+* In this model only the first part of the equns are used:
+* negative q output is used (The part for delivering q !!)
+* To let the model only output negative q values
+* The q-limit is shifted internally from qlo ,qup to
+* qmin=qlo-qup and qmax=0 which are now negative to zero. To let the pv element only output negative
+* q values a constant power element (P0=0 Q=-qmin+qlo) is switched parallel to the pv-element
+* and so the pv-element is forced to output only negative q values
+* This all make the convergence much better as in the q-signed valued
+* case. Therefore this model is the default for pv-slacks !
+* In this model also a new parameter dp is defined which is default zero
+* If <>0 this parameter can help convergence especially in the special P=0 case
+* This parameter shifts the p-output of the PV-slack which is now
+* feeding a constant power element (P=dp Q=qconst)
+
+
+.subckt pv_slack_LF3 v1r v1i v_m p_m q_mx
++ params:
++ on=1 ; not used
++ vmag = 1
++ p = 0
++ qlo=-100e6
++ qup=50e6
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ dp=0 ; try to change this parameter if convergence fails with a specific p-value  (especially with zero p)
++ ilolim=-100e9
++ iuplim=100e9
++ rp=1e10
++ uout=1
+.param p1 = {(p+dp)/sfactor}
+.param v1 = {vmag/vfactor}
+.param fact=0
+.param fact2={fact+1}
+.param qmin={(qlo-qup)*fact2}
+.param qmax={(qlo-qup)*fact}
+.param qconst={-qmin+qlo}
+  v1 ss 0 1 ; for source stepping
+* PQ-element to ensure only negative q output of the PV slack
+  xLoad  v1r v1i v2_m p2_m q2_m constpower_LF params: on={on} q={qconst} p={-dp} vfactor={vfactor} sfactor={sfactor} ilolim={ilolim} iuplim={iuplim}
+* PQ-output of the slack
+  gi1r   v1r   v10  Value = {LIMIT( (((p+dp)*v(ss)*v(ss)*on/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
+  +                           ((v(q_m)*v(ss)*v(ss)*on/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)),ilolim,iuplim) } tripdv={TRIPDV} tripdt={TRIPDT} ; i1r
+  gi1i   v1i   v20  Value = {LIMIT( ((-v(q_m)*v(ss)*v(ss)*on/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
+  +                           (((p+dp)*v(ss)*v(ss)*on/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)),ilolim,iuplim) } tripdv={TRIPDV} tripdt={TRIPDT} ; i1i
+  vi1r   v10   0    dc 0v;   currentmeter
+  vi1i   v20   0    dc 0v;   currentmeter
+* now the equations : with v1r1 and with v1i1 -> q_m1(q_m) is computed, and this is the input for the PQ element above
+  gv1r  0   v1r1  value =  {on*((p1*v(ss)*v(ss)*i(vi1r)+i(vi1i)*sqrt((v1*v(ss))**2*(i(vi1r)**2+i(vi1i)**2)-(p1*v(ss)*v(ss))**2))/(i(vi1r)**2+i(vi1i)**2)+1e-10)} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT} ; real volt output
+  gv1i  0   v1i1  value =  {on*((p1*v(ss)*v(ss)*i(vi1i)-i(vi1r)*sqrt((v1*v(ss))**2*(i(vi1r)**2+i(vi1i)**2)-(p1*v(ss)*v(ss))**2))/(i(vi1r)**2+i(vi1i)**2)+1e-10)} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT} ; imag volt output
+  gqlim 0  q_m  value={on*limit(v(q_m1),qmin,qmax)} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+  gq 0  q_m1  value = {(v(v1i1)*i(vi1r)-v(v1r1)*i(vi1i))*sfactor} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}  ; imag power
+  * measurement stuff
+  evm  v_m 0 value = {uout*vfactor*sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i_m)}  tripdv={TRIPDV} tripdt={TRIPDT} ; abs. voltage
+  epm  p_m  0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor-dp*on} tripdv={TRIPDV} tripdt={TRIPDT}  ; real power
+  eqmx  q_mx 0 value={v(q_m)+v(q2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  eiabs_m i_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))} tripdv={TRIPDV} tripdt={TRIPDT} ; abs. current
+  es1mag_m  s_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i_m) * sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  rvm v_m 0 1e12
+  rpm p_m  0 1e12
+  rqmx q_mx 0 1e12
+  rim i_m 0 1e12
+  rsm s_m 0 1e12
+  rmax1   v1r  0  {rp}
+  rmax2   v1i  0  {rp}
+.ends
+
+
+* Model for Vri_slack-Component
+* Voltage slack with vr and vi (nominal value of real,imag part of voltage)
+*
+*
+.subckt vri_slack_LF v1r v1i v_m p_m q_m
++ params:
++ on = 1
++ vr = 110000
++ vi = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ uout=1
+  ev1r     v1r    v10  value =  { on*(vr/vfactor)+(1-on)*v(v1r) } tripdv={TRIPDV} tripdt={TRIPDT} ; real volt output
+  ev1i     v1i    v20  value =  { on*(vi/vfactor)+(1-on)*v(v1i) } tripdv={TRIPDV} tripdt={TRIPDT} ; imag volt output
+  vi1r     v10    0    dc   0v
+  vi1i     v20    0    dc   0v
+  * measurement stuff
+  evabs_m v_m 0 value = {uout*vfactor*sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i_m)}  tripdv={TRIPDV} tripdt={TRIPDT} ; abs. voltage
+  ep1 p_m 0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ; real power
+  eq1 q_m 0 value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ; imag power
+  eiabs_m i_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))} tripdv={TRIPDV} tripdt={TRIPDT} ; abs. current
+  es1mag_m  s_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i_m) * sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  rvm v_m 0 1e12
+  rpm p_m  0 1e12
+  rqm q_m 0 1e12
+  rsm s_m 0 1e12
+  rim i_m 0 1e12
+  rmax1   v1r  0  1e12
+  rmax2   v1i  0  1e12
+.ends
+*$
+
+* Model for Vri_slack-Component
+* Voltage slack with vr and vi (nominal value of real,imag part of voltage)
+* and with additional neutral port output pin
+.subckt vri_slack_n_LF v1r v1i nr ni v_m p_m q_m
++ params:
++ on = 1
++ vr = 110000
++ vi = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ uout=1
+  ev1r     v1r    v10  value =  { on*(vr/vfactor)+(1-on)*v(v1r,nr) } tripdv={TRIPDV} tripdt={TRIPDT} ; real volt output
+  ev1i     v1i    v20  value =  { on*(vi/vfactor)+(1-on)*v(v1i,ni) } tripdv={TRIPDV} tripdt={TRIPDT} ; imag volt output
+  vi1r     v10    nr    dc   0v
+  vi1i     v20    ni   dc   0v
+  * measurement stuff
+  evabs_m  v_m 0 value = {uout*vfactor*sqrt(v(v1r,nr)*v(v1r,nr)+v(v1i,ni)*v(v1i,ni))+(1-uout)*v(i_m)}  tripdv={TRIPDV} tripdt={TRIPDT} ; abs. voltage
+  ep1  p_m 0  value = {(v(v1r,nr)*i(vi1r)+v(v1i,ni)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ; real power
+  eq1  q_m 0  value = {(v(v1i,ni)*i(vi1r)-v(v1r,nr)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ; imag power
+  eiabs_m i_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))} tripdv={TRIPDV} tripdt={TRIPDT} ; abs. current
+  es1mag_m  s_m 0 value = {sqrt(v(v1r,nr)*v(v1r,nr)+v(v1i,ni)*v(v1i,ni))*v(i_m) * sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  rvm v_m 0 1e12
+  rpm p_m  0 1e12
+  rqm q_m 0 1e12
+  rim i_m 0 1e12
+  rsm s_m 0 1e12
+  rmax1   v1r  0  1e12
+  rmax2   v1i  0  1e12
+.ends
+*$
+* Model for Vri_slack-Component
+* delta Voltage slack with vr and vi (nominal value of real,imag part of voltage)
+* and with additional output pins
+.subckt vri_slack_LF2 v1r n1r v1i n1i v_m p_m q_m
++ params:
++ on = 1
++ vr = 110000
++ vi = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ uout=1
+  ev1r     v1r    v10  value =  { on*(vr/vfactor)+(1-on)*v(v1r,n1r) } tripdv={TRIPDV} tripdt={TRIPDT} ; real volt output
+  ev1i     v1i    v20  value =  { on*(vi/vfactor)+(1-on)*v(v1i,n1i) } tripdv={TRIPDV} tripdt={TRIPDT} ; imag volt output
+  vi1r     v10    n1r    dc   0v
+  vi1i     v20    n1i    dc   0v
+  * measurement stuff
+  ev1mag_m v_m 0 value = {uout*vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i1_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  ev2mag_m v2_m 0 value = {vfactor * sqrt(v(n1r)*v(n1r)+v(n1i)*v(n1i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei1mag_m i1_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei2mag_m i2_m 0 value = {-v(i1_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  es1mag_m s1_m 0 value = {v(v_m)*v(i1_m) * sfactor/vfactor } tripdv={TRIPDV} tripdt={TRIPDT}
+  ep1 p_m 0  value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  ep2 p2_m 0  value = {(v(n1r)*i(vi1r)+v(n1i)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q_m 0  value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  eq2 q2_m 0  value = {(v(n1i)*i(vi1r)-v(n1r)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  epv pv_m 0  value = {v(p_m)+v(p2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  eqv qv_m 0  value = {v(q_m)+v(q2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  rv1mag v_m 0 1e12
+  rv2mag v2_m 0 1e12
+  ri1mag i1_m 0 1e12
+  ri2mag i2_m 0 1e12
+  rsmag s1_m 0 1e12
+  rp1 p_m  0 1e12
+  rp2 p2_m  0 1e12
+  rq1 q_m  0 1e12
+  rq2 q2_m  0 1e12
+  rpv pv_m  0 1e12
+  rqv qv_m  0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+  rmax3  n1r  0   1e12
+  rmax4  n1i  0   1e12
+.ends
+*
+* Iri_Slack
+* Constant current element
+* ir,ii real and imag current input
+.subckt iri_slack_LF v1r v1i i_m p_m q_m
++ params:
++ on = 1
++ ir = 400
++ ii = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ uout=0
+  i1r   v1r    v10  dc  {on*ir} ; real curr output
+  i1i   v1i    v20  dc  {on*ii} ; imag curr output
+  vi1r  v10    0    dc  0v
+  vi1i  v20    0    dc  0v
+  * measurement stuff
+  eiabs_m i_m 0 value = {(1-uout)*sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))+uout*v(v_m)}  tripdv={TRIPDV} tripdt={TRIPDT} ; abs. current
+  evabs_m v_m 0 value = {vfactor*sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))}  tripdv={TRIPDV} tripdt={TRIPDT} ; abs. voltage
+  es1mag_m  s_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i_m) * sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  ep1 p_m 0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ; real power
+  eq1 q_m 0 value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ; imag power
+  rvm v_m 0 1e12
+  rpm p_m  0 1e12
+  rqm q_m 0 1e12
+  rim i_m 0 1e12
+  rsm s_m 0 1e12
+.ends
+*$
+* serial iri_slack
+.subckt iri_slack_LF2 v1r n1r v1i n1i i_m p_m q_m
++ params:
++ on = 1
++ ir = 400
++ ii = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
+  i1r   v1r    v10  dc  {on*ir} ; real curr output
+  i1i   v1i    v20  dc  {on*ii} ; imag curr output
+  vi1r  v10    n1r    dc  0v
+  vi1i  v20    n1i    dc  0v
+  * measurement stuff
+  ev1mag_m v1_m 0 value = {vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ev2mag_m v2_m 0 value = {vfactor * sqrt(v(n1r)*v(n1r)+v(n1i)*v(n1i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei1mag_m i_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei2mag_m i2_m 0 value = {-v(i_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  es1mag_m s1_m 0 value = {v(v1_m)*v(i_m) * sfactor/vfactor } tripdv={TRIPDV} tripdt={TRIPDT}
+  ep1 p_m 0  value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  ep2 p2_m 0  value = {(v(n1r)*i(vi1r)+v(n1i)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q_m 0  value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  eq2 q2_m 0  value = {(v(n1i)*i(vi1r)-v(n1r)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  epv pv_m 0  value = {v(p_m)+v(p2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  eqv qv_m 0  value = {v(q_m)+v(q2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  rv1mag v1_m 0 1e12
+  rv2mag v2_m 0 1e12
+  ri1mag i_m 0 1e12
+  ri2mag i2_m 0 1e12
+  rsmag s1_m 0 1e12
+  rp1 p_m  0 1e12
+  rp2 p2_m  0 1e12
+  rq1 q_m  0 1e12
+  rq2 q2_m  0 1e12
+  rpv pv_m  0 1e12
+  rqv qv_m  0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+  rmax3  n1r  0   1e12
+  rmax4  n1i  0   1e12
+.ends
+
+
+* Constant current element
+* with input of p,q,v instead of ir,ii
+.subckt iri_slack_pqv_LF v1r v1i i_m p_m q_m
++ params:
++ on = 1
++ p=1e6
++ q=0
++ vn=120000
++ vfactor = {sqrt(3)}
++ sfactor = 3
+.param ir={(vfactor/sfactor)*p/vn}
+.param ii={-(vfactor/sfactor)*q/vn}
+  i1r   v1r    v10  dc  {on*ir} ; real curr output
+  i1i   v1i    v20  dc  {on*ii} ; imag curr output
+  vi1r  v10    0    dc  0v
+  vi1i  v20    0    dc  0v
+  * measurement stuff
+  eiabs_m i_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))}  tripdv={TRIPDV} tripdt={TRIPDT} ; abs. current
+  evabs_m v_m 0 value = {vfactor*sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))}  tripdv={TRIPDV} tripdt={TRIPDT} ; abs. voltage
+  ep1 p_m 0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ; real power
+  eq1 q_m 0 value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ; imag power
+  es1mag_m  s_m 0 value = {v(v_m)*v(i_m) * sfactor/vfactor }  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  rvm v_m 0 1e12
+  rpm p_m  0 1e12
+  rqm q_m 0 1e12
+  rim i_m 0 1e12
+  rsm s_m 0 1e12
+.ends
+*$
+*$
+*
+*
+* Voltage slack with input of
+* voltage magnitude and phase instead of vr,vi
+.subckt vri_slack2_LF v1r v1i v_m p_m q_m
++ params:
++ on = 1
++ vmag = 110000
++ delta = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ uout=1
+.param vr = {vmag*cos(delta*3.1415926535897935/180)}
+.param vi = {vmag*sin(delta*3.1415926535897935/180)}
+  ev1r     v1r    v10  value =  { on*(vr/vfactor)+(1-on)*v(v1r) } tripdv={TRIPDV} tripdt={TRIPDT} ; real volt output
+  ev1i     v1i    v20  value =  { on*(vi/vfactor)+(1-on)*v(v1i) } tripdv={TRIPDV} tripdt={TRIPDT} ; imag volt output
+  vi1r     v10    0    dc   0v
+  vi1i     v20    0    dc   0v
+  * measurement stuff
+  eiabs_m i_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))}  tripdv={TRIPDV} tripdt={TRIPDT} ; abs. current
+  evabs_m v_m 0 value = {uout*vfactor*sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*(1-uout)*v(i_m)}  tripdv={TRIPDV} tripdt={TRIPDT} ; abs. voltage
+  ep1 p_m 0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ; real power
+  eq1 q_m 0 value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ; imag power
+  es1mag_m  s_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i_m) * sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  rvm v_m 0 1e12
+  rpm p_m  0 1e12
+  rqm q_m 0 1e12
+  rim i_m 0 1e12
+  rsm s_m 0 1e12
+  rmax1   v1r  0  1e12
+  rmax2   v1i  0  1e12
+.ends
+*$
+*
+* Voltage slack with input of
+* voltage magnitude and phase instead of vr,vi
+* with additional neutral port outputpin
+.subckt vri_slack2_n_LF v1r nr v1i ni v_m p_m q_m
++ params:
++ on = 1
++ vmag = 110000
++ delta = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
+.param vr = {vmag*cos(delta*3.1415926535897935/180)}
+.param vi = {vmag*sin(delta*3.1415926535897935/180)}
+  ev1r     v1r    v10  value =  { on*(vr/vfactor)+(1-on)*v(v1r,nr) } tripdv={TRIPDV} tripdt={TRIPDT} ; real volt output
+  ev1i     v1i    v20  value =  { on*(vi/vfactor)+(1-on)*v(v1i,ni) } tripdv={TRIPDV} tripdt={TRIPDT} ; imag volt output
+  vi1r     v10    nr    dc   0v
+  vi1i     v20    ni   dc   0v
+  * measurement stuff
+  eiabs_m i_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))}  tripdv={TRIPDV} tripdt={TRIPDT} ; abs. current
+  evabs_m v_m 0 value = {vfactor*sqrt(v(v1r,nr)*v(v1r,nr)+v(v1i,ni)*v(v1i,ni))}  tripdv={TRIPDV} tripdt={TRIPDT} ; abs. voltage
+  ep1 p_m  0 value = {(v(v1r,nr)*i(vi1r)+v(v1i,ni)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ; real power
+  eq1 q_m  0 value = {(v(v1i,ni)*i(vi1r)-v(v1r,nr)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ; imag power
+  es1mag_m  s_m 0 value = {v(v_m)*v(i_m) * sfactor/vfactor }  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  rvm v_m 0 1e12
+  rpm p_m  0 1e12
+  rqm q_m 0 1e12
+  rim i_m 0 1e12
+  rsm s_m 0 1e12
+  rmax1   v1r  0  1e12
+  rmax2   v1i  0  1e12
+.ends
+
+* delta Voltage slack with input of
+* voltage magnitude and phase instead of vr,vi
+* with additional outputport 
+.subckt vri_slack2_LF2 v1r n1r v1i n1i v_m p_m q_m
++ params:
++ on = 1
++ vmag = 110000
++ delta = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ uout=1
+.param vr = {vmag*cos(delta*3.1415926535897935/180)}
+.param vi = {vmag*sin(delta*3.1415926535897935/180)}
+  ev1r     v1r    v10  value =  { on*(vr/vfactor)+(1-on)*v(v1r,n1r) } tripdv={TRIPDV} tripdt={TRIPDT} ; real volt output
+  ev1i     v1i    v20  value =  { on*(vi/vfactor)+(1-on)*v(v1i,n1i) } tripdv={TRIPDV} tripdt={TRIPDT} ; imag volt output
+  vi1r     v10    n1r   dc   0v
+  vi1i     v20    n1i   dc   0v
+  * measurement stuff
+  ev1mag_m v_m 0 value = {uout*vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i1_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  ev2mag_m v2_m 0 value = {vfactor * sqrt(v(n1r)*v(n1r)+v(n1i)*v(n1i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei1mag_m i1_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei2mag_m i2_m 0 value = {-v(i1_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  es1mag_m s1_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i1_m) * sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  ep1 p_m 0  value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  ep2 p2_m 0  value = {(v(n1r)*i(vi1r)+v(n1i)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q_m 0  value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  eq2 q2_m 0  value = {(v(n1i)*i(vi1r)-v(n1r)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  epv pv_m 0  value = {v(p_m)+v(p2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  eqv qv_m 0  value = {v(q_m)+v(q2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  rv1mag v_m 0 1e12
+  rv2mag v2_m 0 1e12
+  ri1mag i1_m 0 1e12
+  ri2mag i2_m 0 1e12
+  rsmag s1_m 0 1e12
+  rp1 p_m  0 1e12
+  rp2 p2_m  0 1e12
+  rq1 q_m  0 1e12
+  rq2 q2_m  0 1e12
+  rpv pv_m  0 1e12
+  rqv qv_m  0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+  rmax3  n1r  0   1e12
+  rmax4  n1i  0   1e12
+.ends
+*$
+* Iri_Slack
+*
+* Current slack with input of
+* current magnitude and phase input instead of ir,ii
+.subckt iri_slack2_LF v1r v1i i_m p_m q_m
++ params:
++ on = 1
++ imag = 400
++ delta = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ uout=0
+.param ir = {imag*cos(delta*3.1415926535897935/180)}
+.param ii = {imag*sin(delta*3.1415926535897935/180)}
+  i1r   v1r    v10  dc  {on*ir} ; real curr output
+  i1i   v1i    v20  dc  {on*ii} ; imag curr output
+  vi1r  v10    0    dc  0v
+  vi1i  v20    0    dc  0v
+  * measurement stuff
+  eiabs_m i_m 0 value = {(1-uout)*sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))+uout*v(v_m)}  tripdv={TRIPDV} tripdt={TRIPDT}  ; abs. current
+  evabs_m v_m 0 value = {vfactor*sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))}  tripdv={TRIPDV} tripdt={TRIPDT}  ; abs. voltage
+  ep1 p_m  0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}   ; real power
+  eq1 q_m  0 value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}   ; imag power
+  es1mag_m  s_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i_m) * sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  rvm v_m 0 1e12
+  rpm p_m  0 1e12
+  rqm q_m 0 1e12
+  rim i_m 0 1e12
+  rsm s_m 0 1e12
+  rmax1   v1r  0  1e12
+  rmax2   v1i  0  1e12
+.ends
+*$
+*
+* Current slack with input of
+* current magnitude and phase input instead of ir,ii
+.subckt iri_slack2_LF2 v1r n1r v1i n1i i_m p_m q_m
++ params:
++ on = 1
++ imag = 400
++ delta = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ uout=0 ; default is no voltage output !!
+.param ir = {imag*cos(delta*3.1415926535897935/180)}
+.param ii = {imag*sin(delta*3.1415926535897935/180)}
+  i1r   v1r    v10  dc  {on*ir} ; real curr output
+  i1i   v1i    v20  dc  {on*ii} ; imag curr output
+  vi1r  v10    n1r    dc  0v
+  vi1i  v20    n1i    dc  0v
+  * measurement stuff
+  ev1mag_m v1_m 0 value = {vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ev2mag_m v2_m 0 value = {vfactor * sqrt(v(n1r)*v(n1r)+v(n1i)*v(n1i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei1mag_m i_m 0 value = {(1-uout)*sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))+uout*v(v1_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei2mag_m i2_m 0 value = {-v(i_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  es1mag_m s1_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i_m) * sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  ep1 p_m 0  value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  ep2 p2_m 0  value = {(v(n1r)*i(vi1r)+v(n1i)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q_m 0  value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  eq2 q2_m 0  value = {(v(n1i)*i(vi1r)-v(n1r)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  epv pv_m 0  value = {v(p_m)+v(p2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  eqv qv_m 0  value = {v(q_m)+v(q2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  rv1mag v1_m 0 1e12
+  rv2mag v2_m 0 1e12
+  ri1mag i_m 0 1e12
+  ri2mag i2_m 0 1e12
+  rsmag s1_m 0 1e12
+  rp1 p_m  0 1e12
+  rp2 p2_m  0 1e12
+  rq1 q_m  0 1e12
+  rq2 q2_m  0 1e12
+  rpv pv_m  0 1e12
+  rqv qv_m  0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+  rmax3  n1r  0   1e12
+  rmax4  n1i  0   1e12
+.ends
+*
+* alternate model for Vri_slack-Component based on thevenin-equivalent
+* current sources
+* on - parameter works in all cases contrary to the vri_slack model
+* for good convergence at pv-slacks set gin to a lower value e.g. 1e5
+*
+.subckt vri_slack_te_LF v1r v1i v_m p_m q_m
++ params:
++ on = 1
++ vr = 110000
++ vi = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ gin = 1e3
++ uout=1
+  vss ss 0 1
+  gv1r     v10    v1r  value =  { on*v(ss)*(vr/vfactor)*gin } tripdv={TRIPDV} tripdt={TRIPDT}  ; real volt output
+  gv1i     v20    v1i  value =  { on*v(ss)*(vi/vfactor)*gin } tripdv={TRIPDV} tripdt={TRIPDT}  ; imag volt output
+  gr1r     v1r    v10  value =  { on*v(ss)*v(v1r)*gin } tripdv={TRIPDV} tripdt={TRIPDT}
+  gr1i     v1i    v20  value =  { on*v(ss)*v(v1i)*gin } tripdv={TRIPDV} tripdt={TRIPDT}
+  vi1r     v10    0    dc   0v
+  vi1i     v20    0    dc   0v
+  eiabs_m i_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))}  tripdv={TRIPDV} tripdt={TRIPDT}  ; abs. current
+  evabs_m v_m 0 value = {uout*vfactor*sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i_m)}  tripdv={TRIPDV} tripdt={TRIPDT}  ; abs. voltage
+  ep1 p_m  0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}   ; real power
+  eq1 q_m  0 value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}   ; imag power
+  es1mag_m  s_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i_m) * sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  rvm v_m 0 1e12
+  rpm p_m  0 1e12
+  rqm q_m 0 1e12
+  rim i_m 0 1e12
+  rsm s_m 0 1e12
+  rmax1   v1r  0  1e12
+  rmax2   v1i  0  1e12
+.ends
+*$
+*
+* for good convergence at pv-slacks set gin to a lower value e.g. 1e5
+* with additional neutral pins
+.subckt vri_slack_te_n_LF v1r nr v1i ni v_m p_m q_m
++ params:
++ on = 1
++ vr = 110000
++ vi = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ gin = 1e3
+  vss ss 0 1
+  gv1r     v10    v1r  value =  { on*v(ss)*(vr/vfactor)*gin } tripdv={TRIPDV} tripdt={TRIPDT}  ; real volt output
+  gv1i     v20    v1i  value =  { on*v(ss)*(vi/vfactor)*gin } tripdv={TRIPDV} tripdt={TRIPDT}  ; imag volt output
+  gr1r     v1r    v10  value =  { on*v(ss)*v(v1r,nr)*gin } tripdv={TRIPDV} tripdt={TRIPDT}
+  gr1i     v1i    v20  value =  { on*v(ss)*v(v1i,ni)*gin } tripdv={TRIPDV} tripdt={TRIPDT}
+  vi1r     v10    nr   dc   0v
+  vi1i     v20    ni   dc   0v
+  * measurement stuff
+  eiabs_m i_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))}  tripdv={TRIPDV} tripdt={TRIPDT}  ; abs. current
+  evabs_m v_m 0 value = {vfactor*sqrt(v(v1r,nr)*v(v1r,nr)+v(v1i,ni)*v(v1i,ni))}  tripdv={TRIPDV} tripdt={TRIPDT}  ; abs. voltage
+  ep1 p_m 0 value = {(v(v1r,nr)*i(vi1r)+v(v1i,ni)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}   ; real power
+  eq1 q_m 0 value = {(v(v1i,ni)*i(vi1r)-v(v1r,nr)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}   ; imag power
+  es1mag_m  s_m 0 value = {v(v_m)*v(i_m) * sfactor/vfactor }  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  rvm v_m 0 1e12
+  rpm p_m  0 1e12
+  rqm q_m 0 1e12
+  rim i_m 0 1e12
+  rsm s_m 0 1e12
+  rmax1   v1r  0  1e12
+  rmax2   v1i  0  1e12
+.ends
+*$
+
+*
+*
+* alternate model for Vri_slack2 - component based on thevenin-equivalent
+* current sources
+* on - parameter works in all cases contrary to the vri_slack2 element
+* for good convergence at pv-slacks set gin to a lower value e.g. 1e5
+.subckt vri_slack2_te_LF v1r v1i v_m p_m q_m
++ params:
++ on = 1
++ vmag = 110000
++ delta = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ gin = 1e3
+.param vr = {vmag*cos(delta*3.1415926535897935/180)}
+.param vi = {vmag*sin(delta*3.1415926535897935/180)}
+  vss ss 0 1
+  gv1r     v10    v1r  value =  { on*v(ss)*(vr/vfactor)*gin } tripdv={TRIPDV} tripdt={TRIPDT}  ; real volt output
+  gv1i     v20    v1i  value =  { on*v(ss)*(vi/vfactor)*gin } tripdv={TRIPDV} tripdt={TRIPDT}  ; imag volt output
+  gr1r     v1r    v10  value =  { on*v(ss)*v(v1r)*gin } tripdv={TRIPDV} tripdt={TRIPDT}
+  gr1i     v1i    v20  value =  { on*v(ss)*v(v1i)*gin } tripdv={TRIPDV} tripdt={TRIPDT}
+  vi1r     v10    0    dc   0v
+  vi1i     v20    0    dc   0v
+  * measurement stuff
+  eiabs_m i_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))}  tripdv={TRIPDV} tripdt={TRIPDT}  ; abs. current
+  evabs_m v_m 0 value = {vfactor*sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))}  tripdv={TRIPDV} tripdt={TRIPDT}  ; abs. voltage
+  ep1 p_m  0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}   ; real power
+  eq1 q_m  0 value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}   ; imag power
+  es1mag_m  s_m 0 value = {v(v_m)*v(i_m) * sfactor/vfactor }  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  rvm v_m 0 1e12
+  rpm p_m  0 1e12
+  rqm q_m 0 1e12
+  rim i_m 0 1e12
+  rsm s_m 0 1e12
+  rmax1   v1r  0  1e12
+  rmax2   v1i  0  1e12
+.ends
+*$
+
+* for good convergence at pv-slacks set gin to a lower value e.g. 1e5
+* with additional neutral pins output
+.subckt vri_slack2_te_n_LF v1r nr v1i ni v_m p_m q_m
++ params:
++ on = 1
++ vmag = 110000
++ delta = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ gin = 1e3
+.param vr = {vmag*cos(delta*3.1415926535897935/180)}
+.param vi = {vmag*sin(delta*3.1415926535897935/180)}
+  vss ss 0 1
+  gv1r     v10    v1r  value =  { on*v(ss)*(vr/vfactor)*gin } tripdv={TRIPDV} tripdt={TRIPDT}  ; real volt output
+  gv1i     v20    v1i  value =  { on*v(ss)*(vi/vfactor)*gin } tripdv={TRIPDV} tripdt={TRIPDT}  ; imag volt output
+  gr1r     v1r    v10  value =  { on*v(ss)*v(v1r,nr)*gin } tripdv={TRIPDV} tripdt={TRIPDT}
+  gr1i     v1i    v20  value =  { on*v(ss)*v(v1i,ni)*gin } tripdv={TRIPDV} tripdt={TRIPDT}
+  vi1r     v10    nr    dc   0v
+  vi1i     v20    ni    dc   0v
+  * measurement stuff
+  eiabs_m i_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))}  tripdv={TRIPDV} tripdt={TRIPDT}  ; abs. current
+  evabs_m v_m 0 value = {vfactor*sqrt(v(v1r,nr)*v(v1r,nr)+v(v1i,ni)*v(v1i,ni))}  tripdv={TRIPDV} tripdt={TRIPDT}  ; abs. voltage
+  ep1 p_m 0 value = {(v(v1r,nr)*i(vi1r)+v(v1i,ni)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}   ; real power
+  eq1 q_m 0 value = {(v(v1i,ni)*i(vi1r)-v(v1r,nr)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}   ; imag power
+  es1mag_m  s_m 0 value = {v(v_m)*v(i_m) * sfactor/vfactor }  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  rvm v_m 0 1e12
+  rpm p_m  0 1e12
+  rqm q_m 0 1e12
+  rim i_m 0 1e12
+  rsm s_m 0 1e12
+  rmax1   v1r  0  1e12
+  rmax2   v1i  0  1e12
+.ends
+*$
+
+* Three phase voltage source with neutral ports
+.subckt vri_3phase_n_LF v1r v1i v2r v2i v3r v3i nr ni v1_m p1_m q1_m v2_m p2_m q2_m v3_m p3_m q3_m
++ params:
++ on = 1
++ v = 110000
++ delta1 = 0
++ delta2 = -120
++ delta3 = 120
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ gin = 1e3
+.param vL1r = {v*cos(delta1*3.1415926535897935/180)}
+.param vL1i = {v*sin(delta1*3.1415926535897935/180)}
+.param vL2r = {v*cos(delta2*3.1415926535897935/180)}
+.param vL2i = {v*sin(delta2*3.1415926535897935/180)}
+.param vL3r = {v*cos(delta3*3.1415926535897935/180)}
+.param vL3i = {v*sin(delta3*3.1415926535897935/180)}
+  gv1r     v10    v1r  value =  { on*(vL1r/vfactor)*gin } tripdv={TRIPDV} tripdt={TRIPDT}  ; real volt output
+  gv1i     v1a    v1i  value =  { on*(vL1i/vfactor)*gin } tripdv={TRIPDV} tripdt={TRIPDT}  ; imag volt output
+  gr1r     v1r    v10  value =  { on*v(v1r,nr)*gin } tripdv={TRIPDV} tripdt={TRIPDT}
+  gr1i     v1i    v1a  value =  { on*v(v1i,ni)*gin } tripdv={TRIPDV} tripdt={TRIPDT}
+  vi1r     v10    nr   dc   0v
+  vi1i     v1a    ni   dc   0v
+  gv2r     v20    v2r  value =  { on*(vL2r/vfactor)*gin } tripdv={TRIPDV} tripdt={TRIPDT}  ; real volt output
+  gv2i     v2a    v2i  value =  { on*(vL2i/vfactor)*gin } tripdv={TRIPDV} tripdt={TRIPDT}  ; imag volt output
+  gr2r     v2r    v20  value =  { on*v(v2r,nr)*gin } tripdv={TRIPDV} tripdt={TRIPDT}
+  gr2i     v2i    v2a  value =  { on*v(v2i,ni)*gin } tripdv={TRIPDV} tripdt={TRIPDT}
+  vi2r     v20    nr   dc   0v
+  vi2i     v2a    ni   dc   0v
+  gv3r     v30    v3r  value =  { on*(vL3r/vfactor)*gin } ; real volt output
+  gv3i     v3a    v3i  value =  { on*(vL3i/vfactor)*gin } ; imag volt output
+  gr3r     v3r    v30  value =  { on*v(v3r,nr)*gin }
+  gr3i     v3i    v3a  value =  { on*v(v3i,ni)*gin }
+  vi3r     v30    nr   dc   0v
+  vi3i     v3a    ni   dc   0v
+  * measurement stuff
+  evabs1_m  v1_m 0 value = {vfactor*sqrt(v(v1r,nr)*v(v1r,nr)+v(v1i,ni)*v(v1i,ni))}  tripdv={TRIPDV} tripdt={TRIPDT} ; abs. voltage
+  ep1       p1_m 0 value = {(v(v1r,nr)*i(vi1r)+v(v1i,ni)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}   ; real power
+  eq1       q1_m 0 value = {(v(v1i,ni)*i(vi1r)-v(v1r,nr)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}   ; imag power
+  evabs2_m  v2_m 0 value = {vfactor*sqrt(v(v2r,nr)*v(v2r,nr)+v(v2i,ni)*v(v2i,ni))}  tripdv={TRIPDV} tripdt={TRIPDT} ; abs. voltage
+  ep2       p2_m 0 value = {(v(v2r,nr)*i(vi2r)+v(v2i,ni)*i(vi2i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ; real power
+  eq2       q2_m 0 value = {(v(v2i,ni)*i(vi2r)-v(v2r,nr)*i(vi2i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ; imag power
+  evabs3_m  v3_m 0 value = {vfactor*sqrt(v(v3r,nr)*v(v3r,nr)+v(v3i,ni)*v(v3i,ni))}  tripdv={TRIPDV} tripdt={TRIPDT} ; abs. voltage
+  ep3       p3_m 0 value = {(v(v3r,nr)*i(vi3r)+v(v3i,ni)*i(vi3i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}   ; real power
+  eq3       q3_m 0 value = {(v(v3i,ni)*i(vi3r)-v(v3r,nr)*i(vi3i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}   ; imag power
+  revabs1_m  v1_m 0 1e12
+  rep1       p1_m 0 1e12
+  req1       q1_m 0 1e12
+  revabs2_m  v2_m 0 1e12
+  rep2       p2_m 0 1e12
+  req2       q2_m 0 1e12
+  revabs3_m  v3_m 0 1e12
+  rep3       p3_m 0 1e12
+  req3       q3_m 0 1e12
+  rmax1   v1r  0  1e12
+  rmax1a  v1i  0  1e12
+  rmax2   v2r  0  1e12
+  rmax2a  v2i  0  1e12
+  rmax3   v3r  0  1e12
+  rmax3a  v3i  0  1e12
+.ends
+*$
+
+* Load model with three modes
+* k=0 is constant impedance mode
+* k=1 is constant current mode
+* k=2 is constant power mode
+.subckt loads_LF v1r v1i v1_m p1_m q1_m
++ params:
++ on = 1
++ p  = 0
++ q  = 0
++ vn = 120000
++ k = 2 ; std. is constpower
++ ilolim=-10000
++ iuplim=10000
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ v1r={vn/vfactor} ; real part of voltage for constcurrent
++ v1i=0            ; imag part of voltage for constcurrent
++ uout=1
+.param k0 = { IF((k<=0),1,0) }
+.param k2 = { IF((k>=2),1,0) }
+.param k1 = { 1-k0-k2 }
+.param v2 = {v1r*v1r+v1i*v1i}
+.param p1 = {p/sfactor}
+.param q1 = {q/sfactor}
+  vss     ss    0    1 ; for source stepping convergence
+* constpower k2
+  gi1r1   v1r   v10  Value = { LIMIT(v(li1r),ilolim,iuplim) } tripdv={TRIPDV} tripdt={TRIPDT} ; i1r
+  gi1i1   v1i   v20  Value = { LIMIT(v(li1i),ilolim,iuplim) } tripdv={TRIPDV} tripdt={TRIPDT} ; i1i
+  g1lir   0    li1r  Value = { k2*(((p*v(ss)*v(ss)*on/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
+  +                           ((q*v(ss)*v(ss)*on/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i))) } rpar=1 tripdv={TRIPDV} tripdt={TRIPDT} ;
+  g1lii   0    li1i  Value = { k2*(((-q*v(ss)*v(ss)*on/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
+  +                           ((p*v(ss)*v(ss)*on/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i))) } rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+* constcurrent k1 (v1r=vn/vfactor v1i=0) assumed !!!
+.param ir={(p1*v1r+q1*v1i)/v2}
+.param ii={-(q1*v1r-p1*v1i)/v2} ;
+  gi1r    v1r    v10  value =  { LIMIT((k1*on*ir),ilolim,iuplim) } tripdv={TRIPDV} tripdt={TRIPDT}; i1r
+  gi1i    v1i    v20  value =  { LIMIT((k1*on*ii),ilolim,iuplim) } tripdv={TRIPDV} tripdt={TRIPDT}; i1i
+* constimpedance  k0
+.param gp = {(p/sfactor)/(vn*vn/vfactor/vfactor)}
+.param gq = {(q/sfactor)/(vn*vn/vfactor/vfactor)}
+  gi1r2   v1r   v10 value = {LIMIT(v(li2r),ilolim,iuplim)} tripdv={TRIPDV} tripdt={TRIPDT} ; i1r
+  gi1i2   v1i   v20 value = {LIMIT(v(li2i),ilolim,iuplim)} tripdv={TRIPDV} tripdt={TRIPDT} ; i1i
+  g2ir  0  li2r Value = {(k0*on*(gq*v(v1i)+gp*v(v1r)))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+  g2ii  0  li2i Value = {(-k0*on*(gq*v(v1r)-gp*v(v1i)))} rpar=1 tripdv={TRIPDV} tripdt={TRIPDT}
+  vi1r   v10   0    dc 0v;   currentmeter
+  vi1i   v20   0    dc 0v;   currentmeter
+  * to enable more measurement -> make additional nodes in first line and uncomment following lines
+  * for inst. to enable measurement of i1_m(magnitude of i1) uncomment ei1mag_m and gi1mag_m and
+  * insert additional node (i1_m) in .subckt line
+  eiabs_m   i1_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))}  tripdv={TRIPDV} tripdt={TRIPDT}  ; abs. current
+  ev1mag_m  v1_m 0 value = {uout*vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i1_m)}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  es1mag_m  s1_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i1_m) * sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  * real,imag - parts of p,q,pv,qv,v1r,v1i
+  ep1 p1_m 0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q1_m 0 value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  rvm v1_m 0 1e12
+  rpm p1_m  0 1e12
+  rqm q1_m 0 1e12
+  rim i1_m 0 1e12
+  rsm s1_m 0 1e12
+  rmax1   v1r  0  1e12
+  rmax2   v1i  0  1e12
+.ends
+*
+*$
+*
+* Model for Constpower - Component
+*
+*
+*
+* Load model only with constant power mode
+.subckt constpower_LF v1r v1i v1_m p1_m q1_m
++ params:
++ on = 1
++ p  = 0
++ q  = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ ilolim=-100e9
++ iuplim=100e9
++ uout=1
+  vss    ss    0    1  ; additional voltage for source stepping convergence
+  gi1r   v1r   v10  Value = {LIMIT( ((p*v(ss)*v(ss)*on/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
+  +                           ((q*v(ss)*v(ss)*on/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)),ilolim,iuplim) } tripdv={TRIPDV} tripdt={TRIPDT} ; i1r
+  gi1i   v1i   v20  Value = {LIMIT( ((-q*v(ss)*v(ss)*on/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
+  +                           ((p*v(ss)*v(ss)*on/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)),ilolim,iuplim) } tripdv={TRIPDV} tripdt={TRIPDT} ; i1i
+  vi1r   v10   0    dc 0v;   currentmeter
+  vi1i   v20   0    dc 0v;   currentmeter
+  eiabs_m   i1_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))}  tripdv={TRIPDV} tripdt={TRIPDT}  ; abs. current
+  ev1mag_m  v1_m 0 value = {uout*vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i1_m)}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  es1mag_m  s1_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i1_m) * sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  ep1 p1_m 0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q1_m 0 value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  rvm v1_m 0 1e12
+  rpm p1_m  0 1e12
+  rqm q1_m 0 1e12
+  rim i1_m 0 1e12
+  rsm s1_m 0 1e12
+  rmax1   v1r  0  1e12
+  rmax2   v1i  0  1e12
+.ends
+
+
+* Same as constpower_LF
+.subckt constpower_boot_LF v1r v1i v1_m p1_m q1_m
++ params:
++ on = 1
++ p  = 0
++ q  = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ ilolim=-100e9
++ iuplim=100e9
+  vss    ss    0    1  ; additional voltage for source stepping convergence
+  gi1r   v1r   v10  Value = {LIMIT( ((p*v(ss)*v(ss)*on/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
+  +                           ((q*v(ss)*v(ss)*on/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)),ilolim,iuplim) } tripdv={TRIPDV} tripdt={TRIPDT} ; i1r
+  gi1i   v1i   v20  Value = {LIMIT( ((-q*v(ss)*v(ss)*on/sfactor)*v(v1r))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)) +
+  +                           ((p*v(ss)*v(ss)*on/sfactor)*v(v1i))/(v(v1r)*v(v1r)+v(v1i)*v(v1i)),ilolim,iuplim) } tripdv={TRIPDV} tripdt={TRIPDT} ; i1i
+  vi1r   v10   0    dc 0v;   currentmeter
+  vi1i   v20   0    dc 0v;   currentmeter
+  eiabs_m   i1_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))}  tripdv={TRIPDV} tripdt={TRIPDT}  ; abs. current
+  ev1mag_m  v1_m 0 value = {vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  es1mag_m  s1_m 0 value = {v(v1_m)*v(i1_m) * sfactor/vfactor }  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  ep1 p1_m 0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q1_m 0 value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  rvm v1_m 0 1e12
+  rpm p1_m  0 1e12
+  rqm q1_m 0 1e12
+  rim i1_m 0 1e12
+  rsm s1_m 0 1e12
+  rmax1   v1r  0  1e12
+  rmax2   v1i  0  1e12
+.ends
+*$
+
+
+*
+* Model for transformer lfl - component
+*
+* This model has an old compatibility mode where the transformer is defined by ykr,yki,y0r,y0i
+* and a new interface with SN,U1Nenn,... parameters same as in the transient toolbox
+* If old parameter are given on the parameterline these parameters are used instead of new parameters
+* If these parameter are not given the new parameters are used !!!
+* NOTE: Since the sign of L_ tap or S_ tap value is not normed and dependent of the transformer manufacturer
+* you can change the behaviour with sign1 and sign2 set to -1 or 1 
+.subckt transformer_LF v1r v1i v2r v2i p1_m q1_m v1_m v2_m p2_m q2_m
++ params:
++ on = 1
++ SN=300e6
++ U1Nenn=400e3
++ U20=120e3
++	uR=0.002
++	uX=0.2
++	i0=0.0006
++	p0=0.0004
++ stproz  = 1.0 ; percentvalue per voltage or phase tap
++ l_ = 0  ; voltage tap
++ s_ = 0  ; phase tap
++ middle = 0  ; middle postion of voltage and phase taps
++ phir = -0.5 ; additional phase for phase regulation real part (change this according to your transformer setting)
++ phii = -0.866025404 ; additional phase for phase regulation imaginary part (change this according to your transformer setting)
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zqfactor = 1.0
++ zlfactor = 1.0
++ sign1=1
++ sign2=1
++ uout=1
+***************************************************
+.param delta=0
+.param uerfact={(cos(-delta*3.1415926535897935/180))}
+.param ueifact={(sin(-delta*3.1415926535897935/180))}
+.param ue={U1Nenn/U20}             ; translation factor at l_=0
+.param inos={SN/U1Nenn/sqrt(3)}    ; nominal current on primary side
+.param inus={inos*U1Nenn/U20}      ; nominal current on secondary side
+.param z1n={U1Nenn/sqrt(3)/inos}           ; nominal impedance
+.param rkos={z1n*ur}             ; ohmic part of short circuit impedance -> cooper lost
+.param xkos={z1n*ux}            ; inductive part of short circuit impedance
+.param rfeos={U1Nenn*U1Nenn/(p0*SN)}  ; lost due to iron modelled as resistance
+.param xhos={U1Nenn*U1Nenn/(SN*sqrt(i0*i0-p0*p0))}  ; magnetic field inductance
+.param vfe={p0*SN}   ; iron_lost
+.param vcu={ur*SN}   ; copper lost
+.param imue={(U1Nenn/sqrt(3))/xhos}     ; current to magnetize iron
+.param ife={(U1Nenn/sqrt(3))/rfeos}     ; current due to iron lost
+.param i0abs={sqrt(imue*imue+ife*ife)}  ; open circuit current = ife + imue
+.param ukn={sqrt(ur*ur+ux*ux)}          ; short circuit impedance
+.param ykr={rkos/(rkos*rkos+xkos*xkos)}
+.param yki={-xkos/(rkos*rkos+xkos*xkos)}
+.param y0r={1/rfeos}
+.param y0i={-1/xhos}
+**************************************************
+.param ykr1 = {ykr/zlfactor}
+.param yki1 = {yki/zlfactor}
+.param y0r1 = {y0r/zqfactor}
+.param y0i1 = {y0i/zqfactor}
+.param reL = {ue*(sign1*l_-middle)*stproz/100}
+.param reS = {ue*(sign2*s_-middle)*stproz/100}
+.param ue1r= {ue*(uerfact)+(reL*uerfact)-reS*(ueifact*phii)+reS*(uerfact*phir)}
+.param ue1i= {ue*(ueifact)+(reL*ueifact)+reS*(uerfact*phii)+reS*(ueifact*phir)}
+.param gar = {(ykr1+0.5*y0r1)*on}
+.param gai = {(yki1+0.5*y0i1)*on}
+.param gbr = {(-ue1r*ykr1+ue1i*yki1)*on}
+.param gbi = {(-ue1i*ykr1-ue1r*yki1)*on}
+.param gcr = {(-ue1r*ykr1-ue1i*yki1)*on}
+.param gci = { (ue1i*ykr1-ue1r*yki1)*on}
+.param gdr = { gar*(ue1r*ue1r+ue1i*ue1i)}
+.param gdi = { gai*(ue1r*ue1r+ue1i*ue1i)}
+  gi1r   v1r   v10  Value = {v(v1r)*gar - v(v1i)*gai + v(v2r)*gbr - v(v2i)*gbi} tripdv={TRIPDV} tripdt={TRIPDT} ; i1r
+  gi1i   v1i   v20  Value = {v(v1r)*gai + v(v1i)*gar + v(v2r)*gbi + v(v2i)*gbr} tripdv={TRIPDV} tripdt={TRIPDT} ; i1i
+  gi2r   v2r   v30  Value = {v(v1r)*gcr - v(v1i)*gci + v(v2r)*gdr - v(v2i)*gdi} tripdv={TRIPDV} tripdt={TRIPDT} ; i2r
+  gi2i   v2i   v40  Value = {v(v1r)*gci + v(v1i)*gcr + v(v2r)*gdi + v(v2i)*gdr} tripdv={TRIPDV} tripdt={TRIPDT} ; i2i
+  vi1r   v10   0    dc 0v;   Current measurment
+  vi1i   v20   0    dc 0v;   Current measurment
+  vi2r   v30   0    dc 0v;   Current measurment
+  vi2i   v40   0    dc 0v;   Current measurment
+  ev1mag_m v1_m 0 value = {uout*vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i1_m)}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  ev2mag_m v2_m 0 value = {uout*vfactor * sqrt(v(v2r)*v(v2r)+v(v2i)*v(v2i))+(1-uout)*v(i2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  ei1mag_m i1_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  ei2mag_m i2_m 0 value = {sqrt(i(vi2r)*i(vi2r)+i(vi2i)*i(vi2i))}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  es1mag_m s1_m 0 value = {v(v1_m)*v(i1_m) * sfactor/vfactor }  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  ep1 p1_m 0  value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  ep2 p2_m 0  value = {(v(v2r)*i(vi2r)+v(v2i)*i(vi2i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q1_m 0  value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq2 q2_m 0  value = {(v(v2i)*i(vi2r)-v(v2r)*i(vi2i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  epv  pv_m 0  value = {v(p1_m)+v(p2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  eqv  qv_m 0  value = {v(q1_m)+v(q2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  rvm1 v1_m 0 1e12
+  rpm1 p1_m  0 1e12
+  rqm1 q1_m 0 1e12
+  rim1 i1_m 0 1e12
+  rim2 i2_m 0 1e12
+  rsm1 s1_m 0 1e12
+  rvm2 v2_m 0 1e12
+  rpm2 p2_m  0 1e12
+  rqm2 q2_m 0 1e12
+  rpv pv_m 0 1e12
+  rqv qv_m 0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+  rmax3  v2r  0   1e12
+  rmax4  v2i  0   1e12
+.ends
+*$
+*
+*
+* like the normal transformer but now with additional neutral port
+* NOTE: Since the sign of L_ tap and S_ tap value is not normed and dependent of the transformer manufacturer
+* you can change the behaviour with sign1 and sign2 set to -1 or 1
+.subckt transformer_extd_LF v1r n1r v1i n1i v2r n2r v2i n2i p1_m q1_m v1_m v2_m p2_m q2_m
++ on = 1
++ SN=300e6
++ U1Nenn=400e3
++ U20=120e3
++	uR=0.002
++	uX=0.2
++	i0=0.0006
++	p0=0.0004
++ stproz  = 1.0
++ l_ = 0
++ s_ = 0
++ middle = 0
++ phir = -0.5
++ phii = -0.866025404
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zqfactor = 1.0
++ zlfactor = 1.0
++ sign1=1
++ sign2=1
+***************************************************
+.param delta=0
+.param uerfact={(cos(-delta*3.1415926535897935/180))}
+.param ueifact={(sin(-delta*3.1415926535897935/180))}
+.param ue={U1Nenn/U20}             ; translation factor at l_=0
+.param inos={SN/U1Nenn/sqrt(3)}    ; nominal current on primary side
+.param inus={inos*U1Nenn/U20}      ; nominal current on secondary side
+.param z1n={U1Nenn/sqrt(3)/inos}           ; nominal impedance
+.param rkos={z1n*ur}             ; ohmic part of short circuit impedance -> cooper lost
+.param xkos={z1n*ux}            ; inductive part of short circuit impedance
+.param rfeos={U1Nenn*U1Nenn/(p0*SN)}  ; lost due to iron modelled as resistance
+.param xhos={U1Nenn*U1Nenn/(SN*sqrt(i0*i0-p0*p0))}  ; magnetic field inductance
+.param vfe={p0*SN}   ; iron_lost
+.param vcu={ur*SN}   ; copper lost
+.param imue={(U1Nenn/sqrt(3))/xhos}     ; current to magnetize iron
+.param ife={(U1Nenn/sqrt(3))/rfeos}     ; current due to iron lost
+.param i0abs={sqrt(imue*imue+ife*ife)}  ; open circuit current = ife + imue
+.param ukn={sqrt(ur*ur+ux*ux)}          ; short circuit impedance
+.param ykr={rkos/(rkos*rkos+xkos*xkos)}
+.param yki={-xkos/(rkos*rkos+xkos*xkos)}
+.param y0r={1/rfeos}
+.param y0i={-1/xhos}
+**************************************************
+.param ykr1 = {ykr/zlfactor}
+.param yki1 = {yki/zlfactor}
+.param y0r1 = {y0r/zqfactor}
+.param y0i1 = {y0i/zqfactor}
+.param reL = {ue*(l_*sign1-middle)*stproz/100}
+.param reS = {ue*(s_*sign2-middle)*stproz/100}
+.param ue1r= {ue*(uerfact)+(reL*uerfact)-reS*(ueifact*phii)+reS*(uerfact*phir)}
+.param ue1i= {ue*(ueifact)+(reL*ueifact)+reS*(uerfact*phii)+reS*(ueifact*phir)}
+.param gar = {(ykr1+0.5*y0r1)*on}
+.param gai = {(yki1+0.5*y0i1)*on}
+.param gbr = {(-ue1r*ykr1+ue1i*yki1)*on}
+.param gbi = {(-ue1i*ykr1-ue1r*yki1)*on}
+.param gcr = {(-ue1r*ykr1-ue1i*yki1)*on}
+.param gci = { (ue1i*ykr1-ue1r*yki1)*on}
+.param gdr = { gar*(ue1r*ue1r+ue1i*ue1i)}
+.param gdi = { gai*(ue1r*ue1r+ue1i*ue1i)}
+ggi1r   v1r   v10  value = {v(v1r,n1r) * gar - v(v1i,n1i) * gai + v(v2r,n2r) * gbr - v(v2i,n2i) * gbi} tripdv={TRIPDV} tripdt={TRIPDT}
+ggi1i   v1i   v20  value = {v(v1r,n1r) * gai + v(v1i,n1i) * gar + v(v2r,n2r) * gbi + v(v2i,n2i) * gbr} tripdv={TRIPDV} tripdt={TRIPDT}
+ggi2r   v2r   v30  value = {v(v1r,n1r) * gcr - v(v1i,n1i) * gci + v(v2r,n2r) * gdr - v(v2i,n2i) * gdi} tripdv={TRIPDV} tripdt={TRIPDT}
+ggi2i   v2i   v40  value = {v(v1r,n1r) * gci + v(v1i,n1i) * gcr + v(v2r,n2r) * gdi + v(v2i,n2i) * gdr} tripdv={TRIPDV} tripdt={TRIPDT}
+vi1r   v10   n1r    dc 0v
+vi1i   v20   n1i    dc 0v
+vi2r   v30   n2r    dc 0v
+vi2i   v40   n2i    dc 0v
+ev1mag_m v1_m 0 value = {vfactor*sqrt(v(v1r,n1r)*v(v1r,n1r)+v(v1i,n1i)*v(v1i,n1i))}  tripdv={TRIPDV} tripdt={TRIPDT}
+ev2mag_m v2_m 0 value = {vfactor*sqrt(v(v2r,n2r)*v(v2r,n2r)+v(v2i,n2i)*v(v2i,n2i))}  tripdv={TRIPDV} tripdt={TRIPDT}
+ei1mag_m  i1_m 0 value={sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))} tripdv={TRIPDV} tripdt={TRIPDT}
+ei2mag_m  i2_m 0 value={sqrt(i(vi2r)*i(vi2r)+i(vi2i)*i(vi2i))}  tripdv={TRIPDV} tripdt={TRIPDT}
+es1mag_m  s1_m 0 value={v(v1_m)*v(i1_m)*sfactor/vfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+ep1 p1_m 0 value={(v(v1r,n1r)*i(vi1r)+v(v1i,n1i)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+ep2 p2_m 0 value={(v(v2r,n2r)*i(vi2r)+v(v2i,n2i)*i(vi2i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+eq1 q1_m 0 value={(v(v1i,n1i)*i(vi1r)-v(v1r,n1r)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+eq2 q2_m 0 value={(v(v2i,n2i)*i(vi2r)-v(v2r,n2r)*i(vi2i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+epv pv_m 0  value={v(p1_m)+v(p2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+eqv qv_m 0  value={v(q1_m)+v(q2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  rvm1 v1_m 0 1e12
+  rpm1 p1_m  0 1e12
+  rqm1 q1_m 0 1e12
+  rim1 i1_m 0 1e12
+  rim2 i2_m 0 1e12
+  rsm1 s1_m 0 1e12
+  rvm2 v2_m 0 1e12
+  rpm2 p2_m  0 1e12
+  rqm2 q2_m 0 1e12
+  rpv pv_m 0 1e12
+  rqv qv_m 0 1e12
+rmax1  v1r  0   1e12
+rmax2  v1i  0   1e12
+rmax3  v2r  0   1e12
+rmax4  v2i  0   1e12
+.ends
+*$
+*
+*
+*
+*
+* Three phase Yy0 transformer with additional neutral ports (e.g. for petersen coil)
+* NOTE: Since the sign of L/S_ tap value is not normed and dependent of the transformer manufacturer
+* you can change the behaviour with sign1 and sign2 set to -1 or 1
+.subckt trafo_Yy0_LF r1r r1i s1r s1i t1r t1i n1r n1i r2r r2i s2r s2i t2r t2i n2r n2i
++ params:
++ on = 1
++ SN=300e6
++ U1Nenn=400e3
++ U20=120e3
++	uR=0.002
++	uX=0.2
++	i0=0.0006
++	p0=0.0004
++ stproz  = 1.0
++ l_ = 0
++ s_ = 0
++ middle = 0
++ phir = -0.5
++ phii = -0.866025404
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zqfactor = 1.0
++ zlfactor = 1.0
++ sign1=1
++ sign2=1
+* ----------------- *
+*+ ue={U1Nenn/U20}
++ lp = 1000
++ rp = 0.001
++ w=314.159
++ k=0.9999
++ rfe=1e6
+XRUr1 r1r n1r r1i n1i r2r n2r r2i n2i  p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m transformer_extd_LF
++ on={on} SN={SN/3} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUs1 s1r n1r s1i n1i s2r n2r s2i n2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m transformer_extd_LF
++ on={on} SN={SN/3} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUt1 t1r n1r t1i n1i t2r n2r t2i n2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m transformer_extd_LF
++ on={on} SN={SN/3} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+* alternative model
+* XRUr1 r1r n1r r1i n1i r2r n2r r2i n2i  p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m l1l2k12_LF on={on} ue={ue} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+* XRUs1 s1r n1r s1i n1i s2r n2r s2i n2i  p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m l1l2k12_LF on={on} ue={ue} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+* XRUt1 t1r n1r t1i n1i t2r n2r t2i n2i  p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m l1l2k12_LF on={on} ue={ue} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+* ideal model
+* XRUr1 r1r n1r r1i n1i r2r n2r r2i n2i  p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m ue2_LF on={on} ue={ue} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+* XRUs1 s1r n1r s1i n1i s2r n2r s2i n2i  p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m ue2_LF on={on} ue={ue} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+* XRUt1 t1r n1r t1i n1i t2r n2r t2i n2i  p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m ue2_LF on={on} ue={ue} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+.ends trafo_Yy0
+*$
+
+* Three phase Yy6 transformer with additional neutral ports (e.g. for petersen coil)
+* NOTE: Since the sign of L/S_ tap value is not normed and dependent of the transformer manufacturer
+* you can change the behaviour with sign1 and sign2 set to -1 or 1
+.subckt trafo_Yy6_LF r1r r1i s1r s1i t1r t1i n1r n1i r2r r2i s2r s2i t2r t2i n2r n2i
++ params:
++ on = 1
++ SN=300e6
++ U1Nenn=400e3
++ U20=120e3
++	uR=0.002
++	uX=0.2
++	i0=0.0006
++	p0=0.0004
++ stproz  = 1.0
++ l_ = 0
++ s_ = 0
++ middle = 0
++ phir = -0.5
++ phii = -0.866025404
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zqfactor = 1.0
++ zlfactor = 1.0
++ sign1=1
++ sign2=1
+* ----------------- *
+*+ ue={U1Nenn/U20}
++ lp = 1000
++ rp = 0.001
++ w=314.159
++ k=0.9999
++ rfe=1e6
+XRUr1 r1r n1r r1i n1i n2r r2r n2i r2i  p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m transformer_extd_LF
++ on={on} SN={SN} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/sqrt(3)}  sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUs1 s1r n1r s1i n1i n2r s2r n2i s2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m transformer_extd_LF
++ on={on} SN={SN} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/sqrt(3)}  sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUt1 t1r n1r t1i n1i n2r t2r n2i t2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m transformer_extd_LF
++ on={on} SN={SN} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/sqrt(3)}  sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+* alternative model
+* XRUr1 r1r n1r r1i n1i n2r r2r n2i r2i  p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m l1l2k12_LF on={on} ue={ue} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+* XRUs1 s1r n1r s1i n1i n2r s2r n2i s2i  p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m l1l2k12_LF on={on} ue={ue} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+* XRUt1 t1r n1r t1i n1i n2r t2r n2i t2i  p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m l1l2k12_LF on={on} ue={ue} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+* ideal model
+* XRUr1 r1r n1r r1i n1i n2r r2r n2i r2i  p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m ue2_LF on={on} ue={ue} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+* XRUs1 s1r n1r s1i n1i n2r s2r n2i s2i  p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m ue2_LF on={on} ue={ue} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+* XRUt1 t1r n1r t1i n1i n2r t2r n2i t2i  p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m ue2_LF on={on} ue={ue} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+.ends trafo_Yy0
+*$
+
+* Three phase Dy5 transformer with additional neutral ports (e.g. for petersen coil)
+* NOTE: Since the sign of L/S_ tap value is not normed and dependent of the transformer manufacturer
+* you can change the behaviour with sign1 and sign2 set to -1 or 1
+.subckt trafo_Dy5_LF r1r r1i s1r s1i t1r t1i r2r r2i s2r s2i t2r t2i n2r n2i
++ params:
++ on = 1
++ SN=300e6
++ U1Nenn=400e3
++ U20=120e3
++	uR=0.002
++	uX=0.2
++	i0=0.0006
++	p0=0.0004
++ stproz  = 1.0
++ l_ = 0
++ s_ = 0
++ middle = 0
++ phir = -0.5
++ phii = -0.866025404
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zqfactor = 1.0
++ zlfactor = 1.0
++ sign1=1
++ sign2=1
+* ----------------- *
+*+ ue={U1Nenn/U20}
++ lp = 1000
++ rp = 0.001
++ w=314.159
++ k=0.9999
++ rfe=1e6
+XRUr1 r1r s1r r1i s1i     n2r r2r n2i r2i p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m transformer_extd_LF
++ on={on} SN={SN/3} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn}  U20={U20/sqrt(3)}  sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUs1 s1r t1r s1i t1i     n2r s2r n2i s2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m transformer_extd_LF
++ on={on} SN={SN/3} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn}  U20={U20/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUt1 t1r r1r t1i r1i     n2r t2r n2i t2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m transformer_extd_LF
++ on={on} SN={SN/3} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn}  U20={U20/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+* alternative model
+*XRUr1 r1r s1r r1i s1i     n2r r2r n2i r2i p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUs1 s1r t1r s1i t1i     n2r s2r n2i s2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUt1 t1r r1r t1i r1i     n2r t2r n2i t2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+* ideal model
+*XRUr1 r1r s1r r1i s1i     n2r r2r n2i r2i p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+*+ delta={delta}
+*XRUs1 s1r t1r s1i t1i     n2r s2r n2i s2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+*+ delta={delta}
+*XRUt1 t1r r1r t1i r1i     n2r t2r n2i t2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+*+ delta={delta}
+.ends trafo_Dy5
+*$
+
+
+
+* Three phase Dy11 transformer with additional neutral ports (e.g. for petersen coil)
+* NOTE: Since the sign of L/S_ tap value is not normed and dependent of the transformer manufacturer
+* you can change the behaviour with sign1 and sign2 set to -1 or 1
+.subckt trafo_Dy11_LF r1r r1i s1r s1i t1r t1i r2r r2i s2r s2i t2r t2i n2r n2i
++ params:
++ on = 1
++ SN=300e6
++ U1Nenn=400e3
++ U20=120e3
++	uR=0.002
++	uX=0.2
++	i0=0.0006
++	p0=0.0004
++ stproz  = 1.0
++ l_ = 0
++ s_ = 0
++ middle = 0
++ phir = -0.5
++ phii = -0.866025404
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zqfactor = 1.0
++ zlfactor = 1.0
++ sign1=1
++ sign2=1
+* ----------------- *
+*+ ue={U1Nenn/U20}
++ lp = 1000
++ rp = 0.001
++ w=314.159
++ k=0.9999
++ rfe=1e6
+XRUr1 r1r s1r r1i s1i     r2r n2r r2i n2i p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m transformer_extd_LF
++ on={on} SN={SN/3} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn}  U20={U20/sqrt(3)}  sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUs1 s1r t1r s1i t1i     s2r n2r s2i n2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m transformer_extd_LF
++ on={on} SN={SN/3} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn}  U20={U20/sqrt(3)}  sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUt1 t1r r1r t1i r1i     t2r n2r t2i n2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m transformer_extd_LF
++ on={on} SN={SN/3} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn}  U20={U20/sqrt(3)}  sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+* alternative model
+*XRUr1 r1r s1r r1i s1i    r2r n2r r2i n2i p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUs1 s1r t1r s1i t1i    s2r n2r s2i n2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUt1 t1r r1r t1i r1i    t2r n2r t2i n2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+* ideal model
+*XRUr1 r1r s1r r1i s1i    r2r n2r r2i n2i p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+*+ delta={delta}
+*XRUs1 s1r t1r s1i t1i    s2r n2r s2i n2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+*+ delta={delta}
+*XRUt1 t1r r1r t1i r1i    t2r n2r t2i n2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+*+ delta={delta}
+.ends trafo_Dy11
+*$
+
+
+* Three phase Yd5 transformer with additional neutral ports (e.g. for petersen coil)
+* NOTE: Since the sign of L/S_ tap value is not normed and dependent of the transformer manufacturer
+* you can change the behaviour with sign1 and sign2 set to -1 or 1
+.subckt trafo_Yd5_LF r1r r1i s1r s1i t1r t1i n1r n1i r2r r2i s2r s2i t2r t2i
++ params:
++ on = 1
++ SN=300e6
++ U1Nenn=400e3
++ U20=120e3
++	uR=0.002
++	uX=0.2
++	i0=0.0006
++	p0=0.0004
++ stproz  = 1.0
++ l_ = 0
++ s_ = 0
++ middle = 0
++ phir = -0.5
++ phii = -0.866025404
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zqfactor = 1.0
++ zlfactor = 1.0
++ sign1=1
++ sign2=1
+* ----------------- *
+*+ ue={U1Nenn/U20}
++ lp = 1000
++ rp = 0.001
++ w=314.159
++ k=0.9999
++ rfe=1e6
+XRUr1 r1r n1r r1i n1i t2r r2r t2i r2i p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m transformer_extd_LF
++ on={on} SN={SN/3} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20}  sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUs1 s1r n1r s1i n1i r2r s2r r2i s2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m transformer_extd_LF
++ on={on} SN={SN/3} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20} sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUt1 t1r n1r t1i n1i s2r t2r s2i t2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m transformer_extd_LF
++ on={on} SN={SN/3} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20} sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+* alternative model
+*XRUr1 r1r n1r r1i n1i t2r r2r t2i r2i p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m l1l2k12_LF on={on} ue={ue/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUs1 s1r n1r s1i n1i r2r s2r r2i s2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m l1l2k12_LF on={on} ue={ue/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUt1 t1r n1r t1i n1i s2r t2r s2i t2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m l1l2k12_LF on={on} ue={ue/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+* ideal model
+*XRUr1 r1r n1r r1i n1i t2r r2r t2i r2i p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m ue2_LF on={on} ue={ue/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+*+ delta={delta}
+*XRUs1 s1r n1r s1i n1i r2r s2r r2i s2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m ue2_LF on={on} ue={ue/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+*+ delta={delta}
+*XRUt1 t1r n1r t1i n1i s2r t2r s2i t2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m ue2_LF on={on} ue={ue/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+*+ delta={delta}
+.ends trafo_Dy5
+*$
+
+
+* Three phase Yd11 transformer with additional neutral ports (e.g. for petersen coil)
+* NOTE: Since the sign of L/S_ tap value is not normed and dependent of the transformer manufacturer
+* you can change the behaviour with sign1 and sign2 set to -1 or 1
+.subckt trafo_Yd11_LF r1r r1i s1r s1i t1r t1i n1r n1i r2r r2i s2r s2i t2r t2i
++ params:
++ on = 1
++ SN=300e6
++ U1Nenn=400e3
++ U20=120e3
++	uR=0.002
++	uX=0.2
++	i0=0.0006
++	p0=0.0004
++ stproz  = 1.0
++ l_ = 0
++ s_ = 0
++ middle = 0
++ phir = -0.5
++ phii = -0.866025404
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zqfactor = 1.0
++ zlfactor = 1.0
++ sign1=1
++ sign2=1
+* ----------------- *
++ ue={U1Nenn/U20}
++ lp = 1000
++ rp = 0.001
++ w=314.159
++ k=0.9999
++ rfe=1e6
+XRUr1 r1r n1r r1i n1i r2r t2r r2i t2i p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m transformer_extd_LF
++ on={on} SN={SN/3} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20}   sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUs1 s1r n1r s1i n1i s2r r2r s2i r2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m transformer_extd_LF
++ on={on} SN={SN/3} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20}   sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUt1 t1r n1r t1i n1i t2r s2r t2i s2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m transformer_extd_LF
++ on={on} SN={SN/3} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20}   sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+* alternative model
+*XRUr1 r1r n1r r1i n1i r2r t2r r2i t2i p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m l1l2k12_LF on={on} ue={ue/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUs1 s1r n1r s1i n1i s2r r2r s2i r2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m l1l2k12_LF on={on} ue={ue/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUt1 t1r n1r t1i n1i t2r s2r t2i s2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m l1l2k12_LF on={on} ue={ue/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+* ideal model
+*XRUr1 r1r n1r r1i n1i r2r t2r r2i t2i p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m ue2_LF on={on} ue={ue/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+*+ delta={delta}
+*XRUs1 s1r n1r s1i n1i s2r r2r s2i r2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m ue2_LF on={on} ue={ue/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+*+ delta={delta}
+*XRUt1 t1r n1r t1i n1i t2r s2r t2i s2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m ue2_LF on={on} ue={ue/sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+*+ delta={delta}
+.ends trafo
+*$
+
+
+
+* Three phase Yz5 transformer with additional neutral ports (e.g. for petersen coil)
+* NOTE: Since the sign of L/S_ tap value is not normed and dependent of the transformer manufacturer
+* you can change the behaviour with sign1 and sign2 set to -1 or 1
+.subckt trafo_Yz5_LF r1r r1i s1r s1i t1r t1i n1r n1i r2r r2i s2r s2i t2r t2i n2r n2i
++ params:
++ on = 1
++ SN=300e6
++ U1Nenn=400e3
++ U20=120e3
++	uR=0.002
++	uX=0.2
++	i0=0.0006
++	p0=0.0004
++ stproz  = 1.0
++ l_ = 0
++ s_ = 0
++ middle = 0
++ phir = -0.5
++ phii = -0.866025404
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zqfactor = 1.0
++ zlfactor = 0.75
++ sign1=1
++ sign2=1
+* ----------------- *
+*+ ue={U1Nenn/U20}
++ lp = 1000
++ rp = 0.001
++ w=314.159
++ k=0.9999
++ rfe=1e6
+XRUr1 r1r n1r r1i n1i t2rx n2r t2ix n2i  p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m transformer_extd_LF
++ on={on} SN={SN/6} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/3}   sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUs1 s1r n1r s1i n1i r2rx n2r r2ix n2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m transformer_extd_LF
++ on={on} SN={SN/6} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/3} sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUt1 t1r n1r t1i n1i s2rx n2r s2ix n2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m transformer_extd_LF
++ on={on} SN={SN/6} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/3} sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUr2 r1r n1r r1i n1i r2rx r2r r2ix r2i p1r2_m q1r2_m v1r2_m v2r2_m p2r2_m q2r2_m transformer_extd_LF
++ on={on} SN={SN/6} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/3} sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUs2 s1r n1r s1i n1i s2rx s2r s2ix s2i p1s2_m q1s2_m v1s2_m v2s2_m p2s2_m q2s2_m transformer_extd_LF
++ on={on} SN={SN/6} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/3} sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUt2 t1r n1r t1i n1i t2rx t2r t2ix t2i p1t2_m q1t2_m v1t2_m v2t2_m p2t2_m q2t2_m transformer_extd_LF
++ on={on} SN={SN/6} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/3} sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+* alternative model
+*XRUr1 r1r n1r r1i n1i t2rx n2r t2ix n2i p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUs1 s1r n1r s1i n1i r2rx n2r r2ix n2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUt1 t1r n1r t1i n1i s2rx n2r s2ix n2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUr2 r1r n1r r1i n1i r2rx r2r r2ix r2i p1r2_m q1r2_m v1r2_m v2r2_m p2r2_m q2r2_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUs2 s1r n1r s1i n1i s2rx s2r s2ix s2i p1s2_m q1s2_m v1s2_m v2s2_m p2s2_m q2s2_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUt2 t1r n1r t1i n1i t2rx t2r t2ix t2i p1t2_m q1t2_m v1t2_m v2t2_m p2t2_m q2t2_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+* ideal model
+*XRUr1 r1r n1r r1i n1i t2rx n2r t2ix n2i p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+*XRUs1 s1r n1r s1i n1i r2rx n2r r2ix n2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+*XRUt1 t1r n1r t1i n1i s2rx n2r s2ix n2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+*XRUr2 r1r n1r r1i n1i r2rx r2r r2ix r2i p1r2_m q1r2_m v1r2_m v2r2_m p2r2_m q2r2_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+*XRUs2 s1r n1r s1i n1i s2rx s2r s2ix s2i p1s2_m q1s2_m v1s2_m v2s2_m p2s2_m q2s2_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+*XRUt2 t1r n1r t1i n1i t2rx t2r t2ix t2i p1t2_m q1t2_m v1t2_m v2t2_m p2t2_m q2t2_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+.ends trafo_Yz5
+*$
+
+
+* Three phase Yz11 transformer with additional neutral ports (e.g. for petersen coil)
+* NOTE: Since the sign of L/S_ tap value is not normed and dependent of the transformer manufacturer
+* you can change the behaviour with sign1 and sign2 set to -1 or 1
+.subckt trafo_Yz11_LF r1r r1i s1r s1i t1r t1i n1r n1i r2r r2i s2r s2i t2r t2i n2r n2i
++ params:
++ on = 1
++ SN=300e6
++ U1Nenn=400e3
++ U20=120e3
++	uR=0.002
++	uX=0.2
++	i0=0.0006
++	p0=0.0004
++ stproz  = 1.0
++ l_ = 0
++ s_ = 0
++ middle = 0
++ phir = -0.5
++ phii = -0.866025404
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zqfactor = 1.0
++ zlfactor = 0.75
++ sign1=1
++ sign2=1
+* ----------------- *
+*+ ue={U1Nenn/U20}
++ lp = 1000
++ rp = 0.001
++ w=314.159
++ k=0.9999
++ rfe=1e6
+XRUr1 n1r r1r n1i r1i t2rx n2r t2ix n2i  p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m transformer_extd_LF
++ on={on} SN={SN/6} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/3}   sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUs1 n1r s1r n1i s1i r2rx n2r r2ix n2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m transformer_extd_LF
++ on={on} SN={SN/6} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/3}   sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUt1 n1r t1r n1i t1i s2rx n2r s2ix n2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m transformer_extd_LF
++ on={on} SN={SN/6} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/3}   sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUr2 n1r r1r n1i r1i r2rx r2r r2ix r2i p1r2_m q1r2_m v1r2_m v2r2_m p2r2_m q2r2_m transformer_extd_LF
++ on={on} SN={SN/6} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/3}   sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUs2 n1r s1r n1i s1i s2rx s2r s2ix s2i p1s2_m q1s2_m v1s2_m v2s2_m p2s2_m q2s2_m transformer_extd_LF
++ on={on} SN={SN/6} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/3}   sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+XRUt2 n1r t1r n1i t1i t2rx t2r t2ix t2i p1t2_m q1t2_m v1t2_m v2t2_m p2t2_m q2t2_m transformer_extd_LF
++ on={on} SN={SN/6} ur={ur} ux={ux} i0={i0} p0={p0} sign1={sign1} sign2={sign2}
++ U1Nenn={U1Nenn/sqrt(3)}  U20={U20/3}   sfactor={sfactor} vfactor={vfactor}
++ delta={delta} stproz={stproz} l_={l_} s_={s_} phir={phir} phii={phii} zqfactor={zqfactor} zlfactor={zlfactor}
+* alternative model
+*XRUr1 r1r n1r r1i n1i t2rx n2r t2ix n2i p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUs1 s1r n1r s1i n1i r2rx n2r r2ix n2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUt1 t1r n1r t1i n1i s2rx n2r s2ix n2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUr2 r1r n1r r1i n1i r2rx r2r r2ix r2i p1r2_m q1r2_m v1r2_m v2r2_m p2r2_m q2r2_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUs2 s1r n1r s1i n1i s2rx s2r s2ix s2i p1s2_m q1s2_m v1s2_m v2s2_m p2s2_m q2s2_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+*XRUt2 t1r n1r t1i n1i t2rx t2r t2ix t2i p1t2_m q1t2_m v1t2_m v2t2_m p2t2_m q2t2_m l1l2k12_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + lp={lp} rp={rp} w={w} k={k} rfe={rfe}
+* ideal model
+*XRUr1 r1r n1r r1i n1i t2rx n2r t2ix n2i p1r_m q1r_m v1r_m v2r_m p2r_m q2r_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+*XRUs1 s1r n1r s1i n1i r2rx n2r r2ix n2i p1s_m q1s_m v1s_m v2s_m p2s_m q2s_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+*XRUt1 t1r n1r t1i n1i s2rx n2r s2ix n2i p1t_m q1t_m v1t_m v2t_m p2t_m q2t_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+*XRUr2 r1r n1r r1i n1i r2rx r2r r2ix r2i p1r2_m q1r2_m v1r2_m v2r2_m p2r2_m q2r2_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+*XRUs2 s1r n1r s1i n1i s2rx s2r s2ix s2i p1s2_m q1s2_m v1s2_m v2s2_m p2s2_m q2s2_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+*XRUt2 t1r n1r t1i n1i t2rx t2r t2ix t2i p1t2_m q1t2_m v1t2_m v2t2_m p2t2_m q2t2_m ue2_LF on={on} ue={ue*sqrt(3)} sfactor={sfactor} vfactor={vfactor}
+* + delta={delta}
+.ends trafo_Yz11
+*$
+
+
+* Model for line lfl - Component
+* cb is the nominal working cappacitance of the line to line cap. and the line to earth cap.
+* cb is related to a one phase loadflow simulation
+*
+.subckt line_LF v1r v1i v2r v2i p1_m q1_m v1_m p2_m q2_m
++ params:
++ on = 1
++ r = 0.15
++ l=0
++ xl = 0.4
++ cb = 8.5n
++ ce = 3.5n
++ g = 1e12
++ length = 1
++ omega = {omega_n}
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zqfactor = 1.0
++ zlfactor = 1.0
++ uout=1
+.param xl1=IF(xl>0,xl,omega*l)
+.param cl = {(cb-ce)/3}
+.param c = { ce + 3*cl } ; Dies ist eigentlich cb -> man kann nur mit cb rechnen (für einphasige Rechnung !!!)
+.param z1r = {zlfactor*length*r}
+.param z1i = {zlfactor*length*xl1}
+.param z0r = {(g*2)/length }
+.param z0i = {-2*zqfactor/(length*omega*c)}
+.param g0r = {(1/z0r)*on}
+.param g0i = {(-1/z0i)*on}
+.param g1r = {(z1r*on)/(z1r*z1r+z1i*z1i)}
+.param g1i = {(-z1i*on)/(z1r*z1r+z1i*z1i)}
+.param gr = {g1r+g0r}
+.param gi = {g1i+g0i}
+  gi1r   v1r   v01  Value = {v(v1r)*gr - v(v1i)*gi - v(v2r)*g1r + v(v2i)*g1i} tripdv={TRIPDV} tripdt={TRIPDT} ; i1r
+  gi1i   v1i   v02  Value = {v(v1r)*gi + v(v1i)*gr - v(v2r)*g1i - v(v2i)*g1r} tripdv={TRIPDV} tripdt={TRIPDT} ; i1i
+  gi2r   v2r   v03  Value = {-v(v1r)*g1r + v(v1i)*g1i + v(v2r)*gr - v(v2i)*gi} tripdv={TRIPDV} tripdt={TRIPDT} ; i2r
+  gi2i   v2i   v04  Value = {-v(v1r)*g1i - v(v1i)*g1r + v(v2r)*gi + v(v2i)*gr} tripdv={TRIPDV} tripdt={TRIPDT} ; i2i
+  vi1r   v01   0    dc 0v;   Strommessung fuer p1,q1,s1,i1
+  vi1i   v02   0    dc 0v;   Strommessung fuer p1,q1,s1,i1
+  vi2r   v03   0    dc 0v;   Strommessung fuer p2,q2,s2,i2
+  vi2i   v04   0    dc 0v;   Strommessung fuer p2,q2,s2,i2
+  ev1mag_m v1_m 0 value = {uout*vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*0.5*(v(i1_m)+v(i2_m))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ev2mag_m v2_m 0 value = {vfactor * sqrt(v(v2r)*v(v2r)+v(v2i)*v(v2i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei1mag_m i1_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei2mag_m i2_m 0 value = {sqrt(i(vi2r)*i(vi2r)+i(vi2i)*i(vi2i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  es1mag_m s1_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i1_m) * sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  ep1 p1_m 0  value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  ep2 p2_m 0  value = {(v(v2r)*i(vi2r)+v(v2i)*i(vi2i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q1_m 0  value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  eq2 q2_m 0  value = {(v(v2i)*i(vi2r)-v(v2r)*i(vi2i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  epv pv_m 0  value = {v(p1_m)+v(p2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  eqv qv_m 0  value = {v(q1_m)+v(q2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  rv1mag v1_m 0 1e12
+  rv2mag v2_m 0 1e12
+  ri1mag i1_m 0 1e12
+  ri2mag i2_m 0 1e12
+  rsmag s1_m 0 1e12
+  rp1 p1_m  0 1e12
+  rp2 p2_m  0 1e12
+  rq1 q1_m  0 1e12
+  rq2 q2_m  0 1e12
+  rpv pv_m  0 1e12
+  rqv qv_m  0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+  rmax3  v2r  0   1e12
+  rmax4  v2i  0   1e12
+.ends
+*
+*
+*
+*
+*
+* Model for impedance component
+.subckt impedance_LF v1r v1i v2r v2i p1_m q1_m v1_m p2_m q2_m
++ params:
++ on = 1
++ r = 100;
++ xl = 0
++ xc = 0
++ length = 1
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zfactor = 1.0
++ uout=1
+.param z1r = {(zfactor*length*r)}
+.param z1i = {(zfactor*length*(xl-xc))}
+.param g1r = {(z1r/(z1r*z1r+z1i*z1i))*on}
+.param g1i = {(-z1i/(z1r*z1r+z1i*z1i))*on}
+gi12r   v1r   v01  Value = {v(v1r)*g1r - v(v1i)*g1i - v(v2r)*g1r + v(v2i)*g1i} tripdv={TRIPDV} tripdt={TRIPDT} ; i1r
+gi12i   v1i   v02  Value = {v(v1r)*g1i + v(v1i)*g1r - v(v2r)*g1i - v(v2i)*g1r} tripdv={TRIPDV} tripdt={TRIPDT} ; i1i
+*gi2r = -gi1r
+*gi2i = -gi1i
+*gi2r   v2r   v03  Value = {-v(v1r)*g1r + v(v1i)*g1i + v(v2r)*g1r - v(v2i)*g1i} tripdv={TRIPDV} tripdt={TRIPDT} ; i2r
+*gi2i   v2i   v04  Value = {-v(v1r)*g1i - v(v1i)*g1r + v(v2r)*g1i + v(v2i)*g1r} tripdv={TRIPDV} tripdt={TRIPDT} ; i2i
+vi12r   v01   v2r    dc 0v;   Currentmeter
+vi12i   v02   v2i    dc 0v;   Currentmeter
+*vi2r   v03   0    dc 0v;   Currentmeter
+*vi2i   v04   0    dc 0v;   Currentmeter
+ev1mag_m  v1_m 0 value = {uout*vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i1_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+ev2mag_m  v2_m 0 value = {vfactor * sqrt(v(v2r)*v(v2r)+v(v2i)*v(v2i))} tripdv={TRIPDV} tripdt={TRIPDT}
+ei1mag_m  i1_m 0 value = {sqrt(i(vi12r)*i(vi12r)+i(vi12i)*i(vi12i))} tripdv={TRIPDV} tripdt={TRIPDT}
+es1mag_m  s1_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i1_m) * sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+ep1 p1_m 0  value = {(v(v1r)*i(vi12r)+v(v1i)*i(vi12i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+ep2 p2_m 0  value = {-(v(v2r)*i(vi12r)+v(v2i)*i(vi12i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+eq1 q1_m 0  value = {(v(v1i)*i(vi12r)-v(v1r)*i(vi12i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+eq2 q2_m 0  value = {-(v(v2i)*i(vi12r)-v(v2r)*i(vi12i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+epv pv_m 0  value = {v(p1_m)+v(p2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+eqv qv_m 0  value = {v(q1_m)+v(q2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+rv1mag v1_m 0 1e12
+rv2mag v2_m 0 1e12
+ri1mag i1_m 0 1e12
+rsmag s1_m 0 1e12
+rp1 p1_m  0 1e12
+rp2 p2_m  0 1e12
+rq1 q1_m  0 1e12
+rq2 q2_m  0 1e12
+rpv pv_m  0 1e12
+rqv qv_m  0 1e12
+rmax1  v1r  0   1e12
+rmax2  v1i  0   1e12
+rmax3  v2r  0   1e12
+rmax4  v2i  0   1e12
+.ends
+*$
+*$
+*
+* Petersen coil element
+.subckt petersen_LF v1r v1i v1_m i1_m z1_m
++ params:
++ on = 1
++ r_x = 0.03
++ vn = 10000
++ in = 600
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zfactor = 1.0
+.param zd = {vn/vfactor/in}
+.param r = {r_x*zd}
+.param xl = {sqrt(zd*zd-r*r)}
+.param z1r = {(zfactor*r)}
+.param z1i = {(zfactor*(xl))}
+.param g1r = {(z1r/(z1r*z1r+z1i*z1i))*on}
+.param g1i = {(-z1i/(z1r*z1r+z1i*z1i))*on}
+  gi1r   v1r   v01  Value = {(v(v1r)*g1r-v(v1i)*g1i)} tripdv={TRIPDV} tripdt={TRIPDT} ; i1r
+  gi1i   v1i   v02  Value = {(v(v1r)*g1i+v(v1i)*g1r)} tripdv={TRIPDV} tripdt={TRIPDT} ; i1i
+  vi1r   v01   0    dc 0v;   Currentmeter
+  vi1i   v02   0    dc 0v;   Currentmeter
+  ev1mag_m  v1_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  ei1mag_m  i1_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  ep1 p1_m 0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q1_m 0 value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  ez1 z1_m 0 value = {v(v1_m)/v(i1_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  rv1mag v1_m 0 1e12
+  ri1mag i1_m 0 1e12
+  rp1 p1_m  0 1e12
+  rq1 q1_m  0 1e12
+  rz1 z1_m  0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+.ends
+*$
+*
+* short circuit reactance model
+* place inline with the cable,overheadline
+.subckt scr_LF v1r v1i v2r v2i v1_m p1_m q1_m v1_m p2_m q2_m
++ params:
++ on = 1
++ delta_un = 5
++ r_x = 0.03
++ vn = 10000
++ in = 600
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zfactor = 1.0
++ uout=1
+.param sd = {vfactor*vn*in}
+.param zd = {delta_un*vn*vn/(100*sd)}
+.param r = {r_x*zd}
+.param xl = {sqrt(zd*zd-r*r)}
+.param z1r = {(zfactor*r)}
+.param z1i = {(zfactor*(xl))}
+.param g1r = {(z1r/(z1r*z1r+z1i*z1i))*on}
+.param g1i = {(-z1i/(z1r*z1r+z1i*z1i))*on}
+  gi12r   v1r   v01  Value = {v(v1r)*g1r - v(v1i)*g1i - v(v2r)*g1r + v(v2i)*g1i} tripdv={TRIPDV} tripdt={TRIPDT} ; i1r
+  gi12i   v1i   v02  Value = {v(v1r)*g1i + v(v1i)*g1r - v(v2r)*g1i - v(v2i)*g1r} tripdv={TRIPDV} tripdt={TRIPDT} ; i1i
+  *gi2r = -gi1r
+  *gi2i = -gi1i
+  *gi2r   v2r   v03  Value = {-v(v1r)*g1r + v(v1i)*g1i + v(v2r)*g1r - v(v2i)*g1i} tripdv={TRIPDV} tripdt={TRIPDT} ; i2r
+  *gi2i   v2i   v04  Value = {-v(v1r)*g1i - v(v1i)*g1r + v(v2r)*g1i + v(v2i)*g1r} tripdv={TRIPDV} tripdt={TRIPDT} ; i2i
+  vi12r   v01   v2r    dc 0v;   Currentmeter
+  vi12i   v02   v2i    dc 0v;   Currentmeter
+  *vi2r   v03   0    dc 0v;   Currentmeter
+  *vi2i   v04   0    dc 0v;   Currentmeter
+  ev1mag_m v1_m 0 value = {uout*vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i1_m)}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  es1mag_m s1_m 0 value = {v(v1_m)*v(i1_m) * sfactor/vfactor } tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  ei1mag_m i1_m 0 value = {sqrt(i(vi12r)*i(vi12r)+i(vi12i)*i(vi12i))}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  ep1 p1_m 0  value = {(v(v1r)*i(vi12r)+v(v1i)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  ep2 p2_m 0  value = {-(v(v2r)*i(vi12r)+v(v2i)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q1_m 0  value = {(v(v1i)*i(vi12r)-v(v1r)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq2 q2_m 0  value = {-(v(v2i)*i(vi12r)-v(v2r)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  epv pv_m 0  value = {v(p1_m)+v(p2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eqv qv_m 0  value = {v(q1_m)+v(q2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  rv1mag v1_m 0 1e12
+  ri1mag i1_m 0 1e12
+  rsmag s1_m 0 1e12
+  rp1 p1_m  0 1e12
+  rp2 p2_m  0 1e12
+  rq1 q1_m  0 1e12
+  rq2 q2_m  0 1e12
+  rpv pv_m  0 1e12
+  rqv qv_m  0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+  rmax3  v2r  0   1e12
+  rmax4  v2i  0   1e12
+.ends
+*$
+
+
+* Model for short circuit impedance of net
+.SUBCKT Impedance_sk_LF  v1r v1i v2r v2i p1_m q1_m v1_m p2_m q2_m
++	PARAMS:
++ on = 1
++ SN=40e9 ; Short circuit apparent power
++ vn=400e3
++ r_x=0.1 ; resistance = 0.1*X
++ length=1
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zfactor = 1.0
++ uout=1
+.PARAM
++ xl={vn*vn/SN}
++ r={r_x*xl}
+.param z1r = {(zfactor*length*r)}
+.param z1i = {(zfactor*length*(xl))}
+.param g1r = {(z1r/(z1r*z1r+z1i*z1i))*on}
+.param g1i = {(-z1i/(z1r*z1r+z1i*z1i))*on}
+  gi12r   v1r   v01  Value = {v(v1r)*g1r - v(v1i)*g1i - v(v2r)*g1r + v(v2i)*g1i} tripdv={TRIPDV} tripdt={TRIPDT} ; i1r
+  gi12i   v1i   v02  Value = {v(v1r)*g1i + v(v1i)*g1r - v(v2r)*g1i - v(v2i)*g1r} tripdv={TRIPDV} tripdt={TRIPDT} ; i1i
+  *gi2r = -gi1r
+  *gi2i = -gi1i
+  *gi2r   v2r   v03  Value = {-v(v1r)*g1r + v(v1i)*g1i + v(v2r)*g1r - v(v2i)*g1i} tripdv={TRIPDV} tripdt={TRIPDT} ; i2r
+  *gi2i   v2i   v04  Value = {-v(v1r)*g1i - v(v1i)*g1r + v(v2r)*g1i + v(v2i)*g1r} tripdv={TRIPDV} tripdt={TRIPDT} ; i2i
+  vi12r   v01   v2r    dc 0v;   Currentmeter
+  vi12i   v02   v2i    dc 0v;   Currentmeter
+  *vi2r   v03   0    dc 0v;   Currentmeter
+  *vi2i   v04   0    dc 0v;   Currentmeter
+  ev1mag_m  v1_m 0 value = {uout*vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i1_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  ev2mag_m  v2_m 0 value = {vfactor * sqrt(v(v2r)*v(v2r)+v(v2i)*v(v2i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei1mag_m  i1_m 0 value = {sqrt(i(vi12r)*i(vi12r)+i(vi12i)*i(vi12i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  es1mag_m  s1_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i1_m) * sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  ep1 p1_m 0  value = {(v(v1r)*i(vi12r)+v(v1i)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  ep2 p2_m 0  value = {-(v(v2r)*i(vi12r)+v(v2i)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q1_m 0  value = {(v(v1i)*i(vi12r)-v(v1r)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq2 q2_m 0  value = {-(v(v2i)*i(vi12r)-v(v2r)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  epv pv_m 0  value = {v(p1_m)+v(p2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eqv qv_m 0  value = {v(q1_m)+v(q2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  rv1mag v1_m 0 1e12
+  rv2mag v2_m 0 1e12
+  ri1mag i1_m 0 1e12
+  rsmag s1_m 0 1e12
+  rp1 p1_m  0 1e12
+  rp2 p2_m  0 1e12
+  rq1 q1_m  0 1e12
+  rq2 q2_m  0 1e12
+  rpv pv_m  0 1e12
+  rqv qv_m  0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+  rmax3  v2r  0   1e12
+  rmax4  v2i  0   1e12
+.ends
+*$
+
+* Model for impedance with input of p,q,v
+.subckt impedance_pqv_LF v1r v1i v2r v2i p1_m q1_m v1_m p2_m q2_m
++ params:
++ on=1
++ p=1e6
++ q=0
++ vn=120000
++ length=1
++ vfactor={sqrt(3)}
++ sfactor=3
++ zfactor=1.0
+.param ir={(vfactor/sfactor)*p/vn}
+.param ii={-(vfactor/sfactor)*q/vn}
+.param absi2={(ir)*(ir)+(ii)*(ii)}
+.param tmp2={(vn)/((vfactor)*(absi2))}
+.param z1r={(zfactor)*(length)*(tmp2)*(ir)}
+.param z1i={-(zfactor)*(length)*(tmp2)*(ii)}
+.param g1r={((z1r)/((z1r)*(z1r)+(z1i)*(z1i)))*on}
+.param g1i={(-(z1i)/((z1r)*(z1r)+(z1i)*(z1i)))*on}
+  gi12r   v1r   v01  Value = {v(v1r)*g1r - v(v1i)*g1i - v(v2r)*g1r + v(v2i)*g1i} tripdv={TRIPDV} tripdt={TRIPDT} ; i1r
+  gi12i   v1i   v02  Value = {v(v1r)*g1i + v(v1i)*g1r - v(v2r)*g1i - v(v2i)*g1r} tripdv={TRIPDV} tripdt={TRIPDT} ; i1i
+  *gi2r = -gi1r
+  *gi2i = -gi1i
+  *gi2r   v2r   v03  Value = {-v(v1r)*g1r + v(v1i)*g1i + v(v2r)*g1r - v(v2i)*g1i} tripdv={TRIPDV} tripdt={TRIPDT} ; i2r
+  *gi2i   v2i   v04  Value = {-v(v1r)*g1i - v(v1i)*g1r + v(v2r)*g1i + v(v2i)*g1r} tripdv={TRIPDV} tripdt={TRIPDT} ; i2i
+  vi12r   v01   v2r    dc 0v;   Currentmeter
+  vi12i   v02   v2i    dc 0v;   Currentmeter
+  *vi2r   v03   0    dc 0v;   Currentmeter
+  *vi2i   v04   0    dc 0v;   Currentmeter
+  ev1mag_m  v1_m 0 value = {vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ev2mag_m  v2_m 0 value = {vfactor * sqrt(v(v2r)*v(v2r)+v(v2i)*v(v2i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei1mag_m  i1_m 0 value = {sqrt(i(vi12r)*i(vi12r)+i(vi12i)*i(vi12i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  es1mag_m  s1_m 0 value = {v(v1_m)*v(i1_m) * sfactor/vfactor } tripdv={TRIPDV} tripdt={TRIPDT}
+  ep1 p1_m 0  value = {(v(v1r)*i(vi12r)+v(v1i)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  ep2 p2_m 0  value = {-(v(v2r)*i(vi12r)+v(v2i)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q1_m 0  value = {(v(v1i)*i(vi12r)-v(v1r)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq2 q2_m 0  value = {-(v(v2i)*i(vi12r)-v(v2r)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  epv pv_m 0  value = {v(p1_m)+v(p2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eqv qv_m 0  value = {v(q1_m)+v(q2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  rv1mag v1_m 0 1e12
+  rv2mag v2_m 0 1e12
+  ri1mag i1_m 0 1e12
+  rsmag s1_m 0 1e12
+  rp1 p1_m  0 1e12
+  rp2 p2_m  0 1e12
+  rq1 q1_m  0 1e12
+  rq2 q2_m  0 1e12
+  rpv pv_m  0 1e12
+  rqv qv_m  0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+  rmax3  v2r  0   1e12
+  rmax4  v2i  0   1e12
+.ends
+*$
+*$
+*$
+* Model for impedance with input ir,ii,vn
+.subckt impedance_iv_LF v1r v1i v2r v2i p1_m q1_m v1_m p2_m q2_m
++ params:
++ on=1
++ ir=100
++ ii=0
++ vn=120000
++ length=1
++ vfactor={sqrt(3)}
++ sfactor=3
++ zfactor=1.0
+.param absi2={(ir)*(ir)+(ii)*(ii)}
+.param temp2={(vn)/((vfactor)*(absi2))}
+.param z1r={(zfactor)*(length)*(temp2)*(ir)}
+.param z1i={-(zfactor)*(length)*(temp2)*(ii)}
+.param g1r={((z1r)/((z1r)*(z1r)+(z1i)*(z1i)))*on}
+.param g1i={(-(z1i)/((z1r)*(z1r)+(z1i)*(z1i)))*on}
+  gi12r   v1r   v01  Value = {v(v1r)*g1r - v(v1i)*g1i} tripdv={TRIPDV} tripdt={TRIPDT} ; i1r
+  gi12i   v1i   v02  Value = {v(v1r)*g1i + v(v1i)*g1r} tripdv={TRIPDV} tripdt={TRIPDT} ; i1i
+  *gi2r = -gi1r
+  *gi2i = -gi1i
+  *gi2r   v2r   v03  Value = {-v(v1r)*g1r + v(v1i)*g1i + v(v2r)*g1r - v(v2i)*g1i} tripdv={TRIPDV} tripdt={TRIPDT} ; i2r
+  *gi2i   v2i   v04  Value = {-v(v1r)*g1i - v(v1i)*g1r + v(v2r)*g1i + v(v2i)*g1r} tripdv={TRIPDV} tripdt={TRIPDT} ; i2i
+  vi12r   v01   0    dc 0v;   Currentmeter
+  vi12i   v02   0    dc 0v;   Currentmeter
+  *vi2r   v03   0    dc 0v;   Currentmeter
+  *vi2i   v04   0    dc 0v;   Currentmeter
+  ev1mag_m  v1_m 0 value = {vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ev2mag_m  v2_m 0 value = {vfactor * sqrt(v(v2r)*v(v2r)+v(v2i)*v(v2i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei1mag_m  i1_m 0 value = {sqrt(i(vi12r)*i(vi12r)+i(vi12i)*i(vi12i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  es1mag_m  s1_m 0 value = {v(v1_m)*v(i1_m) * sfactor/vfactor } tripdv={TRIPDV} tripdt={TRIPDT}
+  ep1 p1_m 0  value = {(v(v1r)*i(vi12r)+v(v1i)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  ep2 p2_m 0  value = {-(v(v2r)*i(vi12r)+v(v2i)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q1_m 0  value = {(v(v1i)*i(vi12r)-v(v1r)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq2 q2_m 0  value = {-(v(v2i)*i(vi12r)-v(v2r)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  epv pv_m 0  value = {v(p1_m)+v(p2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eqv qv_m 0  value = {v(q1_m)+v(q2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  rv1mag v1_m 0 1e12
+  rv2mag v2_m 0 1e12
+  ri1mag i1_m 0 1e12
+  rsmag s1_m 0 1e12
+  rp1 p1_m  0 1e12
+  rp2 p2_m  0 1e12
+  rq1 q1_m  0 1e12
+  rq2 q2_m  0 1e12
+  rpv pv_m  0 1e12
+  rqv qv_m  0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+  rmax3  v2r  0   1e12
+  rmax4  v2i  0   1e12
+.ends
+*$
+*$
+* Parallel impedance model
+.subckt impedance_III_LF  v1r v1i v2r v2i p1_m q1_m v1_m p2_m q2_m
++ params:
++ on = 1
++ r= 1
++ xl = 0
++ xc = 0
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zfactor = 1.0
+.param rs = {r*zfactor}
+.param xls = {xl*zfactor}
+.param xcs = {xc*zfactor}
+ gi12Rr v1r v10 value = {on*(v(v1r)-v(v2r))/rs} tripdv={TRIPDV} tripdt={TRIPDT}
+ gi12Ri v1i v20 value = {on*(v(v1i)-v(v2i))/rs} tripdv={TRIPDV} tripdt={TRIPDT}
+ gi12Lr v1r v10 value = {on*(v(v1i)-v(v2i))/xls} tripdv={TRIPDV} tripdt={TRIPDT}
+ gi12Li v1i v20 value = {-on*(v(v1r)-v(v2r))/xls} tripdv={TRIPDV} tripdt={TRIPDT}
+ gi12Cr v1r v10 value = {-on*(v(v1i)-v(v2i))/xcs} tripdv={TRIPDV} tripdt={TRIPDT}
+ gi12Ci v1i v20 value = {on*(v(v1r)-v(v2r))/xcs} tripdv={TRIPDV} tripdt={TRIPDT}
+ vi12r v10 v2r dc 0v
+ vi12i v20 v2i dc 0v
+  ev1mag_m  v1_m 0 value = {vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ev2mag_m  v2_m 0 value = {vfactor * sqrt(v(v2r)*v(v2r)+v(v2i)*v(v2i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei1mag_m  i1_m 0 value = {sqrt(i(vi12r)*i(vi12r)+i(vi12i)*i(vi12i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  es1mag_m  s1_m 0 value = {v(v1_m)*v(i1_m) * sfactor/vfactor } tripdv={TRIPDV} tripdt={TRIPDT}
+  ep1 p1_m 0  value = {(v(v1r)*i(vi12r)+v(v1i)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  ep2 p2_m 0  value = {-(v(v2r)*i(vi12r)+v(v2i)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q1_m 0  value = {(v(v1i)*i(vi12r)-v(v1r)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq2 q2_m 0  value = {-(v(v2i)*i(vi12r)-v(v2r)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  epv pv_m 0  value = {v(p1_m)+v(p2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eqv qv_m 0  value = {v(q1_m)+v(q2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  rv1mag v1_m 0 1e12
+  rv2mag v2_m 0 1e12
+  ri1mag i1_m 0 1e12
+  rsmag s1_m 0 1e12
+  rp1 p1_m  0 1e12
+  rp2 p2_m  0 1e12
+  rq1 q1_m  0 1e12
+  rq2 q2_m  0 1e12
+  rpv pv_m  0 1e12
+  rqv qv_m  0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+  rmax3  v2r  0   1e12
+  rmax4  v2i  0   1e12
+.ends
+*$
+
+* Capacitor bank
+.subckt c_batt_LF v1r v1i v1_m q1_m
++ params:
++ on = 1
++ q = 50000000
++ vn = 110000
++ r_x=0.001 ; NEW with loss
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ uout=1
+.param gi = {-q/(vn*vn)}
+.param gr = {q*r_x/(vn*vn)}
+ gi1r v1r v10 value = {on*gi*v(v1i)+on*gr*v(v1r)} tripdv={TRIPDV} tripdt={TRIPDT}
+ gi1i v1i v20 value = {-on*gi*v(v1r)+on*gr*v(v1i)} tripdv={TRIPDV} tripdt={TRIPDT}
+ vi1r v10 0 dc 0v
+ vi1i v20 0 dc 0v
+  ev1mag_m  v1_m 0 value = {uout*vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i1_m)}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  ei1mag_m  i1_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  eq1 q1_m 0 value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  ep1 p1_m 0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  rv1mag v1_m 0 1e12
+  ri1mag i1_m 0 1e12
+  rq1 q1_m  0 1e12
+  rp1 p1_m 0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+.ends
+*$
+* Inductor bank (inductive reactor)
+.subckt l_batt_LF v1r v1i v1_m q1_m
++ params:
++ on = 1
++ q = 50000000
++ vn = 110000
++ r_x=0.001
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ uout=1
+.param gi = {q/(vn*vn)}
+.param gr = {q*r_x/(vn*vn)}
+ gi1r v1r v10 value = {on*gi*v(v1i)+on*gr*v(v1r)} tripdv={TRIPDV} tripdt={TRIPDT}
+ gi1i v1i v20 value = {-on*gi*v(v1r)+on*gr*v(v1i)} tripdv={TRIPDV} tripdt={TRIPDT}
+ vi1r v10 0 dc 0v
+ vi1i v20 0 dc 0v
+  ev1mag_m  v1_m 0 value = {uout*vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i1_m)}  tripdv={TRIPDV} tripdt={TRIPDT}  ;
+  ei1mag_m  i1_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q1_m 0 value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  ep1 p1_m 0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  rv1mag v1_m 0 1e12
+  ri1mag i1_m 0 1e12
+  rq1 q1_m  0 1e12
+  rp1 p1_m 0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+.ends
+*$
+
+* resistance model
+.subckt z_r_LF v1r v1i v2r v2i p1_m q1_m v1_m p2_m q2_m
++ params:
++ on = 1
++ r = 1
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zfactor = 1.0
++ uout=1
+.param rs = {r*zfactor}
+ gi12r v1r v10 value = {on*(v(v1r)-v(v2r))/rs} tripdv={TRIPDV} tripdt={TRIPDT}
+ gi12i v1i v20 value = {on*(v(v1i)-v(v2i))/rs} tripdv={TRIPDV} tripdt={TRIPDT}
+ vi12r v10 v2r dc 0v
+ vi12i v20 v2i dc 0v
+  ev1mag_m  v1_m 0 value = {uout*vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*(1-uout)*v(i1m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  ev2mag_m  v2_m 0 value = {uout*vfactor * sqrt(v(v2r)*v(v2r)+v(v2i)*v(v2i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei1mag_m  i1_m 0 value = {sqrt(i(vi12r)*i(vi12r)+i(vi12i)*i(vi12i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  es1mag_m  s1_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i1_m) * sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  ep1 p1_m 0  value = {(v(v1r)*i(vi12r)+v(v1i)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  ep2 p2_m 0  value = {-(v(v2r)*i(vi12r)+v(v2i)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q1_m 0  value = {(v(v1i)*i(vi12r)-v(v1r)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq2 q2_m 0  value = {-(v(v2i)*i(vi12r)-v(v2r)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  epv pv_m 0  value = {v(p1_m)+v(p2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eqv qv_m 0  value = {v(q1_m)+v(q2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  rv1mag v1_m 0 1e12
+  rv2mag v2_m 0 1e12
+  ri1mag i1_m 0 1e12
+  rsmag s1_m 0 1e12
+  rp1 p1_m  0 1e12
+  rp2 p2_m  0 1e12
+  rq1 q1_m  0 1e12
+  rq2 q2_m  0 1e12
+  rpv pv_m  0 1e12
+  rqv qv_m  0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+  rmax3  v2r  0   1e12
+  rmax4  v2i  0   1e12
+.ends
+*$
+*$
+* inductance model
+.subckt z_xl_LF  v1r v1i v2r v2i p1_m q1_m v1_m p2_m q2_m
++ params:
++ on = 1
++ xl = 1
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zfactor = 1.0
++ uout=1
+.param xls = {xl*zfactor}
+ gi12r v1r v10 value = {on*(v(v1i)-v(v2i))/xls} tripdv={TRIPDV} tripdt={TRIPDT}
+ gi12i v1i v20 value = {-on*(v(v1r)-v(v2r))/xls} tripdv={TRIPDV} tripdt={TRIPDT}
+ vi12r v10 v2r dc 0v
+ vi12i v20 v2i dc 0v
+  ev1mag_m  v1_m 0 value = {uout*vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i1_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  ev2mag_m  v2_m 0 value = {vfactor * sqrt(v(v2r)*v(v2r)+v(v2i)*v(v2i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei1mag_m  i1_m 0 value = {sqrt(i(vi12r)*i(vi12r)+i(vi12i)*i(vi12i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  es1mag_m  s1_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i1_m) * sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  ep1 p1_m 0  value = {(v(v1r)*i(vi12r)+v(v1i)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  ep2 p2_m 0  value = {-(v(v2r)*i(vi12r)+v(v2i)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q1_m 0  value = {(v(v1i)*i(vi12r)-v(v1r)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq2 q2_m 0  value = {-(v(v2i)*i(vi12r)-v(v2r)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  epv pv_m 0  value = {v(p1_m)+v(p2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eqv qv_m 0  value = {v(q1_m)+v(q2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  rv1mag v1_m 0 1e12
+  rv2mag v2_m 0 1e12
+  ri1mag i1_m 0 1e12
+  rsmag s1_m 0 1e12
+  rp1 p1_m  0 1e12
+  rp2 p2_m  0 1e12
+  rq1 q1_m  0 1e12
+  rq2 q2_m  0 1e12
+  rpv pv_m  0 1e12
+  rqv qv_m  0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+  rmax3  v2r  0   1e12
+  rmax4  v2i  0   1e12
+.ends
+*$
+*$
+* capacitance model
+.subckt z_xc_LF  v1r v1i v2r v2i p1_m q1_m v1_m p2_m q2_m
++ params:
++ on = 1
++ xc = 1
++ vfactor = {sqrt(3)}
++ sfactor = 3
++ zfactor = 1.0
++ uout=1
+.param xcs = {xc*zfactor}
+ gi12r v1r v10 value = {-on*(v(v1i)-v(v2i))/xcs} tripdv={TRIPDV} tripdt={TRIPDT}
+ gi12i v1i v20 value = {on*(v(v1r)-v(v2r))/xcs} tripdv={TRIPDV} tripdt={TRIPDT}
+ vi12r v10 v2r dc 0v
+ vi12i v20 v2i dc 0v
+  ev1mag_m  v1_m 0 value = {uout*vfactor * sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i1_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+  ev2mag_m  v2_m 0 value = {vfactor * sqrt(v(v2r)*v(v2r)+v(v2i)*v(v2i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  ei1mag_m  i1_m 0 value = {sqrt(i(vi12r)*i(vi12r)+i(vi12i)*i(vi12i))} tripdv={TRIPDV} tripdt={TRIPDT}
+  es1mag_m  s1_m 0 value = {sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))*v(i1_m) * sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+  ep1 p1_m 0  value = {(v(v1r)*i(vi12r)+v(v1i)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  ep2 p2_m 0  value = {-(v(v2r)*i(vi12r)+v(v2i)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq1 q1_m 0  value = {(v(v1i)*i(vi12r)-v(v1r)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eq2 q2_m 0  value = {-(v(v2i)*i(vi12r)-v(v2r)*i(vi12i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}
+  epv pv_m 0  value = {v(p1_m)+v(p2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  eqv qv_m 0  value = {v(q1_m)+v(q2_m)}  tripdv={TRIPDV} tripdt={TRIPDT}
+  rv1mag v1_m 0 1e12
+  rv2mag v2_m 0 1e12
+  ri1mag i1_m 0 1e12
+  rsmag s1_m 0 1e12
+  rp1 p1_m  0 1e12
+  rp2 p2_m  0 1e12
+  rq1 q1_m  0 1e12
+  rq2 q2_m  0 1e12
+  rpv pv_m  0 1e12
+  rqv qv_m  0 1e12
+  rmax1  v1r  0   1e12
+  rmax2  v1i  0   1e12
+  rmax3  v2r  0   1e12
+  rmax4  v2i  0   1e12
+.ends
+*
+*
+*
+*
+* coupled inductances 1 phase , differential inputs, like standard spice3 k and l - Elements
+* iron loss modeled with rfe ( related to primary side )
+* cooper loss modeled with rp ( primary side: rp  secondary side: rp/(ue*ue) )
+* coupling loss with k<1  ( primary side: lp  secondary side: lp/(ue*ue) m=k*sqrt(l1l2) )
+
+.subckt l1l2k12_LF v1r n1r v1i n1i v2r n2r v2i n2i p1_m q1_m v1_m v2_m p2_m q2_m
++ params:
++ on=1
++ ue=3.3333
++ lp=2000
++ rp=0.01
++ fn=50
++ omega={2*3.14159*fn}
++ k=0.99995
++ vfactor={sqrt(3)}
++ sfactor=3
++ rfe=1e6
++ rmax=1e12
++ rmin=1e-3
++ rfe=1e12
+.param r1={rp}
+.param r2={rp/(ue*ue)}
+*
+.param l1={lp}
+.param l2={l1/(ue*ue)}
+.param lm={k*sqrt(l1*l2)}
+*
+.param xl1i={(omega)*(l1)}
+.param xl2i={(omega)*(l2)}
+.param xm={omega*lm}
+*
+ev1r v1r v1ry value={r1*i(vi1r)-xl1i*i(vi1i)-xm*i(vi2i)} tripdv={TRIPDV} tripdt={TRIPDT}
+vi1r v1rx n1r dc 0
+ev1i v1i v1iy value={xl1i*i(vi1r)+r1*i(vi1i)+xm*i(vi2r)} tripdv={TRIPDV} tripdt={TRIPDT}
+vi1i v1ix n1i dc 0
+ev2r v2r v2ry value={-xm*i(vi1i)+r2*i(vi2r)-xl2i*i(vi2i)} tripdv={TRIPDV} tripdt={TRIPDT}
+vi2r v2rx n2r dc 0
+ev2i v2i v2iy value={xm*i(vi1r)+xl2i*i(vi2r)+r2*i(vi2i)} tripdv={TRIPDV} tripdt={TRIPDT}
+vi2i v2ix n2i dc 0
+rv1  v1rx v1ry {rmin*on+rmax*(1-on)}
+rv2  v1ix v1iy {rmin*on+rmax*(1-on)}
+rv3  v2rx v2ry {rmin*on+rmax*(1-on)}
+rv4  v2ix v2iy {rmin*on+rmax*(1-on)}
+ev1 v1_m  0  value={vfactor*sqrt(v(v1r,n1r)*v(v1r,n1r)+v(v1i,n1i)*v(v1i,n1i))} tripdv={TRIPDV} tripdt={TRIPDT}
+ev2 v2_m  0  value={vfactor*sqrt(v(v2r,n2r)*v(v2r,n2r)+v(v2i,n2i)*v(v2i,n2i))} tripdv={TRIPDV} tripdt={TRIPDT}
+ei1mag_m   i1_m  0  value={sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))} tripdv={TRIPDV} tripdt={TRIPDT}
+ei2mag_m   i2_m  0  value={sqrt(i(vi2r)*i(vi2r)+i(vi2i)*i(vi2i))} tripdv={TRIPDV} tripdt={TRIPDT}
+es1mag_m   s1_m  0  value={v(v1_m)*v(i1_m) *sfactor/vfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+ep1   p1_m   0    value={(v(v1r,n1r)*i(vi1r)+v(v1i,n1i)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+ep2   p2_m   0    value={(v(v2r,n2r)*i(vi2r)+v(v2i,n2i)*i(vi2i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+eq1   q1_m   0    value={(v(v1i,n1i)*i(vi1r)-v(v1r,n1r)*i(vi1i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+eq2   q2_m   0    value={(v(v2i,n2i)*i(vi2r)-v(v2r,n2r)*i(vi2i))*sfactor} tripdv={TRIPDV} tripdt={TRIPDT}
+epv   pv_m   0    value={v(p1_m)+v(p2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+eqv   qv_m   0    value={v(q1_m)+v(q2_m)} tripdv={TRIPDV} tripdt={TRIPDT}
+rfe1   v1r  n1r {rfe}
+rfe2   v1i  n1i {rfe}
+rmax1  v1r  0   1e12
+rmax2  v1i  0   1e12
+rmax3  v2r  0   1e12
+rmax4  v2i  0   1e12
+.ends
+*$
+*
+*
+*
+* one phase simple lossless transformer
+* This element is without coupling factor
+* Coupling is always 1 !!!
+.subckt ue_LF v1r v1i v2r v2i params: ue=1 l_=0 s_=0 stproz=1 phir=-0.5 phii=-0.866025404
+.param reL={ue*l_*stproz/100}
+.param reS={ue*s_*stproz/100}
+.param uer={ue+reL+reS*phir}
+.param uei={reS*phii}
+v1r v1r v1rx1 0v
+v1i v1i v1ix1 0v
+rser1 v1rx1 v1rx 1u ; add some ser. resistance to prevent voltage loop warning
+rser2 v1ix1 v1ix 1u
+bv1r v1rx 0 v=v(v2r)*uer-v(v2i)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bv1i v1ix 0 v=v(v2i)*uer+v(v2r)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bi2r 0 v2r  i=i(v1r)*uer+i(v1i)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bi2i 0 v2i  i=i(v1i)*uer-i(v1r)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+rmax1  v1r  0   1e12
+rmax2  v1i  0   1e12
+rmax3  v2r  0   1e12
+rmax4  v2i  0   1e12
+.ends
+
+* one phase simple lossless transformer like model above but with neutral port pins
+* This element is without coupling factor and with neutral line
+* Coupling is always 1 !!!
+.subckt ue2_LF v1r v1i n1r n1i v2r v2i n2r n2i params: on=1 ue=1 l_=0 s_=0 stproz=1 phir=-0.5 phii=-0.866025404
+.param reL={ue*l_*stproz/100}
+.param reS={ue*s_*stproz/100}
+.param uer={ue+reL+reS*phir}
+.param uei={reS*phii}
+v1r v1r v1rx1 0v
+v1i v1i v1ix1 0v
+rser1 v1rx1 v1rx 1u ; add some ser. resistance to prevent voltage loop warning
+rser2 v1ix1 v1ix 1u
+bv1r v1rx n1r v=v(v2r,n2r)*uer-v(v2i,n2i)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bv1i v1ix n1i v=v(v2i,n2i)*uer+v(v2r,n2r)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bi2r n2r v2r  i=on*(i(v1r)*uer+i(v1i)*uei) tripdv={TRIPDV} tripdt={TRIPDT}
+bi2i n2i v2i  i=on*(i(v1i)*uer-i(v1r)*uei) tripdv={TRIPDV} tripdt={TRIPDT}
+rmax1  v1r  0   1e12
+rmax2  v1i  0   1e12
+rmax3  v2r  0   1e12
+rmax4  v2i  0   1e12
+rmax5  n1r  0   1e12
+rmax6  n1i  0   1e12
+rmax7  n2r  0   1e12
+rmax8  n2i  0   1e12
+.ends
+
+* one phase simple lossless transformer like model above
+* This element is without coupling factor and with neutral line
+* Coupling is always 1 !!! no transformer taping
+.subckt a v1r v1i n1r n1i v2r v2i n2r n2i params: on=1 ue=1 phir=-0.5 phii=0.866025404
+.param reS={ue}
+.param uer={reS*phir}
+.param uei={-reS*phii}
+v1r v1r v1rx1 0v
+v1i v1i v1ix1 0v
+rser1 v1rx1 v1rx 1u ; add some ser. resistance to prevent voltage loop warning
+rser2 v1ix1 v1ix 1u
+bv1r v1rx n1r v=v(v2r,n2r)*uer-v(v2i,n2i)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bv1i v1ix n1i v=v(v2i,n2i)*uer+v(v2r,n2r)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bi2r n2r v2r  i=on*(i(v1r)*uer+i(v1i)*uei) tripdv={TRIPDV} tripdt={TRIPDT}
+bi2i n2i v2i  i=on*(i(v1i)*uer-i(v1r)*uei) tripdv={TRIPDV} tripdt={TRIPDT}
+rmax1  v1r  0   1e12
+rmax2  v1i  0   1e12
+rmax3  v2r  0   1e12
+rmax4  v2i  0   1e12
+rmax5  n1r  0   1e12
+rmax6  n1i  0   1e12
+rmax7  n2r  0   1e12
+rmax8  n2i  0   1e12
+.ends
+
+* one phase simple lossless transformer like model above
+* This element is without coupling factor and with neutral line
+* Coupling is always 1 !!! no transformer taping
+.subckt a2 v1r v1i n1r n1i v2r v2i n2r n2i params: on=1 ue=1 l_=0 s_=0 stproz=1 phir=-0.5 phii=-0.866025404
+.param reS={ue}
+.param uer={reS*phir}
+.param uei={-reS*phii}
+v1r v1r v1rx1 0v
+v1i v1i v1ix1 0v
+rser1 v1rx1 v1rx 1u ; add some ser. resistance to prevent voltage loop warning
+rser2 v1ix1 v1ix 1u
+bv1r v1rx n1r v=v(v2r,n2r)*uer-v(v2i,n2i)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bv1i v1ix n1i v=v(v2i,n2i)*uer+v(v2r,n2r)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bi2r n2r v2r  i=on*(i(v1r)*uer+i(v1i)*uei) tripdv={TRIPDV} tripdt={TRIPDT}
+bi2i n2i v2i  i=on*(i(v1i)*uer-i(v1r)*uei) tripdv={TRIPDV} tripdt={TRIPDT}
+rmax1  v1r  0   1e12
+rmax2  v1i  0   1e12
+rmax3  v2r  0   1e12
+rmax4  v2i  0   1e12
+rmax5  n1r  0   1e12
+rmax6  n1i  0   1e12
+rmax7  n2r  0   1e12
+rmax8  n2i  0   1e12
+.ends
+
+* This element is with coupling factor k
+* Therefore there are 8 g-devices present
+.subckt ue_k_LF v1r v1i v2r v2i params: ue=1 l_=0 s_=0 stproz=1 phir=-0.5 phii=-0.866025404 k=1
+.param reL={ue*l_*stproz/100}
+.param reS={ue*s_*stproz/100}
+.param uer={ue+reL+reS*phir}
+.param uei={reS*phii}
+g1r 0 mr v1r 0 1
+g1i 0 mi v1i 0 1
+g2r 0 mr VALUE={-1/k*(uer*v(v2r)-uei*v(v2i))} tripdv={TRIPDV} tripdt={TRIPDT}
+g2i 0 mi VALUE={-1/k*(uer*v(v2i)+uei*v(v2r))} tripdv={TRIPDV} tripdt={TRIPDT}
+g3r v1r 0 mr 0 1
+g3i v1i 0 mi 0 1
+g4r v2r 0 VALUE={-1/k*(uer*v(mr)-uei*v(mi))} tripdv={TRIPDV} tripdt={TRIPDT}
+g4i v2i 0 VALUE={-1/k*(uer*v(mi)+uei*v(mr))} tripdv={TRIPDV} tripdt={TRIPDT}
+rmr mr 0 1e10
+rmi mi 0 1e10
+rmax1  v1r  0   1e12
+rmax2  v1i  0   1e12
+rmax3  v2r  0   1e12
+rmax4  v2i  0   1e12
+.ends
+
+* This element is with coupling factor k
+* Therefore there are 8 g-devices present
+.subckt ue2_k_LF v1r v1i n1r n1i v2r v2i n2r n2i params: ue=1 l_=0 s_=0 stproz=1 phir=-0.5 phii=-0.866025404 k=1
+.param reL={ue*l_*stproz/100}
+.param reS={ue*s_*stproz/100}
+.param uer={ue+reL+reS*phir}
+.param uei={reS*phii}
+g1r 0 mr v1r n1r 1
+g1i 0 mi v1i n1r 1
+g2r 0 mr VALUE={-1/k*(uer*v(v2r,n2r)-uei*v(v2i,n2i))} tripdv={TRIPDV} tripdt={TRIPDT}
+g2i 0 mi VALUE={-1/k*(uer*v(v2i,n2i)+uei*v(v2r,n2r))} tripdv={TRIPDV} tripdt={TRIPDT}
+g3r v1r n1r mr 0 1
+g3i v1i n1i mi 0 1
+g4r v2r n2r VALUE={-1/k*(uer*v(mr)-uei*v(mi))} tripdv={TRIPDV} tripdt={TRIPDT}
+g4i v2i n2i VALUE={-1/k*(uer*v(mi)+uei*v(mr))} tripdv={TRIPDV} tripdt={TRIPDT}
+rmr mr 0 1e10
+rmi mi 0 1e10
+rmax1  v1r  0   1e12
+rmax2  v1i  0   1e12
+rmax3  v2r  0   1e12
+rmax4  v2i  0   1e12
+rmax5  n1r  0   1e12
+rmax6  n1i  0   1e12
+rmax7  n2r  0   1e12
+rmax8  n2i  0   1e12
+.ends
+
+
+* NOTE: Since the sign of L_ tap value is not normed and dependent of the transformer manufacturer
+* you can change the behaviour with sign1 and sign2 set to -1 or 1
+.subckt trafo_tap_l_LF v1r v1i v2r v2i params: ue=1 l_=0 stproz=1 middle=0 sign1=1 sign2=1
+.param phir=0 phii=0
+.param s_=0
+.param reL={ue*(l_-middle)*stproz/100*sign1}
+.param reS={ue*(s_-middle)*stproz/100*sign2}
+.param uer={ue+reL+reS*phir}
+.param uei={reS*phii}
+v1r v1r v1rx1 0v
+v1i v1i v1ix1 0v
+rser1 v1rx1 v1rx 1u ; add some ser. resistance to prevent voltage loop warning
+rser2 v1ix1 v1ix 1u
+bv1r v1rx 0 v=v(v2r)*uer-v(v2i)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bv1i v1ix 0 v=v(v2i)*uer+v(v2r)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bi2r 0 v2r  i=i(v1r)*uer+i(v1i)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bi2i 0 v2i  i=i(v1i)*uer-i(v1r)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+rmax1  v1r  0   1e12
+rmax2  v1i  0   1e12
+rmax3  v2r  0   1e12
+rmax4  v2i  0   1e12
+.ends
+
+* NOTE: Since the sign of S_ tap value is not normed and dependent of the transformer manufacturer
+* you can change the behaviour with sign1 and sign2 set to -1 or 1
+.subckt trafo_tap_s_LF v1r v1i v2r v2i params: ue=1 s_=0 stproz=1 phir=-0.5 phii=-0.866025404 middle=0 sign1=1 sign2=1
+.param l_=0
+.param reL={ue*(l_-middle)*stproz/100*sign1}
+.param reS={ue*(s_-middle)*stproz/100*sign2}
+.param uer={ue+reL+reS*phir}
+.param uei={reS*phii}
+v1r v1r v1rx1 0v
+v1i v1i v1ix1 0v
+rser1 v1rx1 v1rx 1u ; add some ser. resistance to prevent voltage loop warning
+rser2 v1ix1 v1ix 1u
+bv1r v1rx 0 v=v(v2r)*uer-v(v2i)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bv1i v1ix 0 v=v(v2i)*uer+v(v2r)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bi2r 0 v2r  i=i(v1r)*uer+i(v1i)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bi2i 0 v2i  i=i(v1i)*uer-i(v1r)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+rmax1  v1r  0   1e12
+rmax2  v1i  0   1e12
+rmax3  v2r  0   1e12
+rmax4  v2i  0   1e12
+.ends
+
+* NOTE: Since the sign of Q_ tap value is not normed and dependent of the transformer manufacturer
+* you can change the behaviour with sign1 and sign2 set to -1 or 1
+.subckt trafo_tap_q_LF v1r v1i v2r v2i params: ue=1 q_=0 stproz=1 middle=0 sign1=1 sign2=1
+.param phir=0
+.param phii=-1
+.param s_={q_}
+.param l_=0
+.param reL={ue*(l_-middle)*stproz/100*sign1}
+.param reS={ue*(s_-middle)*stproz/100*sign2}
+.param uer={ue+reL+reS*phir}
+.param uei={reS*phii}
+v1r v1r v1rx1 0v
+v1i v1i v1ix1 0v
+rser1 v1rx1 v1rx 1u ; add some ser. resistance to prevent voltage loop warning
+rser2 v1ix1 v1ix 1u
+bv1r v1rx 0 v=v(v2r)*uer-v(v2i)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bv1i v1ix 0 v=v(v2i)*uer+v(v2r)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bi2r 0 v2r  i=i(v1r)*uer+i(v1i)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+bi2i 0 v2i  i=i(v1i)*uer-i(v1r)*uei tripdv={TRIPDV} tripdt={TRIPDT}
+rmax1  v1r  0   1e12
+rmax2  v1i  0   1e12
+rmax3  v2r  0   1e12
+rmax4  v2i  0   1e12
+.ends
+
+.subckt trafo_tap_l_ctrl_LF v1r v1i v2r v2i l_ params: ue=1 stproz=1 middle=0 sign=1
+.param reL={ue*(l_-middle)*stproz/100*sign}
+.param uer={ue+reL}
+v1r v1r v1rx1 0v
+v1i v1i v1ix1 0v
+rser1 v1rx1 v1rx 1u ; add some ser. resistance to prevent voltage loop warning
+rser2 v1ix1 v1ix 1u
+bv1r v1rx 0 v=v(v2r)*v(uer) tripdv={TRIPDV} tripdt={TRIPDT}
+bv1i v1ix 0 v=v(v2i)*v(uer) tripdv={TRIPDV} tripdt={TRIPDT}
+bi2r 0 v2r  i=i(v1r)*v(uer) tripdv={TRIPDV} tripdt={TRIPDT}
+bi2i 0 v2i  i=i(v1i)*v(uer) tripdv={TRIPDV} tripdt={TRIPDT}
+rmax1  v1r  0   {rmax}
+rmax2  v1i  0   {rmax}
+rmax3  v2r  0   {rmax}
+rmax4  v2i  0   {rmax}
+.ends
+
+.subckt trafo_tap_s__ctrl_LF v1r v1i v2r v2i s_ params: ue=1 stproz=1 phir=-0.5 phii=-0.866025404 middle=0 sign=1
+ereS reS 0 value={ue*(v(s_)*sign1-middle)*stproz/100}
+euer uer 0 value={ue+v(reS)*phir}
+euei uei 0 value={v(reS)*phii}
+v1r v1r v1rx1 0v
+v1i v1i v1ix1 0v
+rser1 v1rx1 v1rx 1u ; add some ser. resistance to prevent voltage loop warning
+rser2 v1ix1 v1ix 1u
+bv1r v1rx 0 v=v(v2r)*v(uer)-v(v2i)*v(uei) tripdv={TRIPDV} tripdt={TRIPDT} 
+bv1i v1ix 0 v=v(v2i)*v(uer)+v(v2r)*v(uei) tripdv={TRIPDV} tripdt={TRIPDT}
+bi2r 0 v2r  i=i(v1r)*v(uer)+i(v1i)*v(uei) tripdv={TRIPDV} tripdt={TRIPDT}
+bi2i 0 v2i  i=i(v1i)*v(uer)-i(v1r)*v(uei) tripdv={TRIPDV} tripdt={TRIPDT} 
+rmax1  v1r  0   {rmax}
+rmax2  v1i  0   {rmax}
+rmax3  v2r  0   {rmax}
+rmax4  v2i  0   {rmax}
+.ends
+
+.subckt trafo_tap_q_ctrl_LF v1r v1i v2r v2i q_ params: ue=1 stproz=1 middle=0 sign=1
+.param phii=-1
+ereQ reQ 0 value={ue*(v(q_-middle)*sign)*stproz/100}
+euer uer 0 value={ue}
+euei uei 0 value={v(reQ)*phii}
+v1r v1r v1rx1 0v
+v1i v1i v1ix1 0v
+rser1 v1rx1 v1rx 1u ; add some ser. resistance to prevent voltage loop warning
+rser2 v1ix1 v1ix 1u
+bv1r v1rx 0 v=v(v2r)*v(uer)-v(v2i)*v(uei) tripdv={TRIPDV} tripdt={TRIPDT}  
+bv1i v1ix 0 v=v(v2i)*v(uer)+v(v2r)*v(uei) tripdv={TRIPDV} tripdt={TRIPDT}
+bi2r 0 v2r  i=i(v1r)*v(uer)+i(v1i)*v(uei) tripdv={TRIPDV} tripdt={TRIPDT} 
+bi2i 0 v2i  i=i(v1i)*v(uer)-i(v1r)*v(uei) tripdv={TRIPDV} tripdt={TRIPDT} 
+rmax1  v1r  0   {rmax}
+rmax2  v1i  0   {rmax}
+rmax3  v2r  0   {rmax}
+rmax4  v2i  0   {rmax}
+.ends

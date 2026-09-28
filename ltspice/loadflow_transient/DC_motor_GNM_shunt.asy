@@ -1,0 +1,38 @@
+Version 4
+SymbolType BLOCK
+LINE Normal 10 -32 16 -32
+LINE Normal -4 -9 -12 -9
+LINE Normal -4 -13 -12 -13
+LINE Normal 5 -28 10 -32
+LINE Normal 10 0 16 0
+LINE Normal 5 -5 10 0
+CIRCLE Normal 10 2 -27 -34
+CIRCLE Normal 8 0 -25 -32
+TEXT -19 -24 Left 1 DC-GNM
+TEXT -14 -19 Left 1 shunt
+SYMATTR Prefix X
+SYMATTR SpiceModel GNM
+SYMATTR ModelFile DC_motor.lib
+SYMATTR Description DC-motor shunt machine
+SYMATTR Value2 UEN=200V IEN=2A
+SYMATTR SpiceLine rcu=0.1  tauA=50ms tauE=600ms tauMech=300ms
+SYMATTR Value UAN=400 IAN=10A PN=3.2kW nN=2000
+SYMATTR SpiceLine2 IA0=0A psiE0=0Vs n0=0
+PIN 16 -32 VLEFT 2
+PINATTR PinName +
+PINATTR SpiceOrder 1
+PIN 16 0 VLEFT 2
+PINATTR PinName -
+PINATTR SpiceOrder 2
+PIN -32 -32 VBOTTOM 2
+PINATTR PinName F1
+PINATTR SpiceOrder 3
+PIN -32 -48 VBOTTOM 2
+PINATTR PinName F2
+PINATTR SpiceOrder 4
+PIN -32 -16 VBOTTOM 2
+PINATTR PinName M
+PINATTR SpiceOrder 5
+PIN -32 0 VBOTTOM 2
+PINATTR PinName n
+PINATTR SpiceOrder 6

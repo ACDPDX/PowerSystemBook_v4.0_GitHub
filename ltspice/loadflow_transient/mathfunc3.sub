@@ -1,0 +1,61 @@
+********************************************************************************
+*
+*  Variations for the 5 input summer, a more stream-lined approach.
+*
+*							Vlad, ©2008 - 2014
+*
+********************************************************************************
+*
+* [NOTES]
+*
+* - All inputs are floating so unused ones need grounding. Output is 1 Ohm.
+*
+********************************
+.subckt +++ a b c  out
+Ga 0 out a 0 1
+Gb 0 out b 0 1
+Gc 0 out c 0 1
+Ro out 0 1
+.ends
+********************************
+.subckt -++ a b c  out
+Ga 0 out 0 a 1
+Gb 0 out b 0 1
+Gc 0 out c 0 1
+Ro out 0 1
+.ends
+********************************
+.subckt --+ a b c  out
+Ga 0 out 0 a 1
+Gb 0 out 0 b 1
+Gc 0 out c 0 1
+Ro out 0 1
+.ends
+********************************
+.subckt --- a b c  out
+Ga 0 out 0 a 1
+Gb 0 out 0 b 1
+Gc 0 out 0 c 1
+Ro out 0 1
+.ends
+********************************
+.subckt +-+ a b c  out
+Ga 0 out a 0 1
+Gb 0 out 0 b 1
+Gc 0 out c 0 1
+Ro out 0 1
+.ends
+********************************
+.subckt +-- a b c  out
+Ga 0 out a 0 1
+Gb 0 out 0 b 1
+Gc 0 out 0 c 1
+Ro out 0 1
+.ends
+********************************
+.subckt ++- a b c  out
+Ga 0 out a 0 1
+Gb 0 out b 0 1
+Gc 0 out 0 c 1
+Ro out 0 1
+.ends

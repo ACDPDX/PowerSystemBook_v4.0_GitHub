@@ -1,0 +1,63 @@
+Example of a simple V - R - Circuit in LT_SPICE - SYNTAX with additional measurement nodes: 
+* This line ( always the first line ) names the circuit
+* all following lines need a asterisk as first sign to be considered * as comment line. Inline comments are with ";" 
+
+* First sign of a subcircuit call always is a x or X
+* Call of the subcircuit of the voltage source
+Xv   v1r  v1i   v1_m   p1_m    q1_m  vri_slack  params: vr=100 vi=0  ; subckt call with 
+* parameter    v1_m   p1_m   and   q1_m   are additional 
+* measurement nodes for the voltage ( magnitude ) 
+* the real power and the imaginary power
+* v1r = input node real      v1i = input node imaginary   
+* Call of the subcircuit of the Impedance  
+Xzr  v1r  v1i  v2r  v2i  z_r1 params: r=20  ; subckt call with  parameter
+* v1r = input node real      v1i = input node imag     v2r = output node real     v2i = output node imag 
+
+
+.subckt z_r1 v1r  v1i  v2r  v2i  params: r=10  ; subckt-definition with parameters
+*G-Device voltage controlled current source I = f (V)  
+g1r    v1r  0   value =  {1/r*v(v1r)}      ;  voltage controlled current source ( equation 1 )
+* i1r = 1/r * v1r
+g1i    v1i   0   value =  {1/r*v(v1i) }     ;  voltage controlled current  source ( equation 2 )
+* i1i = 1/r * v1i
+.ends ; End of the subcircuit
+
+.param rmax = 1e12 ; Definition of a global parameter 
+
+.subckt vri_slack v1r v1i   v1_m   p1_m   q1_m
++ params:
++ on=1 ; Device on
++ vr=100
++ vi=0
++ vfactor = 1.0 ; Voltage factor for conversion 3 phase to 1 phase system
++ sfactor = 1.0 ; Power factor for conversion 3 phase to 1 phase system
+*  vfactor und sfactor look also at:   Conversion_3_phase_to_1_Phase
+eev1r     v1r    v10  value = {on*(vr/vfactor) + (1-on)*v(v1r)}
+eev1i     v1i    v20  value = {on*(vi/vfactor) + (1-on)*v(v1i)}
+vi1r     v10    0    dc   0v
+vi1i     v20    0    dc   0v
+* measurement stuff
+evabs_m  v1_m  0   value = {vfactor*sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))} ; magnitude of voltage 
+ep1_m   p1_m     0   value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))}*sfactor   ; real power
+eq1_m   q1_m     0   value = {(v(v1i)*i(vi1r)-v(v1r)*i(vi1i))}*sfactor    ; imag power
+*i(vi1r) is the current through the voltage source vi1r 
+*i(vi1i) is the current through the voltage source vi1i
+*further possible output variables actually dimmed 
+*ev1r_m  vr1_m  0  value = v(v1r)*vfactor     ; real part of voltage 
+*ev1i_m  vi1_m  0  value = v(v1i)*vfactor      ; imag part of voltage 
+*to insert it add vr1_m and vi1_m to the first line and 
+*kill out the asterisk in front of ev1r_m and ev1i_m
+rmax1   v1r  0  {rmax}
+rmax2   v1i  0  {rmax}
+.ends
+
+.op  ; ( operating point analyses )
+
+* convergence criteria for the simulator
+.options reltol = 0.001  
+* relative error tolerance 0.001=1%O for current and voltage between two subsequent iterations
+.options abstol = 0.001 ; abs. current error tolerance in A
+.options vntol = 0.001 ; abs. voltage error tolerance in V
+* Low values for reltol,abstol,vntol generates longer simulation runs but gives higher accuracy to the results
+
+.end ; End of the circuit

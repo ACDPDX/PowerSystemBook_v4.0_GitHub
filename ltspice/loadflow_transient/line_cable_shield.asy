@@ -1,0 +1,60 @@
+Version 4
+SymbolType BLOCK
+LINE Normal -16 -32 -32 -32
+LINE Normal 16 -32 32 -32
+LINE Normal -16 32 -32 32
+LINE Normal 16 32 32 32
+LINE Normal -16 0 -32 0
+LINE Normal 16 0 32 0
+LINE Normal 0 63 0 54
+LINE Normal 8 63 0 63
+LINE Normal -8 63 0 63
+LINE Normal 6 66 -6 66
+LINE Normal 32 -16 -32 -16
+LINE Normal 32 16 -32 16
+LINE Normal 32 48 -32 48
+RECTANGLE Normal 16 -28 -16 -36
+RECTANGLE Normal 16 4 -16 -4
+RECTANGLE Normal 16 36 -16 28
+SYMATTR Prefix X
+SYMATTR SpiceModel line_cable_shield_400kV_1200mm2_10km
+SYMATTR ModelFile line_coupled.lib
+SYMATTR Description underground cable with cable shield
+SYMATTR Value length=10  R=0.0186 Rsh=0.01336
+SYMATTR Value2 fact=1
+PIN -32 -32 NONE 8
+PINATTR PinName IN1
+PINATTR SpiceOrder 1
+PIN -32 -16 NONE 8
+PINATTR PinName IN1s
+PINATTR SpiceOrder 2
+PIN -32 0 NONE 8
+PINATTR PinName IN2
+PINATTR SpiceOrder 3
+PIN -32 16 NONE 8
+PINATTR PinName IN2s
+PINATTR SpiceOrder 4
+PIN -32 32 NONE 8
+PINATTR PinName IN3
+PINATTR SpiceOrder 5
+PIN -32 48 NONE 8
+PINATTR PinName IN3s
+PINATTR SpiceOrder 6
+PIN 32 -32 NONE 8
+PINATTR PinName OUT1
+PINATTR SpiceOrder 7
+PIN 32 -16 NONE 8
+PINATTR PinName OUT1s
+PINATTR SpiceOrder 8
+PIN 32 0 NONE 8
+PINATTR PinName OUT2
+PINATTR SpiceOrder 9
+PIN 32 16 NONE 8
+PINATTR PinName OUT2s
+PINATTR SpiceOrder 10
+PIN 32 32 NONE 8
+PINATTR PinName OUT3
+PINATTR SpiceOrder 11
+PIN 32 48 NONE 8
+PINATTR PinName OUT3s
+PINATTR SpiceOrder 12

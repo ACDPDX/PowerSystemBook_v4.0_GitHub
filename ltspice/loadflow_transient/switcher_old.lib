@@ -1,0 +1,515 @@
+********************************************************************************
+* Switcher:
+* ******************************************************************************
+* Sw_3Phase initially off, TSTART>TSTOP
+* Sw_1Phase initially off, TSTART>TSTOP
+* Sw_3Phase_1 initially off, TSTART>TSTOP 
+* Sw_1Phase_1 initially off, TSTART>TSTOP
+* Sw_3Phase_off initially on, TSTOP>TSTART
+* Sw_1Phase_off initially on, TSTOP>TSTART
+* Sw_3Phase_1_off  initially on, TSTOP>TSTART
+* Sw_1Phase_1_off  initially on, TSTOP>TSTART
+* Sw_3Phase_ctrl   on/off via controlling node 1=on 0=off , tsw=extern
+* Sw_1Phase_ctrl   on/off via controlling node 1=on 0=off , tsw=extern
+* Sw_3Phase_1_ctrl on/off via controlling node 1=on 0=off, tsw=extern
+* Sw_1Phase_1_ctrl on/off via controlling node 1=on 0=off, tsw=extern
+* Sw_1Phase_i0     initially off, switch off at current < ioff TSTART>TSTOP
+* Sw_1Phase_off_i0 initially on, switch off at current < ioff TSTOP>TSTART
+* Sw_3Phase_i0     initially off, switch off at current < ioff TSTART>TSTOP
+* Sw_3Phase_off_i0 initially on, switch off at current < ioff TSTOP>TSTART
+* ******************************************************************************
+* Ground
+* Ground_1phase
+* *************
+
+
+
+* t_Start = Switch_on_time
+* t_Stop  = Switch_off_time
+* tsw     = Switching on time duration
+* toff    = Switching off duration
+
+* switches with controll input:  1=on 0=off
+* Mode 1 vh=0     Schalter immmer komplett ein oder aus je nach Wert von Vt ( Widerstandssprung bei V=Vt )
+* Mode 2 vh=pos   Schalter ist komplett ein wenn Spannung über (vt+vh) steigt und komplett aus wenn Spannung unter (vt-vh) fällt 
+*                 ( Widerstandssprung bei V=Vt-Vh und Vt+Vh )                    
+* Mode 3 vh=neg   Wie PspiceSchalter ( R=roff unter vt-vh und R=Ron über vt+vh dazwischen ändert sich der Widerstand nach einen Polynom
+
+
+
+.SUBCKT Sw_3Phase in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
+Vsw ctrl 0 PWL(0s 0v {t_Start} 0 {t_Start+tsw} 1 {t_Stop} 1 {t_Stop+toff} 0 )
+S1 in1 out1 ctrl 0 MS1
+S2 in2 out2 ctrl 0 MS1
+S3 in3 out3 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+*$
+
+* off at current zero (<ioff)
+* 1) for switching at zero current set toff=~1ms and ioff=1/10 of amplitude
+*    if timestep smaller (breakpoint device) can ioff be e.g. 1/100 of amplitude
+* 2) for soft switching set toff~10m and ioff=high value (1e10)
+* 3) for hard switching set toff=1u and ioff=high value (1e10)
+.SUBCKT Sw_3Phase_i0 in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++ioff=1e10
++vt=0.5
++vh=-0.4
+X1 in1 out1 Sw_1Phase_i0 params: 
++t_Start={t_Start}
++t_Stop={t_Stop}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++ioff={ioff}
++Vt={Vt} Vh={Vh}
+X2 in2 out2 Sw_1Phase_i0 params:
++t_Start={t_Start}
++t_Stop={t_Stop}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++ioff={ioff}
++Vt={Vt} Vh={Vh}
+X3 in3 out3 Sw_1Phase_i0 params:
++t_Start={t_Start}
++t_Stop={t_Stop}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++ioff={ioff}
++Vt={Vt} Vh={Vh}
+.ENDS
+
+.SUBCKT Sw_3Phase_1 in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
+Vsw ctrl 0 PWL(0s 0v {t_Start} 0 {t_Start+tsw} 1 {t_Stop} 1 {t_Stop+toff} 0 )
+G1 in1 out1 VALUE={v(ctrl)*v(in1,out1)/ron} tripdv={tdv} tripdt={tdt}
+G2 in2 out2 VALUE={v(ctrl)*v(in2,out2)/ron} tripdv={tdv} tripdt={tdt}
+G3 in3 out3 VALUE={v(ctrl)*v(in3,out3)/ron} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+.SUBCKT Sw_3Phase_soft in1 in2 in3 out1 out2 out3
++PARAMS:
++t_exp=50m
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=100m ioff=1e6; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
+Ein1 in1a N VALUE={IF(time>t_Start,v(in1)*(1-exp(-abs(time-t_Start)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Ein2 in2a N VALUE={IF(time>t_Start,v(in2)*(1-exp(-abs(time-t_Start)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Ein3 in3a N VALUE={IF(time>t_Start,v(in3)*(1-exp(-abs(time-t_Start)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Gin1 N in1 VALUE={I(Ein1)} tripdv={tdv} tripdt={tdt}
+Gin2 N in2 VALUE={I(Ein2)} tripdv={tdv} tripdt={tdt}
+Gin3 N in3 VALUE={I(Ein3)} tripdv={tdv} tripdt={tdt}
+Rinx N 0 1e12
+Vsw ctrl 0 PWL(0s 1v {t_Stop} 1 {t_Stop+toff} 0 )
+Xsw in1a in2a in3a out1 out2 out3 Sw_3Phase_off_i0 params:
++ t_Stop={t_Stop} t_Start=1e6 ioff={ioff}
+.ENDS
+
+
+.SUBCKT Sw_3Phase_ctrl in1 in2 in3 out1 out2 out3  ctrl
++PARAMS:
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
+rctrl ctrl 0 1e12
+S1 in1 out1 ctrl 0 MS1
+S2 in2 out2 ctrl 0 MS1
+S3 in3 out3 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+*$
+
+.SUBCKT Sw_3Phase_1_ctrl in1 in2 in3 out1 out2 out3 ctrl
++PARAMS:
++ron=0.01
+rctrl ctrl 0 1e12
+G1 in1 out1 VALUE={v(ctrl)*v(in1,out1)/ron} tripdv={tdv} tripdt={tdt}
+G2 in2 out2 VALUE={v(ctrl)*v(in2,out2)/ron} tripdv={tdv} tripdt={tdt}
+G3 in3 out3 VALUE={v(ctrl)*v(in3,out3)/ron} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT Sw_3Phase_off in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++vt=0.5
++vh=-0.4
+Vsw ctrl 0 PWL(0s 1 {t_Stop} 1 {t_Stop+toff} 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in1 out1 ctrl 0 MS1
+S2 in2 out2 ctrl 0 MS1
+S3 in3 out3 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+
+* off at current zero (<ioff)
+* 1) for switching at zero current set toff=~1ms and ioff=1/10 of amplitude
+*    if timestep smaller (breakpoint device) can ioff be e.g. 1/100 of amplitude
+* 2) for soft switching set toff~10m and ioff=high value (1e10)
+* 3) for hard switching set toff=1u and ioff=high value (1e10)
+.SUBCKT Sw_3Phase_off_i0 in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++ioff=1e10
++vt=0.5
++vh=-0.4
+X1 in1 out1 Sw_1Phase_off_i0 params: 
++t_Stop={t_Stop}
++t_Start={t_Start}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++ioff={ioff}
++Vt={Vt} Vh={Vh}
+X2 in2 out2 Sw_1Phase_off_i0 params:
++t_Stop={t_Stop}
++t_Start={t_Start}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++ioff={ioff}
++Vt={Vt} Vh={Vh}
+X3 in3 out3 Sw_1Phase_off_i0 params:
++t_Stop={t_Stop}
++t_Start={t_Start}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++ioff={ioff}
++Vt={Vt} Vh={Vh}
+.ENDS
+
+.SUBCKT Sw_3Phase_only_i0 in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++imax=10k
+X1 in1 out1 Sw_1Phase_only_i0 params: 
++t_Start={t_Start}
++t_Stop={t_Stop}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++imax={imax}
+X2 in2 out2 Sw_1Phase_only_i0 params:
++t_Start={t_Start}
++t_Stop={t_Stop}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++imax={imax}
+X3 in3 out3 Sw_1Phase_only_i0 params:
++t_Start={t_Start}
++t_Stop={t_Stop}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++imax={imax}
+.ENDS
+
+
+.SUBCKT Sw_3Phase_off_only_i0 in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++imax=10k
+X1 in1 out1 Sw_1Phase_off_only_i0 params: 
++t_Stop={t_Stop}
++t_Start={t_Start}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++imax={imax}
+X2 in2 out2 Sw_1Phase_off_only_i0 params:
++t_Stop={t_Stop}
++t_Start={t_Start}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++imax={imax}
+X3 in3 out3 Sw_1Phase_off_only_i0 params:
++t_Stop={t_Stop}
++t_Start={t_Start}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++imax={imax}
+.ENDS
+
+.SUBCKT fault_earth in1 in2 in3
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
+Vsw ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 {t_Stop} 1 {t_Stop+toff} 0 )
+S1 in1 0 ctrl 0 MS1
+S2 in2 0 ctrl 0 MS1
+S3 in3 0 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+
+.SUBCKT fault_earth_1phase in1 
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
+Vsw ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 {t_Stop} 1 {t_Stop+toff} 0 )
+S1 in1 0 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+
+.SUBCKT Sw_3Phase_1_off in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
+Vsw ctrl 0 PWL(0s 1 {t_Stop} 1 {t_Stop+toff} 0 {t_Start} 0 {t_Start+tsw} 1 )
+G1 in1 out1 VALUE={v(ctrl)*v(in1,out1)/ron} tripdv={tdv} tripdt={tdt}
+G2 in2 out2 VALUE={v(ctrl)*v(in2,out2)/ron} tripdv={tdv} tripdt={tdt}
+G3 in3 out3 VALUE={v(ctrl)*v(in3,out3)/ron} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT Sw_1Phase_model3 in1 out1
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++vt=0.5
++vh=-0.4
+Vsw1 ctrl 0 PWL(0s 0v {t_Start} 0 {t_Start+tsw} 1 {t_Stop} 1 {t_Stop+toff} 0)
+S1 in1 out1 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={vt} Vh={vh} Lser=0 Vser=0)
+.ENDS
+
+.SUBCKT Sw_1Phase in1 out1
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
+Vsw ctrl 0 PWL (0s 0  {t_Start} 0 {t_Start+tsw} 1 {t_Stop} 1 {t_Stop+toff} 0 )
+S1 in1 out1 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={vt} Vh={vh} Lser=0 Vser=0)
+.ENDS
+
+
+* off at current zero (<ioff)
+* 1) for switching at zero current set toff=~1ms and ioff=1/10 of amplitude
+*    if timestep smaller (breakpoint device) can ioff be e.g. 1/100 of amplitude
+* 2) for soft switching set toff~10m and ioff=high value (1e10)
+* 3) for hard switching set toff=1u and ioff=high value (1e10)
+.SUBCKT Sw_1Phase_i0 in1 out1
++PARAMS:
++t_Start=1e6
++t_Stop=0.5
++tsw=100u toff=100u ; on and off switching times 
++ron=0.01
++roff=1e9
++ioff=1e10
++vt=0.9
++vh=0
+v2 in1 in1a 0
+b1 st 0 v=if(time>(t_start+tsw),1,0) tripdv={tdv} tripdt={tdt} ; for switch on
+b2 st2 0 v=if(time>t_Stop,if(abs( i(V2))<ioff,0,1),1) tripdv={tdv} tripdt={tdt} ; for switch off
+A1 st2 0 0 0 0 0 st3 0 OR tfall={toff} td=1n ; for switch off
+* Switches in series 
+S1 in1a in1b st3 0 SWoff
+S2 in1b out1 st 0 SWon
+.model SWon VSWITCH (Ron={ron} Roff={roff} Vt=0.9 Vh=0 Lser=0 Vser=0)
+.model SWoff VSWITCH (Ron={ron} Roff={roff} Vt={vt} Vh={vh} Lser=0 Vser=0)
+.ENDS
+
+
+* off at current zero (<ioff)
+* 1) for switching at zero current set toff=~1ms and ioff=1/10 of amplitude
+*    if timestep smaller (breakpoint device) can ioff be e.g. 1/100 of amplitude
+* 2) for soft switching set toff~10m and ioff=high value (1e10)
+* 3) for hard switching set toff=1u and ioff=high value (1e10)
+.SUBCKT Sw_1Phase_off_i0 in1 out1
++PARAMS:
++t_Start=1e6
++t_Stop=0.5
++tsw=100u toff=10m ; on and off switching times 
++ron=0.01
++roff=1e9
++ioff=1e10
++vt=0.5
++vh=-0.4
+v2 in1 in1a 0
+b1 st 0 v=if(time>(t_start+tsw),1,0) tripdv={tdv} tripdt={tdt} ; for switch on
+b2 st2 0 v=if(time>t_Stop,if(abs(i(V2))<ioff,0,1),1) tripdv={tdv} tripdt={tdt} ; for switch off
+* Switches in parallel 
+A1 st2 0 0 0 0 0 st3 0 OR tfall={toff} td=1n ; for switch off
+S1 in1a out1 st3 0 SWoff
+S2 in1a out1 st 0 SWon
+.model SWon VSWITCH (Ron={ron} Roff={roff} Vt=0.9 Vh=0 Lser=0 Vser=0)
+.model SWoff VSWITCH (Ron={ron} Roff={roff} Vt={vt} Vh={vh} Lser=0 Vser=0)
+.ENDS
+
+.SUBCKT Sw_1Phase_only_i0 in out
++PARAMS:
++t_Start=1e6
++t_Stop=0.5
++tsw=100u toff=100u ; on and off switching times 
++ron=0.01
++roff=1e9
++imax=10k
+* Switcher
+Vi in A1 0
+S1 A1 out Lst 0 schalter
+.model schalter sw ron={ron} roff={roff} Vt=0.5 Vh=-0.4
+* control switcher
+R4 sta Lst 1k
+C2 Lst 0 2p
+B1 sta 0 V=TABLE((v(st)+ABS(i(Vi))/{imax}),0,0,0.1,2)
+vst st 0 PWL (0s 0 {t_Start} 0 {t_Start+tsw} 1 {t_Stop} 1 {t_Stop+toff} 0)
+.ends
+
+.SUBCKT Sw_1Phase_off_only_i0 in out
++PARAMS:
++t_Start=1e6
++t_Stop=0.5
+* t_Stop = first time
++tsw=100u toff=100u ; on and off switching times 
++ron=0.01
++roff=1e9
++imax=10k
+* Switcher
+Vi in A1 0
+S1 A1 out Lst 0 schalter
+.model schalter sw ron={ron} roff={roff} Vt=0.5 Vh=-0.4
+* control switcher
+R4 sta Lst 1k
+C2 Lst 0 2p
+B1 sta 0 V=TABLE((v(st)+ABS(i(Vi))/{imax}),0,0,0.1,2)
+vst st 0 PWL(0s 1 {t_Stop} 1 {t_Stop+toff} 0 {t_Start} 0 {t_Start+tsw} 1 )
+.ends
+
+.SUBCKT Sw_1Phase_1 in1 out1
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
+Vsw1 ctrl 0 PWL(0s 0v {t_Start} 0 {t_Start+tsw} 1 {t_Stop} 1 {t_Stop+toff} 0)
+R1 in1 out1 {roff}
+G1 in1 out1 VALUE={v(ctrl)*v(in1,out1)/ron} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+.SUBCKT Sw_1Phase_1_off in1 out1
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
+Vsw1 ctrl 0 PWL(0s 1 {t_Stop} 1 {t_Stop+toff} 0 {t_Start} 0 {t_Start+tsw} 1 )
+G1 in1 out1 VALUE={v(ctrl)*v(in1,out1)/ron} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+.SUBCKT Sw_1Phase_ctrl in1 out1  ctrl
++PARAMS:
++ron=0.01
++roff=1e9
++vt=0.5
++vh=-0.4
+rctrl ctrl 0 1e12
+S1 in1 out1 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+
+
+.SUBCKT Sw_1Phase_1_ctrl in1 out1 ctrl
++PARAMS:
++ron=0.01
+rctrl ctrl 0 1e12
+G1 in1 out1 VALUE={v(ctrl)*v(in1,out1)/ron} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT Sw_1Phase_off in1 out1
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=10m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.5
++vh=-0.4
+Vsw1 ctrl 0 PWL(0s 1 {t_Stop} 1 {t_Stop+toff} 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in1 out1 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+
+* rgnd=0.05ohm/km lgnd=1mH/km
+.SUBCKT Ground in1 in2 in3
++PARAMS: 
++ rgnd=le-3 lgnd=1uH
+RGND1 in1 in11 {rgnd}
+RGND2 in2 in21 {rgnd}
+RGND3 in3 in31 {rgnd}
+LGND1 in11 0 {lgnd}
+LGND2 in21 0 {lgnd}
+LGND3 in31 0 {lgnd}
+.ENDS
+
+* rgnd=0.05ohm/km lgnd=1mH/km
+.SUBCKT Ground_1phase in1
++PARAMS: 
++ rgnd=1e-3 lgnd=1uH
+RGND1 in1 in11 {rgnd}
+LGND1 in11 0 {lgnd}
+.ENDS

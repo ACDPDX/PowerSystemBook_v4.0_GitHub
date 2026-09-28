@@ -1,0 +1,249 @@
+* use .uic at command line for .tran command
+
+.subckt 2us_50us_voltage out 
++  params: tstart=0 tstop=1e6 tsw=1p toff=1p ic=4k
+R1 in 0 18k
+XU1 in 0 SW_1Phase_2a t_Start={tstart} t_Stop={tstop} tsw={tsw} toff={toff} ron=0.01 roff=1e12
+XU2 out1 ESD SW_1Phase_2a t_Start={tstart} t_Stop={tstop} tsw={tsw} toff={toff} ron=0.01 roff=1e12
+XU3 x N001 SW_1Phase_2a t_Start={tstart} t_Stop={tstop} tsw={tsw} toff={toff} ron=0.01 roff=1e12
+XU4 out2 out SW_1Phase_2a t_Start={tstart} t_Stop={tstop} tsw={tsw} toff={toff} ron=0.01 roff=1e12
+R2 N001 0 134
+R4 out1 x 33
+R5 out 0 1e6
+C1 x in 0.5u
+C2 ESD 0 0.0125u
+.ic v(x)={ic*1.05}
+Eout out2  0  VALUE={V(esd)} tripdv=1 tripdt=1
+.ends
+
+
+.subckt 1ns_dual_flash_voltage out
++  params: tstart=0 tstop=1e3 tsw=1p toff=1p ic=4k
+C1 c1 0 150p
+C2 c2 0 8p
+R1 N004 c1 330
+R2 N005 c2 200
+L1 N001 N002 2.4u
+L2 N001 N003 140n
+R3 ESD 0 100
+X§U1 N001 ESD SW_1Phase_2a t_Start={tstart} t_Stop={tstop} tsw={tsw} toff={toff} ron=0.01 roff=1e12
+X§U2 N002 N004 SW_1Phase_2a t_Start={tstart} t_Stop={tstop} tsw={tsw} toff={toff} ron=0.01 roff=1e12
+X§U3 N003 N005 SW_1Phase_2a t_Start={tstart} t_Stop={tstop} tsw={tsw} toff={toff} ron=0.01 roff=1e12
+X§U4 Out1 out SW_1Phase_2a t_Start={tstart} t_Stop={tstop} tsw={tsw} toff={toff} ron=0.01 roff=1e12
+R4 out 0 1e6
+.ic V(c1)={ic*3.5} V(c2)={ic*3.5}
+Eout out1  0  VALUE={V(esd)} tripdv=1 tripdt=1
+.ends
+
+.subckt 2us_50us_Current_flash p 
++ params: iflash=100k delay=0 
+.param risedelay={delay} falldelay={risedelay+1n}
+Iexp 0 p  exp(0 {iflash*1.025} {risedelay} {2u/5} {falldelay} {50u*1.4})
+.ends
+
+.subckt 8us_20us_Current_flash p 
++ params: iflash=100k delay=0
+.param risedelay={delay} falldelay={risedelay+1n}
+Iexp 0 p  exp(0 {iflash*8} {risedelay} {8u/1.25} {falldelay} {20u*0.45})
+.ends
+
+.subckt 10us_350us_Current_flash p 
++ params: iflash=100k delay=0
+.param risedelay={delay} falldelay={risedelay+1n}
+Iexp 0 p exp(0 {iflash*1.03} {risedelay} {10u/6} {falldelay} {350u*1.35})
+.ends
+
+.SUBCKT Sw_1Phase_2a in1 out1
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u 
++toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
+Vsw ctrl 0 PWL (0s 0  {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0 )
+S1 in1 out1 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={vt} Vh={vh} Lser=0 Vser=0)
+.ENDS
+
+
+
+* To see the parameters: Parameter des Cassie Mayr Arc.docx
+* for more cooling pm->smaller
+* for faster stop hext->higher and lower tau_th 
+.SUBCKT ARC_CM p n params: gmin=1e-4 gmax=200m gstartup=1e-3 tau_c=50u tau_m=200u Pc=1e7 Pm=2e4 Isw=500 Vflash=750k Hext=0.5 tau_th=500u tau_g=20u zint=2e4 delay=20u 
+* Trigger für Flash
+Vmeas p pa 0
+Ein1 in 0 value={if(V(pa,n)>Vflash,1,0)} tripdv=1 tripdt=1
+Rtrig2 trig 0 1e6
+.lib misc.lib
+Xpulse2pulse in trig Pulse2Pulse params: delay={delay}
+* ---------------------------------------------------------
+* Zünddetektion
+* --------------------------------------------------------- 
+Bfire fire 0 V=if(v(z)<1 & V(trig) & v(extinguish)<0.5,1,0) tripdv=1 tripdt=1
+*Bfire fire 0 V=if(v(z)<0.5 & V(pa,n)>Von & v(extinguish)<0.5,1,if(v(z)>0.5 & v(pa,n)>Voff,1,0)) tripdv=1 tripdt=1 
+* ---------------------------------------------------------
+* Arc-Latch
+* ---------------------------------------------------------
+Cz zint 0 1 IC=0
+Rzleak zint 0 1G
+Bset 0 zint I=if(V(fire)>0.5 & V(zint)<1,zint,0) tripdv=1 tripdt=1
+* ---------------------------------------------------------
+* Arc zurücksetzen
+* ---------------------------------------------------------
+Breset zint 0 I=if(V(extinguish)>0.5 & V(z)>1e-6,zint,0) tripdv=1 tripdt=1
+Bz z 0 V=limit(V(zint),0,1) tripdv=1 tripdt=1 
+* ---------------------------------------------------------
+* Leitwertzustand
+* --------------------------------------------------------- 
+Cg gint 0 1 IC={gstartup}
+Rgleak gint 0 1G
+*Bdecay gint 0 I=if(v(h)>hext,1,if(v(fire)>0,1,0))*(V(g)-gmin)/tau_g tripdv=1 tripdt=1
+Bdecay gint 0 I=(V(g)-gmin)/tau_g tripdv=1 tripdt=1
+* ---------------------------------------------------------
+* Relaxationsterm für Leitwert
+* ---------------------------------------------------------
+Bg g 0 V=limit(V(gint),gmin,gmax) tripdv=1 tripdt=1
+* ---------------------------------------------------------
+* Leitwertdynamik
+* ---------------------------------------------------------
+Bdyn 0 gint I=if(v(h)>hext,1,if(v(fire)>0.5,1,0))*limit(V(alpha)*V(gc)+(1-V(alpha))*V(gm),-1e4,1e4) tripdv=1 tripdt=1
+* ---------------------------------------------------------
+* ARC Strom
+* ---------------------------------------------------------
+Bcur iarc 0 V=I(Vmeas) tripdv=1 tripdt=1
+* ---------------------------------------------------------
+* ARC Leistung
+* ---------------------------------------------------------
+Bpow parc 0 V=max(V(pa,n)*I(Vmeas),0) tripdv=1 tripdt=1 
+* ---------------------------------------------------------
+* Cassie-Mayr Gewichtung
+* ---------------------------------------------------------
+Balpha alpha 0 V=abs(V(iarc))/(abs(V(iarc))+Isw) tripdv=1 tripdt=1
+* ---------------------------------------------------------
+* Cassie Anteil
+* ---------------------------------------------------------
+Bcass gc 0 V=((V(iarc)**2)/Pc-V(g))/tau_c tripdv=1 tripdt=1
+Rgc gc 0 1G
+* ---------------------------------------------------------
+* Mayr Anteil
+* ---------------------------------------------------------
+Bmayr gm 0 V=(V(parc)/Pm-V(g))/tau_m tripdv=1 tripdt=1
+Rgm gm 0 1G
+* ---------------------------------------------------------
+* Thermische Arcenergie Zustand
+* ---------------------------------------------------------
+Ch h 0 1 IC={hext}
+Rh h 0 1G 
+Bheat 0 h I=V(parc) tripdv=1 tripdt=1
+Bcool h 0 I=V(h)/tau_th tripdv=1 tripdt=1
+* ---------------------------------------------------------
+* Löschbedingung
+* --------------------------------------------------------- 
+Bext extinguish 0 V=if(V(z)>1e-4 & V(h)<Hext & v(fire)<0.5,1,0) tripdv=1 tripdt=1
+* ---------------------------------------------------------
+* Lichtbogen
+* --------------------------------------------------------- 
+Barc pa n i=v(z)*V(g)*V(pa,n) tripdv=1 tripdt=1
+Rpan pa n 1G
+Brout rout 0 v=(1/(v(z)*v(g)+1p)) tripdv=1 tripdt=1
+.ends ARC_CM
+
+* To see the parameters: Parameter des Cassie Mayr Arc.docx
+* for more cooling pm->smaller
+* for faster stop hext->higher and lower tau_th 
+.SUBCKT ARC_CM2 p n params: gmin=1e-4 gmax=200m gstartup=1e-3 tau_c=50u tau_m=200u Pc=1e7 Pm=2e4 Isw=500 Vflash=750k Hext=0.5 tau_th=500u tau_g=20u zint=2e5 trig=1 
+* Trigger für Flash
+Vmeas p pa 0
+A3 d 0 in 0 clr N001 trig 0 DFLOP
+A4 t 0 0 0 0 N002 clr 0 SCHMITT Vhigh=1 Vlow=0 Vt=0.5 Vh=0.2 Td=2n Trise=10n Tfall=10n
+* RC-Timer
+R1 trig T 100k
+C1 T 0 {1n*trig}
+* Trigger
+Ein1 in 0 value={if(V(pa,n)>Vflash,1,0)} tripdv=1 tripdt=1
+* konstante logische 1 für D
+VDD D 0 1
+* ---------------------------------------------------------
+* Zünddetektion
+* --------------------------------------------------------- 
+Bfire fire 0 V=if(v(z)<1 & V(trig) & v(extinguish)<0.5,1,0) tripdv=1 tripdt=1
+*Bfire fire 0 V=if(v(z)<0.5 & V(pa,n)>Von & v(extinguish)<0.5,1,if(v(z)>0.5 & v(pa,n)>Voff,1,0)) tripdv=1 tripdt=1 
+* ---------------------------------------------------------
+* Arc-Latch
+* ---------------------------------------------------------
+Cz zint 0 1 IC=0
+Rzleak zint 0 1G
+Bset 0 zint I=if(V(fire)>0.5 & V(zint)<1,zint,0) tripdv=1 tripdt=1
+* ---------------------------------------------------------
+* Arc zurücksetzen
+* ---------------------------------------------------------
+Breset zint 0 I=if(V(extinguish)>0.5 & V(z)>1e-6,zint,0) tripdv=1 tripdt=1
+Bz z 0 V=limit(V(zint),0,1) tripdv=1 tripdt=1 
+* ---------------------------------------------------------
+* Leitwertzustand
+* --------------------------------------------------------- 
+Cg gint 0 1 IC={gstartup}
+Rgleak gint 0 1G
+*Bdecay gint 0 I=if(v(h)>hext,1,if(v(fire)>0,1,0))*(V(g)-gmin)/tau_g tripdv=1 tripdt=1
+Bdecay gint 0 I=(V(g)-gmin)/tau_g tripdv=1 tripdt=1
+* ---------------------------------------------------------
+* Relaxationsterm für Leitwert
+* ---------------------------------------------------------
+Bg g 0 V=limit(V(gint),gmin,gmax) tripdv=1 tripdt=1
+* ---------------------------------------------------------
+* Leitwertdynamik
+* ---------------------------------------------------------
+Bdyn 0 gint I=if(v(h)>hext,1,if(v(fire)>0.5,1,0))*limit(V(alpha)*V(gc)+(1-V(alpha))*V(gm),-1e4,1e4) tripdv=1 tripdt=1
+* ---------------------------------------------------------
+* ARC Strom
+* ---------------------------------------------------------
+Bcur iarc 0 V=I(Vmeas) tripdv=1 tripdt=1
+* ---------------------------------------------------------
+* ARC Leistung
+* ---------------------------------------------------------
+Bpow parc 0 V=max(V(pa,n)*I(Vmeas),0) tripdv=1 tripdt=1 
+* ---------------------------------------------------------
+* Cassie-Mayr Gewichtung
+* ---------------------------------------------------------
+Balpha alpha 0 V=abs(V(iarc))/(abs(V(iarc))+Isw) tripdv=1 tripdt=1
+* ---------------------------------------------------------
+* Cassie Anteil
+* ---------------------------------------------------------
+Bcass gc 0 V=((V(iarc)**2)/Pc-V(g))/tau_c tripdv=1 tripdt=1
+Rgc gc 0 1G
+* ---------------------------------------------------------
+* Mayr Anteil
+* ---------------------------------------------------------
+Bmayr gm 0 V=(V(parc)/Pm-V(g))/tau_m tripdv=1 tripdt=1
+Rgm gm 0 1G
+* ---------------------------------------------------------
+* Thermische Arcenergie Zustand
+* ---------------------------------------------------------
+Ch h 0 1 IC={hext}
+Rh h 0 1G 
+Bheat 0 h I=V(parc) tripdv=1 tripdt=1
+Bcool h 0 I=V(h)/tau_th tripdv=1 tripdt=1
+* ---------------------------------------------------------
+* Löschbedingung
+* --------------------------------------------------------- 
+Bext extinguish 0 V=if(V(z)>1e-4 & V(h)<Hext & v(fire)<0.5,1,0) tripdv=1 tripdt=1
+* ---------------------------------------------------------
+* Lichtbogen
+* --------------------------------------------------------- 
+Barc pa n i=v(z)*V(g)*V(pa,n) tripdv=1 tripdt=1
+Rpan pa n 1G
+Brout rout 0 v=(1/(v(z)*v(g)+1p)) tripdv=1 tripdt=1
+.ends ARC_CM
+
+
+
+
+
+
+
+
+

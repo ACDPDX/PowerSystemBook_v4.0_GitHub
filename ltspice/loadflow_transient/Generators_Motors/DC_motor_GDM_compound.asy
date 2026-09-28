@@ -1,0 +1,43 @@
+Version 4
+SymbolType BLOCK
+LINE Normal 10 -32 16 -32
+LINE Normal -4 -9 -12 -9
+LINE Normal -4 -13 -12 -13
+LINE Normal 5 -28 10 -32
+LINE Normal 10 0 16 0
+LINE Normal 5 -5 10 0
+CIRCLE Normal 10 2 -27 -34
+CIRCLE Normal 8 0 -25 -32
+TEXT -19 -24 Left 1 DC-GDM
+TEXT -22 -19 Left 1 compound
+SYMATTR Prefix X
+SYMATTR SpiceModel GDM
+SYMATTR ModelFile DC_motor.lib
+SYMATTR Description DC-motor compound machine
+SYMATTR Value2 NR_NE=0.1 Rp=1 Rh=1e6 J=0.0025  tpsi=0.8 sigmaE=0.03 sigmaR=0.03
+SYMATTR SpiceLine a=0.6 m=9 nN=2900 Mn=15.73 mot=1 rbg=0.001
+SYMATTR Value UA=230 UE=110 IAN=23 RA=0.8 LA=0.04 RE=110 RR=0.2
+PIN 16 -32 VLEFT 2
+PINATTR PinName +
+PINATTR SpiceOrder 1
+PIN 16 0 VLEFT 2
+PINATTR PinName -
+PINATTR SpiceOrder 2
+PIN -32 -32 VBOTTOM 2
+PINATTR PinName F1
+PINATTR SpiceOrder 3
+PIN -32 -48 VBOTTOM 2
+PINATTR PinName F2
+PINATTR SpiceOrder 4
+PIN -32 0 VBOTTOM 2
+PINATTR PinName D1
+PINATTR SpiceOrder 5
+PIN -32 -16 VBOTTOM 2
+PINATTR PinName D2
+PINATTR SpiceOrder 6
+PIN -32 16 VBOTTOM 2
+PINATTR PinName M
+PINATTR SpiceOrder 7
+PIN -32 32 VBOTTOM 2
+PINATTR PinName n
+PINATTR SpiceOrder 8

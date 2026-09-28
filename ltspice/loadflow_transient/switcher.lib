@@ -1,0 +1,1340 @@
+********************************************************************************
+* Switcher:
+* ******************************************************************************
+* Sw_3Phase initially off, TSTART>TSTOP
+* Sw_1Phase initially off, TSTART>TSTOP
+* Sw_3Phase_1 initially off, TSTART>TSTOP 
+* Sw_1Phase_1 initially off, TSTART>TSTOP
+* Sw_3Phase_off initially on, TSTOP>TSTART
+* Sw_1Phase_off initially on, TSTOP>TSTART
+* Sw_3Phase_1_off  initially on, TSTOP>TSTART
+* Sw_1Phase_1_off  initially on, TSTOP>TSTART
+* Sw_3Phase_ctrl   on/off via controlling node 1=on 0=off , tsw=extern
+* Sw_1Phase_ctrl   on/off via controlling node 1=on 0=off , tsw=extern
+* Sw_3Phase_1_ctrl on/off via controlling node 1=on 0=off, tsw=extern
+* Sw_1Phase_1_ctrl on/off via controlling node 1=on 0=off, tsw=extern
+* Sw_1Phase_i0     initially off, switch off at current < ioff TSTART>TSTOP
+* Sw_1Phase_off_i0 initially on, switch off at current < ioff TSTOP>TSTART
+* Sw_3Phase_i0     initially off, switch off at current < ioff TSTART>TSTOP
+* Sw_3Phase_off_i0 initially on, switch off at current < ioff TSTOP>TSTART
+* ******************************************************************************
+* Ground
+* Ground_1phase
+* *************
+
+
+
+* t_Start = Switch_on_time
+* t_Stop  = Switch_off_time
+* tsw     = Switching on time duration
+* toff    = Switching off duration
+
+* switches with controll input:  1=on 0=off
+* Mode 1 vh=0     Schalter immmer komplett ein oder aus je nach Wert von Vt ( Widerstandssprung bei V=Vt )
+* Mode 2 vh=pos   Schalter ist komplett ein wenn Spannung über (vt+vh) steigt und komplett aus wenn Spannung unter (vt-vh) fällt 
+*                 ( Widerstandssprung bei V=Vt-Vh und Vt+Vh )                    
+* Mode 3 vh=neg   Wie PspiceSchalter ( R=roff unter vt-vh und R=Ron über vt+vh dazwischen ändert sich der Widerstand nach einen Polynom
+
+
+
+.SUBCKT Sw_3Phase in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
+Vsw ctrl 0 PWL(0s 0v {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0 )
+S1 in1 out1 ctrl 0 MS1
+S2 in2 out2 ctrl 0 MS1
+S3 in3 out3 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+*$
+
+* off at current zero (<ioff)
+* 1) for switching at zero current set toff=~1ms and ioff=1/10 of amplitude
+*    if timestep smaller (breakpoint device) can ioff be e.g. 1/100 of amplitude
+* 2) for soft switching set toff~10m and ioff=high value (1e10)
+* 3) for hard switching set toff=1u and ioff=high value (1e10)
+.SUBCKT Sw_3Phase_i0 in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++ioff=1e10
++vt=0.5
++vh=-0.4
+X1 in1 out1 Sw_1Phase_i0 params: 
++t_Start={t_Start}
++t_Stop={t_Stop}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++ioff={ioff}
++Vt={Vt} Vh={Vh}
+X2 in2 out2 Sw_1Phase_i0 params:
++t_Start={t_Start}
++t_Stop={t_Stop}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++ioff={ioff}
++Vt={Vt} Vh={Vh}
+X3 in3 out3 Sw_1Phase_i0 params:
++t_Start={t_Start}
++t_Stop={t_Stop}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++ioff={ioff}
++Vt={Vt} Vh={Vh}
+.ENDS
+
+.SUBCKT Sw_3Phase_1 in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
+Vsw ctrl 0 PWL(0s 0v {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0 )
+G1 in1 out1 VALUE={v(ctrl)*v(in1,out1)/ron} tripdv={tdv} tripdt={tdt}
+G2 in2 out2 VALUE={v(ctrl)*v(in2,out2)/ron} tripdv={tdv} tripdt={tdt}
+G3 in3 out3 VALUE={v(ctrl)*v(in3,out3)/ron} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+.SUBCKT Sw_3Phase_soft in1 in2 in3 out1 out2 out3
++PARAMS:
++texp=50m
++tpwl=0
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=100m ioff=1e6; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
+Vpwl1 pwl1 0 pwl 0s 0v {tpwl+1p} 1v ; tpwl>0 Tstart=0
+Vpwl2 pwl2 0 pwl 0s 0v {t_Start+1p} 0v {t_Start+Tpwl+2p} 1 ; T_Start>0 T_pwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(t_start>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+Ein1 in1a N VALUE={IF(time>t_Start,v(pwl)*v(in1)*(1-exp(-abs(time-t_Start)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Ein2 in2a N VALUE={IF(time>t_Start,v(pwl)*v(in2)*(1-exp(-abs(time-t_Start)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Ein3 in3a N VALUE={IF(time>t_Start,v(pwl)*v(in3)*(1-exp(-abs(time-t_Start)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Gin1 N in1 VALUE={I(Ein1)} tripdv={tdv} tripdt={tdt}
+Gin2 N in2 VALUE={I(Ein2)} tripdv={tdv} tripdt={tdt}
+Gin3 N in3 VALUE={I(Ein3)} tripdv={tdv} tripdt={tdt}
+Rinx N 0 1e12
+Vsw ctrl 0 PWL(0s 1v {t_Stop+1p} 1 {t_Stop+toff+2p} 0 )
+Xsw in1a in2a in3a out1 out2 out3 Sw_3Phase_off_i0 params:
++ t_Stop={t_Stop} t_Start=1e6 ioff={ioff}
+.ENDS
+
+
+.SUBCKT Sw_3Phase_ctrl in1 in2 in3 out1 out2 out3  ctrl
++PARAMS:
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
+rctrl ctrl 0 1e12
+S1 in1 out1 ctrl 0 MS1
+S2 in2 out2 ctrl 0 MS1
+S3 in3 out3 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+*$
+
+.SUBCKT Sw_3Phase_1_ctrl in1 in2 in3 out1 out2 out3 ctrl
++PARAMS:
++ron=0.01
+rctrl ctrl 0 1e12
+G1 in1 out1 VALUE={v(ctrl)*v(in1,out1)/ron} tripdv={tdv} tripdt={tdt}
+G2 in2 out2 VALUE={v(ctrl)*v(in2,out2)/ron} tripdv={tdv} tripdt={tdt}
+G3 in3 out3 VALUE={v(ctrl)*v(in3,out3)/ron} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT Sw_3Phase_off in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Start=1e6
++t_Stop=0.5
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++vt=0.5
++vh=-0.4
+Vsw ctrl 0 PWL(0s 1 {t_Stop+1p} 1 {t_Stop+toff+2p} 0 {t_Start+3p} 0 {t_Start+tsw+4p} 1 )
+S1 in1 out1 ctrl 0 MS1
+S2 in2 out2 ctrl 0 MS1
+S3 in3 out3 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+
+* off at current zero (<ioff)
+* 1) for switching at zero current set toff=~1ms and ioff=1/10 of amplitude
+*    if timestep smaller (breakpoint device) can ioff be e.g. 1/100 of amplitude
+* 2) for soft switching set toff~10m and ioff=high value (1e10)
+* 3) for hard switching set toff=1u and ioff=high value (1e10)
+.SUBCKT Sw_3Phase_off_i0 in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Start=1e6
++t_Stop=0.5
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++ioff=1e10
++vt=0.5
++vh=-0.4
+X1 in1 out1 Sw_1Phase_off_i0 params: 
++t_Stop={t_Stop}
++t_Start={t_Start}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++ioff={ioff}
++Vt={Vt} Vh={Vh}
+X2 in2 out2 Sw_1Phase_off_i0 params:
++t_Stop={t_Stop}
++t_Start={t_Start}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++ioff={ioff}
++Vt={Vt} Vh={Vh}
+X3 in3 out3 Sw_1Phase_off_i0 params:
++t_Stop={t_Stop}
++t_Start={t_Start}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++ioff={ioff}
++Vt={Vt} Vh={Vh}
+.ENDS
+
+.SUBCKT Sw_3Phase_only_i0 in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++imax=10k
+X1 in1 out1 Sw_1Phase_only_i0 params: 
++t_Start={t_Start}
++t_Stop={t_Stop}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++imax={imax}
+X2 in2 out2 Sw_1Phase_only_i0 params:
++t_Start={t_Start}
++t_Stop={t_Stop}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++imax={imax}
+X3 in3 out3 Sw_1Phase_only_i0 params:
++t_Start={t_Start}
++t_Stop={t_Stop}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++imax={imax}
+.ENDS
+
+
+.SUBCKT Sw_3Phase_off_only_i0 in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Start=1e6
++t_Stop=0.5
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++imax=10k
+X1 in1 out1 Sw_1Phase_off_only_i0 params: 
++t_Stop={t_Stop}
++t_Start={t_Start}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++imax={imax}
+X2 in2 out2 Sw_1Phase_off_only_i0 params:
++t_Stop={t_Stop}
++t_Start={t_Start}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++imax={imax}
+X3 in3 out3 Sw_1Phase_off_only_i0 params:
++t_Stop={t_Stop}
++t_Start={t_Start}
++tsw={tsw} toff={toff}
++ron={ron}
++roff={roff}
++imax={imax}
+.ENDS
+
+.SUBCKT fault_earth in1 in2 in3
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
+Vsw ctrl 0 PWL(0s 0 {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0 )
+S1 in1 0 ctrl 0 MS1
+S2 in2 0 ctrl 0 MS1
+S3 in3 0 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+
+.SUBCKT fault_earth_i0 in1 in2 in3
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ioff=1e10
+xS1 in1 in2 in3 0 0 0 Sw_3Phase_i0 params: t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff} ron={ron} roff={roff} vt={vt} vh={vh} ioff={ioff}  
+.ENDS
+
+
+.SUBCKT fault_earth_1phase in1 
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
+Vsw ctrl 0 PWL(0s 0 {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0 )
+S1 in1 0 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+
+.SUBCKT Sw_3Phase_1_off in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
+Vsw ctrl 0 PWL(0s 1 {t_Stop+1p} 1 {t_Stop+toff+2p} 0 {t_Start+3p} 0 {t_Start+tsw+4p} 1 )
+G1 in1 out1 VALUE={v(ctrl)*v(in1,out1)/ron} tripdv={tdv} tripdt={tdt}
+G2 in2 out2 VALUE={v(ctrl)*v(in2,out2)/ron} tripdv={tdv} tripdt={tdt}
+G3 in3 out3 VALUE={v(ctrl)*v(in3,out3)/ron} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT Sw_1Phase_model3 in1 out1
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++vt=0.5
++vh=-0.4
+Vsw1 ctrl 0 PWL(0s 0v {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0)
+S1 in1 out1 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={vt} Vh={vh} Lser=0 Vser=0)
+.ENDS
+
+.SUBCKT Sw_1Phase in1 out1
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
+Vsw ctrl 0 PWL (0s 0  {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0 )
+S1 in1 out1 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={vt} Vh={vh} Lser=0 Vser=0)
+.ENDS
+
+
+* off at current zero (<ioff)
+* 1) for switching at zero current set toff=~1ms and ioff=1/10 of amplitude
+*    if timestep smaller (breakpoint device) can ioff be e.g. 1/100 of amplitude
+* 2) for soft switching set toff~10m and ioff=high value (1e10)
+* 3) for hard switching set toff=1u and ioff=high value (1e10)
+.SUBCKT Sw_1Phase_i0 in1 out1
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=100u ; on and off switching times 
++ron=0.01
++roff=1e9
++ioff=1e10
++vt=0.9
++vh=0
+v2 in1 in1a 0
+b1 st 0 v=if(time>(t_start+tsw),1,0) tripdv={tdv} tripdt={tdt} ; for switch on
+b2 st2 0 v=if(time>t_Stop,if(abs( i(V2))<ioff,0,1),1) tripdv={tdv} tripdt={tdt} ; for switch off
+A1 st2 0 0 0 0 0 st3 0 OR tfall={toff} td=1n ; for switch off
+* Switches in series 
+S1 in1a in1b st3 0 SWoff
+S2 in1b out1 st 0 SWon
+.model SWon VSWITCH (Ron={ron} Roff={roff} Vt=0.9 Vh=0 Lser=0 Vser=0)
+.model SWoff VSWITCH (Ron={ron} Roff={roff} Vt={vt} Vh={vh} Lser=0 Vser=0)
+.ENDS
+
+
+* off at current zero (<ioff)
+* 1) for switching at zero current set toff=~1ms and ioff=1/10 of amplitude
+*    if timestep smaller (breakpoint device) can ioff be e.g. 1/100 of amplitude
+* 2) for soft switching set toff~10m and ioff=high value (1e10)
+* 3) for hard switching set toff=1u and ioff=high value (1e10)
+.SUBCKT Sw_1Phase_off_i0 in1 out1
++PARAMS:
++t_Start=1e6
++t_Stop=0.5
++tsw=100u toff=10m ; on and off switching times 
++ron=0.01
++roff=1e9
++ioff=1e10
++vt=0.5
++vh=-0.4
+v2 in1 in1a 0
+b1 st 0 v=if(time>(t_start+tsw),1,0) tripdv={tdv} tripdt={tdt} ; for switch on
+b2 st2 0 v=if(time>t_Stop,if(abs(i(V2))<ioff,0,1),1) tripdv={tdv} tripdt={tdt} ; for switch off
+* Switches in parallel 
+A1 st2 0 0 0 0 0 st3 0 OR tfall={toff} td=1n ; for switch off
+S1 in1a out1 st3 0 SWoff
+S2 in1a out1 st 0 SWon
+.model SWon VSWITCH (Ron={ron} Roff={roff} Vt=0.9 Vh=0 Lser=0 Vser=0)
+.model SWoff VSWITCH (Ron={ron} Roff={roff} Vt={vt} Vh={vh} Lser=0 Vser=0)
+.ENDS
+
+.SUBCKT Sw_1Phase_only_i0 in out
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=100u ; on and off switching times 
++ron=0.01
++roff=1e9
++imax=10k
+* Switcher
+Vi in A1 0
+S1 A1 out Lst 0 schalter
+.model schalter sw ron={ron} roff={roff} Vt=0.5 Vh=-0.4
+* control switcher
+R4 sta Lst 1k
+C2 Lst 0 2p
+B1 sta 0 V=TABLE((v(st)+ABS(i(Vi))/{imax}),0,0,0.1,2)
+vst st 0 PWL (0s 0 {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0)
+.ends
+
+.SUBCKT Sw_1Phase_off_only_i0 in out
++PARAMS:
++t_Start=1e6
++t_Stop=0.5
+* t_Stop = first time
++tsw=100u toff=100u ; on and off switching times 
++ron=0.01
++roff=1e9
++imax=10k
+* Switcher
+Vi in A1 0
+S1 A1 out Lst 0 schalter
+.model schalter sw ron={ron} roff={roff} Vt=0.5 Vh=-0.4
+* control switcher
+R4 sta Lst 1k
+C2 Lst 0 2p
+B1 sta 0 V=TABLE((v(st)+ABS(i(Vi))/{imax}),0,0,0.1,2)
+vst st 0 PWL(0s 1 {t_Stop+1p} 1 {t_Stop+toff+2p} 0 {t_Start+3p} 0 {t_Start+tsw+4p} 1 )
+.ends
+
+.SUBCKT Sw_1Phase_1 in1 out1
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
++roff=1e9
+Vsw1 ctrl 0 PWL(0s 0v {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0)
+R1 in1 out1 {roff}
+G1 in1 out1 VALUE={v(ctrl)*v(in1,out1)/ron} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+.SUBCKT Sw_1Phase_1_off in1 out1
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=10m ; on and off switching times
++ron=0.01
+Vsw1 ctrl 0 PWL(0s 1 {t_Stop+1p} 1 {t_Stop+toff+2p} 0 {t_Start+3p} 0 {t_Start+tsw+4p} 1 )
+G1 in1 out1 VALUE={v(ctrl)*v(in1,out1)/ron} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+.SUBCKT Sw_1Phase_ctrl in1 out1  ctrl
++PARAMS:
++ron=0.01
++roff=1e9
++vt=0.5
++vh=-0.4
+rctrl ctrl 0 1e12
+S1 in1 out1 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+
+
+.SUBCKT Sw_1Phase_1_ctrl in1 out1 ctrl
++PARAMS:
++ron=0.01
+rctrl ctrl 0 1e12
+G1 in1 out1 VALUE={v(ctrl)*v(in1,out1)/ron} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT Sw_1Phase_off in1 out1
++PARAMS:
++t_Start=1e6
++t_Stop=0.5
++tsw=100u toff=10m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.5
++vh=-0.4
+Vsw1 ctrl 0 PWL(0s 1 {t_Stop+1p} 1 {t_Stop+toff+2p} 0 {t_Start+3p} 0 {t_Start+tsw+4p} 1 )
+S1 in1 out1 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+
+* rgnd=0.05ohm/km lgnd=1mH/km
+.SUBCKT Ground in1 in2 in3
++PARAMS: 
++ rgnd=1e-3 lgnd=1uH
+RGND1 in1 in11 {rgnd}
+RGND2 in2 in21 {rgnd}
+RGND3 in3 in31 {rgnd}
+LGND1 in11 0 {lgnd}
+LGND2 in21 0 {lgnd}
+LGND3 in31 0 {lgnd}
+.ENDS
+
+* rgnd=0.05ohm/km lgnd=1mH/km
+.SUBCKT Ground_1phase in1
++PARAMS: 
++ rgnd=1e-3 lgnd=1uH
+RGND1 in1 in11 {rgnd}
+LGND1 in11 0 {lgnd}
+.ENDS
+
+.subckt breaker_1ph_400V in out params: Rs=20 vin=400V cs=10n exp=9 
++ td1=1n ioff=1 ioff0=10 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=0.5
++ t_Stop=1e6
++ tsw=100u 
++ toff=1n ; on and off switching times 
+Vsw1 gate 0 PWL(0s 0v {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0)
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff} 
+.ends
+
+.subckt breaker_1ph_400V_off in out params: Rs=20 vin=400V cs=10n exp=9 
++ td1=1n ioff=1 ioff0=10 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=1e6
++ t_Stop=0.5
++ tsw=100u 
++ toff=1n ; on and off switching times 
+Vsw1 gate 0 PWL(0s 1 {t_Stop+1p} 1 {t_Stop+toff+2p} 0 {t_Start+3p} 0 {t_Start+tsw+4p} 1 )
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl  in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff}
+.ends
+
+.subckt breaker_1ph_400V_ctrl in out gate params: Rs=20 vin=400V cs=10n exp=9 
++ td1=1n ioff=1 ioff0=10 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9 
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl  in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff}
+.ends
+
+.subckt breaker_3ph_400V in1 in2 in3 out1 out2 out3 params: Rs=20 vin=400V cs=10n exp=9 
++ td1=1n ioff=1 ioff0=10 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=0.5
++ t_Stop=1e6
++ tsw=100u 
++ toff=1n ; on and off switching times 
+xbreakerA in1 out1 breaker_1ph_400V params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+xbreakerB in2 out2 breaker_1ph_400V params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+xbreakerC in3 out3 breaker_1ph_400V params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+.ends
+
+.subckt breaker_3ph_400V_off in1 in2 in3 out1 out2 out3 params: Rs=20 vin=400V cs=10n exp=9 
++ td1=1n ioff=1 ioff0=10 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=1e6
++ t_Stop=0.5
++ tsw=100u 
++ toff=1n ; on and off switching times 
+xbreakerA in1 out1 breaker_1ph_400V_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}
+xbreakerB in2 out2 breaker_1ph_400V_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}  
+xbreakerC in3 out3 breaker_1ph_400V_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}  
+.ends
+
+.subckt breaker_3ph_400V_ctrl in1 in2 in3 out1 out2 out3 gate params: Rs=20 vin=400V cs=10n exp=9 
++ td1=1n ioff=1 ioff0=10 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
+xbreakerA in1 out1 gate breaker_1ph_400V_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}   
+xbreakerB in2 out2 gate breaker_1ph_400V_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}  
+xbreakerC in3 out3 gate breaker_1ph_400V_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}   
+.ends
+
+.subckt breaker_1ph_10kV in out params: Rs=100 vin=10kV cs=2.2n exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=0.5
++ t_Stop=1e6
++ tsw=100u 
++ toff=1n ; on and off switching times 
+Vsw1 gate 0 PWL(0s 0v {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0)
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff}
+.ends
+
+.subckt breaker_1ph_10kV_off in out params: Rs=100 vin=10kV cs=2.2n exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=1e6
++ t_Stop=0.5
++ tsw=100u 
++ toff=1n ; on and off switching times 
+Vsw1 gate 0 PWL(0s 1 {t_Stop+1p} 1 {t_Stop+toff+2p} 0 {t_Start+3p} 0 {t_Start+tsw+4p} 1 )
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl  in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff}
+.ends
+
+.subckt breaker_1ph_10kV_ctrl in out gate params: Rs=100 vin=10kV cs=2.2n exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9 
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl  in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff}
+.ends
+
+.subckt breaker_3ph_10kV in1 in2 in3 out1 out2 out3 params:Rs=100 vin=10kV cs=2.2n exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=0.5
++ t_Stop=1e6
++ tsw=100u 
++ toff=1n ; on and off switching times 
+xbreakerA in1 out1 breaker_1ph_10kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+xbreakerB in2 out2 breaker_1ph_10kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+xbreakerC in3 out3 breaker_1ph_10kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+.ends
+
+.subckt breaker_3ph_10kV_off in1 in2 in3 out1 out2 out3 params: Rs=100 vin=10kV cs=2.2n exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=1e6
++ t_Stop=0.5
++ tsw=100u 
++ toff=1n ; on and off switching times 
+xbreakerA in1 out1 breaker_1ph_10kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}
+xbreakerB in2 out2 breaker_1ph_10kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}  
+xbreakerC in3 out3 breaker_1ph_10kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}  
+.ends
+
+.subckt breaker_3ph_10kV_ctrl in1 in2 in3 out1 out2 out3 gate params: Rs=100 vin=10kV cs=2.2n exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
+xbreakerA in1 out1 gate breaker_1ph_10kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}   
+xbreakerB in2 out2 gate breaker_1ph_10kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}  
+xbreakerC in3 out3 gate breaker_1ph_10kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}   
+.ends
+
+.subckt breaker_1ph_20kV in out params: Rs=100 vin=20kV cs=1n exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=0.5
++ t_Stop=1e6
++ tsw=100u 
++ toff=1n ; on and off switching times 
+Vsw1 gate 0 PWL(0s 0v {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0)
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff} 
+.ends
+
+.subckt breaker_1ph_20kV_off in out params: Rs=100 vin=20kV cs=1n exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=1e6
++ t_Stop=0.5
++ tsw=100u 
++ toff=1n ; on and off switching times 
+Vsw1 gate 0 PWL(0s 1 {t_Stop+1p} 1 {t_Stop+toff+2p} 0 {t_Start+3p} 0 {t_Start+tsw+4p} 1 )
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl  in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff}
+.ends
+
+.subckt breaker_1ph_20kV_ctrl in out gate params: Rs=100 vin=20kV cs=1n exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9 
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl  in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff}
+.ends
+
+.subckt breaker_3ph_20kV in1 in2 in3 out1 out2 out3 params:Rs=100 vin=20kV cs=1n exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=0.5
++ t_Stop=1e6
++ tsw=100u 
++ toff=1n ; on and off switching times 
+xbreakerA in1 out1 breaker_1ph_20kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+xbreakerB in2 out2 breaker_1ph_20kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+xbreakerC in3 out3 breaker_1ph_20kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+.ends
+
+.subckt breaker_3ph_20kV_off in1 in2 in3 out1 out2 out3 params: Rs=100 vin=20kV cs=1n exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=1e6
++ t_Stop=0.5
++ tsw=100u 
++ toff=1n ; on and off switching times 
+xbreakerA in1 out1 breaker_1ph_20kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}
+xbreakerB in2 out2 breaker_1ph_20kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}  
+xbreakerC in3 out3 breaker_1ph_20kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}  
+.ends
+
+.subckt breaker_3ph_20kV_ctrl in1 in2 in3 out1 out2 out3 gate params: Rs=100 vin=20kV cs=1n exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
+xbreakerA in1 out1 gate breaker_1ph_20kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}   
+xbreakerB in2 out2 gate breaker_1ph_20kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}  
+xbreakerC in3 out3 gate breaker_1ph_20kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}   
+.ends
+
+.subckt breaker_1ph_120kV in out params: Rs=10k vin=120kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=0.5
++ t_Stop=1e6
++ tsw=100u 
++ toff=1n ; on and off switching times 
+Vsw1 gate 0 PWL(0s 0v {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0)
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff} 
+.ends
+
+.subckt breaker_1ph_120kV_off in out params: Rs=10k vin=120kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=1e6
++ t_Stop=0.5
++ tsw=100u 
++ toff=1n ; on and off switching times 
+Vsw1 gate 0 PWL(0s 1 {t_Stop+1p} 1 {t_Stop+toff+2p} 0 {t_Start+3p} 0 {t_Start+tsw+4p} 1 )
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl  in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff}
+.ends
+
+.subckt breaker_1ph_120kV_ctrl in out gate params: Rs=10k vin=120kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9 
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl  in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff}
+.ends
+
+.subckt breaker_3ph_120kV in1 in2 in3 out1 out2 out3 params:Rs=10k vin=120kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=0.5
++ t_Stop=1e6
++ tsw=100u 
++ toff=1n ; on and off switching times 
+xbreakerA in1 out1 breaker_1ph_120kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+xbreakerB in2 out2 breaker_1ph_120kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+xbreakerC in3 out3 breaker_1ph_120kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+.ends
+
+.subckt breaker_3ph_120kV_off in1 in2 in3 out1 out2 out3 params: Rs=10k vin=120kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=1e6
++ t_Stop=0.5
++ tsw=100u 
++ toff=1n ; on and off switching times 
+xbreakerA in1 out1 breaker_1ph_120kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}
+xbreakerB in2 out2 breaker_1ph_120kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}  
+xbreakerC in3 out3 breaker_1ph_120kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}  
+.ends
+
+.subckt breaker_3ph_120kV_ctrl in1 in2 in3 out1 out2 out3 gate params: Rs=10k vin=120kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
+xbreakerA in1 out1 gate breaker_1ph_120kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}   
+xbreakerB in2 out2 gate breaker_1ph_120kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}  
+xbreakerC in3 out3 gate breaker_1ph_120kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}   
+.ends
+
+.subckt breaker_1ph_230kV in out params: Rs=20k vin=230kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=0.5
++ t_Stop=1e6
++ tsw=100u 
++ toff=1n ; on and off switching times 
+Vsw1 gate 0 PWL(0s 0v {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0)
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff} 
+.ends
+
+.subckt breaker_1ph_230kV_off in out params: Rs=20k vin=230kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=1e6
++ t_Stop=0.5
++ tsw=100u 
++ toff=1n ; on and off switching times 
+Vsw1 gate 0 PWL(0s 1 {t_Stop+1p} 1 {t_Stop+toff+2p} 0 {t_Start+3p} 0 {t_Start+tsw+4p} 1 )
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl  in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff}
+.ends
+
+.subckt breaker_1ph_230kV_ctrl in out gate params: Rs=20k vin=230kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9 
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl  in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff}
+.ends
+
+.subckt breaker_3ph_230kV in1 in2 in3 out1 out2 out3 params: Rs=20k vin=230kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=0.5
++ t_Stop=1e6
++ tsw=100u 
++ toff=1n ; on and off switching times 
+xbreakerA in1 out1 breaker_1ph_230kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+xbreakerB in2 out2 breaker_1ph_230kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+xbreakerC in3 out3 breaker_1ph_230kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+.ends
+
+.subckt breaker_3ph_230kV_off in1 in2 in3 out1 out2 out3 params: Rs=20k vin=230kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=1e6
++ t_Stop=0.5
++ tsw=100u 
++ toff=1n ; on and off switching times 
+xbreakerA in1 out1 breaker_1ph_230kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}
+xbreakerB in2 out2 breaker_1ph_230kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}  
+xbreakerC in3 out3 breaker_1ph_230kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}  
+.ends
+
+.subckt breaker_3ph_230kV_ctrl in1 in2 in3 out1 out2 out3 gate params: Rs=20k vin=230kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
+xbreakerA in1 out1 gate breaker_1ph_230kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}   
+xbreakerB in2 out2 gate breaker_1ph_230kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}  
+xbreakerC in3 out3 gate breaker_1ph_230kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}   
+.ends
+
+.subckt breaker_1ph_400kV in out params: Rs=20k vin=400kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=0.5
++ t_Stop=1e6
++ tsw=100u 
++ toff=1n ; on and off switching times 
+Vsw1 gate 0 PWL(0s 0v {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0)
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff} 
+.ends
+
+.subckt breaker_1ph_400kV_off in out params: Rs=20k vin=400kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=1e6
++ t_Stop=0.5
++ tsw=100u 
++ toff=1n ; on and off switching times 
+Vsw1 gate 0 PWL(0s 1 {t_Stop+1p} 1 {t_Stop+toff+2p} 0 {t_Start+3p} 0 {t_Start+tsw+4p} 1 )
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl  in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff}
+.ends
+
+.subckt breaker_1ph_400kV_ctrl in out gate params: Rs=20k vin=400kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9 
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl  in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff}
+.ends
+
+.subckt breaker_3ph_400kV in1 in2 in3 out1 out2 out3 params: Rs=20k vin=400kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=0.5
++ t_Stop=1e6
++ tsw=100u 
++ toff=1n ; on and off switching times 
+xbreakerA in1 out1 breaker_1ph_400kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+xbreakerB in2 out2 breaker_1ph_400kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+xbreakerC in3 out3 breaker_1ph_400kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+.ends
+
+.subckt breaker_3ph_400kV_off in1 in2 in3 out1 out2 out3 params: Rs=20k vin=400kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=1e6
++ t_Stop=0.5
++ tsw=100u 
++ toff=1n ; on and off switching times 
+xbreakerA in1 out1 breaker_1ph_400kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}
+xbreakerB in2 out2 breaker_1ph_400kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}  
+xbreakerC in3 out3 breaker_1ph_400kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}  
+.ends
+
+.subckt breaker_3ph_400kV_ctrl in1 in2 in3 out1 out2 out3 gate params: Rs=20k vin=400kV cs=500p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
+xbreakerA in1 out1 gate breaker_1ph_400kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}   
+xbreakerB in2 out2 gate breaker_1ph_400kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}  
+xbreakerC in3 out3 gate breaker_1ph_400kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}   
+.ends
+
+.subckt breaker_1ph_750kV in out params: Rs=20k vin=750kV cs=100p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=0.5
++ t_Stop=1e6
++ tsw=100u 
++ toff=1n ; on and off switching times 
+Vsw1 gate 0 PWL(0s 0v {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0)
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff} 
+.ends
+
+.subckt breaker_1ph_750kV_off in out params: Rs=20k vin=750kV cs=100p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=1e6
++ t_Stop=0.5
++ tsw=100u 
++ toff=1n ; on and off switching times 
+Vsw1 gate 0 PWL(0s 1 {t_Stop+1p} 1 {t_Stop+toff+2p} 0 {t_Start+3p} 0 {t_Start+tsw+4p} 1 )
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs}
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl  in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff}
+.ends
+
+.subckt breaker_1ph_750kV_ctrl in out gate params: Rs=20k vin=750kV cs=100p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9 
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl  in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff}
+.ends
+
+.subckt breaker_3ph_750kV in1 in2 in3 out1 out2 out3 params: Rs=20k vin=750kV cs=100p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=0.5
++ t_Stop=1e6
++ tsw=100u 
++ toff=1n ; on and off switching times 
+xbreakerA in1 out1 breaker_1ph_750kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+xbreakerB in2 out2 breaker_1ph_750kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+xbreakerC in3 out3 breaker_1ph_750kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+.ends
+
+.subckt breaker_3ph_750kV_off in1 in2 in3 out1 out2 out3 params: Rs=20k vin=750kV cs=100p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=1e6
++ t_Stop=0.5
++ tsw=100u 
++ toff=1n ; on and off switching times 
+xbreakerA in1 out1 breaker_1ph_750kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}
+xbreakerB in2 out2 breaker_1ph_750kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}  
+xbreakerC in3 out3 breaker_1ph_750kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}  
+.ends
+
+.subckt breaker_3ph_750kV_ctrl in1 in2 in3 out1 out2 out3 gate params: Rs=20k vin=750kV cs=100p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
+xbreakerA in1 out1 gate breaker_1ph_750kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}   
+xbreakerB in2 out2 gate breaker_1ph_750kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}  
+xbreakerC in3 out3 gate breaker_1ph_750kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}   
+.ends
+
+.subckt breaker_1ph_1150kV in out params: Rs=20k vin=1150kV cs=50p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=0.5
++ t_Stop=1e6
++ tsw=100u 
++ toff=1n ; on and off switching times 
+Vsw1 gate 0 PWL(0s 0v {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0)
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff} 
+.ends
+
+.subckt breaker_1ph_1150kV_off in out params: Rs=20k vin=1150kV cs=50p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=1e6
++ t_Stop=0.5
++ tsw=100u 
++ toff=1n ; on and off switching times 
+Vsw1 gate 0 PWL(0s 1 {t_Stop+1p} 1 {t_Stop+toff+2p} 0 {t_Start+3p} 0 {t_Start+tsw+4p} 1 )
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl  in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff}
+.ends
+
+.subckt breaker_1ph_1150kV_ctrl in out gate params: Rs=20k vin=1150kV cs=50p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9 
+Xmov1 out 0 mov0 params: vbo={vin*2/1.73205} exp={exp}
+Xmov2 in 0 mov0 params: vbo={vin*2/1.73205} exp={exp} 
+Rs in x {Rs}
+Cs x out {Cs} 
+xbrp ctrl brkp_ctrl params: c1={cbrk}
+xsw gate ctrl  in out sw params: td1={td1} ioff0={ioff0} ioff={ioff} ron={ron} roff={roff} toff={toff}
+.ends
+
+.subckt breaker_3ph_1150kV in1 in2 in3 out1 out2 out3 params: Rs=20k vin=1150kV cs=50p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=0.5
++ t_Stop=1e6
++ tsw=100u 
++ toff=1n ; on and off switching times 
+xbreakerA in1 out1 breaker_1ph_1150kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+xbreakerB in2 out2 breaker_1ph_1150kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+xbreakerC in3 out3 breaker_1ph_1150kV params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw}  toff={toff}  
+.ends
+
+.subckt breaker_3ph_1150kV_off in1 in2 in3 out1 out2 out3 params: Rs=20k vin=1150kV cs=50p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
++ t_Start=1e6
++ t_Stop=0.5
++ tsw=100u 
++ toff=1n ; on and off switching times 
+xbreakerA in1 out1 breaker_1ph_1150kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}
+xbreakerB in2 out2 breaker_1ph_1150kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}  
+xbreakerC in3 out3 breaker_1ph_1150kV_off params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff} t_Start={t_Start} t_Stop={t_Stop} tsw={tsw} toff={toff}  
+.ends
+
+.subckt breaker_3ph_1150kV_ctrl in1 in2 in3 out1 out2 out3 gate params: Rs=20k vin=1150kV cs=50p exp=9 
++ td1=1n ioff=5 ioff0=100 cbrk=0.1n toff=1n
++ ron=0.01
++ roff=1e9
+xbreakerA in1 out1 gate breaker_1ph_1150kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}   
+xbreakerB in2 out2 gate breaker_1ph_1150kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}  
+xbreakerC in3 out3 gate breaker_1ph_1150kV_ctrl params: Rs={rs} cs={cs} vin={vin} exp={exp} td1={td1} ioff={ioff} ioff0={ioff0} cbrk={cbrk}
++ ron={ron} roff={roff}   
+.ends
+
+.subckt sw gate1 ctrl in out params: td1=0 ioff0=20 ioff=500m ron=0.01 roff=1e9 toff=1n
+V1 in in2 0
+xsw1 in2 out gate Sw_1Phase_ctrl params: ron={ron} roff={roff} toff={toff}
+A1 gate1 0 0 0 0 N002 N001 0 BUF
+A2 N002 N002 N002 tst1 tst1 gate 0 0 AND
+A3 gate2 gate2 gate2 N004 N004 ctrl N003 0 AND
+A4 gate 0 0 0 0 0 gate2 0 BUF td={td1}
+A5 gate1 0 0 0 0 N005 0 0 BUF
+A6 tst2 tst2 N005 N005 N005 0 N004 0 AND
+Etst1 tst1 0 value={IF(abs(I(v1))<IOFF,1,0)} tripdv=1 tripdt=1
+Etst2 tst2 0 value={IF(abs(I(v1))<IOFF0,1,0)} tripdv=1 tripdt=1
+.ends
+
+* ctrl=0V -> go   ctrl=1V -> stop
+.subckt brkp_ctrl ctrl params: C1=0.1n trise=1n tfall=1n Td=1n ic=0
+A1 N001 0 0 0 0 N002 0 0 BUF Vhigh=1V Vlow=0V trise={trise} tfall={tfall} Td={td}
+A2 N002 0 0 0 0 N003 0 0 BUF Vhigh=1V Vlow=0V trise={trise} tfall={tfall} Td={td} 
+C1 N003 N004 {C1} IC={ic}
+R1 N002 N004 100k
+R2 N001 N004 10k
+X§U2 N004 0 ctrl SW_1Phase_ctrl ron=0.01 roff=1e9 tsw=1n toff=1n
+.ends
+
+* mov ciruitry to prevent voltage spike 
+.subckt mov0 1 2 ; base generic
++PARAMS: VBO=10 Vr=0.71 exp=9
+.param Vratio={VBO/Vr} 
+B1 1 2 I=if(V(1, 2)-0.5, (V(1, 2) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+B2 2 1 I=if(V(2, 1)-0.5, (V(2, 1) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
+.ends
+
+.SUBCKT Thyri_Lite_1ph_Switcher in out PARAMS:tsw=100u t_start=0.1s t_stop=10s ron=1e-3 roff=1e9 von=1 voff=0.1 rs=20k cs=500p
+Vpwl1 a out pwl 0s 0 {t_start} 0 {t_start+tsw} 1 {t_stop} 1 {t_stop+tsw} 0 
+Vpwl2 a1 in pwl 0s 0 {t_start} 0 {t_start+tsw} 1 {t_stop} 1 {t_stop+tsw} 0 
+Xsw1 in a out Thyri_Lite2a PARAMS: tsw={tsw} Ron={Ron} Roff={Roff} Von={Von} Voff={Voff}
+Xsw2 out a1 in Thyri_Lite2a PARAMS: tsw={tsw} Ron={Ron} Roff={Roff} Von={Von} Voff={Voff}
+Rs in x {Rs}
+Cs x out {Cs} 
+.ENDS
+
+.SUBCKT Thyri_Lite_3ph_Switcher in1 in2 in3 out1 out2 out3 PARAMS:tsw=100u t_start=0.1s t_stop=10s ron=1e-3 roff=1e9 von=1 voff=0.1 rs=20k cs=500p
+Xsw1 in1 out1 Thyri_Lite_1ph_Switcher tsw={tsw} t_start={t_start} t_stop={t_stop} ron={ron} roff={roff} von={von} voff={voff} rs={rs} cs={cs}
+Xsw2 in2 out2 Thyri_Lite_1ph_Switcher tsw={tsw} t_start={t_start} t_stop={t_stop} ron={ron} roff={roff} von={von} voff={voff} rs={rs} cs={cs}
+Xsw3 in3 out3 Thyri_Lite_1ph_Switcher tsw={tsw} t_start={t_start} t_stop={t_stop} ron={ron} roff={roff} von={von} voff={voff} rs={rs} cs={cs}
+.ENDS
+
+.SUBCKT Thyri_Lite_1ph_Switcher_off in out PARAMS:tsw=100u t_start=0.1s t_stop=10s ron=1e-3 roff=1e9 von=1 voff=0.1 rs=20k cs=500p
+Vpwl1 a out pwl 0s 1 {t_stop} 1 {t_stop+tsw} 0 {t_start} 0 {t_start+tsw} 1 
+Vpwl2 a1 in pwl 0s 1 {t_stop} 1 {t_stop+tsw} 0 {t_start} 0 {t_start+tsw} 1 
+Xsw1 in a out Thyri_Lite2a PARAMS: tsw={tsw} Ron={Ron} Roff={Roff} Von={Von} Voff={Voff}
+Xsw2 out a1 in Thyri_Lite2a PARAMS: tsw={tsw} Ron={Ron} Roff={Roff} Von={Von} Voff={Voff}
+Rs in x {Rs}
+Cs x out {Cs} 
+.ENDS
+
+.SUBCKT Thyri_Lite_3ph_Switcher_off in1 in2 in3 out1 out2 out3 PARAMS:tsw=100u t_start=1s t_stop=0.1s ron=1e-3 roff=1e9 von=1 voff=0.1 rs=20k cs=500p
+Xsw1 in1 out1 Thyri_Lite_1ph_Switcher_off tsw={tsw} t_start={t_start} t_stop={t_stop} ron={ron} roff={roff} von={von} voff={voff} rs={rs} cs={cs}
+Xsw2 in2 out2 Thyri_Lite_1ph_Switcher_off tsw={tsw} t_start={t_start} t_stop={t_stop} ron={ron} roff={roff} von={von} voff={voff} rs={rs} cs={cs}
+Xsw3 in3 out3 Thyri_Lite_1ph_Switcher_off tsw={tsw} t_start={t_start} t_stop={t_stop} ron={ron} roff={roff} von={von} voff={voff} rs={rs} cs={cs}
+.ENDS
+
+.SUBCKT Thyri_Lite_3ph_Switcher_ctrl in1 in2 in3 out1 out2 out3 ctrl PARAMS:tsw=100u ron=1e-3 roff=1e9 von=1 voff=0.1 rs=20k cs=500p
+Xsw1 in1 out1 ctrl Thyri_Lite_1ph_Switcher_ctrl tsw={tsw} ron={ron} roff={roff} von={von} voff={voff} rs={rs} cs={cs} 
+Xsw2 in2 out2 ctrl Thyri_Lite_1ph_Switcher_ctrl tsw={tsw} ron={ron} roff={roff} von={von} voff={voff} rs={rs} cs={cs}
+Xsw3 in3 out3 ctrl Thyri_Lite_1ph_Switcher_ctrl tsw={tsw} ron={ron} roff={roff} von={von} voff={voff} rs={rs} cs={cs}
+.ENDS
+
+.SUBCKT Thyri_Lite_1ph_Switcher_ctrl in out ctrl PARAMS:tsw=100u ron=1e-3 roff=1e9 von=1 voff=0.1 rs=20k cs=500p
+Ectrl1 a out VALUE=V(ctrl) tripdv={tdv} tripdt={tdt}
+Ectrl2 a2 in VALUE=V(ctrl) tripdv={tdv} tripdt={tdt}
+Xsw1 in a out Thyri_Lite2a PARAMS: tsw={tsw} Ron={Ron} Roff={Roff} Von={Von} Voff={Voff}
+Xsw2 out a2 in Thyri_Lite2a PARAMS: tsw={tsw} Ron={Ron} Roff={Roff} Von={Von} Voff={Voff}
+Rs in x {Rs}
+Cs x out {Cs}
+.ENDS
+
+.SUBCKT Thyri_Lite2a Anode Gate Kathode PARAMS: tsw=100u ron=1e-1 roff=1e6 von=1 voff=0.1
+.MODEL Schliesser	VSWITCH Ron={Ron} Roff={Roff} Von={Von} Voff={Voff}
+Sch	Anode	GA	St	0	Schliesser
+Rgate	Gate	Kathode	1
+ViK	GA	Kathode	0V
+Csch	Anode	Kathode	50p	
+Gst	0	st	TABLE {(i(ViK)+v(Gate,Kathode)/20)} = (0,0) (0.05,1)
+Rst	st	0	1
+Cst	st	0	{tsw/5}	IC=0
+.ENDS

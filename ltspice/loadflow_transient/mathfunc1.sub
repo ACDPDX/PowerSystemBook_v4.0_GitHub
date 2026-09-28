@@ -1,0 +1,414 @@
+********************************************************************************
+*
+*  A simplified and multi-functional approach to mathematical functions. Simply
+* place Math1 symbol in the schematic and then choose the desired math function
+* through the drop-down menu in the symbol's properties. Or simply right-click
+* on it's name and rename it, for example from '+' to 'x'.
+*  The reason for this is usability, easier workflow and, not lastly, a modular
+* approach, meaning many other functions can be added to the list without the
+* need to create a symbol for each.
+*
+*							Vlad, ©2008 - 2013
+*
+********************************************************************************
+*
+* [GENERAL]
+*
+* - Math1 means symbol with one variable. The following functions are available:
+*
+* 1/x
+* abs(x)
+* acos(x)
+* acosh(x)
+* asin(x)
+* asinh(x)
+* atan(x)
+* atanh(x)
+* ceil(x)
+* cos(x)
+* cosh(x)
+** ddt(x)
+** delay(x)
+* exp(x)
+* floor(x)
+** idt(x)
+* int(x)
+* ln(x)
+* log(x)
+* log10(x)
+* mod1(x,y)	(mod1 (one input) to avoid cross-naming with mod(a,b) from Math2)
+* pow(x,y)
+* pwr(x,y)
+* pwrs(x,y)
+* quant(x)	(quantizaion to the value of {y})
+** rand(x)
+** random(x
+* round(x)
+** sdt(x)
+* sgn(x)
+* sin(x)
+* sinh(x)
+* sqrt(x)
+* tan(x)
+* tanh(x)
+* u(x)
+* uramp(x)
+*
+*  where {x} is the input and {y} is a parameter.
+*
+*
+* [PARAMETERS]
+*
+* y		= 1. a minimum estimated number to avoid division by zero (1/x);
+*		  2. fixed number for mod1();
+*		  3. exponent for pwr(), pow() and pwrs();
+*		  4. quantifying number in quant();
+* phi	[rad]	= displacement angle for trigonometric functions.
+*
+* - Hidden:
+*
+* tripdv,tripdt	= LTspice's specific for B-sources, default 0/0 (LTspice handles
+*		them).
+*
+*
+* [CHARACTERISTICS]
+*
+* - All the symbols have floating input and Rout=1 Ohm.
+*
+*
+* [NOTES]
+*
+* - mod(x,y) appears as "mod1" in the list, as in one input mod(), to not be
+* mistaken for the two input version in mathfunc2.sub.
+*
+************************
+*
+*	1/x
+*
+************************
+.subckt 1/x in out
+.param y=1p
+B1 0 out I=1/if( abs(v(in))<y, y, v(in) ) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends 1/x
+************************
+*
+*	abs(x)
+*
+************************
+.subckt abs in out
+Gabs 0 out in 0 table(-1G,1G,0,0,1G,1G)
+Rout 0 out 1
+.ends abs
+********************************
+*
+*	acos(x), arccos(x)
+*
+********************************
+.subckt acos in out
+B1 0 out I=acos(v(in)+phi) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends acos
+************************
+*
+*	acosh(x)
+*
+************************
+.subckt acosh in out
+B1 0 out I=acosh(v(in)) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends acosh
+********************************
+*
+*	asin(x), arcsin(x)
+*
+********************************
+.subckt asin in out
+B1 0 out I=asin(v(in)+phi) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends asin
+************************
+*
+*	asinh(x)
+*
+************************
+.subckt asinh in out
+B1 0 out I=asinh(v(in)) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends asinh
+********************************
+*
+*	atan(x), arctanh(x)
+*
+********************************
+.subckt atan in out
+B1 0 out I=atan(v(in)+phi) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends atan
+************************
+*
+*	atanh(x)
+*
+************************
+.subckt atanh in out
+B1 0 out I=atanh(v(in)) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends atanh
+************************
+*
+*	ceil(x)
+*
+************************
+.subckt ceil in out
+B1 0 out I=ceil(v(in)) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends ceil
+************************
+*
+*	cos(x)
+*
+************************
+.subckt cos in out
+.param phi=0
+B1 0 out I=cos(v(in)+phi) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends cos
+************************
+*
+*	cosh(x)
+*
+************************
+.subckt cosh in out
+B1 0 out I=cosh(v(in)) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends cosh
+************************
+*
+*	ddt(x)
+*
+************************
+.subckt ddt in out
+B1 0 out I=ddt(v(in)) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends ddt
+************************
+*
+*	delay(x)
+*
+************************
+.subckt delay in out
+B1 0 out I=delay(v(in)) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends delay
+************************
+*
+*	exp(x)
+*
+************************
+.subckt exp in out
+B1 0 out I=exp(v(in)) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends exp
+************************
+*
+*	floor(x)
+*
+************************
+.subckt floor in out
+B1 0 out I=floor(v(in)) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends floor
+************************
+*
+*	idt(x)
+*
+************************
+.subckt idt in out
+.param ic=0
+B2 out 0 I=v(idt1) Rpar=1 tripdv={tdv} tripdt={tdt}
+G1 0 idt1 I={v(in)}
+C1 idt1 0 1 IC={ic}
+R1 idt1 0 1e10
+.ends idt
+************************
+*
+*	int(x)
+*
+************************
+.subckt int in out
+B1 0 out I=int(v(in)) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends int
+********************************
+*
+*	ln(x), log(x)
+*
+********************************
+.subckt ln in out
+B1 0 out I=ln(v(in)) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends ln
+********************************
+.subckt log in out
+B1 0 out I=log(v(in)) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends log
+************************
+*
+*	log10(x)
+*
+************************
+.subckt log10 in out
+B1 0 out I=log10(v(in)) Rpar=1  tripdv={tdv} tripdt={tdt}
+.ends log
+************************
+*
+*	mod(x,y)
+*
+************************
+.subckt mod1 in out
+.param y=2
+B1 0 out I=v(in)-int(v(in)/y)*y Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends mod1
+************************
+*
+*	pow(x)
+*
+************************
+.subckt pow in out
+.param y=2
+B1 0 out I=pow(v(in),y) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends pow
+************************
+*
+*	pwr(x)
+*
+************************
+.subckt pwr in out
+.param y=2
+B1 0 out I=pwr(v(in),y) Rpar=1  tripdv={tdv} tripdt={tdt}
+.ends pwr
+************************
+*
+*	pwrs(x)
+*
+************************
+.subckt pwrs in out
+.param y=2
+B1 0 out I=pwrs(v(in),y) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends pwrs
+************************
+*
+*	quant(x)
+*
+************************
+.subckt quant in out
+.param y=2 tripdv=0 tripdt=0
+B1 0 out I=int(v(in)*y)/y Rpar=1  tripdv={tdv} tripdt={tdt}
+.ends quant
+************************
+*
+*	rand(x)
+*
+************************
+.subckt rand in out
+B1 0 out I=rand(v(in)) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends rand
+************************
+*
+*	random(x)
+*
+************************
+.subckt random in out
+B1 0 out I=random(v(in)) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends random
+************************
+*
+*	round(x)
+*
+************************
+.subckt round in out
+B1 0 out I=round(v(in)) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends round
+************************
+*
+*	sdt(x)
+*
+************************
+.subckt sdt in out
+.param ic=0
+B2 out 0 I=v(idt1) Rpar=1 tripdv={tdv} tripdt={tdt}
+G1 0 idt1 I={v(in)}
+C1 idt1 0 1 IC={ic}
+R1 idt1 0 1e10
+.ends idt
+************************
+*
+*	sgn(x)
+*
+************************
+.subckt sgn in out
+B1 0 out I=sgn(v(in)+y) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends sgn
+************************
+*
+*	sin(x)
+*
+************************
+.subckt sin in out
+.param phi=0
+B1 0 out I=sin(v(in)+phi) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends sin
+************************
+*
+*	sinh(x)
+*
+************************
+.subckt sinh in out
+B1 0 out I=sinh(v(in)) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends sinh
+************************
+*
+*	sqrt(x)
+*
+************************
+.subckt sqrt in out
+B1 0 out I=sqrt(v(in)) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends sqrt
+************************
+*
+*	tan(x)
+*
+************************
+.subckt tan in out
+B1 0 out I=tan(v(in)+phi) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends tan
+************************
+*
+*	tanh(x)
+*
+************************
+.subckt tanh in out
+B1 0 out I=tanh(v(in)) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends tanh
+************************
+*
+*	u(x)
+*
+************************
+.subckt U in out
+B1 0 out I=u(v(in)+y) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends U
+************************
+*
+*	uramp(x)
+*
+************************
+.subckt uramp in out
+B1 0 out I=uramp(v(in)+y) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends uramp
+************************
+*
+*	white(x)
+*
+************************
+.subckt white in out
+B1 0 out I=white(v(in)) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends white
+********************************************************************************
+*
+* [UPDATES]
+*
+* 2012.02.04	- Added log as the equivalent of ln.
+*		- Changed the old log to log10.
+* 2013.11.11	- Added the long forgotten tanh.
+* 2014.04.08	- Modified mod1, int() is faster than floor().
+*		- Added the also long forgotten uramp.
+*		- Added offset {y} to sgn, u, uramp.
+*		- Added {phi} phase to asin, acos, atan, tan.
+*		- Corrected atanh.
+*
+********************************************************************************

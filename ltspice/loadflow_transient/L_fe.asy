@@ -1,0 +1,28 @@
+Version 4
+SymbolType BLOCK
+LINE Normal 15 2 -15 2
+LINE Normal 15 4 -15 4
+LINE Normal -15 0 -28 0
+LINE Normal -15 -2 -15 0
+LINE Normal 15 0 28 0
+LINE Normal 15 0 15 0
+LINE Normal 15 -2 15 0
+LINE Normal -28 0 -32 0
+LINE Normal 32 0 28 0
+ARC Normal -15 1 -9 -5 3 -3 -27 -2
+ARC Normal -9 1 -3 -5 9 -3 -21 -2
+ARC Normal -3 1 3 -5 15 -3 -15 -2
+ARC Normal 3 1 9 -5 21 -3 -9 -2
+ARC Normal 9 1 15 -5 27 -3 -3 -2
+SYMATTR Prefix X
+SYMATTR SpiceModel L_Fe
+SYMATTR Value L=100m  fn={fn1}  rcu_rel=0.1 pfe_rel=0.01
+SYMATTR ModelFile spule.lib
+SYMATTR Value2 init=0
+SYMATTR Description inductance with iron core
+PIN -32 0 NONE 8
+PINATTR PinName 1_1
+PINATTR SpiceOrder 1
+PIN 32 0 NONE 8
+PINATTR PinName 1_2
+PINATTR SpiceOrder 2

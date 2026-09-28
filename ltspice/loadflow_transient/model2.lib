@@ -1,0 +1,26 @@
++ length=1
++ cl=1
++ g=1e12
+X1 1a 2a 3a 1a1 2a1 3a1 modelfilename
++ params: R0s={R0} R1s={R1} L0s={L0} L1s={L1} C0s={C0} C1s={C1} length={length/10} cl={cl} g={g}
+X2 1a1 2a1 3a1 1a2 2a2 3a2 modelfilename
++ params: R0s={R0} R1s={R1} L0s={L0} L1s={L1} C0s={C0} C1s={C1} length={length/10} cl={cl} g={g}
+X3 1a2 2a2 3a2 1a3 2a3 3a3 modelfilename
++ params: R0s={R0} R1s={R1} L0s={L0} L1s={L1} C0s={C0} C1s={C1} length={length/10} cl={cl} g={g}
+X4 1a3 2a3 3a3 1a4 2a4 3a4 modelfilename
++ params: R0s={R0} R1s={R1} L0s={L0} L1s={L1} C0s={C0} C1s={C1} length={length/10} cl={cl} g={g}
+X5 1a4 2a4 3a4 1a5 2a5 3a5 modelfilename
++ params: R0s={R0} R1s={R1} L0s={L0} L1s={L1} C0s={C0} C1s={C1} length={length/10} cl={cl} g={g}
+X6 1a5 2a5 3a5 1a6 2a6 3a6 modelfilename
++ params: R0s={R0} R1s={R1} L0s={L0} L1s={L1} C0s={C0} C1s={C1} length={length/10} cl={cl} g={g}
+X7 1a6 2a6 3a6 1a7 2a7 3a7 modelfilename
++ params: R0s={R0} R1s={R1} L0s={L0} L1s={L1} C0s={C0} C1s={C1} length={length/10} cl={cl} g={g}
+X8 1a7 2a7 3a7 1a8 2a8 3a8 modelfilename
++ params: R0s={R0} R1s={R1} L0s={L0} L1s={L1} C0s={C0} C1s={C1} length={length/10} cl={cl} g={g}
+X9 1a8 2a8 3a8 1a9 2a9 3a9 modelfilename
++ params: R0s={R0} R1s={R1} L0s={L0} L1s={L1} C0s={C0} C1s={C1} length={length/10} cl={cl} g={g}
+X10 1a9 2a9 3a9 1b 2b 3b modelfilename
++ params: R0s={R0} R1s={R1} L0s={L0} L1s={L1} C0s={C0} C1s={C1} length={length/10} cl={cl} g={g}
+.ENDS
+*
+*

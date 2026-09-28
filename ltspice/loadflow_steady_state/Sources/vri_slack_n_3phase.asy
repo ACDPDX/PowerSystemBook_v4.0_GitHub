@@ -1,0 +1,75 @@
+Version 4
+SymbolType BLOCK
+LINE Normal 0 -48 16 -48
+LINE Normal 0 -32 16 -32
+LINE Normal 0 16 16 16
+LINE Normal 0 32 16 32
+LINE Normal 0 96 16 96
+LINE Normal 0 144 16 144
+LINE Normal 0 160 16 160
+LINE Normal 0 80 16 80
+RECTANGLE Normal 0 192 -64 -64
+TEXT -27 -42 Left 2 L1
+TEXT -26 21 Left 2 L2
+TEXT -25 86 Left 2 L3
+TEXT -44 53 Left 2 V_3ph
+TEXT -22 150 Left 2 N
+WINDOW 3 -29 202 Center 2
+WINDOW 0 -51 217 Left 2
+SYMATTR Value on=1 v=400000
+SYMATTR Prefix X
+SYMATTR SpiceModel vri_3phase_n_LF
+SYMATTR ModelFile ltspice.lib
+SYMATTR Value2 deltaL1=0 deltaL2=-120 deltaL3=120 vfactor={sqrt(3)} sfactor=1
+SYMATTR Description 3 phase voltage slack
+PIN 16 -48 NONE 8
+PINATTR PinName r1r
+PINATTR SpiceOrder 1
+PIN 16 -32 NONE 8
+PINATTR PinName r1i
+PINATTR SpiceOrder 2
+PIN 16 16 NONE 8
+PINATTR PinName s1r
+PINATTR SpiceOrder 3
+PIN 16 32 NONE 8
+PINATTR PinName s1i
+PINATTR SpiceOrder 4
+PIN 16 80 NONE 8
+PINATTR PinName t1r
+PINATTR SpiceOrder 5
+PIN 16 96 NONE 8
+PINATTR PinName t1i
+PINATTR SpiceOrder 6
+PIN 16 144 NONE 8
+PINATTR PinName n1r
+PINATTR SpiceOrder 7
+PIN 16 160 NONE 8
+PINATTR PinName n1i
+PINATTR SpiceOrder 8
+PIN -64 -48 NONE 8
+PINATTR PinName v1_m
+PINATTR SpiceOrder 9
+PIN -64 -32 NONE 8
+PINATTR PinName p1_m
+PINATTR SpiceOrder 10
+PIN -64 -16 NONE 8
+PINATTR PinName q1_m
+PINATTR SpiceOrder 11
+PIN -64 16 NONE 8
+PINATTR PinName v2_m
+PINATTR SpiceOrder 12
+PIN -64 32 NONE 8
+PINATTR PinName p2_m
+PINATTR SpiceOrder 13
+PIN -64 48 NONE 8
+PINATTR PinName q2_m
+PINATTR SpiceOrder 14
+PIN -64 80 NONE 8
+PINATTR PinName v3_m
+PINATTR SpiceOrder 15
+PIN -64 96 NONE 8
+PINATTR PinName p3_m
+PINATTR SpiceOrder 16
+PIN -64 112 NONE 8
+PINATTR PinName q3_m
+PINATTR SpiceOrder 17
