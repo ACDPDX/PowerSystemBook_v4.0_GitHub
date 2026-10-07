@@ -1,0 +1,424 @@
+LTspice 26.0.2 for Windows
+Circuit: C:\Users\fried\Documents\PowerSystemBook_v4.0\ltspice\examples\07_Coupled_lines_resonance\Coupled_lines_resonance_TRAN_transposed.net
+Start Time: Mon Sep 28 15:46:05 2026
+    --- Expanded Netlist ---
+.options vntol=0.001 abstol=1e-06 reltol=0.003
+
+comp2:LL1 N022 N025 Rser=800 INDUCTANCE=254.65055577483798
+comp2:LL3 N030 N022 Rser=800 INDUCTANCE=254.65055577483798
+comp2:LL2 N025 N030 Rser=800 INDUCTANCE=254.65055577483798
+
+comp1:LL1 N021 N013 Rser=800 INDUCTANCE=254.65055577483798
+comp1:LL3 N007 N021 Rser=800 INDUCTANCE=254.65055577483798
+comp1:LL2 N013 N007 Rser=800 INDUCTANCE=254.65055577483798
+
+line:C_10a N006 0 CAPACITANCE=7.920954e-09
+line:C_30a N016 0 CAPACITANCE=6.675237166666666e-09
+line:C25a N010 PhaseB CAPACITANCE=5.351946666666667e-10
+line:C15b N018 N023 CAPACITANCE=7.628656666666667e-10
+line:C23b N011 N017 CAPACITANCE=5.6811450000000004e-09
+line:C24b N011 N027 CAPACITANCE=7.628656666666667e-10
+line:C25b N011 N023 CAPACITANCE=5.351946666666667e-10
+line:E1 line:1ax N018 V=3.3333333333333335*(0.05075*I(line:V1)+0.0357*I(line:V2)+0.0357*I(line:V3)+0.0357*I(line:V4)+0.0357*I(line:V5)+0.0357*I(line:V6))+0.010610338501629218*(0.4701577*ddt(I(line:V1))+0.2053937*ddt(I(line:V2))+0.203972*ddt(I(line:V3))+0.1673517*ddt(I(line:V4))+0.1599586*ddt(I(line:V5))+0.1736505*ddt(I(line:V6))) tripdv=1 tripdt=1
+line:C14b N018 N027 CAPACITANCE=2.0633883333333336e-09
+line:C15a N006 PhaseB CAPACITANCE=7.628656666666667e-10
+line:C35a N016 PhaseB CAPACITANCE=1.0778941666666667e-09
+line:C12b N018 N011 CAPACITANCE=3.166251666666667e-09
+line:E4 line:4ax N027 V=3.3333333333333335*(0.0357*I(line:V1)+0.0357*I(line:V2)+0.0357*I(line:V3)+0.05075*I(line:V4)+0.0357*I(line:V5)+0.0357*I(line:V6))+0.010610338501629218*(0.1673517*ddt(I(line:V1))+0.1599586*ddt(I(line:V2))+0.1736505*ddt(I(line:V3))+0.4701577*ddt(I(line:V4))+0.2053937*ddt(I(line:V5))+0.203972*ddt(I(line:V6))) tripdv=1 tripdt=1
+line:C_10b N018 0 CAPACITANCE=7.920954e-09
+line:C12a N006 N010 CAPACITANCE=3.166251666666667e-09
+line:C24a N010 PhaseA CAPACITANCE=7.628656666666667e-10
+line:C13b N018 N017 CAPACITANCE=2.83096e-09
+line:C26b N011 N026 CAPACITANCE=1.0778941666666667e-09
+line:C45b N027 N023 CAPACITANCE=3.166251666666667e-09
+line:V5 PhaseB line:5ax DC=0 rser=1e-15
+line:E5 line:5ax N023 V=3.3333333333333335*(0.0357*I(line:V1)+0.0357*I(line:V2)+0.0357*I(line:V3)+0.0357*I(line:V4)+0.05075*I(line:V5)+0.0357*I(line:V6))+0.010610338501629218*(0.1599586*ddt(I(line:V1))+0.168184*ddt(I(line:V2))+0.1849741*ddt(I(line:V3))+0.2053937*ddt(I(line:V4))+0.4889833*ddt(I(line:V5))+0.2539645*ddt(I(line:V6))) tripdv=1 tripdt=1
+line:Rgnd12 N026 0 R=10000000000
+line:C_20a N010 0 CAPACITANCE=8.291165499999998e-09
+line:C_20b N011 0 CAPACITANCE=8.291165499999998e-09
+line:V1 N006 line:1ax DC=0 rser=1e-15
+line:Rgnd2 N010 0 R=10000000000
+line:Rgnd4 PhaseA 0 R=10000000000
+line:C45a PhaseA PhaseB CAPACITANCE=3.166251666666667e-09
+line:C46a PhaseA PhaseC CAPACITANCE=2.83096e-09
+line:C_60a PhaseC 0 CAPACITANCE=6.675237166666666e-09
+line:C_50b N023 0 CAPACITANCE=8.291165500000001e-09
+line:C34a N016 PhaseA CAPACITANCE=1.2933470000000002e-09
+line:C56b N023 N026 CAPACITANCE=5.6811450000000004e-09
+line:V2 N010 line:2ax DC=0 rser=1e-15
+line:V3 N016 line:3ax DC=0 rser=1e-15
+line:E2 line:2ax N011 V=3.3333333333333335*(0.0357*I(line:V1)+0.05075*I(line:V2)+0.0357*I(line:V3)+0.0357*I(line:V4)+0.0357*I(line:V5)+0.0357*I(line:V6))+0.010610338501629218*(0.2053937*ddt(I(line:V1))+0.4889833*ddt(I(line:V2))+0.2539645*ddt(I(line:V3))+0.1599586*ddt(I(line:V4))+0.168184*ddt(I(line:V5))+0.1849741*ddt(I(line:V6))) tripdv=1 tripdt=1
+line:E3 line:3ax N017 V=3.3333333333333335*(0.0357*I(line:V1)+0.0357*I(line:V2)+0.05075*I(line:V3)+0.0357*I(line:V4)+0.0357*I(line:V5)+0.0357*I(line:V6))+0.010610338501629218*(0.203972*ddt(I(line:V1))+0.2539645*ddt(I(line:V2))+0.486438*ddt(I(line:V3))+0.1736505*ddt(I(line:V4))+0.1849741*ddt(I(line:V5))+0.2091193*ddt(I(line:V6))) tripdv=1 tripdt=1
+line:Rgnd8 N011 0 R=10000000000
+line:Rgnd9 N017 0 R=10000000000
+line:C14a N006 PhaseA CAPACITANCE=2.0633883333333336e-09
+line:C16a N006 PhaseC CAPACITANCE=1.2933470000000002e-09
+line:C34b N017 N027 CAPACITANCE=1.2933470000000002e-09
+line:V4 PhaseA line:4ax DC=0 rser=1e-15
+line:E6 line:6ax N026 V=3.3333333333333335*(0.0357*I(line:V1)+0.0357*I(line:V2)+0.0357*I(line:V3)+0.0357*I(line:V4)+0.0357*I(line:V5)+0.05075*I(line:V6))+0.010610338501629218*(0.1736505*ddt(I(line:V1))+0.1849741*ddt(I(line:V2))+0.2091193*ddt(I(line:V3))+0.203972*ddt(I(line:V4))+0.2539645*ddt(I(line:V5))+0.486438*ddt(I(line:V6))) tripdv=1 tripdt=1
+line:Rgnd11 N023 0 R=10000000000
+line:C_30b N017 0 CAPACITANCE=6.675237166666666e-09
+line:C_60b N026 0 CAPACITANCE=6.675237166666666e-09
+line:C13a N006 N016 CAPACITANCE=2.83096e-09
+line:C36a N016 PhaseC CAPACITANCE=2.5792666666666666e-09
+line:C16b N018 N026 CAPACITANCE=1.2933470000000002e-09
+line:C36b N017 N026 CAPACITANCE=2.5792666666666666e-09
+line:C46b N027 N026 CAPACITANCE=2.83096e-09
+line:Rgnd1 N006 0 R=10000000000
+line:Rgnd5 PhaseB 0 R=10000000000
+line:Rgnd6 PhaseC 0 R=10000000000
+line:Rgnd10 N027 0 R=10000000000
+line:V6 PhaseC line:6ax DC=0 rser=1e-15
+line:C56a PhaseB PhaseC CAPACITANCE=5.6811450000000004e-09
+line:C_40a PhaseA 0 CAPACITANCE=7.920953999999999e-09
+line:C_50a PhaseB 0 CAPACITANCE=8.291165500000001e-09
+line:C_40b N027 0 CAPACITANCE=7.920953999999999e-09
+line:C23a N010 N016 CAPACITANCE=5.6811450000000004e-09
+line:C26a N010 PhaseC CAPACITANCE=1.0778941666666667e-09
+line:C35b N017 N023 CAPACITANCE=1.0778941666666667e-09
+line:Rgnd3 N016 0 R=10000000000
+line:Rgnd7 N018 0 R=10000000000
+
+slack:Vpwl1 slack:pwl1 0 pwl=+0,0,+1e-12,1
+slack:Gpwl 0 slack:pwl I=if(0,if(0,v(slack:pwl2),v(slack:pwl1)),1) rpar=1 tripdv=1 tripdt=1
+slack:El2 N008 0 V=if(time>0,v(slack:pwl)*0.8165*400000*sin(6.283185307179586*(50*time+-0.3333333333333333))*(1-if((-(abs(time))/0.050000000001)<230.1248639459018,exp(-(abs(time))/0.050000000001),8.749002899132048e+99*(-(abs(time))/0.050000000001+-229.1248639459018))),0) tripdv=1 tripdt=1
+slack:Vpwl2 slack:pwl2 0 pwl=+0,0,+1e-12,0,+1e-12,1
+slack:El1 N004 0 V=if(time>0,v(slack:pwl)*0.8165*400000*sin(6.283185307179586*50*time)*(1-if((-(abs(time))/0.050000000001)<230.1248639459018,exp(-(abs(time))/0.050000000001),8.749002899132048e+99*(-(abs(time))/0.050000000001+-229.1248639459018))),0) tripdv=1 tripdt=1
+slack:El3 N014 0 V=if(time>0,v(slack:pwl)*0.8165*400000*sin(6.283185307179586*(50*time+0.3333333333333333))*(1-if((-(abs(time))/0.050000000001)<230.1248639459018,exp(-(abs(time))/0.050000000001),8.749002899132048e+99*(-(abs(time))/0.050000000001+-229.1248639459018))),0) tripdv=1 tripdt=1
+
+line2:C_10a N012 0 CAPACITANCE=7.920954e-09
+line2:C_30a N020 0 CAPACITANCE=6.675237166666666e-09
+line2:C25a N019 N028 CAPACITANCE=5.351946666666667e-10
+line2:C15b N007 N025 CAPACITANCE=7.628656666666667e-10
+line2:C23b N013 N021 CAPACITANCE=5.6811450000000004e-09
+line2:C24b N013 N022 CAPACITANCE=7.628656666666667e-10
+line2:C25b N013 N025 CAPACITANCE=5.351946666666667e-10
+line2:E1 line2:1ax N007 V=3.3333333333333335*(0.05075*I(line2:V1)+0.0357*I(line2:V2)+0.0357*I(line2:V3)+0.0357*I(line2:V4)+0.0357*I(line2:V5)+0.0357*I(line2:V6))+0.010610338501629218*(0.4701577*ddt(I(line2:V1))+0.2053937*ddt(I(line2:V2))+0.203972*ddt(I(line2:V3))+0.1673517*ddt(I(line2:V4))+0.1599586*ddt(I(line2:V5))+0.1736505*ddt(I(line2:V6))) tripdv=1 tripdt=1
+line2:C14b N007 N022 CAPACITANCE=2.0633883333333336e-09
+line2:C15a N012 N028 CAPACITANCE=7.628656666666667e-10
+line2:C35a N020 N028 CAPACITANCE=1.0778941666666667e-09
+line2:C12b N007 N013 CAPACITANCE=3.166251666666667e-09
+line2:E4 line2:4ax N022 V=3.3333333333333335*(0.0357*I(line2:V1)+0.0357*I(line2:V2)+0.0357*I(line2:V3)+0.05075*I(line2:V4)+0.0357*I(line2:V5)+0.0357*I(line2:V6))+0.010610338501629218*(0.1673517*ddt(I(line2:V1))+0.1599586*ddt(I(line2:V2))+0.1736505*ddt(I(line2:V3))+0.4701577*ddt(I(line2:V4))+0.2053937*ddt(I(line2:V5))+0.203972*ddt(I(line2:V6))) tripdv=1 tripdt=1
+line2:C_10b N007 0 CAPACITANCE=7.920954e-09
+line2:C12a N012 N019 CAPACITANCE=3.166251666666667e-09
+line2:C24a N019 N024 CAPACITANCE=7.628656666666667e-10
+line2:C13b N007 N021 CAPACITANCE=2.83096e-09
+line2:C26b N013 N030 CAPACITANCE=1.0778941666666667e-09
+line2:C45b N022 N025 CAPACITANCE=3.166251666666667e-09
+line2:V5 N028 line2:5ax DC=0 rser=1e-15
+line2:E5 line2:5ax N025 V=3.3333333333333335*(0.0357*I(line2:V1)+0.0357*I(line2:V2)+0.0357*I(line2:V3)+0.0357*I(line2:V4)+0.05075*I(line2:V5)+0.0357*I(line2:V6))+0.010610338501629218*(0.1599586*ddt(I(line2:V1))+0.168184*ddt(I(line2:V2))+0.1849741*ddt(I(line2:V3))+0.2053937*ddt(I(line2:V4))+0.4889833*ddt(I(line2:V5))+0.2539645*ddt(I(line2:V6))) tripdv=1 tripdt=1
+line2:Rgnd12 N030 0 R=10000000000
+line2:C_20a N019 0 CAPACITANCE=8.291165499999998e-09
+line2:C_20b N013 0 CAPACITANCE=8.291165499999998e-09
+line2:V1 N012 line2:1ax DC=0 rser=1e-15
+line2:Rgnd2 N019 0 R=10000000000
+line2:Rgnd4 N024 0 R=10000000000
+line2:C45a N024 N028 CAPACITANCE=3.166251666666667e-09
+line2:C46a N024 N029 CAPACITANCE=2.83096e-09
+line2:C_60a N029 0 CAPACITANCE=6.675237166666666e-09
+line2:C_50b N025 0 CAPACITANCE=8.291165500000001e-09
+line2:C34a N020 N024 CAPACITANCE=1.2933470000000002e-09
+line2:C56b N025 N030 CAPACITANCE=5.6811450000000004e-09
+line2:V2 N019 line2:2ax DC=0 rser=1e-15
+line2:V3 N020 line2:3ax DC=0 rser=1e-15
+line2:E2 line2:2ax N013 V=3.3333333333333335*(0.0357*I(line2:V1)+0.05075*I(line2:V2)+0.0357*I(line2:V3)+0.0357*I(line2:V4)+0.0357*I(line2:V5)+0.0357*I(line2:V6))+0.010610338501629218*(0.2053937*ddt(I(line2:V1))+0.4889833*ddt(I(line2:V2))+0.2539645*ddt(I(line2:V3))+0.1599586*ddt(I(line2:V4))+0.168184*ddt(I(line2:V5))+0.1849741*ddt(I(line2:V6))) tripdv=1 tripdt=1
+line2:E3 line2:3ax N021 V=3.3333333333333335*(0.0357*I(line2:V1)+0.0357*I(line2:V2)+0.05075*I(line2:V3)+0.0357*I(line2:V4)+0.0357*I(line2:V5)+0.0357*I(line2:V6))+0.010610338501629218*(0.203972*ddt(I(line2:V1))+0.2539645*ddt(I(line2:V2))+0.486438*ddt(I(line2:V3))+0.1736505*ddt(I(line2:V4))+0.1849741*ddt(I(line2:V5))+0.2091193*ddt(I(line2:V6))) tripdv=1 tripdt=1
+line2:Rgnd8 N013 0 R=10000000000
+line2:Rgnd9 N021 0 R=10000000000
+line2:C14a N012 N024 CAPACITANCE=2.0633883333333336e-09
+line2:C16a N012 N029 CAPACITANCE=1.2933470000000002e-09
+line2:C34b N021 N022 CAPACITANCE=1.2933470000000002e-09
+line2:V4 N024 line2:4ax DC=0 rser=1e-15
+line2:E6 line2:6ax N030 V=3.3333333333333335*(0.0357*I(line2:V1)+0.0357*I(line2:V2)+0.0357*I(line2:V3)+0.0357*I(line2:V4)+0.0357*I(line2:V5)+0.05075*I(line2:V6))+0.010610338501629218*(0.1736505*ddt(I(line2:V1))+0.1849741*ddt(I(line2:V2))+0.2091193*ddt(I(line2:V3))+0.203972*ddt(I(line2:V4))+0.2539645*ddt(I(line2:V5))+0.486438*ddt(I(line2:V6))) tripdv=1 tripdt=1
+line2:Rgnd11 N025 0 R=10000000000
+line2:C_30b N021 0 CAPACITANCE=6.675237166666666e-09
+line2:C_60b N030 0 CAPACITANCE=6.675237166666666e-09
+line2:C13a N012 N020 CAPACITANCE=2.83096e-09
+line2:C36a N020 N029 CAPACITANCE=2.5792666666666666e-09
+line2:C16b N007 N030 CAPACITANCE=1.2933470000000002e-09
+line2:C36b N021 N030 CAPACITANCE=2.5792666666666666e-09
+line2:C46b N022 N030 CAPACITANCE=2.83096e-09
+line2:Rgnd1 N012 0 R=10000000000
+line2:Rgnd5 N028 0 R=10000000000
+line2:Rgnd6 N029 0 R=10000000000
+line2:Rgnd10 N022 0 R=10000000000
+line2:V6 N029 line2:6ax DC=0 rser=1e-15
+line2:C56a N028 N029 CAPACITANCE=5.6811450000000004e-09
+line2:C_40a N024 0 CAPACITANCE=7.920953999999999e-09
+line2:C_50a N028 0 CAPACITANCE=8.291165500000001e-09
+line2:C_40b N022 0 CAPACITANCE=7.920953999999999e-09
+line2:C23a N019 N020 CAPACITANCE=5.6811450000000004e-09
+line2:C26a N019 N029 CAPACITANCE=1.0778941666666667e-09
+line2:C35b N021 N025 CAPACITANCE=1.0778941666666667e-09
+line2:Rgnd3 N020 0 R=10000000000
+line2:Rgnd7 N007 0 R=10000000000
+
+qmeter:xpm1:Eenable qmeter:xpm1:vin2 0 V=if(time>1e-06,v(n005),0) tripdv=1 tripdt=1
+qmeter:xpm1:Vamper N005 qmeter:xpm1:vout1 DC=0
+qmeter:xpm1:Eamper qmeter:xpm1:I1 0 V=if(time>1e-06,I(qmeter:xpm1:Vamper),0) tripdv=1 tripdt=1
+qmeter:xpm1:Eout qmeter:xpm1:S 0 V=v(qmeter:xpm1:i)*v(qmeter:xpm1:v)*3 tripdv=1 tripdt=1
+qmeter:xpm1:Ephi qmeter:xpm1:phi 0 V=if(v(qmeter:xpm1:dphi)>90,v(qmeter:xpm1:dphi)-180,if(v(qmeter:xpm1:dphi)<-90,v(qmeter:xpm1:dphi)+180,v(qmeter:xpm1:dphi))) tripdv=1 tripdt=1
+qmeter:xpm1:Rq N001 0 R=1000000000000
+qmeter:xpm1:Edphi qmeter:xpm1:dphi 0 V=v(qmeter:xpm1:phii)-v(qmeter:xpm1:phiv) tripdv=1 tripdt=1
+qmeter:xpm1:Eq_m N001 0 V=if((v(qmeter:xpm1:dphi)<90)&(v(qmeter:xpm1:dphi)>-90),-(v(qmeter:xpm1:s))*sin(v(qmeter:xpm1:phi)*3.141592653589793/180),v(qmeter:xpm1:s)*sin(v(qmeter:xpm1:phi)*3.141592653589793/180)) tripdv=1 tripdt=1
+
+qmeter:xpm1:xpmc:v01 qmeter:xpm1:vout1 qmeter:xpm1:Vout2 DC=0
+qmeter:xpm1:xpmc:e1 qmeter:xpm1:xpmc:i 0 V=I(qmeter:xpm1:xpmc:v01) tripdt=1 tripdv=1
+qmeter:xpm1:xpmc:e3 qmeter:xpm1:xpmc:i1 0 V=if(time>0.01,v(qmeter:xpm1:xpmc:i),0) tripdt=1 tripdv=1
+qmeter:xpm1:xpmc:e2 qmeter:xpm1:phii 0 V=if(time>1e-06,v(qmeter:xpm1:xpmc:phi1),0) tripdt=1 tripdv=1
+
+qmeter:xpm1:xpmc:xph1:Ts qmeter:xpm1:xpmc:xph1:1 0 qmeter:xpm1:xpmc:xph1:11 0 Td=0.02 Z0=1
+qmeter:xpm1:xpmc:xph1:Gs 0 qmeter:xpm1:xpmc:xph1:s qmeter:xpm1:xpmc:xph1:1 qmeter:xpm1:xpmc:xph1:11 GAIN=1
+qmeter:xpm1:xpmc:xph1:Tc qmeter:xpm1:xpmc:xph1:2 0 qmeter:xpm1:xpmc:xph1:22 0 Td=0.02 Z0=1
+qmeter:xpm1:xpmc:xph1:Gc 0 qmeter:xpm1:xpmc:xph1:c qmeter:xpm1:xpmc:xph1:2 qmeter:xpm1:xpmc:xph1:22 GAIN=1
+qmeter:xpm1:xpmc:xph1:Cc qmeter:xpm1:xpmc:xph1:c 0 CAPACITANCE=0.02 ic=0 Rpar=1000000000
+qmeter:xpm1:xpmc:xph1:Asc 0 qmeter:xpm1:xpmc:i1 0 0 0 qmeter:xpm1:xpmc:xph1:2 qmeter:xpm1:xpmc:xph1:1 0 MODULATOR mark=50 space=0
+qmeter:xpm1:xpmc:xph1:Rs qmeter:xpm1:xpmc:xph1:11 0 R=1
+qmeter:xpm1:xpmc:xph1:Cs qmeter:xpm1:xpmc:xph1:s 0 CAPACITANCE=0.02 ic=0 Rpar=1000000000
+qmeter:xpm1:xpmc:xph1:Rc qmeter:xpm1:xpmc:xph1:22 0 R=1
+qmeter:xpm1:xpmc:xph1:Br 0 qmeter:xpm1:xpmc:phi1 I=atan2(v(qmeter:xpm1:xpmc:xph1:c),v(qmeter:xpm1:xpmc:xph1:s)) Rpar=57.29577951308232 tripdv=1 tripdt=1
+
+qmeter:xpm1:xpmv:v01 qmeter:xpm1:Vout2 N006 DC=0
+qmeter:xpm1:xpmv:e1 qmeter:xpm1:phiv 0 V=if(time>0.01,v(qmeter:xpm1:xpmv:phi1),0) tripdt=1 tripdv=1
+qmeter:xpm1:xpmv:e02 qmeter:xpm1:xpmv:vin1 0 V=if(time>1e-06,v(qmeter:xpm1:vout2),0) tripdt=1 tripdv=1
+
+qmeter:xpm1:xpmv:xph1:Ts qmeter:xpm1:xpmv:xph1:1 0 qmeter:xpm1:xpmv:xph1:11 0 Td=0.02 Z0=1
+qmeter:xpm1:xpmv:xph1:Gs 0 qmeter:xpm1:xpmv:xph1:s qmeter:xpm1:xpmv:xph1:1 qmeter:xpm1:xpmv:xph1:11 GAIN=1
+qmeter:xpm1:xpmv:xph1:Tc qmeter:xpm1:xpmv:xph1:2 0 qmeter:xpm1:xpmv:xph1:22 0 Td=0.02 Z0=1
+qmeter:xpm1:xpmv:xph1:Gc 0 qmeter:xpm1:xpmv:xph1:c qmeter:xpm1:xpmv:xph1:2 qmeter:xpm1:xpmv:xph1:22 GAIN=1
+qmeter:xpm1:xpmv:xph1:Cc qmeter:xpm1:xpmv:xph1:c 0 CAPACITANCE=0.02 ic=0 Rpar=1000000000
+qmeter:xpm1:xpmv:xph1:Asc 0 qmeter:xpm1:xpmv:vin1 0 0 0 qmeter:xpm1:xpmv:xph1:2 qmeter:xpm1:xpmv:xph1:1 0 MODULATOR mark=50 space=0
+qmeter:xpm1:xpmv:xph1:Rs qmeter:xpm1:xpmv:xph1:11 0 R=1
+qmeter:xpm1:xpmv:xph1:Cs qmeter:xpm1:xpmv:xph1:s 0 CAPACITANCE=0.02 ic=0 Rpar=1000000000
+qmeter:xpm1:xpmv:xph1:Rc qmeter:xpm1:xpmv:xph1:22 0 R=1
+qmeter:xpm1:xpmv:xph1:Br 0 qmeter:xpm1:xpmv:phi1 I=atan2(v(qmeter:xpm1:xpmv:xph1:c),v(qmeter:xpm1:xpmv:xph1:s)) Rpar=57.29577951308232 tripdv=1 tripdt=1
+
+qmeter:xpm1:xu5:Asq 0 qmeter:xpm1:I1 qmeter:xpm1:I1 0 0 0 qmeter:xpm1:xu5:sq 0 ota vhigh=1000000000 rout=1 linear
+qmeter:xpm1:xu5:Adiv_lf qmeter:xpm1:xu5:_sq qmeter:xpm1:xu5:sq 0 0 0 0 qmeter:xpm1:xu5:div 0 ota vhigh=1000000000 rout=1000000000 cout=3.3333333333333337e-10 linear
+qmeter:xpm1:xu5:Adiv 0 qmeter:xpm1:xu5:div qmeter:xpm1:I 0 0 0 qmeter:xpm1:xu5:_sq 0 ota vhigh=1000000000 rout=1 linear
+qmeter:xpm1:xu5:Ab0 qmeter:xpm1:I qmeter:xpm1:xu5:div 0 0 0 0 qmeter:xpm1:xu5:1 0 ota vhigh=1000000000 vlow=-1000000000 cout=0.05305164769729845 rout=1000000000 g=0.3333333333333333 linear
+qmeter:xpm1:xu5:Ab1 qmeter:xpm1:I qmeter:xpm1:xu5:1 0 0 0 0 qmeter:xpm1:I 0 ota vhigh=1000000000 vlow=-1000000000 cout=0.05305164769729845 rout=1000000000 g=3 linear
+qmeter:xpm1:xu5:Rout qmeter:xpm1:I 0 R=1000000000000
+
+qmeter:xpm1:xu4:Asq 0 qmeter:xpm1:vin2 qmeter:xpm1:vin2 0 0 0 qmeter:xpm1:xu4:sq 0 ota vhigh=1000000000 rout=1 linear
+qmeter:xpm1:xu4:Adiv_lf qmeter:xpm1:xu4:_sq qmeter:xpm1:xu4:sq 0 0 0 0 qmeter:xpm1:xu4:div 0 ota vhigh=1000000000 rout=1000000000 cout=3.3333333333333337e-10 linear
+qmeter:xpm1:xu4:Adiv 0 qmeter:xpm1:xu4:div qmeter:xpm1:V 0 0 0 qmeter:xpm1:xu4:_sq 0 ota vhigh=1000000000 rout=1 linear
+qmeter:xpm1:xu4:Ab0 qmeter:xpm1:V qmeter:xpm1:xu4:div 0 0 0 0 qmeter:xpm1:xu4:1 0 ota vhigh=1000000000 vlow=-1000000000 cout=0.05305164769729845 rout=1000000000 g=0.3333333333333333 linear
+qmeter:xpm1:xu4:Ab1 qmeter:xpm1:V qmeter:xpm1:xu4:1 0 0 0 0 qmeter:xpm1:V 0 ota vhigh=1000000000 vlow=-1000000000 cout=0.05305164769729845 rout=1000000000 g=3 linear
+qmeter:xpm1:xu4:Rout qmeter:xpm1:V 0 R=1000000000000
+
+qmeter:xpm2:Eenable qmeter:xpm2:vin2 0 V=if(time>1e-06,v(n009),0) tripdv=1 tripdt=1
+qmeter:xpm2:Vamper N009 qmeter:xpm2:vout1 DC=0
+qmeter:xpm2:Eamper qmeter:xpm2:I1 0 V=if(time>1e-06,I(qmeter:xpm2:Vamper),0) tripdv=1 tripdt=1
+qmeter:xpm2:Eout qmeter:xpm2:S 0 V=v(qmeter:xpm2:i)*v(qmeter:xpm2:v)*3 tripdv=1 tripdt=1
+qmeter:xpm2:Ephi qmeter:xpm2:phi 0 V=if(v(qmeter:xpm2:dphi)>90,v(qmeter:xpm2:dphi)-180,if(v(qmeter:xpm2:dphi)<-90,v(qmeter:xpm2:dphi)+180,v(qmeter:xpm2:dphi))) tripdv=1 tripdt=1
+qmeter:xpm2:Rq N002 0 R=1000000000000
+qmeter:xpm2:Edphi qmeter:xpm2:dphi 0 V=v(qmeter:xpm2:phii)-v(qmeter:xpm2:phiv) tripdv=1 tripdt=1
+qmeter:xpm2:Eq_m N002 0 V=if((v(qmeter:xpm2:dphi)<90)&(v(qmeter:xpm2:dphi)>-90),-(v(qmeter:xpm2:s))*sin(v(qmeter:xpm2:phi)*3.141592653589793/180),v(qmeter:xpm2:s)*sin(v(qmeter:xpm2:phi)*3.141592653589793/180)) tripdv=1 tripdt=1
+
+qmeter:xpm2:xpmc:v01 qmeter:xpm2:vout1 qmeter:xpm2:Vout2 DC=0
+qmeter:xpm2:xpmc:e1 qmeter:xpm2:xpmc:i 0 V=I(qmeter:xpm2:xpmc:v01) tripdt=1 tripdv=1
+qmeter:xpm2:xpmc:e3 qmeter:xpm2:xpmc:i1 0 V=if(time>0.01,v(qmeter:xpm2:xpmc:i),0) tripdt=1 tripdv=1
+qmeter:xpm2:xpmc:e2 qmeter:xpm2:phii 0 V=if(time>1e-06,v(qmeter:xpm2:xpmc:phi1),0) tripdt=1 tripdv=1
+
+qmeter:xpm2:xpmc:xph1:Ts qmeter:xpm2:xpmc:xph1:1 0 qmeter:xpm2:xpmc:xph1:11 0 Td=0.02 Z0=1
+qmeter:xpm2:xpmc:xph1:Gs 0 qmeter:xpm2:xpmc:xph1:s qmeter:xpm2:xpmc:xph1:1 qmeter:xpm2:xpmc:xph1:11 GAIN=1
+qmeter:xpm2:xpmc:xph1:Tc qmeter:xpm2:xpmc:xph1:2 0 qmeter:xpm2:xpmc:xph1:22 0 Td=0.02 Z0=1
+qmeter:xpm2:xpmc:xph1:Gc 0 qmeter:xpm2:xpmc:xph1:c qmeter:xpm2:xpmc:xph1:2 qmeter:xpm2:xpmc:xph1:22 GAIN=1
+qmeter:xpm2:xpmc:xph1:Cc qmeter:xpm2:xpmc:xph1:c 0 CAPACITANCE=0.02 ic=0 Rpar=1000000000
+qmeter:xpm2:xpmc:xph1:Asc 0 qmeter:xpm2:xpmc:i1 0 0 0 qmeter:xpm2:xpmc:xph1:2 qmeter:xpm2:xpmc:xph1:1 0 MODULATOR mark=50 space=0
+qmeter:xpm2:xpmc:xph1:Rs qmeter:xpm2:xpmc:xph1:11 0 R=1
+qmeter:xpm2:xpmc:xph1:Cs qmeter:xpm2:xpmc:xph1:s 0 CAPACITANCE=0.02 ic=0 Rpar=1000000000
+qmeter:xpm2:xpmc:xph1:Rc qmeter:xpm2:xpmc:xph1:22 0 R=1
+qmeter:xpm2:xpmc:xph1:Br 0 qmeter:xpm2:xpmc:phi1 I=atan2(v(qmeter:xpm2:xpmc:xph1:c),v(qmeter:xpm2:xpmc:xph1:s)) Rpar=57.29577951308232 tripdv=1 tripdt=1
+
+qmeter:xpm2:xpmv:v01 qmeter:xpm2:Vout2 N010 DC=0
+qmeter:xpm2:xpmv:e1 qmeter:xpm2:phiv 0 V=if(time>0.01,v(qmeter:xpm2:xpmv:phi1),0) tripdt=1 tripdv=1
+qmeter:xpm2:xpmv:e02 qmeter:xpm2:xpmv:vin1 0 V=if(time>1e-06,v(qmeter:xpm2:vout2),0) tripdt=1 tripdv=1
+
+qmeter:xpm2:xpmv:xph1:Ts qmeter:xpm2:xpmv:xph1:1 0 qmeter:xpm2:xpmv:xph1:11 0 Td=0.02 Z0=1
+qmeter:xpm2:xpmv:xph1:Gs 0 qmeter:xpm2:xpmv:xph1:s qmeter:xpm2:xpmv:xph1:1 qmeter:xpm2:xpmv:xph1:11 GAIN=1
+qmeter:xpm2:xpmv:xph1:Tc qmeter:xpm2:xpmv:xph1:2 0 qmeter:xpm2:xpmv:xph1:22 0 Td=0.02 Z0=1
+qmeter:xpm2:xpmv:xph1:Gc 0 qmeter:xpm2:xpmv:xph1:c qmeter:xpm2:xpmv:xph1:2 qmeter:xpm2:xpmv:xph1:22 GAIN=1
+qmeter:xpm2:xpmv:xph1:Cc qmeter:xpm2:xpmv:xph1:c 0 CAPACITANCE=0.02 ic=0 Rpar=1000000000
+qmeter:xpm2:xpmv:xph1:Asc 0 qmeter:xpm2:xpmv:vin1 0 0 0 qmeter:xpm2:xpmv:xph1:2 qmeter:xpm2:xpmv:xph1:1 0 MODULATOR mark=50 space=0
+qmeter:xpm2:xpmv:xph1:Rs qmeter:xpm2:xpmv:xph1:11 0 R=1
+qmeter:xpm2:xpmv:xph1:Cs qmeter:xpm2:xpmv:xph1:s 0 CAPACITANCE=0.02 ic=0 Rpar=1000000000
+qmeter:xpm2:xpmv:xph1:Rc qmeter:xpm2:xpmv:xph1:22 0 R=1
+qmeter:xpm2:xpmv:xph1:Br 0 qmeter:xpm2:xpmv:phi1 I=atan2(v(qmeter:xpm2:xpmv:xph1:c),v(qmeter:xpm2:xpmv:xph1:s)) Rpar=57.29577951308232 tripdv=1 tripdt=1
+
+qmeter:xpm2:xu5:Asq 0 qmeter:xpm2:I1 qmeter:xpm2:I1 0 0 0 qmeter:xpm2:xu5:sq 0 ota vhigh=1000000000 rout=1 linear
+qmeter:xpm2:xu5:Adiv_lf qmeter:xpm2:xu5:_sq qmeter:xpm2:xu5:sq 0 0 0 0 qmeter:xpm2:xu5:div 0 ota vhigh=1000000000 rout=1000000000 cout=3.3333333333333337e-10 linear
+qmeter:xpm2:xu5:Adiv 0 qmeter:xpm2:xu5:div qmeter:xpm2:I 0 0 0 qmeter:xpm2:xu5:_sq 0 ota vhigh=1000000000 rout=1 linear
+qmeter:xpm2:xu5:Ab0 qmeter:xpm2:I qmeter:xpm2:xu5:div 0 0 0 0 qmeter:xpm2:xu5:1 0 ota vhigh=1000000000 vlow=-1000000000 cout=0.05305164769729845 rout=1000000000 g=0.3333333333333333 linear
+qmeter:xpm2:xu5:Ab1 qmeter:xpm2:I qmeter:xpm2:xu5:1 0 0 0 0 qmeter:xpm2:I 0 ota vhigh=1000000000 vlow=-1000000000 cout=0.05305164769729845 rout=1000000000 g=3 linear
+qmeter:xpm2:xu5:Rout qmeter:xpm2:I 0 R=1000000000000
+
+qmeter:xpm2:xu4:Asq 0 qmeter:xpm2:vin2 qmeter:xpm2:vin2 0 0 0 qmeter:xpm2:xu4:sq 0 ota vhigh=1000000000 rout=1 linear
+qmeter:xpm2:xu4:Adiv_lf qmeter:xpm2:xu4:_sq qmeter:xpm2:xu4:sq 0 0 0 0 qmeter:xpm2:xu4:div 0 ota vhigh=1000000000 rout=1000000000 cout=3.3333333333333337e-10 linear
+qmeter:xpm2:xu4:Adiv 0 qmeter:xpm2:xu4:div qmeter:xpm2:V 0 0 0 qmeter:xpm2:xu4:_sq 0 ota vhigh=1000000000 rout=1 linear
+qmeter:xpm2:xu4:Ab0 qmeter:xpm2:V qmeter:xpm2:xu4:div 0 0 0 0 qmeter:xpm2:xu4:1 0 ota vhigh=1000000000 vlow=-1000000000 cout=0.05305164769729845 rout=1000000000 g=0.3333333333333333 linear
+qmeter:xpm2:xu4:Ab1 qmeter:xpm2:V qmeter:xpm2:xu4:1 0 0 0 0 qmeter:xpm2:V 0 ota vhigh=1000000000 vlow=-1000000000 cout=0.05305164769729845 rout=1000000000 g=3 linear
+qmeter:xpm2:xu4:Rout qmeter:xpm2:V 0 R=1000000000000
+
+qmeter:xpm3:Eenable qmeter:xpm3:vin2 0 V=if(time>1e-06,v(n015),0) tripdv=1 tripdt=1
+qmeter:xpm3:Vamper N015 qmeter:xpm3:vout1 DC=0
+qmeter:xpm3:Eamper qmeter:xpm3:I1 0 V=if(time>1e-06,I(qmeter:xpm3:Vamper),0) tripdv=1 tripdt=1
+qmeter:xpm3:Eout qmeter:xpm3:S 0 V=v(qmeter:xpm3:i)*v(qmeter:xpm3:v)*3 tripdv=1 tripdt=1
+qmeter:xpm3:Ephi qmeter:xpm3:phi 0 V=if(v(qmeter:xpm3:dphi)>90,v(qmeter:xpm3:dphi)-180,if(v(qmeter:xpm3:dphi)<-90,v(qmeter:xpm3:dphi)+180,v(qmeter:xpm3:dphi))) tripdv=1 tripdt=1
+qmeter:xpm3:Rq N003 0 R=1000000000000
+qmeter:xpm3:Edphi qmeter:xpm3:dphi 0 V=v(qmeter:xpm3:phii)-v(qmeter:xpm3:phiv) tripdv=1 tripdt=1
+qmeter:xpm3:Eq_m N003 0 V=if((v(qmeter:xpm3:dphi)<90)&(v(qmeter:xpm3:dphi)>-90),-(v(qmeter:xpm3:s))*sin(v(qmeter:xpm3:phi)*3.141592653589793/180),v(qmeter:xpm3:s)*sin(v(qmeter:xpm3:phi)*3.141592653589793/180)) tripdv=1 tripdt=1
+
+qmeter:xpm3:xpmc:v01 qmeter:xpm3:vout1 qmeter:xpm3:Vout2 DC=0
+qmeter:xpm3:xpmc:e1 qmeter:xpm3:xpmc:i 0 V=I(qmeter:xpm3:xpmc:v01) tripdt=1 tripdv=1
+qmeter:xpm3:xpmc:e3 qmeter:xpm3:xpmc:i1 0 V=if(time>0.01,v(qmeter:xpm3:xpmc:i),0) tripdt=1 tripdv=1
+qmeter:xpm3:xpmc:e2 qmeter:xpm3:phii 0 V=if(time>1e-06,v(qmeter:xpm3:xpmc:phi1),0) tripdt=1 tripdv=1
+
+qmeter:xpm3:xpmc:xph1:Ts qmeter:xpm3:xpmc:xph1:1 0 qmeter:xpm3:xpmc:xph1:11 0 Td=0.02 Z0=1
+qmeter:xpm3:xpmc:xph1:Gs 0 qmeter:xpm3:xpmc:xph1:s qmeter:xpm3:xpmc:xph1:1 qmeter:xpm3:xpmc:xph1:11 GAIN=1
+qmeter:xpm3:xpmc:xph1:Tc qmeter:xpm3:xpmc:xph1:2 0 qmeter:xpm3:xpmc:xph1:22 0 Td=0.02 Z0=1
+qmeter:xpm3:xpmc:xph1:Gc 0 qmeter:xpm3:xpmc:xph1:c qmeter:xpm3:xpmc:xph1:2 qmeter:xpm3:xpmc:xph1:22 GAIN=1
+qmeter:xpm3:xpmc:xph1:Cc qmeter:xpm3:xpmc:xph1:c 0 CAPACITANCE=0.02 ic=0 Rpar=1000000000
+qmeter:xpm3:xpmc:xph1:Asc 0 qmeter:xpm3:xpmc:i1 0 0 0 qmeter:xpm3:xpmc:xph1:2 qmeter:xpm3:xpmc:xph1:1 0 MODULATOR mark=50 space=0
+qmeter:xpm3:xpmc:xph1:Rs qmeter:xpm3:xpmc:xph1:11 0 R=1
+qmeter:xpm3:xpmc:xph1:Cs qmeter:xpm3:xpmc:xph1:s 0 CAPACITANCE=0.02 ic=0 Rpar=1000000000
+qmeter:xpm3:xpmc:xph1:Rc qmeter:xpm3:xpmc:xph1:22 0 R=1
+qmeter:xpm3:xpmc:xph1:Br 0 qmeter:xpm3:xpmc:phi1 I=atan2(v(qmeter:xpm3:xpmc:xph1:c),v(qmeter:xpm3:xpmc:xph1:s)) Rpar=57.29577951308232 tripdv=1 tripdt=1
+
+qmeter:xpm3:xpmv:v01 qmeter:xpm3:Vout2 N016 DC=0
+qmeter:xpm3:xpmv:e1 qmeter:xpm3:phiv 0 V=if(time>0.01,v(qmeter:xpm3:xpmv:phi1),0) tripdt=1 tripdv=1
+qmeter:xpm3:xpmv:e02 qmeter:xpm3:xpmv:vin1 0 V=if(time>1e-06,v(qmeter:xpm3:vout2),0) tripdt=1 tripdv=1
+
+qmeter:xpm3:xpmv:xph1:Ts qmeter:xpm3:xpmv:xph1:1 0 qmeter:xpm3:xpmv:xph1:11 0 Td=0.02 Z0=1
+qmeter:xpm3:xpmv:xph1:Gs 0 qmeter:xpm3:xpmv:xph1:s qmeter:xpm3:xpmv:xph1:1 qmeter:xpm3:xpmv:xph1:11 GAIN=1
+qmeter:xpm3:xpmv:xph1:Tc qmeter:xpm3:xpmv:xph1:2 0 qmeter:xpm3:xpmv:xph1:22 0 Td=0.02 Z0=1
+qmeter:xpm3:xpmv:xph1:Gc 0 qmeter:xpm3:xpmv:xph1:c qmeter:xpm3:xpmv:xph1:2 qmeter:xpm3:xpmv:xph1:22 GAIN=1
+qmeter:xpm3:xpmv:xph1:Cc qmeter:xpm3:xpmv:xph1:c 0 CAPACITANCE=0.02 ic=0 Rpar=1000000000
+qmeter:xpm3:xpmv:xph1:Asc 0 qmeter:xpm3:xpmv:vin1 0 0 0 qmeter:xpm3:xpmv:xph1:2 qmeter:xpm3:xpmv:xph1:1 0 MODULATOR mark=50 space=0
+qmeter:xpm3:xpmv:xph1:Rs qmeter:xpm3:xpmv:xph1:11 0 R=1
+qmeter:xpm3:xpmv:xph1:Cs qmeter:xpm3:xpmv:xph1:s 0 CAPACITANCE=0.02 ic=0 Rpar=1000000000
+qmeter:xpm3:xpmv:xph1:Rc qmeter:xpm3:xpmv:xph1:22 0 R=1
+qmeter:xpm3:xpmv:xph1:Br 0 qmeter:xpm3:xpmv:phi1 I=atan2(v(qmeter:xpm3:xpmv:xph1:c),v(qmeter:xpm3:xpmv:xph1:s)) Rpar=57.29577951308232 tripdv=1 tripdt=1
+
+qmeter:xpm3:xu5:Asq 0 qmeter:xpm3:I1 qmeter:xpm3:I1 0 0 0 qmeter:xpm3:xu5:sq 0 ota vhigh=1000000000 rout=1 linear
+qmeter:xpm3:xu5:Adiv_lf qmeter:xpm3:xu5:_sq qmeter:xpm3:xu5:sq 0 0 0 0 qmeter:xpm3:xu5:div 0 ota vhigh=1000000000 rout=1000000000 cout=3.3333333333333337e-10 linear
+qmeter:xpm3:xu5:Adiv 0 qmeter:xpm3:xu5:div qmeter:xpm3:I 0 0 0 qmeter:xpm3:xu5:_sq 0 ota vhigh=1000000000 rout=1 linear
+qmeter:xpm3:xu5:Ab0 qmeter:xpm3:I qmeter:xpm3:xu5:div 0 0 0 0 qmeter:xpm3:xu5:1 0 ota vhigh=1000000000 vlow=-1000000000 cout=0.05305164769729845 rout=1000000000 g=0.3333333333333333 linear
+qmeter:xpm3:xu5:Ab1 qmeter:xpm3:I qmeter:xpm3:xu5:1 0 0 0 0 qmeter:xpm3:I 0 ota vhigh=1000000000 vlow=-1000000000 cout=0.05305164769729845 rout=1000000000 g=3 linear
+qmeter:xpm3:xu5:Rout qmeter:xpm3:I 0 R=1000000000000
+
+qmeter:xpm3:xu4:Asq 0 qmeter:xpm3:vin2 qmeter:xpm3:vin2 0 0 0 qmeter:xpm3:xu4:sq 0 ota vhigh=1000000000 rout=1 linear
+qmeter:xpm3:xu4:Adiv_lf qmeter:xpm3:xu4:_sq qmeter:xpm3:xu4:sq 0 0 0 0 qmeter:xpm3:xu4:div 0 ota vhigh=1000000000 rout=1000000000 cout=3.3333333333333337e-10 linear
+qmeter:xpm3:xu4:Adiv 0 qmeter:xpm3:xu4:div qmeter:xpm3:V 0 0 0 qmeter:xpm3:xu4:_sq 0 ota vhigh=1000000000 rout=1 linear
+qmeter:xpm3:xu4:Ab0 qmeter:xpm3:V qmeter:xpm3:xu4:div 0 0 0 0 qmeter:xpm3:xu4:1 0 ota vhigh=1000000000 vlow=-1000000000 cout=0.05305164769729845 rout=1000000000 g=0.3333333333333333 linear
+qmeter:xpm3:xu4:Ab1 qmeter:xpm3:V qmeter:xpm3:xu4:1 0 0 0 0 qmeter:xpm3:V 0 ota vhigh=1000000000 vlow=-1000000000 cout=0.05305164769729845 rout=1000000000 g=3 linear
+qmeter:xpm3:xu4:Rout qmeter:xpm3:V 0 R=1000000000000
+
+netimpedanz:RL2 N008 netimpedanz:L2_1m R=0.4
+netimpedanz:LL1 netimpedanz:L1_1m N005 rser=0 IC=0 INDUCTANCE=0.012732406201955062
+netimpedanz:LL3 netimpedanz:L3_1m N015 rser=0 IC=0 INDUCTANCE=0.012732406201955062
+netimpedanz:Rgnd2 N008 0 R=1000000000000
+netimpedanz:Rgnd4 N005 0 R=1000000000000
+netimpedanz:RL1 N004 netimpedanz:L1_1m R=0.4
+netimpedanz:RL3 N014 netimpedanz:L3_1m R=0.4
+netimpedanz:LL2 netimpedanz:L2_1m N009 rser=0 IC=0 INDUCTANCE=0.012732406201955062
+netimpedanz:Rgnd1 N004 0 R=1000000000000
+netimpedanz:Rgnd3 N014 0 R=1000000000000
+netimpedanz:Rgnd5 N009 0 R=1000000000000
+netimpedanz:Rgnd6 N015 0 R=1000000000000
+
+line1:C_10a N011 0 CAPACITANCE=7.920954e-09
+line1:C_30a N018 0 CAPACITANCE=6.675237166666666e-09
+line1:C25a N017 N026 CAPACITANCE=5.351946666666667e-10
+line1:C15b N020 N024 CAPACITANCE=7.628656666666667e-10
+line1:C23b N012 N019 CAPACITANCE=5.6811450000000004e-09
+line1:C24b N012 N029 CAPACITANCE=7.628656666666667e-10
+line1:C25b N012 N024 CAPACITANCE=5.351946666666667e-10
+line1:E1 line1:1ax N020 V=3.3333333333333335*(0.05075*I(line1:V1)+0.0357*I(line1:V2)+0.0357*I(line1:V3)+0.0357*I(line1:V4)+0.0357*I(line1:V5)+0.0357*I(line1:V6))+0.010610338501629218*(0.4701577*ddt(I(line1:V1))+0.2053937*ddt(I(line1:V2))+0.203972*ddt(I(line1:V3))+0.1673517*ddt(I(line1:V4))+0.1599586*ddt(I(line1:V5))+0.1736505*ddt(I(line1:V6))) tripdv=1 tripdt=1
+line1:C14b N020 N029 CAPACITANCE=2.0633883333333336e-09
+line1:C15a N011 N026 CAPACITANCE=7.628656666666667e-10
+line1:C35a N018 N026 CAPACITANCE=1.0778941666666667e-09
+line1:C12b N020 N012 CAPACITANCE=3.166251666666667e-09
+line1:E4 line1:4ax N029 V=3.3333333333333335*(0.0357*I(line1:V1)+0.0357*I(line1:V2)+0.0357*I(line1:V3)+0.05075*I(line1:V4)+0.0357*I(line1:V5)+0.0357*I(line1:V6))+0.010610338501629218*(0.1673517*ddt(I(line1:V1))+0.1599586*ddt(I(line1:V2))+0.1736505*ddt(I(line1:V3))+0.4701577*ddt(I(line1:V4))+0.2053937*ddt(I(line1:V5))+0.203972*ddt(I(line1:V6))) tripdv=1 tripdt=1
+line1:C_10b N020 0 CAPACITANCE=7.920954e-09
+line1:C12a N011 N017 CAPACITANCE=3.166251666666667e-09
+line1:C24a N017 N023 CAPACITANCE=7.628656666666667e-10
+line1:C13b N020 N019 CAPACITANCE=2.83096e-09
+line1:C26b N012 N028 CAPACITANCE=1.0778941666666667e-09
+line1:C45b N029 N024 CAPACITANCE=3.166251666666667e-09
+line1:V5 N026 line1:5ax DC=0 rser=1e-15
+line1:E5 line1:5ax N024 V=3.3333333333333335*(0.0357*I(line1:V1)+0.0357*I(line1:V2)+0.0357*I(line1:V3)+0.0357*I(line1:V4)+0.05075*I(line1:V5)+0.0357*I(line1:V6))+0.010610338501629218*(0.1599586*ddt(I(line1:V1))+0.168184*ddt(I(line1:V2))+0.1849741*ddt(I(line1:V3))+0.2053937*ddt(I(line1:V4))+0.4889833*ddt(I(line1:V5))+0.2539645*ddt(I(line1:V6))) tripdv=1 tripdt=1
+line1:Rgnd12 N028 0 R=10000000000
+line1:C_20a N017 0 CAPACITANCE=8.291165499999998e-09
+line1:C_20b N012 0 CAPACITANCE=8.291165499999998e-09
+line1:V1 N011 line1:1ax DC=0 rser=1e-15
+line1:Rgnd2 N017 0 R=10000000000
+line1:Rgnd4 N023 0 R=10000000000
+line1:C45a N023 N026 CAPACITANCE=3.166251666666667e-09
+line1:C46a N023 N027 CAPACITANCE=2.83096e-09
+line1:C_60a N027 0 CAPACITANCE=6.675237166666666e-09
+line1:C_50b N024 0 CAPACITANCE=8.291165500000001e-09
+line1:C34a N018 N023 CAPACITANCE=1.2933470000000002e-09
+line1:C56b N024 N028 CAPACITANCE=5.6811450000000004e-09
+line1:V2 N017 line1:2ax DC=0 rser=1e-15
+line1:V3 N018 line1:3ax DC=0 rser=1e-15
+line1:E2 line1:2ax N012 V=3.3333333333333335*(0.0357*I(line1:V1)+0.05075*I(line1:V2)+0.0357*I(line1:V3)+0.0357*I(line1:V4)+0.0357*I(line1:V5)+0.0357*I(line1:V6))+0.010610338501629218*(0.2053937*ddt(I(line1:V1))+0.4889833*ddt(I(line1:V2))+0.2539645*ddt(I(line1:V3))+0.1599586*ddt(I(line1:V4))+0.168184*ddt(I(line1:V5))+0.1849741*ddt(I(line1:V6))) tripdv=1 tripdt=1
+line1:E3 line1:3ax N019 V=3.3333333333333335*(0.0357*I(line1:V1)+0.0357*I(line1:V2)+0.05075*I(line1:V3)+0.0357*I(line1:V4)+0.0357*I(line1:V5)+0.0357*I(line1:V6))+0.010610338501629218*(0.203972*ddt(I(line1:V1))+0.2539645*ddt(I(line1:V2))+0.486438*ddt(I(line1:V3))+0.1736505*ddt(I(line1:V4))+0.1849741*ddt(I(line1:V5))+0.2091193*ddt(I(line1:V6))) tripdv=1 tripdt=1
+line1:Rgnd8 N012 0 R=10000000000
+line1:Rgnd9 N019 0 R=10000000000
+line1:C14a N011 N023 CAPACITANCE=2.0633883333333336e-09
+line1:C16a N011 N027 CAPACITANCE=1.2933470000000002e-09
+line1:C34b N019 N029 CAPACITANCE=1.2933470000000002e-09
+line1:V4 N023 line1:4ax DC=0 rser=1e-15
+line1:E6 line1:6ax N028 V=3.3333333333333335*(0.0357*I(line1:V1)+0.0357*I(line1:V2)+0.0357*I(line1:V3)+0.0357*I(line1:V4)+0.0357*I(line1:V5)+0.05075*I(line1:V6))+0.010610338501629218*(0.1736505*ddt(I(line1:V1))+0.1849741*ddt(I(line1:V2))+0.2091193*ddt(I(line1:V3))+0.203972*ddt(I(line1:V4))+0.2539645*ddt(I(line1:V5))+0.486438*ddt(I(line1:V6))) tripdv=1 tripdt=1
+line1:Rgnd11 N024 0 R=10000000000
+line1:C_30b N019 0 CAPACITANCE=6.675237166666666e-09
+line1:C_60b N028 0 CAPACITANCE=6.675237166666666e-09
+line1:C13a N011 N018 CAPACITANCE=2.83096e-09
+line1:C36a N018 N027 CAPACITANCE=2.5792666666666666e-09
+line1:C16b N020 N028 CAPACITANCE=1.2933470000000002e-09
+line1:C36b N019 N028 CAPACITANCE=2.5792666666666666e-09
+line1:C46b N029 N028 CAPACITANCE=2.83096e-09
+line1:Rgnd1 N011 0 R=10000000000
+line1:Rgnd5 N026 0 R=10000000000
+line1:Rgnd6 N027 0 R=10000000000
+line1:Rgnd10 N029 0 R=10000000000
+line1:V6 N027 line1:6ax DC=0 rser=1e-15
+line1:C56a N026 N027 CAPACITANCE=5.6811450000000004e-09
+line1:C_40a N023 0 CAPACITANCE=7.920953999999999e-09
+line1:C_50a N026 0 CAPACITANCE=8.291165500000001e-09
+line1:C_40b N029 0 CAPACITANCE=7.920953999999999e-09
+line1:C23a N017 N018 CAPACITANCE=5.6811450000000004e-09
+line1:C26a N017 N027 CAPACITANCE=1.0778941666666667e-09
+line1:C35b N019 N024 CAPACITANCE=1.0778941666666667e-09
+line1:Rgnd3 N018 0 R=10000000000
+line1:Rgnd7 N020 0 R=10000000000
+
+.end
+
+Options:vntol=1m abstol=1u reltol=0.003
+solver = Alternate
+Maximum thread count: 16
+tnom = 27
+temp = 27
+method = modified trap
+abstol = 1e-06
+reltol = 0.003
+trtol = 1
+volttol = 0.001
+Compress1stOrder = true
+Compress2ndOrder = true
+Direct Newton iteration succeeded in finding operating point.
+
+Simulation stopped by user.
+Total elapsed time: 3.586 seconds.
+
+Files loaded:
+C:\Users\fried\Documents\PowerSystemBook_v4.0\ltspice\examples\07_Coupled_lines_resonance\Coupled_lines_resonance_TRAN_transposed.net
+C:\Users\fried\Documents\ltspice\loadflow_transient\comp.lib
+C:\Users\fried\Documents\ltspice\loadflow_transient\impedance.lib
+C:\Users\fried\Documents\ltspice\loadflow_transient\line_coupled.lib
+C:\Users\fried\Documents\ltspice\loadflow_transient\measure.lib
+C:\Users\fried\Documents\ltspice\loadflow_transient\sources.lib
+
