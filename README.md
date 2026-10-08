@@ -1,1 +1,6 @@
-In this repository i develop two LTSPICE toolboxes for nonlinear loadflow computation and transient simulation of high energy networks. Additionally i will add soon a free LTSPICE PDF-book to explain in detail some prelimanary examples which resides in the ltspice folder. If you want more examples you can go to my homepage at www.friedrichschmidt.at or to the file section of the ltspice usergroup after logging in. 
+In this repository i develop two LTSPICE toolboxes for nonlinear loadflow computation and transient simulation of high energy networks. 
+
+In addition, I'd like to introduce my LTspice PDF book here to explain the 9 examples in this repository in much greater detail.
+
+I originally wanted to make the book available as an Open Access book, but then decided to go with Amazon because it's easier to find things there.
+
