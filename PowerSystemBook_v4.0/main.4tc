@@ -1,0 +1,129 @@
+\expandafter\ifx\csname doTocEntry\endcsname\relax \expandafter\endinput\fi
+\doTocEntry\toclikechapter{}{\csname a:TocLink\endcsname{2}{x2-1000}{QQ2-2-1}{Preface}}{5}\relax 
+\doTocEntry\tocchapter{}{\csname a:TocLink\endcsname{2}{Q1-2-2}{}{Preface}}{v}\relax 
+\doTocEntry\toclikechapter{}{\csname a:TocLink\endcsname{3}{x3-2000}{QQ2-3-3}{Acknowledgements}}{9}\relax 
+\doTocEntry\tocchapter{}{\csname a:TocLink\endcsname{3}{Q1-3-4}{}{Acknowledgements}}{ix}\relax 
+\doTocEntry\toclikechapter{}{\csname a:TocLink\endcsname{4}{x4-3000}{QQ2-4-5}{How to Use This Book}}{13}\relax 
+\doTocEntry\tocchapter{}{\csname a:TocLink\endcsname{4}{Q1-4-6}{}{How to Use This Book}}{xiii}\relax 
+\doTocEntry\toclikechapter{}{\csname a:TocLink\endcsname{5}{x5-4000}{QQ2-5-7}{Contents}}{17}\relax 
+\doTocEntry\toclikechapter{}{\csname a:TocLink\endcsname{6}{x6-5000}{QQ2-6-8}{List of Figures}}{23}\relax 
+\doTocEntry\tocchapter{}{\csname a:TocLink\endcsname{6}{Q1-6-9}{}{\nonumberline List of Figures}}{xxiii}\relax 
+\doTocEntry\toclikechapter{}{\csname a:TocLink\endcsname{7}{x7-6000}{QQ2-7-10}{List of Tables}}{29}\relax 
+\doTocEntry\tocchapter{}{\csname a:TocLink\endcsname{7}{Q1-7-11}{}{\nonumberline List of Tables}}{xxix}\relax 
+\doTocEntry\toclikechapter{}{\csname a:TocLink\endcsname{8}{x8-7000}{QQ2-8-12}{List of Listings}}{35}\relax 
+\doTocEntry\tocchapter{}{\csname a:TocLink\endcsname{8}{Q1-8-13}{}{\nonumberline List of Listings}}{xxxv}\relax 
+\doTocEntry\tocchapter{1}{\csname a:TocLink\endcsname{9}{x9-80001}{QQ2-9-14}{Transformer and Shunt Reactor}}{5}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{9}{Q1-9-15}{}{\numberline {1.1}General}}{5}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{9}{Q1-9-16}{}{\numberline {1.2}Circuit Design}}{6}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{9}{Q1-9-17}{}{\numberline {1.2.1}Transformer Without Shunt Reactor}}{7}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{9}{Q1-9-18}{}{\numberline {1.2.2}One Transformer and Shunt Reactor}}{7}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{9}{Q1-9-19}{}{\numberline {1.2.3}Two Transformers in Parallel and Shunt Reactor}}{8}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{9}{Q1-9-20}{}{\numberline {1.2.4}Two Transformers in Series and Shunt Reactor}}{8}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{9}{Q1-9-21}{}{\numberline {1.2.5}Transformer and Shunt Reactor for AC-Analysis}}{8}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{9}{Q1-9-22}{}{\numberline {1.3}Manual Calculation of the Line-to-Line Voltage Drop with Two Transformers in Series}}{9}\relax 
+\doTocEntry\toclof{1.1}{\csname a:TocLink\endcsname{9}{x9-8030r1}{}{\ignorespaces AC voltages and currents at the shunt reactors.}}{figure}\relax 
+\doTocEntry\toclof{1.2}{\csname a:TocLink\endcsname{9}{x9-8031r2}{}{\ignorespaces AC voltages and currents at the shunt reactors.}}{figure}\relax 
+\doTocEntry\tocchapter{2}{\csname a:TocLink\endcsname{10}{x10-90002}{QQ2-10-25}{Short-Circuit Current in the Medium-Voltage Grid}}{23}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{10}{Q1-10-26}{}{\numberline {2.1}General}}{23}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{10}{Q1-10-27}{}{\numberline {2.2}Circuit Design}}{23}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{10}{Q1-10-28}{}{\numberline {2.3}Transient Simulation}}{24}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{10}{Q1-10-29}{}{\numberline {2.3.1}Before the Fault}}{24}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{10}{Q1-10-30}{}{\numberline {2.3.2}Fault Inception}}{24}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{10}{Q1-10-31}{}{\numberline {2.3.3}Settled Fault Current}}{25}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{10}{Q1-10-32}{}{\numberline {2.4}Estimating the Steady-State Short-Circuit Current}}{25}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{10}{Q1-10-33}{}{\numberline {2.5}Short-Circuit Current with Initial Load}}{27}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{10}{Q1-10-34}{}{\numberline {2.6}Short-Circuit Reactor}}{28}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{10}{Q1-10-35}{}{\numberline {2.6.1}Manual Calculation}}{28}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{10}{Q1-10-36}{}{\numberline {2.7}AC Analysis}}{30}\relax 
+\doTocEntry\toclof{2.1}{\csname a:TocLink\endcsname{10}{x10-9043r1}{}{\ignorespaces Shortcircuit in the medium voltage grid - schematic}}{figure}\relax 
+\doTocEntry\toclof{2.2}{\csname a:TocLink\endcsname{10}{x10-9044r2}{}{\ignorespaces Shortcircuit in the medium voltage grid - waveform}}{figure}\relax 
+\doTocEntry\toclof{2.3}{\csname a:TocLink\endcsname{10}{x10-9045r3}{}{\ignorespaces Shortcircuit in the medium voltage grid with initial load - schematic}}{figure}\relax 
+\doTocEntry\toclof{2.4}{\csname a:TocLink\endcsname{10}{x10-9046r4}{}{\ignorespaces Shortcircuit in the medium voltage grid with initial load - waveform}}{figure}\relax 
+\doTocEntry\toclof{2.5}{\csname a:TocLink\endcsname{10}{x10-9047r5}{}{\ignorespaces Shortcircuit in the medium voltage grid with scr - schematic}}{figure}\relax 
+\doTocEntry\toclof{2.6}{\csname a:TocLink\endcsname{10}{x10-9048r6}{}{\ignorespaces Shortcircuit in the medium voltage grid with scr - waveform}}{figure}\relax 
+\doTocEntry\toclof{2.7}{\csname a:TocLink\endcsname{10}{x10-9049r7}{}{\ignorespaces Shortcircuit in the medium voltage grid AC analysis - schematic}}{figure}\relax 
+\doTocEntry\toclof{2.8}{\csname a:TocLink\endcsname{10}{x10-9050r8}{}{\ignorespaces Shortcircuit in the medium voltage grid AC analysis - waveform}}{figure}\relax 
+\doTocEntry\tocchapter{3}{\csname a:TocLink\endcsname{11}{x11-100003}{QQ2-11-45}{Initializing Transformers with Residual Flux}}{63}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{11}{Q1-11-46}{}{\numberline {3.1}General}}{63}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{11}{Q1-11-47}{}{\numberline {3.2}Circuit Design}}{64}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{11}{Q1-11-48}{}{\numberline {3.3}Energization at \SI {40}{\milli \second } Without Residual Flux}}{64}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{11}{Q1-11-49}{}{\numberline {3.4}Energization at \SI {40}{\milli \second } with Unfavourable Residual Flux}}{66}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{11}{Q1-11-50}{}{\numberline {3.5}Energization at \SI {40}{\milli \second } with Favourable Residual Flux}}{67}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{11}{Q1-11-51}{}{\numberline {3.6}Energization at \SI {45}{\milli \second } with Unfavourable Residual Flux}}{69}\relax 
+\doTocEntry\toclof{3.1}{\csname a:TocLink\endcsname{11}{x11-10040r1}{}{\ignorespaces Initializing a Transformer with residual flux - schematic}}{figure}\relax 
+\doTocEntry\toclof{3.2}{\csname a:TocLink\endcsname{11}{x11-10041r2}{}{\ignorespaces Initializing a Transformer with residual flux - Currents}}{figure}\relax 
+\doTocEntry\toclof{3.3}{\csname a:TocLink\endcsname{11}{x11-10042r3}{}{\ignorespaces Initializing Transformer with residual flux - Fluxes}}{figure}\relax 
+\doTocEntry\tocchapter{4}{\csname a:TocLink\endcsname{12}{x12-110004}{QQ2-12-55}{Switching Lines}}{85}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{12}{Q1-12-56}{}{\numberline {4.1}General}}{85}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{12}{Q1-12-57}{}{\numberline {4.2}Circuit Design}}{85}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{12}{Q1-12-58}{}{\numberline {4.2.1}Adjustment of the Petersen Coil}}{86}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{12}{Q1-12-59}{}{\numberline {4.3}Energization of an Unloaded \SI {110}{\kilo \volt } Cable}}{86}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{12}{Q1-12-60}{}{\numberline {4.3.1}Natural Frequency}}{87}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{12}{Q1-12-61}{}{\numberline {4.3.2}Petersen-Coil Oscillation}}{89}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{12}{Q1-12-62}{}{\numberline {4.4}Energization of a Loaded Line}}{89}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{12}{Q1-12-63}{}{\numberline {4.5}Energization of a Second Line}}{89}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{12}{Q1-12-64}{}{\numberline {4.6}Energization of a Transformer-Terminated Line}}{91}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{12}{Q1-12-65}{}{\numberline {4.7}Extended-Line Study: Charging Current Near Rated Current}}{92}\relax 
+\doTocEntry\toclof{4.1}{\csname a:TocLink\endcsname{12}{x12-11043r1}{}{\ignorespaces Switching lines - schematic}}{figure}\relax 
+\doTocEntry\toclof{4.2}{\csname a:TocLink\endcsname{12}{x12-11044r2}{}{\ignorespaces Switching lines1 - waveform}}{figure}\relax 
+\doTocEntry\toclof{4.3}{\csname a:TocLink\endcsname{12}{x12-11045r3}{}{\ignorespaces Switching lines2 - waveform}}{figure}\relax 
+\doTocEntry\toclof{4.4}{\csname a:TocLink\endcsname{12}{x12-11046r4}{}{\ignorespaces Switching lines3ab - waveform}}{figure}\relax 
+\doTocEntry\toclof{4.5}{\csname a:TocLink\endcsname{12}{x12-11047r5}{}{\ignorespaces Switching lines4 - waveform}}{figure}\relax 
+\doTocEntry\toclof{4.6}{\csname a:TocLink\endcsname{12}{x12-11048r6}{}{\ignorespaces Switching lines 15s - waveform}}{figure}\relax 
+\doTocEntry\toclof{4.7}{\csname a:TocLink\endcsname{12}{x12-11049r7}{}{\ignorespaces Switching lines 70km - schematic}}{figure}\relax 
+\doTocEntry\toclof{4.8}{\csname a:TocLink\endcsname{12}{x12-11050r8}{}{\ignorespaces Switching lines 70km - waveform1}}{figure}\relax 
+\doTocEntry\toclof{4.9}{\csname a:TocLink\endcsname{12}{x12-11051r9}{}{\ignorespaces Switching lines 70km - waveform2}}{figure}\relax 
+\doTocEntry\tocchapter{5}{\csname a:TocLink\endcsname{13}{x13-120005}{QQ2-13-75}{Earth Faults in \SI {110}{\kilo \volt } and \SI {10}{\kilo \volt } Power Grids}}{129}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{13}{Q1-13-76}{}{\numberline {5.1}General}}{129}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{13}{Q1-13-77}{}{\numberline {5.2}Circuit design}}{129}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{13}{Q1-13-78}{}{\numberline {5.3}Compensated \SI {110}{\kilo \volt } Network Without a Fault}}{130}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{13}{Q1-13-79}{}{\numberline {5.3.1}Adjustment of the Petersen Coil}}{130}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{13}{Q1-13-80}{}{\numberline {5.3.2}Neutral Displacement Voltage in the Transient Analysis}}{131}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{13}{Q1-13-81}{}{\numberline {5.3.3}Corrected Petersen-Coil Setting}}{131}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{13}{Q1-13-82}{}{\numberline {5.3.4}Reason about the reduction of the starpoint voltage}}{132}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{13}{Q1-13-83}{}{\numberline {5.3.5}Resonance Frequency at about 50Hz}}{133}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{13}{Q1-13-84}{}{\numberline {5.4}Low-Resistance Earth Fault in the \SI {110}{\kilo \volt } Network}}{135}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{13}{Q1-13-85}{}{\numberline {5.4.1}Network Designed for \SI {300}{\ampere } Earth-Fault Current}}{136}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{13}{Q1-13-86}{}{\numberline {5.4.2}Reactive Power detailed}}{136}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{13}{Q1-13-87}{}{\numberline {5.4.3}Reactive-Power Increase at Fault Inception}}{137}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{13}{Q1-13-88}{}{\numberline {5.4.4}Additional Transformer Loading Due to Petersen-Coil Current}}{138}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{13}{Q1-13-89}{}{\numberline {5.4.5}Loaded and Unloaded Transformer}}{138}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{13}{Q1-13-90}{}{\numberline {5.5}High-Resistance Earth Fault}}{138}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{13}{Q1-13-91}{}{\numberline {5.6}Comparison of coupled and uncoupeled line impedance}}{139}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{13}{Q1-13-92}{}{\numberline {5.7}Compensated \SI {10}{\kilo \volt } Network with a Grounding Transformer}}{139}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{13}{Q1-13-93}{}{\numberline {5.8}Solid Neutral Earthing and a Transformer with a Five-Leg Core}}{140}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{13}{Q1-13-94}{}{\numberline {5.9}Characteristic Resonance Frequencies}}{140}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{13}{Q1-13-95}{}{\numberline {5.9.1}Resonance at \SI {1.2}{\kilo \hertz }}}{140}\relax 
+\doTocEntry\tocsubsection{}{\csname a:TocLink\endcsname{13}{Q1-13-96}{}{\numberline {5.9.2}Resonance at \SI {260}{\hertz }}}{141}\relax 
+\doTocEntry\toclof{5.1}{\csname a:TocLink\endcsname{13}{x13-12053r1}{}{\ignorespaces Petersen without fault - schematic}}{figure}\relax 
+\doTocEntry\toclof{5.2}{\csname a:TocLink\endcsname{13}{x13-12054r2}{}{\ignorespaces Petersen without fault TRAN - waveform}}{figure}\relax 
+\doTocEntry\toclof{5.3}{\csname a:TocLink\endcsname{13}{x13-12055r3}{}{\ignorespaces Petersen without fault AC starpoint (Petersen) voltage - waveform}}{figure}\relax 
+\doTocEntry\toclof{5.4}{\csname a:TocLink\endcsname{13}{x13-12056r4}{}{\ignorespaces Petersen with fault AC hierarchical model - waveform}}{figure}\relax 
+\doTocEntry\toclof{5.5}{\csname a:TocLink\endcsname{13}{x13-12057r5}{}{\ignorespaces Phase difference between the voltages U0B and U0C, plotted with GeoGebra}}{figure}\relax 
+\doTocEntry\toclof{5.6}{\csname a:TocLink\endcsname{13}{x13-12058r6}{}{\ignorespaces Petersen with fault TRAN - schematic}}{figure}\relax 
+\doTocEntry\toclof{5.7}{\csname a:TocLink\endcsname{13}{x13-12059r7}{}{\ignorespaces Petersen with fault TRAN - waveform}}{figure}\relax 
+\doTocEntry\toclof{5.8}{\csname a:TocLink\endcsname{13}{x13-12060r8}{}{\ignorespaces Petersen with fault AC - waveform}}{figure}\relax 
+\doTocEntry\toclof{5.9}{\csname a:TocLink\endcsname{13}{x13-12061r9}{}{\ignorespaces Petersen with fault and load AC - schematic}}{figure}\relax 
+\doTocEntry\toclof{5.10}{\csname a:TocLink\endcsname{13}{x13-12062r10}{}{\ignorespaces Petersen with fault and load AC - waveform}}{figure}\relax 
+\doTocEntry\toclof{5.11}{\csname a:TocLink\endcsname{13}{x13-12063r11}{}{\ignorespaces Petersen with high-resistance earth fault fault AC - schematic}}{figure}\relax 
+\doTocEntry\toclof{5.12}{\csname a:TocLink\endcsname{13}{x13-12064r12}{}{\ignorespaces Petersen with high-resistance earth fault fault AC - waveform}}{figure}\relax 
+\doTocEntry\toclof{5.13}{\csname a:TocLink\endcsname{13}{x13-12065r13}{}{\ignorespaces Petersen with coupled and uncoupled line impedance - schematic}}{figure}\relax 
+\doTocEntry\toclof{5.14}{\csname a:TocLink\endcsname{13}{x13-12066r14}{}{\ignorespaces Petersen with coupled and uncoupled line impedance - waveform}}{figure}\relax 
+\doTocEntry\toclof{5.15}{\csname a:TocLink\endcsname{13}{x13-12067r15}{}{\ignorespaces Petersen without fault and external grounding transformer TRAN - schematic}}{figure}\relax 
+\doTocEntry\toclof{5.16}{\csname a:TocLink\endcsname{13}{x13-12068r16}{}{\ignorespaces Petersen without fault and external grounding transformer TRAN - waveform}}{figure}\relax 
+\doTocEntry\toclof{5.17}{\csname a:TocLink\endcsname{13}{x13-12069r17}{}{\ignorespaces Petersen without fault and external grounding transformer AC - schematic}}{figure}\relax 
+\doTocEntry\toclof{5.18}{\csname a:TocLink\endcsname{13}{x13-12070r18}{}{\ignorespaces Petersen without fault and external grounding transformer AC - waveform}}{figure}\relax 
+\doTocEntry\toclof{5.19}{\csname a:TocLink\endcsname{13}{x13-12071r19}{}{\ignorespaces FFT of current through capacitor C11}}{figure}\relax 
+\doTocEntry\tocchapter{6}{\csname a:TocLink\endcsname{14}{x14-130006}{QQ2-14-116}{Switching Whole Networks}}{205}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{14}{Q1-14-117}{}{\numberline {6.1}General}}{205}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{14}{Q1-14-118}{}{\numberline {6.2}Circuit Design}}{206}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{14}{Q1-14-119}{}{\numberline {6.3}Petersen-Coil Setting}}{206}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{14}{Q1-14-120}{}{\numberline {6.4}Calculation of the Network Resonance}}{208}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{14}{Q1-14-121}{}{\numberline {6.5}Rated current of the main transformer}}{209}\relax 
+\doTocEntry\tocsection{}{\csname a:TocLink\endcsname{14}{Q1-14-122}{}{\numberline {6.6}Case 1: Closing at the Phase-R Voltage Zero}}{209}\relax 
+\doTocEntry\toclof{6.1}{\csname a:TocLink\endcsname{14}{x14-13022r1}{}{\ignorespaces Switching on networks schematic - case1}}{figure}\relax 
+\doTocEntry\toclof{6.2}{\csname a:TocLink\endcsname{14}{x14-13023r2}{}{\ignorespaces Switching on networks voltages - case1}}{figure}\relax 
+\doTocEntry\toclof{6.3}{\csname a:TocLink\endcsname{14}{x14-13024r3}{}{\ignorespaces Switching on networks currents - case1}}{figure}\relax 
+\doTocEntry\toclof{6.4}{\csname a:TocLink\endcsname{14}{x14-13025r4}{}{\ignorespaces Switching on networks currents line1, line4 - case1}}{figure}\relax 
+\doTocEntry\toclof{6.5}{\csname a:TocLink\endcsname{14}{x14-13026r5}{}{\ignorespaces Switching on networks fluxes - case1}}{figure}\relax 
+\doTocEntry\toclof{6.6}{\csname a:TocLink\endcsname{14}{x14-13027r6}{}{\ignorespaces Switching on networks FFT - case1}}{figure}\relax 

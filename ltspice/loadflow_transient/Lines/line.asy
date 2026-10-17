@@ -24,7 +24,7 @@ SYMATTR ModelFile line.lib
 SYMATTR Value2 R1=0.5 L1=0.001 XL1=0 Cb1=10n Ce1=10n
 SYMATTR SpiceLine R2=0.5 L2=0.001 XL2=0 Cb2=10n Ce2=10n
 SYMATTR SpiceLine2 R3=0.5 L3=0.001 XL3=0 Cb3=10n Ce3=10n
-SYMATTR Description Three phase uncoupled symmetrix line
+SYMATTR Description Three phase line ( for 60Hz lines set fn=60 )
 PIN -32 0 NONE 8
 PINATTR PinName L1_1
 PINATTR SpiceOrder 1

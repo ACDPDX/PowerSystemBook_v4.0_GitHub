@@ -1,0 +1,63 @@
+[Transient Analysis]
+{
+   Npanes: 5
+   Active Pane: 4
+   {
+      traces: 1 {524290,0,"V(qa)"}
+      X: (' ',1,0,0.5,5)
+      Y[0]: ('M',0,-28000000,7000000,49000000)
+      Y[1]: ('_',0,1e+308,0,-1e+308)
+      Volts: ('M',0,0,0,-28000000,7000000,49000000)
+      Log: 0 0 0
+      Text: "V" 1 (2.06367924528302,39497872.3404255) ;Fault current phase A is inductive
+      Text: "V" 1 (0.542452830188679,-9978723.40425533) ;Q of Phase A
+      Text: "V" 1 (2.55344418052257,-7000000) ;Q Phase A = 0
+      Text: "V" 1 (2.93349168646081,7583333.33333333) ;Capacitance shorted -> Q=0
+      Text: "V" 1 (0.979809976247031,-19833333.3333333) ;Reactive power Phase A = -6.3kVar
+      Text: "V" 1 (2.19714964370546,26833333.3333333) ;+Q for inductive short circuit current
+   },
+   {
+      traces: 2 {524291,0,"V(qb)"} {524292,0,"V(qc)"}
+      X: (' ',1,0,0.5,5)
+      Y[0]: ('M',0,-40000000,4000000,0)
+      Y[1]: ('_',0,1e+308,0,-1e+308)
+      Volts: ('M',0,0,0,-40000000,4000000,0)
+      Log: 0 0 0
+      Text: "" 1 (1.73990498812352,-30625000) ;Capacitive Power phase B,C about doubled at fault start
+      Text: "V" 1 (2.61282660332542,-5000000) ;Sum = -20MVar for phase B+C
+   },
+   {
+      traces: 1 {524294,0,"V(qa)+V(qb)+V(qc)"}
+      X: (' ',1,0,0.5,5)
+      Y[0]: ('M',0,-50000000,5000000,5000000)
+      Y[1]: ('_',0,1e+308,0,-1e+308)
+      Volts: ('M',0,0,0,-50000000,5000000,5000000)
+      Log: 0 0 0
+      Text: "V" 1 (0.483490566037736,-23323353.2934132) ;About -20MVAr
+      Text: "V" 1 (3.03655660377358,-23323353.2934132) ;About -20MVAr
+      Text: "V" 1 (1.37971698113208,-2574850.2994012) ;Capacitive and inductive transients
+      Text: "V" 1 (2.95724465558195,-33242187.5) ;End
+      Text: "V" 1 (0.469121140142518,-31953125) ;Start
+   },
+   {
+      traces: 1 {68157445,0,"Ix(Switcher1:in1)"}
+      X: (' ',1,0,0.5,5)
+      Y[0]: ('K',1,-4500,900,4500)
+      Y[1]: ('_',0,1e+308,0,-1e+308)
+      Amps: ('K',0,0,0,-4500,900,4500)
+      Log: 0 0 0
+      Text: "A" 1 (2.9186320754717,-1110.38961038961) ;Simulate also with the switcher parameter
+      Text: "A" 1 (2.83254156769596,2320.3125) ;Current transients at the fault position with t_start = 1.005s
+      Text: "A" 1 (2.91567695961995,-2742.1875) ;t_Start=1.0s for smaller current maximum
+   },
+   {
+      traces: 2 {524295,0,"V(phb)"} {524296,0,"V(phc)"}
+      X: (' ',1,0,0.5,5)
+      Y[0]: ('K',0,-250000,50000,250000)
+      Y[1]: ('_',0,1e+308,0,-1e+308)
+      Volts: ('K',0,0,0,-250000,50000,250000)
+      Log: 0 0 0
+      Text: "V" 1 (2.78503562945368,207031.25) ;Voltage transients
+   }
+}
+

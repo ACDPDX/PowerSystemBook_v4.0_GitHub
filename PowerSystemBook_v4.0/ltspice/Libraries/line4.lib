@@ -1,0 +1,1227 @@
+
+* ip = (inv(T))'*im
+* vp = T*vm
+* im = T'*ip
+* vm = inv(T)*vp
+* Lm = inv(T)*L*inv(T');
+* Cm = T'*C*T;
+* Rm = inv(T)*R*inv(T');
+
+
+* P = vp'*ip = vm'*im (power invariance)
+* vp=T*vm
+* annahme ip=S*im
+* p=vp'*ip
+* p=(T*vm)'(S*im)
+* p=vm'*T'*S*im=vm'*Im
+* T'*S have to be the eye-matrix I to let left and right side be the same
+* T'*S=I -> S=inv(T')=(inv(T))'
+* Probe:
+* P=vp'*ip=(Tvm)'*(inv(T))'*im = vm'*T'*inv(T)'*im = vm'*im (OK!) (T'*inv(T)'=1)
+*
+* dVp/dx = -R*Ip -L*d(Ip/dt)
+* und dIp/dx = -C*d(Vp/dt)
+* mit Vp = T*Vm und Ip = inv(T)'*Im
+* d(Vm/dx) = -inv(T)*R*inv(T)'*Im - inv(T)*L*inv(T)'*d(Im/dt) (inv(T)*R*inv(T)'=Rm , inv(T)*L*inv(T)'=Lm) UND
+* und d(Im/dx) = -T'*C*T*d(Vm/dt) (T'*C*T=Cm)
+
+
+
+* see also stalu_u110_o185mm2 matlab file for the DATA 
+.subckt stalu_u110_o185mm2_distributed_coupled_earth AIN BIN CIN AOUT BOUT COUT EIN EOUT params: length=1
+* ============================================================
+* 3PH + EARTH WIRE - untransposed - direct from ATP - FULL MODAL LTspice MODEL (CONSISTENT)
+* Includes bidirectional E + G transformation at BOTH ends
+* ============================================================
+* MATLAB: Donaumast__1sys_110kV_2x185_30_1x95_15_ATP_untransposed.m
+
+
+ 
+* ------------------------------------------------------------
+* MODES (from eigenanalysis)
+* ------------------------------------------------------------
+
+RAIN AIN AIN1 {0.156*l/2}
+RBIN BIN BIN1 {0.156*l/2}
+RCIN CIN CIN1 {0.156*l/2}
+REIN EIN EIN1 {0.352*l/2}
+
+RAOUT AOUT1 AOUT {0.156*l/2}
+RBOUT BOUT1 BOUT {0.156*l/2}
+RCOUT COUT1 COUT {0.156*l/2}
+REOUT EOUT1 EOUT {0.352*l/2}
+  
+V1 m1in1 m1in 0
+V2 m2in1 m2in 0
+V3 m3in1 m3in 0
+V4 m4in1 m4in 0
+ 
+V5 m1out1 m1out 0
+V6 m2out1 m2out 0
+V7 m3out1 m3out 0
+V8 m4out1 m4out 0
+
+* T-Lines, TD's Z's E,G Lines all from Matlab .m file!
+
+******************************************
+* Paste following lines from matlab file
+******************************************
+.param l={length}
+
+.param TD1=   4.992us
+.param TD2=   3.397us
+.param TD3=   3.393us
+.param TD4=   3.387us
+
+.param Z1=  1096.5Ohm
+.param Z2=   424.6Ohm
+.param Z3=   388.8Ohm
+.param Z4=   402.4Ohm
+
+T1 m1in 0 m1out1 0 Z0= 1096.5 TD={4.9915us*l}
+T2 m2in 0 m2out1 0 Z0=  424.6 TD={3.3968us*l}
+T3 m3in 0 m3out1 0 Z0=  388.8 TD={3.3934us*l}
+T4 m4in 0 m4out1 0 Z0=  402.4 TD={3.3867us*l}
+
+
+**************************************************
+* INPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Ein1 M1in1 0 VALUE={+0.4439*V(Ain1)+0.5498*V(Bin1)+0.5424*V(Cin1)+0.4590*V(Ein1)} tripdv=1 tripdt=1
+Ein2 M2in1 0 VALUE={+0.1991*V(Ain1)-0.8194*V(Bin1)+0.1469*V(Cin1)+0.5344*V(Ein1)} tripdv=1 tripdt=1
+Ein3 M3in1 0 VALUE={-0.3686*V(Ain1)-0.2423*V(Bin1)+0.8560*V(Cin1)-0.2907*V(Ein1)} tripdv=1 tripdt=1
+Ein4 M4in1 0 VALUE={+0.7860*V(Ain1)-0.2752*V(Bin1)+0.0314*V(Cin1)-0.5621*V(Ein1)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Eout1 M1out 0 VALUE={+0.4439*V(Aout1)+0.5498*V(Bout1)+0.5424*V(Cout1)+0.4590*V(Eout1)} tripdv=1 tripdt=1
+Eout2 M2out 0 VALUE={+0.1991*V(Aout1)-0.8194*V(Bout1)+0.1469*V(Cout1)+0.5344*V(Eout1)} tripdv=1 tripdt=1
+Eout3 M3out 0 VALUE={-0.3686*V(Aout1)-0.2423*V(Bout1)+0.8560*V(Cout1)-0.2907*V(Eout1)} tripdv=1 tripdt=1
+Eout4 M4out 0 VALUE={+0.7860*V(Aout1)-0.2752*V(Bout1)+0.0314*V(Cout1)-0.5621*V(Eout1)} tripdv=1 tripdt=1
+
+**************************************************
+* INPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_Ain Ain1 0 VALUE={+0.4439*I(V1)+0.1991*I(V2)-0.3686*I(V3)+0.7860*I(V4)} tripdv=1 tripdt=1
+G_Bin Bin1 0 VALUE={+0.5498*I(V1)-0.8194*I(V2)-0.2423*I(V3)-0.2752*I(V4)} tripdv=1 tripdt=1
+G_Cin Cin1 0 VALUE={+0.5424*I(V1)+0.1469*I(V2)+0.8560*I(V3)+0.0314*I(V4)} tripdv=1 tripdt=1
+G_Ein Ein1 0 VALUE={+0.4590*I(V1)+0.5344*I(V2)-0.2907*I(V3)-0.5621*I(V4)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_Aout 0  Aout  VALUE={+0.4439*I(V5)+0.1991*I(V6)-0.3686*I(V7)+0.7860*I(V8)} tripdv=1 tripdt=1
+G_Bout 0  Bout  VALUE={+0.5498*I(V5)-0.8194*I(V6)-0.2423*I(V7)-0.2752*I(V8)} tripdv=1 tripdt=1
+G_Cout 0  Cout  VALUE={+0.5424*I(V5)+0.1469*I(V6)+0.8560*I(V7)+0.0314*I(V8)} tripdv=1 tripdt=1
+G_Eout 0  Eout  VALUE={+0.4590*I(V5)+0.5344*I(V6)-0.2907*I(V7)-0.5621*I(V8)} tripdv=1 tripdt=1
+
+******************************************
+* End Paste lines from matlab file
+******************************************
+
+R_Aout Aout 0  1e9
+R_Bout Bout 0  1e9 
+R_Cout Cout 0  1e9
+R_Eout Eout 0  1e9
+
+R_Ain Ain 0 1e9
+R_Bin Bin 0 1e9 
+R_Cin Cin 0 1e9
+R_Ein Ein 0 1e9
+ 
+.ends
+
+
+.subckt stalu_u110_o185mm2_transposed_distributed_coupled_earth AIN BIN CIN AOUT BOUT COUT EIN EOUT params: length=1
+* ============================================================
+* 3PH + EARTH WIRE - FULL MODAL LTspice MODEL (CONSISTENT)
+* Includes bidirectional E + G transformation at BOTH ends
+* ============================================================
+
+RAIN AIN AIN1 {0.156*l/2}
+RBIN BIN BIN1 {0.156*l/2}
+RCIN CIN CIN1 {0.156*l/2}
+REIN EIN EIN1 {0.352*l/2}
+
+RAOUT AOUT1 AOUT {0.156*l/2}
+RBOUT BOUT1 BOUT {0.156*l/2}
+RCOUT COUT1 COUT {0.156*l/2}
+REOUT EOUT1 EOUT {0.352*l/2}
+  
+V1 m1in1 m1in 0
+V2 m2in1 m2in 0
+V3 m3in1 m3in 0
+V4 m4in1 m4in 0
+ 
+V5 m1out1 m1out 0
+V6 m2out1 m2out 0
+V7 m3out1 m3out 0
+V8 m4out1 m4out 0
+
+* T-Lines, TD's Z's E,G Lines all from Matlab .m file!
+
+******************************************
+* Paste following lines from matlab file
+******************************************
+ 
+.param l={length}
+ 
+* ------------------------------------------------------------
+* MODES (from eigenanalysis)
+* ------------------------------------------------------------
+
+* Z0=sqrt(L'/C')
+* tau=l*sqrt(L'*C')
+* L'=Z0*Tau/l
+* C'=tau/Z0/l 
+ 
+.param TD1 :    4.990us
+.param TD2 :    3.404us
+.param TD3 :    3.396us
+.param TD4 :    3.382us
+
+.param Z1 :   1097.5Ohm
+.param Z2 :    401.4Ohm
+.param Z3 :    373.0Ohm
+.param Z4 :    440.0Ohm
+
+T1 m1in 0 m1out1 0 Z0= 1097.5 TD={4.9896us*l}
+T2 m2in 0 m2out1 0 Z0=  401.4 TD={3.4045us*l}
+T3 m3in 0 m3out1 0 Z0=  373.0 TD={3.3963us*l}
+T4 m4in 0 m4out1 0 Z0=  440.0 TD={3.3818us*l}
+
+
+**************************************************
+* INPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Ein1 M1in1 0 VALUE={+0.4638*V(Ain1)+0.5447*V(Bin1)+0.5293*V(Cin1)+0.4592*V(Ein1)} tripdv=1 tripdt=1
+Ein2 M2in1 0 VALUE={+0.7251*V(Ain1)+0.1804*V(Bin1)-0.3936*V(Cin1)-0.5469*V(Ein1)} tripdv=1 tripdt=1
+Ein3 M3in1 0 VALUE={+0.3437*V(Ain1)-0.7364*V(Bin1)+0.5579*V(Cin1)-0.1717*V(Ein1)} tripdv=1 tripdt=1
+Ein4 M4in1 0 VALUE={+0.4100*V(Ain1)-0.4018*V(Bin1)-0.5568*V(Cin1)+0.6118*V(Ein1)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Eout1 M1out 0 VALUE={+0.4638*V(Aout1)+0.5447*V(Bout1)+0.5293*V(Cout1)+0.4592*V(Eout1)} tripdv=1 tripdt=1
+Eout2 M2out 0 VALUE={+0.7251*V(Aout1)+0.1804*V(Bout1)-0.3936*V(Cout1)-0.5469*V(Eout1)} tripdv=1 tripdt=1
+Eout3 M3out 0 VALUE={+0.3437*V(Aout1)-0.7364*V(Bout1)+0.5579*V(Cout1)-0.1717*V(Eout1)} tripdv=1 tripdt=1
+Eout4 M4out 0 VALUE={+0.4100*V(Aout1)-0.4018*V(Bout1)-0.5568*V(Cout1)+0.6118*V(Eout1)} tripdv=1 tripdt=1
+
+**************************************************
+* INPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_Ain Ain1 0 VALUE={+0.4638*I(V1)+0.7251*I(V2)+0.3437*I(V3)+0.4100*I(V4)} tripdv=1 tripdt=1
+G_Bin Bin1 0 VALUE={+0.5447*I(V1)+0.1804*I(V2)-0.7364*I(V3)-0.4018*I(V4)} tripdv=1 tripdt=1
+G_Cin Cin1 0 VALUE={+0.5293*I(V1)-0.3936*I(V2)+0.5579*I(V3)-0.5568*I(V4)} tripdv=1 tripdt=1
+G_Ein Ein1 0 VALUE={+0.4592*I(V1)-0.5469*I(V2)-0.1717*I(V3)+0.6118*I(V4)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_Aout 0  Aout  VALUE={+0.4638*I(V5)+0.7251*I(V6)+0.3437*I(V7)+0.4100*I(V8)} tripdv=1 tripdt=1
+G_Bout 0  Bout  VALUE={+0.5447*I(V5)+0.1804*I(V6)-0.7364*I(V7)-0.4018*I(V8)} tripdv=1 tripdt=1
+G_Cout 0  Cout  VALUE={+0.5293*I(V5)-0.3936*I(V6)+0.5579*I(V7)-0.5568*I(V8)} tripdv=1 tripdt=1
+G_Eout 0  Eout  VALUE={+0.4592*I(V5)-0.5469*I(V6)-0.1717*I(V7)+0.6118*I(V8)} tripdv=1 tripdt=1
+
+******************************************
+* End Paste lines from matlab file
+******************************************
+
+R_Aout Aout 0  1e9
+R_Bout Bout 0  1e9 
+R_Cout Cout 0  1e9
+R_Eout Eout 0  1e9
+
+R_Ain Ain 0 1e9
+R_Bin Bin 0 1e9 
+R_Cin Cin 0 1e9
+R_Ein Ein 0 1e9
+
+.ends
+
+.subckt stalu_u110_o185mm2_transposed_distributed_coupled_line2_2_line4_3phases_1system AIN BIN CIN AOUT BOUT COUT params: length=1
+* ============================================================
+* 3PH - 3Phase full transposed FULL MODAL LTspice MODEL (CONSISTENT)
+* Includes bidirectional E + G transformation at BOTH ends
+* ============================================================
+
+RAIN AIN AIN1 {0.156*l/2}
+RBIN BIN BIN1 {0.156*l/2}
+RCIN CIN CIN1 {0.156*l/2}
+
+
+RAOUT AOUT1 AOUT {0.156*l/2}
+RBOUT BOUT1 BOUT {0.156*l/2}
+RCOUT COUT1 COUT {0.156*l/2}
+
+  
+V1 m1in1 m1in 0
+V2 m2in1 m2in 0
+V3 m3in1 m3in 0
+
+ 
+V4 m1out1 m1out 0
+V5 m2out1 m2out 0
+V6 m3out1 m3out 0
+
+* T-Lines, TD's Z's E,G Lines all from Matlab .m file!
+
+******************************************
+* Paste following lines from matlab file
+******************************************
+ 
+.param l={length}
+
+.param TD1=   4.117us
+.param TD2=   3.583us
+.param TD3=   3.583us
+
+.param Z1=  1131.0Ohm
+.param Z2=   371.2Ohm
+.param Z3=   371.2Ohm
+
+T1 m1in 0 m1out1 0 Z0= 1131.0 TD={4.1169us*l}
+T2 m2in 0 m2out1 0 Z0=  371.2 TD={3.5825us*l}
+T3 m3in 0 m3out1 0 Z0=  371.2 TD={3.5825us*l}
+
+
+**************************************************
+* INPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Ein1 M1in1 0 VALUE={+0.5774*V(Ain1)+0.5774*V(Bin1)+0.5774*V(Cin1)} tripdv=1 tripdt=1
+Ein2 M2in1 0 VALUE={+0.7071*V(Ain1)-0.7071*V(Bin1)-0.0000*V(Cin1)} tripdv=1 tripdt=1
+Ein3 M3in1 0 VALUE={+0.4082*V(Ain1)+0.4082*V(Bin1)-0.8165*V(Cin1)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Eout1 M1out 0 VALUE={+0.5774*V(Aout1)+0.5774*V(Bout1)+0.5774*V(Cout1)} tripdv=1 tripdt=1
+Eout2 M2out 0 VALUE={+0.7071*V(Aout1)-0.7071*V(Bout1)-0.0000*V(Cout1)} tripdv=1 tripdt=1
+Eout3 M3out 0 VALUE={+0.4082*V(Aout1)+0.4082*V(Bout1)-0.8165*V(Cout1)} tripdv=1 tripdt=1
+
+**************************************************
+* INPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_Ain Ain1 0 VALUE={+0.5774*I(V1)+0.7071*I(V2)+0.4082*I(V3)} tripdv=1 tripdt=1
+G_Bin Bin1 0 VALUE={+0.5774*I(V1)-0.7071*I(V2)+0.4082*I(V3)} tripdv=1 tripdt=1
+G_Cin Cin1 0 VALUE={+0.5774*I(V1)-0.0000*I(V2)-0.8165*I(V3)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_Aout 0  Aout  VALUE={+0.5774*I(V5)+0.7071*I(V6)+0.4082*I(V7)} tripdv=1 tripdt=1
+G_Bout 0  Bout  VALUE={+0.5774*I(V5)-0.7071*I(V6)+0.4082*I(V7)} tripdv=1 tripdt=1
+G_Cout 0  Cout  VALUE={+0.5774*I(V5)-0.0000*I(V6)-0.8165*I(V7)} tripdv=1 tripdt=1
+
+******************************************
+* End Paste lines from matlab file
+******************************************
+
+R_Aout Aout 0  1e9
+R_Bout Bout 0  1e9 
+R_Cout Cout 0  1e9
+
+
+R_Ain Ain 0 1e9
+R_Bin Bin 0 1e9 
+R_Cin Cin 0 1e9
+
+
+.ends
+
+.subckt stalu_u110_o185mm2_transposed_distributed_coupled_line2_2_line4_4phases_1system AIN BIN CIN AOUT BOUT COUT EIN EOUT params: length=1
+* ============================================================
+* 3PH + EARTH WIRE - FULL MODAL LTspice MODEL (CONSISTENT)
+* Includes bidirectional E + G transformation at BOTH ends
+* ============================================================
+
+RAIN AIN AIN1 {0.156*l/2}
+RBIN BIN BIN1 {0.156*l/2}
+RCIN CIN CIN1 {0.156*l/2}
+REIN EIN EIN1 {0.352*l/2}
+
+RAOUT AOUT1 AOUT {0.156*l/2}
+RBOUT BOUT1 BOUT {0.156*l/2}
+RCOUT COUT1 COUT {0.156*l/2}
+REOUT EOUT1 EOUT {0.352*l/2}
+
+  
+V1 m1in1 m1in 0
+V2 m2in1 m2in 0
+V3 m3in1 m3in 0
+V4 m4in1 m4in 0
+ 
+V5 m1out1 m1out 0
+V6 m2out1 m2out 0
+V7 m3out1 m3out 0
+V8 m4out1 m4out 0
+
+* T-Lines, TD's Z's E,G Lines all from Matlab .m file!
+
+******************************************
+* Paste following lines from matlab file
+******************************************
+
+.param l={length}
+
+.param TD1=   4.339us
+.param TD2=   3.583us
+.param TD3=   3.576us
+.param TD4=   3.264us
+
+.param Z1=  1223.7Ohm
+.param Z2=   371.3Ohm
+.param Z3=   376.9Ohm
+.param Z4=   545.6Ohm
+
+T1 m1in 0 m1out1 0 Z0= 1223.7 TD={4.3387us*l}
+T2 m2in 0 m2out1 0 Z0=  371.3 TD={3.5826us*l}
+T3 m3in 0 m3out1 0 Z0=  376.9 TD={3.5761us*l}
+T4 m4in 0 m4out1 0 Z0=  545.6 TD={3.2636us*l}
+
+
+**************************************************
+* INPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Ein1 M1in1 0 VALUE={-0.2753*V(Ain1)-0.4466*V(Bin1)-0.4180*V(Cin1)-0.8012*V(Ein1)} tripdv=1 tripdt=1
+Ein2 M2in1 0 VALUE={-0.1649*V(Ain1)-0.6180*V(Bin1)+0.7687*V(Cin1)+0.0080*V(Ein1)} tripdv=1 tripdt=1
+Ein3 M3in1 0 VALUE={+0.8177*V(Ain1)-0.5288*V(Bin1)-0.2501*V(Cin1)+0.0078*V(Ein1)} tripdv=1 tripdt=1
+Ein4 M4in1 0 VALUE={-0.3590*V(Ain1)-0.3169*V(Bin1)-0.3500*V(Cin1)+0.8540*V(Ein1)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Eout1 M1out 0 VALUE={-0.2753*V(Aout1)-0.4466*V(Bout1)-0.4180*V(Cout1)-0.8012*V(Eout1)} tripdv=1 tripdt=1
+Eout2 M2out 0 VALUE={-0.1649*V(Aout1)-0.6180*V(Bout1)+0.7687*V(Cout1)+0.0080*V(Eout1)} tripdv=1 tripdt=1
+Eout3 M3out 0 VALUE={+0.8177*V(Aout1)-0.5288*V(Bout1)-0.2501*V(Cout1)+0.0078*V(Eout1)} tripdv=1 tripdt=1
+Eout4 M4out 0 VALUE={-0.3590*V(Aout1)-0.3169*V(Bout1)-0.3500*V(Cout1)+0.8540*V(Eout1)} tripdv=1 tripdt=1
+
+**************************************************
+* INPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_Ain Ain1 0 VALUE={-0.2753*I(V1)-0.1649*I(V2)+0.8177*I(V3)-0.3590*I(V4)} tripdv=1 tripdt=1
+G_Bin Bin1 0 VALUE={-0.4466*I(V1)-0.6180*I(V2)-0.5288*I(V3)-0.3169*I(V4)} tripdv=1 tripdt=1
+G_Cin Cin1 0 VALUE={-0.4180*I(V1)+0.7687*I(V2)-0.2501*I(V3)-0.3500*I(V4)} tripdv=1 tripdt=1
+G_Ein Ein1 0 VALUE={-0.8012*I(V1)+0.0080*I(V2)+0.0078*I(V3)+0.8540*I(V4)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_Aout 0  Aout  VALUE={-0.2753*I(V5)-0.1649*I(V6)+0.8177*I(V7)-0.3590*I(V8)} tripdv=1 tripdt=1
+G_Bout 0  Bout  VALUE={-0.4466*I(V5)-0.6180*I(V6)-0.5288*I(V7)-0.3169*I(V8)} tripdv=1 tripdt=1
+G_Cout 0  Cout  VALUE={-0.4180*I(V5)+0.7687*I(V6)-0.2501*I(V7)-0.3500*I(V8)} tripdv=1 tripdt=1
+G_Eout 0  Eout  VALUE={-0.8012*I(V5)+0.0080*I(V6)+0.0078*I(V7)+0.8540*I(V8)} tripdv=1 tripdt=1
+
+******************************************
+* End Paste lines from matlab file
+******************************************
+
+R_Aout Aout 0  1e9
+R_Bout Bout 0  1e9 
+R_Cout Cout 0  1e9
+R_Eout Eout 0  1e9
+
+R_Ain Ain 0 1e9
+R_Bin Bin 0 1e9 
+R_Cin Cin 0 1e9
+R_Ein Ein 0 1e9
+
+.ends
+
+
+.subckt stalu_u110_o185mm2_transposed_distributed_coupled_line2_2_line4_3phases_2systems A1IN B1IN C1IN A2IN B2IN C2IN A1OUT B1OUT C1OUT A2OUT B2OUT C2OUT params: length=1
+* ============================================================
+* 6PH - 6Phase full transposed FULL MODAL LTspice MODEL (CONSISTENT)
+* Includes bidirectional E + G transformation at BOTH ends
+* ============================================================
+
+RAIN1 A1IN A1IN1 {0.156*l/2}
+RBIN1 B1IN B1IN1 {0.156*l/2}
+RCIN1 C1IN C1IN1 {0.156*l/2}
+RAIN2 A2IN A2IN1 {0.156*l/2}
+RBIN2 B2IN B2IN1 {0.156*l/2}
+RCIN2 C2IN C2IN1 {0.156*l/2}
+
+RAOUT1 A1OUT1 A1OUT {0.156*l/2}
+RBOUT1 B1OUT1 B1OUT {0.156*l/2}
+RCOUT1 C1OUT1 C1OUT {0.156*l/2}
+RAOUT2 A2OUT1 A2OUT {0.156*l/2}
+RBOUT2 B2OUT1 B2OUT {0.156*l/2}
+RCOUT2 C2OUT1 C2OUT {0.156*l/2}
+  
+V1 m1in1 m1in 0
+V2 m2in1 m2in 0
+V3 m3in1 m3in 0
+V4 m4in1 m4in 0
+V5 m5in1 m5in 0
+V6 m6in1 m6in 0
+
+ 
+V7 m1out1 m1out 0
+V8 m2out1 m2out 0
+V9 m3out1 m3out 0
+V10 m4out1 m4out 0
+V11 m5out1 m5out 0
+V12 m6out1 m6out 0
+
+* T-Lines, TD's Z's E,G Lines all from Matlab .m file!
+
+******************************************
+* Paste following lines from matlab file
+******************************************
+
+.param l={length}
+
+.param TD1=   4.068us
+.param TD2=   3.670us
+.param TD3=   3.588us
+.param TD4=   3.588us
+.param TD5=   3.577us
+.param TD6=   3.577us
+
+.param Z1=  1587.3Ohm
+.param Z2=   778.0Ohm
+.param Z3=   395.6Ohm
+.param Z4=   395.6Ohm
+.param Z5=   379.0Ohm
+.param Z6=   379.0Ohm
+
+T1 m1in 0 m1out1 0 Z0= 1587.3 TD={4.0678us*l}
+T2 m2in 0 m2out1 0 Z0=  778.0 TD={3.6701us*l}
+T3 m3in 0 m3out1 0 Z0=  395.6 TD={3.5885us*l}
+T4 m4in 0 m4out1 0 Z0=  395.6 TD={3.5885us*l}
+T5 m5in 0 m5out1 0 Z0=  379.0 TD={3.5766us*l}
+T6 m6in 0 m6out1 0 Z0=  379.0 TD={3.5766us*l}
+
+
+**************************************************
+* INPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Ein1 M1in1 0 VALUE={+0.4082*V(A1in1)+0.4082*V(B1in1)+0.4082*V(C1in1)+0.4082*V(A2in1)+0.4082*V(B2in1)+0.4082*V(C2in1)} tripdv=1 tripdt=1
+Ein2 M2in1 0 VALUE={+0.4082*V(A1in1)+0.4082*V(B1in1)+0.4082*V(C1in1)-0.4082*V(A2in1)-0.4082*V(B2in1)-0.4082*V(C2in1)} tripdv=1 tripdt=1
+Ein3 M3in1 0 VALUE={-0.5774*V(A1in1)+0.1079*V(B1in1)+0.4695*V(C1in1)-0.5774*V(A2in1)+0.1079*V(B2in1)+0.4695*V(C2in1)} tripdv=1 tripdt=1
+Ein4 M4in1 0 VALUE={+0.0000*V(A1in1)+0.5317*V(B1in1)-0.5317*V(C1in1)-0.0000*V(A2in1)+0.5317*V(B2in1)-0.5317*V(C2in1)} tripdv=1 tripdt=1
+Ein5 M5in1 0 VALUE={-0.5774*V(A1in1)+0.3968*V(B1in1)+0.1806*V(C1in1)+0.5774*V(A2in1)-0.3968*V(B2in1)-0.1806*V(C2in1)} tripdv=1 tripdt=1
+Ein6 M6in1 0 VALUE={-0.0000*V(A1in1)-0.5116*V(B1in1)+0.5116*V(C1in1)+0.0000*V(A2in1)+0.5116*V(B2in1)-0.5116*V(C2in1)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Eout1 M1out 0 VALUE={+0.4082*V(A1out1)+0.4082*V(B1out1)+0.4082*V(C1out1)+0.4082*V(A2out1)+0.4082*V(B2out1)+0.4082*V(C2out1)} tripdv=1 tripdt=1
+Eout2 M2out 0 VALUE={+0.4082*V(A1out1)+0.4082*V(B1out1)+0.4082*V(C1out1)-0.4082*V(A2out1)-0.4082*V(B2out1)-0.4082*V(C2out1)} tripdv=1 tripdt=1
+Eout3 M3out 0 VALUE={-0.5774*V(A1out1)+0.1079*V(B1out1)+0.4695*V(C1out1)-0.5774*V(A2out1)+0.1079*V(B2out1)+0.4695*V(C2out1)} tripdv=1 tripdt=1
+Eout4 M4out 0 VALUE={+0.0000*V(A1out1)+0.5317*V(B1out1)-0.5317*V(C1out1)-0.0000*V(A2out1)+0.5317*V(B2out1)-0.5317*V(C2out1)} tripdv=1 tripdt=1
+Eout5 M5out 0 VALUE={-0.5774*V(A1out1)+0.3968*V(B1out1)+0.1806*V(C1out1)+0.5774*V(A2out1)-0.3968*V(B2out1)-0.1806*V(C2out1)} tripdv=1 tripdt=1
+Eout6 M6out 0 VALUE={-0.0000*V(A1out1)-0.5116*V(B1out1)+0.5116*V(C1out1)+0.0000*V(A2out1)+0.5116*V(B2out1)-0.5116*V(C2out1)} tripdv=1 tripdt=1
+
+**************************************************
+* INPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_A1in A1in1 0 VALUE={+0.4082*I(V1)+0.4082*I(V2)-0.5774*I(V3)+0.0000*I(V4)-0.5774*I(V5)-0.0000*I(V6)} tripdv=1 tripdt=1
+G_B1in B1in1 0 VALUE={+0.4082*I(V1)+0.4082*I(V2)+0.1079*I(V3)+0.5317*I(V4)+0.3968*I(V5)-0.5116*I(V6)} tripdv=1 tripdt=1
+G_C1in C1in1 0 VALUE={+0.4082*I(V1)+0.4082*I(V2)+0.4695*I(V3)-0.5317*I(V4)+0.1806*I(V5)+0.5116*I(V6)} tripdv=1 tripdt=1
+G_A2in A2in1 0 VALUE={+0.4082*I(V1)-0.4082*I(V2)-0.5774*I(V3)-0.0000*I(V4)+0.5774*I(V5)+0.0000*I(V6)} tripdv=1 tripdt=1
+G_B2in B2in1 0 VALUE={+0.4082*I(V1)-0.4082*I(V2)+0.1079*I(V3)+0.5317*I(V4)-0.3968*I(V5)+0.5116*I(V6)} tripdv=1 tripdt=1
+G_C2in C2in1 0 VALUE={+0.4082*I(V1)-0.4082*I(V2)+0.4695*I(V3)-0.5317*I(V4)-0.1806*I(V5)-0.5116*I(V6)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_A1out 0  A1out  VALUE={+0.4082*I(V7)+0.4082*I(V8)-0.5774*I(V9)+0.0000*I(V10)-0.5774*I(V11)-0.0000*I(V12)} tripdv=1 tripdt=1
+G_B1out 0  B1out  VALUE={+0.4082*I(V7)+0.4082*I(V8)+0.1079*I(V9)+0.5317*I(V10)+0.3968*I(V11)-0.5116*I(V12)} tripdv=1 tripdt=1
+G_C1out 0  C1out  VALUE={+0.4082*I(V7)+0.4082*I(V8)+0.4695*I(V9)-0.5317*I(V10)+0.1806*I(V11)+0.5116*I(V12)} tripdv=1 tripdt=1
+G_A2out 0  A2out  VALUE={+0.4082*I(V7)-0.4082*I(V8)-0.5774*I(V9)-0.0000*I(V10)+0.5774*I(V11)+0.0000*I(V12)} tripdv=1 tripdt=1
+G_B2out 0  B2out  VALUE={+0.4082*I(V7)-0.4082*I(V8)+0.1079*I(V9)+0.5317*I(V10)-0.3968*I(V11)+0.5116*I(V12)} tripdv=1 tripdt=1
+G_C2out 0  C2out  VALUE={+0.4082*I(V7)-0.4082*I(V8)+0.4695*I(V9)-0.5317*I(V10)-0.1806*I(V11)-0.5116*I(V12)} tripdv=1 tripdt=1
+
+******************************************
+* End Paste lines from matlab file
+******************************************
+
+R_Aout1 A1out 0  1e9
+R_Bout2 B1out 0  1e9 
+R_Cout3 C1out 0  1e9
+R_Aout4 A2out 0  1e9
+R_Bout5 B2out 0  1e9
+R_Cout6 C2out 0 1e9
+
+R_A1in A1in 0 1e9
+R_B1in B1in 0 1e9 
+R_C1in C1in 0 1e9
+R_A2in A2in 0 1e9
+R_B2in B2in 0 1e9 
+R_C2in C2in 0 1e9
+
+.ends
+
+
+.subckt stalu_u110_o185mm2_transposed_distributed_coupled_line2_2_line4_4phases_2systems A1IN B1IN C1IN A2IN B2IN C2IN A1OUT B1OUT C1OUT A2OUT B2OUT C2OUT Ein Eout params: length=1
+* ============================================================
+* 6PH - 6Phase + earth wire full transposed FULL MODAL LTspice MODEL (CONSISTENT)
+* Includes bidirectional E + G transformation at BOTH ends
+* ============================================================
+
+RAIN1 A1IN A1IN1 {0.156*l/2}
+RBIN1 B1IN B1IN1 {0.156*l/2}
+RCIN1 C1IN C1IN1 {0.156*l/2}
+RAIN2 A2IN A2IN1 {0.156*l/2}
+RBIN2 B2IN B2IN1 {0.156*l/2}
+RCIN2 C2IN C2IN1 {0.156*l/2}
+REIN EIN EIN1 {0.352*l/2}
+
+
+RAOUT1 A1OUT1 A1OUT {0.156*l/2}
+RBOUT1 B1OUT1 B1OUT {0.156*l/2}
+RCOUT1 C1OUT1 C1OUT {0.156*l/2}
+RAOUT2 A2OUT1 A2OUT {0.156*l/2}
+RBOUT2 B2OUT1 B2OUT {0.156*l/2}
+RCOUT2 C2OUT1 C2OUT {0.156*l/2}
+REOUT EOUT1 EOUT {0.352*l/2}
+  
+V1 m1in1 m1in 0
+V2 m2in1 m2in 0
+V3 m3in1 m3in 0
+V4 m4in1 m4in 0
+V5 m5in1 m5in 0
+V6 m6in1 m6in 0
+V7 m7in1 m7in 0
+ 
+V8 m1out1 m1out 0
+V9 m2out1 m2out 0
+V10 m3out1 m3out 0
+V11 m4out1 m4out 0
+V12 m5out1 m5out 0
+V13 m6out1 m6out 0
+V14 m7out1 m7out 0
+
+* T-Lines, TD's Z's E,G Lines all from Matlab .m file!
+
+******************************************
+* Paste following lines from matlab file
+******************************************
+ 
+.param l={length}
+
+.param TD1=   4.211us
+.param TD2=   3.670us
+.param TD3=   3.588us
+.param TD4=   3.577us
+.param TD5=   3.577us
+.param TD6=   3.575us
+.param TD7=   3.052us
+
+.param Z1=  1646.9Ohm
+.param Z2=   778.0Ohm
+.param Z3=   372.0Ohm
+.param Z4=   372.0Ohm
+.param Z5=   370.5Ohm
+.param Z6=   390.1Ohm
+.param Z7=   624.8Ohm
+
+T1 m1in 0 m1out1 0 Z0= 1646.9 TD={4.2115us*l}
+T2 m2in 0 m2out1 0 Z0=  778.0 TD={3.6701us*l}
+T3 m3in 0 m3out1 0 Z0=  372.0 TD={3.5885us*l}
+T4 m4in 0 m4out1 0 Z0=  372.0 TD={3.5770us*l}
+T5 m5in 0 m5out1 0 Z0=  370.5 TD={3.5766us*l}
+T6 m6in 0 m6out1 0 Z0=  390.1 TD={3.5752us*l}
+T7 m7in 0 m7out1 0 Z0=  624.8 TD={3.0524us*l}
+
+
+**************************************************
+* INPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Ein1 M1in1 0 VALUE={+0.0864*V(A1in1)+0.3036*V(B1in1)+0.3120*V(C1in1)+0.0864*V(A2in1)+0.3120*V(B2in1)+0.3036*V(C2in1)+0.9583*V(Ein1)} tripdv=1 tripdt=1
+Ein2 M2in1 0 VALUE={-0.4082*V(A1in1)-0.4082*V(B1in1)-0.4082*V(C1in1)+0.4082*V(A2in1)+0.4082*V(B2in1)+0.4082*V(C2in1)+0.0000*V(Ein1)} tripdv=1 tripdt=1
+Ein3 M3in1 0 VALUE={+0.0000*V(A1in1)+0.5000*V(B1in1)-0.5000*V(C1in1)-0.0000*V(A2in1)+0.5000*V(B2in1)-0.5000*V(C2in1)+0.0000*V(Ein1)} tripdv=1 tripdt=1
+Ein4 M4in1 0 VALUE={+0.0917*V(A1in1)+0.4614*V(B1in1)-0.5294*V(C1in1)+0.0917*V(A2in1)-0.5294*V(B2in1)+0.4614*V(C2in1)-0.0115*V(Ein1)} tripdv=1 tripdt=1
+Ein5 M5in1 0 VALUE={+0.5774*V(A1in1)-0.2887*V(B1in1)-0.2887*V(C1in1)-0.5774*V(A2in1)+0.2887*V(B2in1)+0.2887*V(C2in1)-0.0000*V(Ein1)} tripdv=1 tripdt=1
+Ein6 M6in1 0 VALUE={-0.5860*V(A1in1)+0.3583*V(B1in1)+0.2097*V(C1in1)-0.5860*V(A2in1)+0.2097*V(B2in1)+0.3583*V(C2in1)-0.0456*V(Ein1)} tripdv=1 tripdt=1
+Ein7 M7in1 0 VALUE={-0.2843*V(A1in1)-0.1946*V(B1in1)-0.2472*V(C1in1)-0.2843*V(A2in1)-0.2472*V(B2in1)-0.1946*V(C2in1)+0.9556*V(Ein1)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Eout1 M1out 0 VALUE={+0.0864*V(A1out1)+0.3036*V(B1out1)+0.3120*V(C1out1)+0.0864*V(A2out1)+0.3120*V(B2out1)+0.3036*V(C2out1)+0.9583*V(Eout1)} tripdv=1 tripdt=1
+Eout2 M2out 0 VALUE={-0.4082*V(A1out1)-0.4082*V(B1out1)-0.4082*V(C1out1)+0.4082*V(A2out1)+0.4082*V(B2out1)+0.4082*V(C2out1)+0.0000*V(Eout1)} tripdv=1 tripdt=1
+Eout3 M3out 0 VALUE={+0.0000*V(A1out1)+0.5000*V(B1out1)-0.5000*V(C1out1)-0.0000*V(A2out1)+0.5000*V(B2out1)-0.5000*V(C2out1)+0.0000*V(Eout1)} tripdv=1 tripdt=1
+Eout4 M4out 0 VALUE={+0.0917*V(A1out1)+0.4614*V(B1out1)-0.5294*V(C1out1)+0.0917*V(A2out1)-0.5294*V(B2out1)+0.4614*V(C2out1)-0.0115*V(Eout1)} tripdv=1 tripdt=1
+Eout5 M5out 0 VALUE={+0.5774*V(A1out1)-0.2887*V(B1out1)-0.2887*V(C1out1)-0.5774*V(A2out1)+0.2887*V(B2out1)+0.2887*V(C2out1)-0.0000*V(Eout1)} tripdv=1 tripdt=1
+Eout6 M6out 0 VALUE={-0.5860*V(A1out1)+0.3583*V(B1out1)+0.2097*V(C1out1)-0.5860*V(A2out1)+0.2097*V(B2out1)+0.3583*V(C2out1)-0.0456*V(Eout1)} tripdv=1 tripdt=1
+Eout7 M7out 0 VALUE={-0.2843*V(A1out1)-0.1946*V(B1out1)-0.2472*V(C1out1)-0.2843*V(A2out1)-0.2472*V(B2out1)-0.1946*V(C2out1)+0.9556*V(Eout1)} tripdv=1 tripdt=1
+
+**************************************************
+* INPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_A1in A1in1 0 VALUE={+0.0864*I(V1)-0.4082*I(V2)+0.0000*I(V3)+0.0917*I(V4)+0.5774*I(V5)-0.5860*I(V6)-0.2843*I(V7)} tripdv=1 tripdt=1
+G_B1in B1in1 0 VALUE={+0.3036*I(V1)-0.4082*I(V2)+0.5000*I(V3)+0.4614*I(V4)-0.2887*I(V5)+0.3583*I(V6)-0.1946*I(V7)} tripdv=1 tripdt=1
+G_C1in C1in1 0 VALUE={+0.3120*I(V1)-0.4082*I(V2)-0.5000*I(V3)-0.5294*I(V4)-0.2887*I(V5)+0.2097*I(V6)-0.2472*I(V7)} tripdv=1 tripdt=1
+G_A2in A2in1 0 VALUE={+0.0864*I(V1)+0.4082*I(V2)-0.0000*I(V3)+0.0917*I(V4)-0.5774*I(V5)-0.5860*I(V6)-0.2843*I(V7)} tripdv=1 tripdt=1
+G_B2in B2in1 0 VALUE={+0.3120*I(V1)+0.4082*I(V2)+0.5000*I(V3)-0.5294*I(V4)+0.2887*I(V5)+0.2097*I(V6)-0.2472*I(V7)} tripdv=1 tripdt=1
+G_C2in C2in1 0 VALUE={+0.3036*I(V1)+0.4082*I(V2)-0.5000*I(V3)+0.4614*I(V4)+0.2887*I(V5)+0.3583*I(V6)-0.1946*I(V7)} tripdv=1 tripdt=1
+G_Ein Ein1 0 VALUE={+0.9583*I(V1)+0.0000*I(V2)+0.0000*I(V3)-0.0115*I(V4)-0.0000*I(V5)-0.0456*I(V6)+0.9556*I(V7)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_A1out 0  A1out  VALUE={+0.0864*I(V8)-0.4082*I(V9)+0.0000*I(V10)+0.0917*I(V11)+0.5774*I(V12)-0.5860*I(V13)-0.2843*I(V14)} tripdv=1 tripdt=1
+G_B1out 0  B1out  VALUE={+0.3036*I(V8)-0.4082*I(V9)+0.5000*I(V10)+0.4614*I(V11)-0.2887*I(V12)+0.3583*I(V13)-0.1946*I(V14)} tripdv=1 tripdt=1
+G_C1out 0  C1out  VALUE={+0.3120*I(V8)-0.4082*I(V9)-0.5000*I(V10)-0.5294*I(V11)-0.2887*I(V12)+0.2097*I(V13)-0.2472*I(V14)} tripdv=1 tripdt=1
+G_A2out 0  A2out  VALUE={+0.0864*I(V8)+0.4082*I(V9)-0.0000*I(V10)+0.0917*I(V11)-0.5774*I(V12)-0.5860*I(V13)-0.2843*I(V14)} tripdv=1 tripdt=1
+G_B2out 0  B2out  VALUE={+0.3120*I(V8)+0.4082*I(V9)+0.5000*I(V10)-0.5294*I(V11)+0.2887*I(V12)+0.2097*I(V13)-0.2472*I(V14)} tripdv=1 tripdt=1
+G_C2out 0  C2out  VALUE={+0.3036*I(V8)+0.4082*I(V9)-0.5000*I(V10)+0.4614*I(V11)+0.2887*I(V12)+0.3583*I(V13)-0.1946*I(V14)} tripdv=1 tripdt=1
+G_Eout 0  Eout  VALUE={+0.9583*I(V8)+0.0000*I(V9)+0.0000*I(V10)-0.0115*I(V11)-0.0000*I(V12)-0.0456*I(V13)+0.9556*I(V14)} tripdv=1 tripdt=1
+
+******************************************
+* End Paste lines from matlab file
+******************************************
+
+
+R_Aout1 A1out 0  1e9
+R_Bout2 B1out 0  1e9 
+R_Cout3 C1out 0  1e9
+R_Aout4 A2out 0  1e9
+R_Bout5 B2out 0  1e9 
+R_Cout6 C2out 0 1e9
+R_Eout Eout 0 1e9
+
+
+R_A1in A1in 0 1e9
+R_B1in B1in 0 1e9 
+R_C1in C1in 0 1e9
+R_A2in A2in 0 1e9
+R_B2in B2in 0 1e9 
+R_C2in C2in 0 1e9
+R_Ein Ein 0 1e9
+
+.ends
+
+.subckt stalu_u110_o185mm2_transposed_distributed_coupled_line2_2_line4_4phases_2systems_LTRA A1IN B1IN C1IN A2IN B2IN C2IN A1OUT B1OUT C1OUT A2OUT B2OUT C2OUT Ein Eout params: length=1
+* ============================================================
+* 6PH - 6Phase with earth wire full transposed FULL MODAL LTspice MODEL (CONSISTENT)
+* Includes bidirectional E + G transformation at BOTH ends
+* with LTRA Model instead of TLINE model
+* ============================================================
+
+RAIN1 A1IN A1IN1 {1u*l/2}
+RBIN1 B1IN B1IN1 {1u*l/2}
+RCIN1 C1IN C1IN1 {1u*l/2}
+RAIN2 A2IN A2IN1 {1u*l/2}
+RBIN2 B2IN B2IN1 {1u*l/2}
+RCIN2 C2IN C2IN1 {1u*l/2}
+REIN EIN EIN1 {1u*l/2}
+
+
+RAOUT1 A1OUT1 A1OUT {1u*l/2}
+RBOUT1 B1OUT1 B1OUT {1u*l/2}
+RCOUT1 C1OUT1 C1OUT {1u*l/2}
+RAOUT2 A2OUT1 A2OUT {1u*l/2}
+RBOUT2 B2OUT1 B2OUT {1u*l/2}
+RCOUT2 C2OUT1 C2OUT {1u*l/2}
+REOUT EOUT1 EOUT {1u*l/2}
+
+  
+V1 m1in1 m1in 0
+V2 m2in1 m2in 0
+V3 m3in1 m3in 0
+V4 m4in1 m4in 0
+V5 m5in1 m5in 0
+V6 m6in1 m6in 0
+V7 m7in1 m7in 0
+ 
+V8 m1out1 m1out 0
+V9 m2out1 m2out 0
+V10 m3out1 m3out 0
+V11 m4out1 m4out 0
+V12 m5out1 m5out 0
+V13 m6out1 m6out 0
+V14 m7out1 m7out 0
+
+* LTRA-Lines, TD's Z's E,G Lines all from Matlab .m file!
+
+******************************************
+* Paste following lines from matlab file
+******************************************
+
+.param l={length}
+
+.param TD1=   4.211us
+.param TD2=   3.670us
+.param TD3=   3.588us
+.param TD4=   3.577us
+.param TD5=   3.577us
+.param TD6=   3.575us
+.param TD7=   3.052us
+
+.param Z1=  1646.9Ohm
+.param Z2=   778.0Ohm
+.param Z3=   372.0Ohm
+.param Z4=   372.0Ohm
+.param Z5=   370.5Ohm
+.param Z6=   390.1Ohm
+.param Z7=   624.8Ohm
+
+O1 m1in 0 m1out1 0 LTLine1
+.model LTLine1  LTRA(len={length} R=6.497e-01 L=6.936e-03 C=2.557e-09) 
+O2 m2in 0 m2out1 0 LTLine2
+.model LTLine2  LTRA(len={length} R=2.089e-01 L=2.855e-03 C=4.717e-09) 
+O3 m3in 0 m3out1 0 LTLine3
+.model LTLine3  LTRA(len={length} R=1.560e-01 L=1.335e-03 C=9.645e-09) 
+O4 m4in 0 m4out1 0 LTLine4
+.model LTLine4  LTRA(len={length} R=1.566e-01 L=1.331e-03 C=9.615e-09) 
+O5 m5in 0 m5out1 0 LTLine5
+.model LTLine5  LTRA(len={length} R=1.560e-01 L=1.325e-03 C=9.655e-09) 
+O6 m6in 0 m6out1 0 LTLine6
+.model LTLine6  LTRA(len={length} R=1.619e-01 L=1.395e-03 C=9.164e-09) 
+O7 m7in 0 m7out1 0 LTLine7
+.model LTLine7  LTRA(len={length} R=3.903e-01 L=1.907e-03 C=4.885e-09) 
+
+
+**************************************************
+* INPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Ein1 M1in1 0 VALUE={+0.0864*V(A1in1)+0.3036*V(B1in1)+0.3120*V(C1in1)+0.0864*V(A2in1)+0.3120*V(B2in1)+0.3036*V(C2in1)+0.9583*V(Ein1)} tripdv=1 tripdt=1
+Ein2 M2in1 0 VALUE={-0.4082*V(A1in1)-0.4082*V(B1in1)-0.4082*V(C1in1)+0.4082*V(A2in1)+0.4082*V(B2in1)+0.4082*V(C2in1)+0.0000*V(Ein1)} tripdv=1 tripdt=1
+Ein3 M3in1 0 VALUE={+0.0000*V(A1in1)+0.5000*V(B1in1)-0.5000*V(C1in1)-0.0000*V(A2in1)+0.5000*V(B2in1)-0.5000*V(C2in1)+0.0000*V(Ein1)} tripdv=1 tripdt=1
+Ein4 M4in1 0 VALUE={+0.0917*V(A1in1)+0.4614*V(B1in1)-0.5294*V(C1in1)+0.0917*V(A2in1)-0.5294*V(B2in1)+0.4614*V(C2in1)-0.0115*V(Ein1)} tripdv=1 tripdt=1
+Ein5 M5in1 0 VALUE={+0.5774*V(A1in1)-0.2887*V(B1in1)-0.2887*V(C1in1)-0.5774*V(A2in1)+0.2887*V(B2in1)+0.2887*V(C2in1)-0.0000*V(Ein1)} tripdv=1 tripdt=1
+Ein6 M6in1 0 VALUE={-0.5860*V(A1in1)+0.3583*V(B1in1)+0.2097*V(C1in1)-0.5860*V(A2in1)+0.2097*V(B2in1)+0.3583*V(C2in1)-0.0456*V(Ein1)} tripdv=1 tripdt=1
+Ein7 M7in1 0 VALUE={-0.2843*V(A1in1)-0.1946*V(B1in1)-0.2472*V(C1in1)-0.2843*V(A2in1)-0.2472*V(B2in1)-0.1946*V(C2in1)+0.9556*V(Ein1)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Eout1 M1out 0 VALUE={+0.0864*V(A1out1)+0.3036*V(B1out1)+0.3120*V(C1out1)+0.0864*V(A2out1)+0.3120*V(B2out1)+0.3036*V(C2out1)+0.9583*V(Eout1)} tripdv=1 tripdt=1
+Eout2 M2out 0 VALUE={-0.4082*V(A1out1)-0.4082*V(B1out1)-0.4082*V(C1out1)+0.4082*V(A2out1)+0.4082*V(B2out1)+0.4082*V(C2out1)+0.0000*V(Eout1)} tripdv=1 tripdt=1
+Eout3 M3out 0 VALUE={+0.0000*V(A1out1)+0.5000*V(B1out1)-0.5000*V(C1out1)-0.0000*V(A2out1)+0.5000*V(B2out1)-0.5000*V(C2out1)+0.0000*V(Eout1)} tripdv=1 tripdt=1
+Eout4 M4out 0 VALUE={+0.0917*V(A1out1)+0.4614*V(B1out1)-0.5294*V(C1out1)+0.0917*V(A2out1)-0.5294*V(B2out1)+0.4614*V(C2out1)-0.0115*V(Eout1)} tripdv=1 tripdt=1
+Eout5 M5out 0 VALUE={+0.5774*V(A1out1)-0.2887*V(B1out1)-0.2887*V(C1out1)-0.5774*V(A2out1)+0.2887*V(B2out1)+0.2887*V(C2out1)-0.0000*V(Eout1)} tripdv=1 tripdt=1
+Eout6 M6out 0 VALUE={-0.5860*V(A1out1)+0.3583*V(B1out1)+0.2097*V(C1out1)-0.5860*V(A2out1)+0.2097*V(B2out1)+0.3583*V(C2out1)-0.0456*V(Eout1)} tripdv=1 tripdt=1
+Eout7 M7out 0 VALUE={-0.2843*V(A1out1)-0.1946*V(B1out1)-0.2472*V(C1out1)-0.2843*V(A2out1)-0.2472*V(B2out1)-0.1946*V(C2out1)+0.9556*V(Eout1)} tripdv=1 tripdt=1
+
+**************************************************
+* INPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_A1in A1in1 0 VALUE={+0.0864*I(V1)-0.4082*I(V2)+0.0000*I(V3)+0.0917*I(V4)+0.5774*I(V5)-0.5860*I(V6)-0.2843*I(V7)} tripdv=1 tripdt=1
+G_B1in B1in1 0 VALUE={+0.3036*I(V1)-0.4082*I(V2)+0.5000*I(V3)+0.4614*I(V4)-0.2887*I(V5)+0.3583*I(V6)-0.1946*I(V7)} tripdv=1 tripdt=1
+G_C1in C1in1 0 VALUE={+0.3120*I(V1)-0.4082*I(V2)-0.5000*I(V3)-0.5294*I(V4)-0.2887*I(V5)+0.2097*I(V6)-0.2472*I(V7)} tripdv=1 tripdt=1
+G_A2in A2in1 0 VALUE={+0.0864*I(V1)+0.4082*I(V2)-0.0000*I(V3)+0.0917*I(V4)-0.5774*I(V5)-0.5860*I(V6)-0.2843*I(V7)} tripdv=1 tripdt=1
+G_B2in B2in1 0 VALUE={+0.3120*I(V1)+0.4082*I(V2)+0.5000*I(V3)-0.5294*I(V4)+0.2887*I(V5)+0.2097*I(V6)-0.2472*I(V7)} tripdv=1 tripdt=1
+G_C2in C2in1 0 VALUE={+0.3036*I(V1)+0.4082*I(V2)-0.5000*I(V3)+0.4614*I(V4)+0.2887*I(V5)+0.3583*I(V6)-0.1946*I(V7)} tripdv=1 tripdt=1
+G_Ein Ein1 0 VALUE={+0.9583*I(V1)+0.0000*I(V2)+0.0000*I(V3)-0.0115*I(V4)-0.0000*I(V5)-0.0456*I(V6)+0.9556*I(V7)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_A1out 0  A1out  VALUE={+0.0864*I(V8)-0.4082*I(V9)+0.0000*I(V10)+0.0917*I(V11)+0.5774*I(V12)-0.5860*I(V13)-0.2843*I(V14)} tripdv=1 tripdt=1
+G_B1out 0  B1out  VALUE={+0.3036*I(V8)-0.4082*I(V9)+0.5000*I(V10)+0.4614*I(V11)-0.2887*I(V12)+0.3583*I(V13)-0.1946*I(V14)} tripdv=1 tripdt=1
+G_C1out 0  C1out  VALUE={+0.3120*I(V8)-0.4082*I(V9)-0.5000*I(V10)-0.5294*I(V11)-0.2887*I(V12)+0.2097*I(V13)-0.2472*I(V14)} tripdv=1 tripdt=1
+G_A2out 0  A2out  VALUE={+0.0864*I(V8)+0.4082*I(V9)-0.0000*I(V10)+0.0917*I(V11)-0.5774*I(V12)-0.5860*I(V13)-0.2843*I(V14)} tripdv=1 tripdt=1
+G_B2out 0  B2out  VALUE={+0.3120*I(V8)+0.4082*I(V9)+0.5000*I(V10)-0.5294*I(V11)+0.2887*I(V12)+0.2097*I(V13)-0.2472*I(V14)} tripdv=1 tripdt=1
+G_C2out 0  C2out  VALUE={+0.3036*I(V8)+0.4082*I(V9)-0.5000*I(V10)+0.4614*I(V11)+0.2887*I(V12)+0.3583*I(V13)-0.1946*I(V14)} tripdv=1 tripdt=1
+G_Eout 0  Eout  VALUE={+0.9583*I(V8)+0.0000*I(V9)+0.0000*I(V10)-0.0115*I(V11)-0.0000*I(V12)-0.0456*I(V13)+0.9556*I(V14)} tripdv=1 tripdt=1
+
+******************************************
+* End Paste lines from matlab file
+******************************************
+
+R_Aout1 A1out 0  1e9
+R_Bout2 B1out 0  1e9 
+R_Cout3 C1out 0  1e9
+R_Aout4 A2out 0  1e9
+R_Bout5 B2out 0  1e9 
+R_Cout6 C2out 0 1e9
+R_Eout Eout 0 1e9
+
+
+R_A1in A1in 0 1e9
+R_B1in B1in 0 1e9 
+R_C1in C1in 0 1e9
+R_A2in A2in 0 1e9
+R_B2in B2in 0 1e9 
+R_C2in C2in 0 1e9
+R_Ein Ein 0 1e9
+
+.ends
+
+.subckt line_cable_shield_400kV_1200mm2_10km_2_thin_shield_1mm_distributed AIN shAIN BIN shBIN CIN shCIN AOUT shAOUT BOUT shBOUT COUT shCOUT params: length=10
+* ============================================================
+* 6PH - 6Phase full transposed FULL MODAL LTspice MODEL (CONSISTENT)
+* Includes bidirectional E + G transformation at BOTH ends
+* ============================================================
+.param Rphase=0.018042
+.param Rshield=0.0676
+
+RAIN1 AIN AIN1 {Rphase*l/2}
+RBIN1 BIN BIN1 {Rphase*l/2}
+RCIN1 CIN CIN1 {Rphase*l/2}
+
+RAIN2 shAIN shAIN1 {Rshield*l/2}
+RBIN2 shBIN shBIN1 {Rshield*l/2}
+RCIN2 shCIN shCIN1 {Rshield*l/2}
+
+RAOUT1 AOUT1 AOUT {Rphase*l/2}
+RBOUT1 BOUT1 BOUT {Rphase*l/2}
+RCOUT1 COUT1 COUT {Rphase*l/2}
+
+RAOUT2 shAOUT1 shAOUT {Rshield*l/2}
+RBOUT2 shBOUT1 shBOUT {Rshield*l/2}
+RCOUT2 shCOUT1 shCOUT {Rshield*l/2}
+  
+V1 m1in1 m1in 0
+V2 m2in1 m2in 0
+V3 m3in1 m3in 0
+V4 m4in1 m4in 0
+V5 m5in1 m5in 0
+V6 m6in1 m6in 0
+
+ 
+V7 m1out1 m1out 0
+V8 m2out1 m2out 0
+V9 m3out1 m3out 0
+V10 m4out1 m4out 0
+V11 m5out1 m5out 0
+V12 m6out1 m6out 0
+
+* T-Lines, TD's Z's E,G Lines all from Matlab .m file!
+
+.param l={length}
+
+.param TD1=  74.012us
+.param TD2=  30.287us
+.param TD3=  26.428us
+.param TD4=   7.794us
+.param TD5=   7.794us
+.param TD6=   7.794us
+
+.param Z1=  125.74Ohm
+.param Z2=   51.51Ohm
+.param Z3=   44.96Ohm
+.param Z4=   23.12Ohm
+.param Z5=   23.11Ohm
+.param Z6=   23.10Ohm
+
+T1 m1in 0 m1out1 0 Z0= 125.74 TD={74.0124us*l}
+T2 m2in 0 m2out1 0 Z0=  51.51 TD={30.2871us*l}
+T3 m3in 0 m3out1 0 Z0=  44.96 TD={26.4280us*l}
+T4 m4in 0 m4out1 0 Z0=  23.12 TD={7.7940us*l}
+T5 m5in 0 m5out1 0 Z0=  23.11 TD={7.7940us*l}
+T6 m6in 0 m6out1 0 Z0=  23.10 TD={7.7940us*l}
+
+
+**************************************************
+* INPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Ein1 M1in1 0 VALUE={+4.1238e-05*V(Ain1)+4.2662e-05*V(Bin1)+4.1238e-05*V(Cin1)+8.0713e-01*V(ShAin1)+8.3501e-01*V(ShBin1)+8.0713e-01*V(ShCin1)} tripdv=1 tripdt=1
+Ein2 M2in1 0 VALUE={+3.2328e-04*V(Ain1)+5.5511e-16*V(Bin1)-3.2328e-04*V(Cin1)+1.0002e+00*V(ShAin1)+2.1789e-15*V(ShBin1)-1.0002e+00*V(ShCin1)} tripdv=1 tripdt=1
+Ein3 M3in1 0 VALUE={+2.5643e-04*V(Ain1)-4.9574e-04*V(Bin1)+2.5643e-04*V(Cin1)+5.9061e-01*V(ShAin1)-1.1418e+00*V(ShBin1)+5.9061e-01*V(ShCin1)} tripdv=1 tripdt=1
+Ein4 M4in1 0 VALUE={-5.7067e-01*V(Ain1)-5.9039e-01*V(Bin1)-5.7067e-01*V(Cin1)+5.7077e-01*V(ShAin1)+5.9050e-01*V(ShBin1)+5.7077e-01*V(ShCin1)} tripdv=1 tripdt=1
+Ein5 M5in1 0 VALUE={-7.0688e-01*V(Ain1)-2.3514e-10*V(Bin1)+7.0688e-01*V(Cin1)+7.0768e-01*V(ShAin1)+2.3541e-10*V(ShBin1)-7.0768e-01*V(ShCin1)} tripdv=1 tripdt=1
+Ein6 M6in1 0 VALUE={+4.1731e-01*V(Ain1)-8.0674e-01*V(Bin1)+4.1731e-01*V(Cin1)-4.1794e-01*V(ShAin1)+8.0797e-01*V(ShBin1)-4.1794e-01*V(ShCin1)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Eout1 M1out 0 VALUE={+4.1238e-05*V(Aout1)+4.2662e-05*V(Bout1)+4.1238e-05*V(Cout1)+8.0713e-01*V(ShAout1)+8.3501e-01*V(ShBout1)+8.0713e-01*V(ShCout1)} tripdv=1 tripdt=1
+Eout2 M2out 0 VALUE={+3.2328e-04*V(Aout1)+5.5511e-16*V(Bout1)-3.2328e-04*V(Cout1)+1.0002e+00*V(ShAout1)+2.1789e-15*V(ShBout1)-1.0002e+00*V(ShCout1)} tripdv=1 tripdt=1
+Eout3 M3out 0 VALUE={+2.5643e-04*V(Aout1)-4.9574e-04*V(Bout1)+2.5643e-04*V(Cout1)+5.9061e-01*V(ShAout1)-1.1418e+00*V(ShBout1)+5.9061e-01*V(ShCout1)} tripdv=1 tripdt=1
+Eout4 M4out 0 VALUE={-5.7067e-01*V(Aout1)-5.9039e-01*V(Bout1)-5.7067e-01*V(Cout1)+5.7077e-01*V(ShAout1)+5.9050e-01*V(ShBout1)+5.7077e-01*V(ShCout1)} tripdv=1 tripdt=1
+Eout5 M5out 0 VALUE={-7.0688e-01*V(Aout1)-2.3514e-10*V(Bout1)+7.0688e-01*V(Cout1)+7.0768e-01*V(ShAout1)+2.3541e-10*V(ShBout1)-7.0768e-01*V(ShCout1)} tripdv=1 tripdt=1
+Eout6 M6out 0 VALUE={+4.1731e-01*V(Aout1)-8.0674e-01*V(Bout1)+4.1731e-01*V(Cout1)-4.1794e-01*V(ShAout1)+8.0797e-01*V(ShBout1)-4.1794e-01*V(ShCout1)} tripdv=1 tripdt=1
+
+**************************************************
+* INPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_Ain Ain1 0 VALUE={+4.1238e-05*I(V1)+3.2328e-04*I(V2)+2.5643e-04*I(V3)-5.7067e-01*I(V4)-7.0688e-01*I(V5)+4.1731e-01*I(V6)} tripdv=1 tripdt=1
+G_Bin Bin1 0 VALUE={+4.2662e-05*I(V1)+5.5511e-16*I(V2)-4.9574e-04*I(V3)-5.9039e-01*I(V4)-2.3514e-10*I(V5)-8.0674e-01*I(V6)} tripdv=1 tripdt=1
+G_Cin Cin1 0 VALUE={+4.1238e-05*I(V1)-3.2328e-04*I(V2)+2.5643e-04*I(V3)-5.7067e-01*I(V4)+7.0688e-01*I(V5)+4.1731e-01*I(V6)} tripdv=1 tripdt=1
+G_ShAin ShAin1 0 VALUE={+8.0713e-01*I(V1)+1.0002e+00*I(V2)+5.9061e-01*I(V3)+5.7077e-01*I(V4)+7.0768e-01*I(V5)-4.1794e-01*I(V6)} tripdv=1 tripdt=1
+G_ShBin ShBin1 0 VALUE={+8.3501e-01*I(V1)+2.1789e-15*I(V2)-1.1418e+00*I(V3)+5.9050e-01*I(V4)+2.3541e-10*I(V5)+8.0797e-01*I(V6)} tripdv=1 tripdt=1
+G_ShCin ShCin1 0 VALUE={+8.0713e-01*I(V1)-1.0002e+00*I(V2)+5.9061e-01*I(V3)+5.7077e-01*I(V4)-7.0768e-01*I(V5)-4.1794e-01*I(V6)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_Aout 0  Aout  VALUE={+4.1238e-05*I(V7)+3.2328e-04*I(V8)+2.5643e-04*I(V9)-5.7067e-01*I(V10)-7.0688e-01*I(V11)+4.1731e-01*I(V12)} tripdv=1 tripdt=1
+G_Bout 0  Bout  VALUE={+4.2662e-05*I(V7)+5.5511e-16*I(V8)-4.9574e-04*I(V9)-5.9039e-01*I(V10)-2.3514e-10*I(V11)-8.0674e-01*I(V12)} tripdv=1 tripdt=1
+G_Cout 0  Cout  VALUE={+4.1238e-05*I(V7)-3.2328e-04*I(V8)+2.5643e-04*I(V9)-5.7067e-01*I(V10)+7.0688e-01*I(V11)+4.1731e-01*I(V12)} tripdv=1 tripdt=1
+G_ShAout 0  ShAout  VALUE={+8.0713e-01*I(V7)+1.0002e+00*I(V8)+5.9061e-01*I(V9)+5.7077e-01*I(V10)+7.0768e-01*I(V11)-4.1794e-01*I(V12)} tripdv=1 tripdt=1
+G_ShBout 0  ShBout  VALUE={+8.3501e-01*I(V7)+2.1789e-15*I(V8)-1.1418e+00*I(V9)+5.9050e-01*I(V10)+2.3541e-10*I(V11)+8.0797e-01*I(V12)} tripdv=1 tripdt=1
+G_ShCout 0  ShCout  VALUE={+8.0713e-01*I(V7)-1.0002e+00*I(V8)+5.9061e-01*I(V9)+5.7077e-01*I(V10)-7.0768e-01*I(V11)-4.1794e-01*I(V12)} tripdv=1 tripdt=1
+
+R_Aout1 Aout 0  1e9
+R_Bout2 Bout 0  1e9 
+R_Cout3 Cout 0  1e9
+R_Aout4 ShAout 0  1e9
+R_Bout5 ShBout 0  1e9
+R_Cout6 ShCout 0 1e9
+
+R_A1in Ain 0 1e9
+R_B1in Bin 0 1e9 
+R_C1in Cin 0 1e9
+R_A2in ShAin 0 1e9
+R_B2in ShBin 0 1e9 
+R_C2in ShCin 0 1e9
+
+.ends
+
+
+.subckt line_cable_shield_400kV_1200mm2_10km_2_thin_shield_1mm_distributed_trefoil AIN shAIN BIN shBIN CIN shCIN AOUT shAOUT BOUT shBOUT COUT shCOUT params: length=10
+* ============================================================
+* 6PH - 6Phase full transposed FULL MODAL LTspice MODEL (CONSISTENT)
+* Includes bidirectional E + G transformation at BOTH ends
+* ============================================================
+.param Rphase=0.018042
+.param Rshield=0.0676
+.param l={length}
+
+RAIN1 AIN AIN1 {Rphase*l/2}
+RBIN1 BIN BIN1 {Rphase*l/2}
+RCIN1 CIN CIN1 {Rphase*l/2}
+
+RAIN2 shAIN shAIN1 {Rshield*l/2}
+RBIN2 shBIN shBIN1 {Rshield*l/2}
+RCIN2 shCIN shCIN1 {Rshield*l/2}
+
+RAOUT1 AOUT1 AOUT {Rphase*l/2}
+RBOUT1 BOUT1 BOUT {Rphase*l/2}
+RCOUT1 COUT1 COUT {Rphase*l/2}
+
+RAOUT2 shAOUT1 shAOUT {Rshield*l/2}
+RBOUT2 shBOUT1 shBOUT {Rshield*l/2}
+RCOUT2 shCOUT1 shCOUT {Rshield*l/2}
+  
+V1 m1in1 m1in 0
+V2 m2in1 m2in 0
+V3 m3in1 m3in 0
+V4 m4in1 m4in 0
+V5 m5in1 m5in 0
+V6 m6in1 m6in 0
+
+ 
+V7 m1out1 m1out 0
+V8 m2out1 m2out 0
+V9 m3out1 m3out 0
+V10 m4out1 m4out 0
+V11 m5out1 m5out 0
+V12 m6out1 m6out 0
+
+* T-Lines, TD's Z's E,G Lines all from Matlab .m file!
+
+******************************************
+* Paste following lines from matlab file
+******************************************
+
+
+.param TD1=  81.663us
+.param TD2=  14.572us
+.param TD3=  14.572us
+.param TD4=   7.794us
+.param TD5=   7.794us
+.param TD6=   7.794us
+
+.param Z1=   138.7Ohm
+.param Z2=    24.9Ohm
+.param Z3=    24.9Ohm
+.param Z4=    23.1Ohm
+.param Z5=    23.0Ohm
+.param Z6=    23.0Ohm
+
+T1 m1in 0 m1out1 0 Z0=  138.7 TD={81.6631us*l}
+T2 m2in 0 m2out1 0 Z0=   24.9 TD={14.5721us*l}
+T3 m3in 0 m3out1 0 Z0=   24.9 TD={14.5720us*l}
+T4 m4in 0 m4out1 0 Z0=   23.1 TD={7.7940us*l}
+T5 m5in 0 m5out1 0 Z0=   23.0 TD={7.7939us*l}
+T6 m6in 0 m6out1 0 Z0=   23.0 TD={7.7939us*l}
+
+
+**************************************************
+* INPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Ein1 M1in1 0 VALUE={-0.0000*V(Ain1)-0.0000*V(Bin1)-0.0000*V(Cin1)-0.8165*V(ShAin1)-0.8165*V(ShBin1)-0.8165*V(ShCin1)} tripdv=1 tripdt=1
+Ein2 M2in1 0 VALUE={+0.0011*V(Ain1)+0.0011*V(Bin1)-0.0021*V(Cin1)+0.5781*V(ShAin1)+0.5781*V(ShBin1)-1.1563*V(ShCin1)} tripdv=1 tripdt=1
+Ein3 M3in1 0 VALUE={+0.0018*V(Ain1)-0.0018*V(Bin1)+0.0000*V(Cin1)+1.0014*V(ShAin1)-1.0014*V(ShBin1)+0.0000*V(ShCin1)} tripdv=1 tripdt=1
+Ein4 M4in1 0 VALUE={+0.6101*V(Ain1)+0.6101*V(Bin1)+0.5053*V(Cin1)-0.6104*V(ShAin1)-0.6104*V(ShBin1)-0.5050*V(ShCin1)} tripdv=1 tripdt=1
+Ein5 M5in1 0 VALUE={+0.7058*V(Ain1)-0.7058*V(Bin1)-0.0000*V(Cin1)-0.7103*V(ShAin1)+0.7103*V(ShBin1)+0.0000*V(ShCin1)} tripdv=1 tripdt=1
+Ein6 M6in1 0 VALUE={+0.3567*V(Ain1)+0.3567*V(Bin1)-0.8613*V(Cin1)-0.3593*V(ShAin1)-0.3593*V(ShBin1)+0.8665*V(ShCin1)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Eout1 M1out 0 VALUE={-0.0000*V(Aout1)-0.0000*V(Bout1)-0.0000*V(Cout1)-0.8165*V(ShAout1)-0.8165*V(ShBout1)-0.8165*V(ShCout1)} tripdv=1 tripdt=1
+Eout2 M2out 0 VALUE={+0.0011*V(Aout1)+0.0011*V(Bout1)-0.0021*V(Cout1)+0.5781*V(ShAout1)+0.5781*V(ShBout1)-1.1563*V(ShCout1)} tripdv=1 tripdt=1
+Eout3 M3out 0 VALUE={+0.0018*V(Aout1)-0.0018*V(Bout1)+0.0000*V(Cout1)+1.0014*V(ShAout1)-1.0014*V(ShBout1)+0.0000*V(ShCout1)} tripdv=1 tripdt=1
+Eout4 M4out 0 VALUE={+0.6101*V(Aout1)+0.6101*V(Bout1)+0.5053*V(Cout1)-0.6104*V(ShAout1)-0.6104*V(ShBout1)-0.5050*V(ShCout1)} tripdv=1 tripdt=1
+Eout5 M5out 0 VALUE={+0.7058*V(Aout1)-0.7058*V(Bout1)-0.0000*V(Cout1)-0.7103*V(ShAout1)+0.7103*V(ShBout1)+0.0000*V(ShCout1)} tripdv=1 tripdt=1
+Eout6 M6out 0 VALUE={+0.3567*V(Aout1)+0.3567*V(Bout1)-0.8613*V(Cout1)-0.3593*V(ShAout1)-0.3593*V(ShBout1)+0.8665*V(ShCout1)} tripdv=1 tripdt=1
+
+**************************************************
+* INPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_Ain Ain1 0 VALUE={-0.0000*I(V1)+0.0011*I(V2)+0.0018*I(V3)+0.6101*I(V4)+0.7058*I(V5)+0.3567*I(V6)} tripdv=1 tripdt=1
+G_Bin Bin1 0 VALUE={-0.0000*I(V1)+0.0011*I(V2)-0.0018*I(V3)+0.6101*I(V4)-0.7058*I(V5)+0.3567*I(V6)} tripdv=1 tripdt=1
+G_Cin Cin1 0 VALUE={-0.0000*I(V1)-0.0021*I(V2)+0.0000*I(V3)+0.5053*I(V4)-0.0000*I(V5)-0.8613*I(V6)} tripdv=1 tripdt=1
+G_ShAin ShAin1 0 VALUE={-0.8165*I(V1)+0.5781*I(V2)+1.0014*I(V3)-0.6104*I(V4)-0.7103*I(V5)-0.3593*I(V6)} tripdv=1 tripdt=1
+G_ShBin ShBin1 0 VALUE={-0.8165*I(V1)+0.5781*I(V2)-1.0014*I(V3)-0.6104*I(V4)+0.7103*I(V5)-0.3593*I(V6)} tripdv=1 tripdt=1
+G_ShCin ShCin1 0 VALUE={-0.8165*I(V1)-1.1563*I(V2)+0.0000*I(V3)-0.5050*I(V4)+0.0000*I(V5)+0.8665*I(V6)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_Aout 0  Aout  VALUE={-0.0000*I(V7)+0.0011*I(V8)+0.0018*I(V9)+0.6101*I(V10)+0.7058*I(V11)+0.3567*I(V12)} tripdv=1 tripdt=1
+G_Bout 0  Bout  VALUE={-0.0000*I(V7)+0.0011*I(V8)-0.0018*I(V9)+0.6101*I(V10)-0.7058*I(V11)+0.3567*I(V12)} tripdv=1 tripdt=1
+G_Cout 0  Cout  VALUE={-0.0000*I(V7)-0.0021*I(V8)+0.0000*I(V9)+0.5053*I(V10)-0.0000*I(V11)-0.8613*I(V12)} tripdv=1 tripdt=1
+G_ShAout 0  ShAout  VALUE={-0.8165*I(V7)+0.5781*I(V8)+1.0014*I(V9)-0.6104*I(V10)-0.7103*I(V11)-0.3593*I(V12)} tripdv=1 tripdt=1
+G_ShBout 0  ShBout  VALUE={-0.8165*I(V7)+0.5781*I(V8)-1.0014*I(V9)-0.6104*I(V10)+0.7103*I(V11)-0.3593*I(V12)} tripdv=1 tripdt=1
+G_ShCout 0  ShCout  VALUE={-0.8165*I(V7)-1.1563*I(V8)+0.0000*I(V9)-0.5050*I(V10)+0.0000*I(V11)+0.8665*I(V12)} tripdv=1 tripdt=1
+
+
+******************************************
+* End Paste lines from matlab file
+******************************************
+
+R_Aout1 Aout 0  1e9
+R_Bout2 Bout 0  1e9 
+R_Cout3 Cout 0  1e9
+R_Aout4 ShAout 0  1e9
+R_Bout5 ShBout 0  1e9
+R_Cout6 ShCout 0 1e9
+
+R_A1in Ain 0 1e9
+R_B1in Bin 0 1e9 
+R_C1in Cin 0 1e9
+R_A2in ShAin 0 1e9
+R_B2in ShBin 0 1e9 
+R_C2in ShCin 0 1e9
+
+.ends
+
+.subckt TEST AIN BIN CIN AOUT BOUT COUT params: length=1
+* ============================================================
+* 3PH - 3Phase full transposed FULL MODAL LTspice MODEL (CONSISTENT)
+* Includes bidirectional E + G transformation at BOTH ends
+* ============================================================
+
+RAIN AIN AIN1 {0.156*l/2}
+RBIN BIN BIN1 {0.156*l/2}
+RCIN CIN CIN1 {0.156*l/2}
+
+
+RAOUT AOUT1 AOUT {0.156*l/2}
+RBOUT BOUT1 BOUT {0.156*l/2}
+RCOUT COUT1 COUT {0.156*l/2}
+
+  
+V1 m1in1 m1in 0
+V2 m2in1 m2in 0
+V3 m3in1 m3in 0
+
+ 
+V4 m1out1 m1out 0
+V5 m2out1 m2out 0
+V6 m3out1 m3out 0
+
+* T-Lines, TD's Z's E,G Lines all from Matlab .m file!
+
+******************************************
+* Paste following lines from matlab file
+******************************************
+ 
+.param l={length}
+
+.param TD1=   9.168us
+.param TD2=   8.910us
+.param TD3=   8.002us
+
+.param Z1=    27.2Ohm
+.param Z2=    26.4Ohm
+.param Z3=    23.7Ohm
+
+T1 m1in 0 m1out1 0 Z0=   27.2 TD={9.1682us*l}
+T2 m2in 0 m2out1 0 Z0=   26.4 TD={8.9105us*l}
+T3 m3in 0 m3out1 0 Z0=   23.7 TD={8.0021us*l}
+
+
+**************************************************
+* INPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Ein1 M1in1 0 VALUE={-0.4170*V(Ain1)+0.8076*V(Bin1)-0.4170*V(Cin1)} tripdv=1 tripdt=1
+Ein2 M2in1 0 VALUE={-0.7071*V(Ain1)+0.0000*V(Bin1)+0.7071*V(Cin1)} tripdv=1 tripdt=1
+Ein3 M3in1 0 VALUE={+0.5711*V(Ain1)+0.5897*V(Bin1)+0.5711*V(Cin1)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
+**************************************************
+
+Eout1 M1out 0 VALUE={-0.4170*V(Aout1)+0.8076*V(Bout1)-0.4170*V(Cout1)} tripdv=1 tripdt=1
+Eout2 M2out 0 VALUE={-0.7071*V(Aout1)+0.0000*V(Bout1)+0.7071*V(Cout1)} tripdv=1 tripdt=1
+Eout3 M3out 0 VALUE={+0.5711*V(Aout1)+0.5897*V(Bout1)+0.5711*V(Cout1)} tripdv=1 tripdt=1
+
+**************************************************
+* INPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_Ain Ain1 0 VALUE={-0.4170*I(V1)-0.7071*I(V2)+0.5711*I(V3)} tripdv=1 tripdt=1
+G_Bin Bin1 0 VALUE={+0.8076*I(V1)+0.0000*I(V2)+0.5897*I(V3)} tripdv=1 tripdt=1
+G_Cin Cin1 0 VALUE={-0.4170*I(V1)+0.7071*I(V2)+0.5711*I(V3)} tripdv=1 tripdt=1
+
+**************************************************
+* OUTPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
+**************************************************
+
+G_Aout 0  Aout  VALUE={-0.4170*I(V4)-0.7071*I(V5)+0.5711*I(V6)} tripdv=1 tripdt=1
+G_Bout 0  Bout  VALUE={+0.8076*I(V4)+0.0000*I(V5)+0.5897*I(V6)} tripdv=1 tripdt=1
+G_Cout 0  Cout  VALUE={-0.4170*I(V4)+0.7071*I(V5)+0.5711*I(V6)} tripdv=1 tripdt=1
+
+******************************************
+* End Paste lines from matlab file
+******************************************
+
+R_Aout Aout 0  1e9
+R_Bout Bout 0  1e9 
+R_Cout Cout 0  1e9
+
+
+R_Ain Ain 0 1e9
+R_Bin Bin 0 1e9 
+R_Cin Cin 0 1e9
+
+
+.ends

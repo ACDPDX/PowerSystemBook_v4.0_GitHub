@@ -1,0 +1,74 @@
+Version 4
+SymbolType CELL
+LINE Normal 64 -32 -48 32
+LINE Normal 36 10 32 10
+LINE Normal 36 -6 36 10
+LINE Normal 44 -6 36 -6
+LINE Normal 44 10 44 -6
+LINE Normal 48 10 44 10
+LINE Normal 48 2 31 2
+LINE Normal 46 0 48 2
+LINE Normal 48 2 46 0
+LINE Normal 46 4 48 2
+LINE Normal 34 0 31 2
+LINE Normal 34 3 31 2
+RECTANGLE Normal 64 32 -48 -32
+TEXT -20 -5 Left 5 =
+TEXT -37 -22 Left 2 G1
+TEXT -21 -22 Left 2 K1
+TEXT -5 -22 Left 2 G2
+TEXT 11 -22 Left 2 K2
+TEXT 26 -22 Left 2 G3
+TEXT 43 -22 Left 2 K3
+TEXT -42 0 Left 1 alpha
+TEXT -38 22 Left 2 G4
+TEXT -22 22 Left 2 K4
+TEXT -6 22 Left 2 G5
+TEXT 10 22 Left 2 K5
+TEXT 25 22 Left 2 G6
+TEXT 41 22 Left 2 K6
+WINDOW 0 -50 -46 Left 2
+SYMATTR Value n=0
+SYMATTR Prefix X
+SYMATTR Description Thyristor_control
+SYMATTR SpiceModel ST_B6
+SYMATTR ModelFile inverter_rectifier.lib
+PIN -32 -32 NONE 0
+PINATTR PinName G1
+PINATTR SpiceOrder 1
+PIN -16 -32 NONE 0
+PINATTR PinName K1
+PINATTR SpiceOrder 2
+PIN 0 -32 NONE 0
+PINATTR PinName G2
+PINATTR SpiceOrder 3
+PIN 16 -32 NONE 0
+PINATTR PinName K2
+PINATTR SpiceOrder 4
+PIN 32 -32 NONE 0
+PINATTR PinName G3
+PINATTR SpiceOrder 5
+PIN 48 -32 NONE 0
+PINATTR PinName K3
+PINATTR SpiceOrder 6
+PIN -32 32 NONE 0
+PINATTR PinName G4
+PINATTR SpiceOrder 7
+PIN -16 32 NONE 0
+PINATTR PinName K4
+PINATTR SpiceOrder 8
+PIN 0 32 NONE 0
+PINATTR PinName G5
+PINATTR SpiceOrder 9
+PIN 16 32 NONE 0
+PINATTR PinName K5
+PINATTR SpiceOrder 10
+PIN 32 32 NONE 0
+PINATTR PinName G6
+PINATTR SpiceOrder 11
+PIN 48 32 NONE 0
+PINATTR PinName K6
+PINATTR SpiceOrder 12
+PIN -48 0 NONE 0
+PINATTR PinName Alpha
+PINATTR SpiceOrder 13

@@ -1,0 +1,23 @@
+
+Open ATP and load the file containing the cable models
+Double click on the cable instance icon
+On the model register card choose single core cable, Bergeron Model
+Check cable constants and Matrix output
+Set Rho to 100, Length to 1000m
+On the DATA register card insert the geometrical cable data
+With the View button you can see the cable distances and placings
+With the Verify button you can see some R,L,C data of your line 
+Press Run ATP button
+To get the spice macro model entries 
+the ATP impedance Z Matrix (Bergeron model+Cable constants) must be copied to the Mat_L.txt file
+Then:
+Open a command window in the loadflow_transient directory or the crossbonding directory or the coupled lines directory
+execute tinyperl gen_lc_cable.pl 
+Copy the XL,XM matrix to the spice macro model entries.
+The coupled capacitances must be copied from the ATP Conductance G matrix (Bergeron+Cable constants)
+where ce1 = upper diagonal matrix entries
+and cShield1 = lower diagonal matrix entries
+The Rnn,Rmm,Rmn values are from the Impedance Z matrix
+where Rnn=Resistance upper diagonal matrix entries
+Rmm=Resistance lower diagonal matrix entries
+Rmn-Resistance out of line matrix entries

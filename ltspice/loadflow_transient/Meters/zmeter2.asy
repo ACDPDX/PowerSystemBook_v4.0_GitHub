@@ -1,13 +1,11 @@
 Version 4
 SymbolType CELL
 LINE Normal 48 0 -32 0
-LINE Normal 23 0 19 -3
-LINE Normal 23 0 23 0
-LINE Normal 19 3 23 0
-CIRCLE Normal 17 4 9 -4
-TEXT -2 -9 Left 2 Z
-TEXT -18 -9 Left 2 X
-TEXT -34 -9 Left 2 R
+LINE Normal 17 0 13 -3
+LINE Normal 17 0 17 0
+LINE Normal 13 3 17 0
+CIRCLE Normal 11 4 3 -4
+TEXT -28 -10 Left 2 Z
 SYMATTR SpiceLine fn=50  fc=3 zenable=100m
 SYMATTR Prefix x
 SYMATTR SpiceModel zmeter2_RMS
@@ -24,7 +22,7 @@ PIN -32 -16 NONE 8
 PINATTR PinName r
 PINATTR SpiceOrder 3
 PIN -16 -16 NONE 8
-PINATTR PinName X
+PINATTR PinName x
 PINATTR SpiceOrder 4
 PIN 0 -16 NONE 8
 PINATTR PinName z

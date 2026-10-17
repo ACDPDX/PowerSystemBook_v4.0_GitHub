@@ -1,0 +1,49 @@
+% Measurement values table for the Power System Simulation book.
+% Required packages are already loaded by the central preamble:
+% booktabs, tabularx, array, siunitx, xcolor.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Signal ranges for Case 5. All values are peak values, bus values are multiplied by 1.73/1.414}
+  \label{tab:measurement-values-case5}
+  \small
+  \setlength{\tabcolsep}{3.5pt}
+  \renewcommand{\arraystretch}{1.18}
+  \begin{tabularx}{\textwidth}{@{}
+      >{\raggedright\arraybackslash}p{0.055\textwidth}
+      >{\raggedright\arraybackslash}p{0.085\textwidth}
+      >{\raggedright\arraybackslash}p{0.095\textwidth}
+      >{\raggedright\arraybackslash}p{0.105\textwidth}
+      >{\raggedright\arraybackslash}p{0.075\textwidth}
+      >{\raggedright\arraybackslash}p{0.075\textwidth}
+      Y@{}}
+    \toprule
+    \textbf{Meas.} &
+    \textbf{Grid element} &
+    \textbf{Phase} &
+    \textbf{Voltage level} &
+    \textbf{Min.} &
+    \textbf{Max.} &
+    \textbf{Notes} \\
+    \midrule
+    $V$ & Bus0  & Ph A       & \SI{220}{\kilo\volt} & \SI{-229}{\kilo\volt} & \SI{229}{\kilo\volt} & -- \\
+    $V$ & Bus1  & Ph A,    & \SI{110}{\kilo\volt} & \SI{-140}{\kilo\volt} & \SI{120}{\kilo\volt} & -- \\
+    $V$ & Bus1  & Ph B,C     & \SI{110}{\kilo\volt} & \SI{-180}{\kilo\volt} & \SI{180}{\kilo\volt} & -- \\
+    $I$ & HTr1  & Ph A       & \SI{220}{\kilo\volt} & \SI{-160}{\ampere} & \SI{530}{\ampere} & -- \\
+    $I$ & HTr1  & Ph B, C    & \SI{220}{\kilo\volt} & \SI{-1}{\kilo\ampere} & \SI{1}{\kilo\ampere} & -- \\
+    $I$ & KD1   & Ph A       & \SI{110}{\kilo\volt} & \SI{0}{\ampere} & \SI{620}{\ampere} & Steady state: \SI{300}{\ampere} \\
+    $I$ & Tr1   & Ph A       & \SI{110}{\kilo\volt} & \SI{0}{\ampere} & \SI{54}{\ampere} &  Fluctuating \\
+    $I$ & Tr2   & Ph A       & \SI{110}{\kilo\volt} & \SI{0}{\ampere} & \SI{52}{\ampere} &  Fluctuating \\
+    $I$ & Tr3   & Ph A      & \SI{110}{\kilo\volt} & \SI{0}{\ampere} & \SI{52}{\ampere} &  Fluctuating \\
+    $I$ & Line4 & Ph A & \SI{110}{\kilo\volt} & \SI{-1.6}{\ampere} & \SI{1.6}{\ampere} & Small capacitive inrush current  \\
+    $I$ & Line1 & Ph A & \SI{110}{\kilo\volt} & \SI{-530}{\ampere} & \SI{600}{\ampere} & High capacitive inrush current due to cable \\
+    $I$ & Line1 & Ph B, C & \SI{110}{\kilo\volt} & \SI{-1.3}{\kilo\ampere} & \SI{1.3}{\kilo\ampere} & High capacitive inrush current due to cable \\
+    $I$ & Pet1 & Ph N & \SI{110}{\kilo\volt} & \SI{-6}{\ampere} & \SI{10}{\ampere} & Fluctuating, Longtime value very small \\
+    $V$ & Pet1 & Ph N & \SI{110}{\kilo\volt} & \SI{-800}{\volt} & \SI{600}{\volt} & Fluctuating, Longtime value very small \\
+    $\Phi$ & Tr1 & Ph A, B, C   & \SI{110}{\kilo\volt} & \SI{0}{\weber} & \SI{0.60}{\weber} & Nominal flux: 
+    \SI{0.288}{\weber} \\
+    FFT & HTr1  & Ph C       & \SI{220}{\kilo\volt} & \SI{50}{\hertz} & \SI{178}{\hertz} & mostly \SI{50}{\hertz} and \SI{178}{\hertz} \\
+    FFT & Tr2   & Ph A       & \SI{110}{\kilo\volt} & \SI{50}{\hertz} & \SI{250}{\hertz} & \SI{50}{\hertz}, \SI{100}{\hertz}, \SI{150}{\hertz}, \SI{200}{\hertz}, and \SI{250}{\hertz} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}

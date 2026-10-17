@@ -1,0 +1,633 @@
+
+
+* shunt reactor for voltage regulation
+.SUBCKT   LBatt  L1 L2 L3
++	PARAMS:
++   VN=110e3;
++   fn={fn1}
++   Q=50e6
++   r_x=0.001
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++	L ={(VN*VN)/(QN*omega)}
+* Delta
+LL1 L1 L2 {L} Rser={L*omega*r_x}
+LL2 L2 L3 {L} Rser={L*omega*r_x}
+LL3 L3 L1 {L} Rser={L*omega*r_x}
+.ENDS
+
+.SUBCKT C_exp1  L1_1 L1_2
++	PARAMS:
++	C=0.5	;
++   fn={fn1}
++   XC=0
++ length=1
++ rser=1e-6
++ TD=0
++ texp=25m
++ g=1e12
+.PARAM
++   C1=IF(xc>0,1/xc/fn/2/pi,C)
++   rser1=IF(rser>0,rser,1e-6)
+Ein in1a in1b VALUE={IF(time>TD,v(L1_1,L1_2x)*(1-exp(-abs(time-TD)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Gout L1_1 L1_2x VALUE={DDT(v(in1a,in1b))*C1*length} tripdv={tdv} tripdt={tdt}
+Rser L1_2x L1_2 {rser1}
+Rx  L1_2x 0 1e12
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+.SUBCKT L_exp1  L1_1 L1_2
++	PARAMS:
++	L=1	
++   fn={fn1}
++   xl=0
++ length=1
++ TD=0
++ rser=1e-6
++ texp=25m
++ g=1e12
+.PARAM
++   L1=IF(xl>0,xl/fn/2/pi,L)
++   rser1=IF(rser>0,rser,1e-6)
+Ein in1a in1b VALUE={IF(time>TD,v(L1_1,L1_2x)*(1-exp(-abs(time-TD)/(Texp+1u))),0)} tripdv={tdv} tripdt={tdt}
+Gout L1_1 L1_2x VALUE={v(idt1)/(L1*length)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(in1a,in1b)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Rser L1_2x L1_2 {rser1}
+Rx L1_2x 0 1e12
+Rgnd1 L1_1 0 {g}
+Rgnd2 L1_2 0 {g}
+.ENDS
+
+*************************************
+* capacitance for voltage regulation
+* Cexp, Lexp from impedance.lib 
+********************************
+.SUBCKT   LBatt_exp  L1 L2 L3
++	PARAMS:
++   VN=110e3;
++   fn={fn1}
++   Q=50e6
++   TD=0
++   Texp=5ms
++   r_x=0.001
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++	L ={(VN*VN)/(QN*omega)}
+* Delta
+RL1 L1 L1a {L*omega*r_x}
+RL2 L2 L2a {L*omega*r_x}
+RL3 L3 L3a {L*omega*r_x}
+XLL1 L1a L2 L_exp1 params: L={L} TD={TD} Texp={Texp} fn={fn}
+XLL2 L2a L3 L_exp1 params: L={L} TD={TD} Texp={Texp} fn={fn}
+XLL3 L3a L1 L_exp1 params: L={L} TD={TD} Texp={Texp} fn={fn}
+.ENDS
+
+
+* shunt reactor for voltage regulation
+.SUBCKT   LBatt_50MVAR  L1 L2 L3
++	PARAMS:
++   VN=110e3;
++   fn={fn1}
++   Q=50e6
++   r_x=0.001
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++	L ={(VN*VN)/(QN*omega)}
+* Delta
+LL1 L1 L2 {L} Rser={L*omega*r_x}
+LL2 L2 L3 {L} Rser={L*omega*r_x}
+LL3 L3 L1 {L} Rser={L*omega*r_x}
+.ENDS
+
+* shunt reactor for voltage regulation
+.SUBCKT   LBatt_50MVAR_GND  L1 L2 L3
++	PARAMS:
++   VN=110e3;
++   fn={fn1}
++   Q=50e6
++   r_x=0.001
++   RGND=1e-3
++   LGND=1e-6
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++	L ={(VN*VN)/(3*QN*omega)}
+* Delta
+LL1 L1 N {L} Rser={L*omega*r_x}
+LL2 L2 N {L} Rser={L*omega*r_x}
+LL3 L3 N {L} Rser={L*omega*r_x}
+RGND N N1 {RGND}
+LGND N1 0 {LGND}
+.ENDS
+
+
+* shunt reactor for voltage regulation
+.SUBCKT   LBatt_100MVAR  L1 L2 L3
++	PARAMS:
++   VN=110e3;
++   fn={fn1}
++   Q=100e6
++   r_x=0.001
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++	L ={(VN*VN)/(QN*omega)}
+* Delta
+LL1 L1 L2 {L} Rser={L*omega*r_x}
+LL2 L2 L3 {L} Rser={L*omega*r_x}
+LL3 L3 L1 {L} Rser={L*omega*r_x}
+.ENDS
+
+.SUBCKT   LBatt_100MVAR_GND  L1 L2 L3
++	PARAMS:
++   VN=110e3;
++   fn={fn1}
++   Q=100e6
++   r_x=0.001
++   RGND=1e-3
++   LGND=1e-6
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++	L ={(VN*VN)/(3*QN*omega)}
+* Delta
+LL1 L1 N {L} Rser={L*omega*r_x}
+LL2 L2 N {L} Rser={L*omega*r_x}
+LL3 L3 N {L} Rser={L*omega*r_x}
+RGND N N1 {RGND}
+LGND N1 0 {LGND}
+.ENDS
+
+
+
+* shunt reactor for voltage regulation with controlling nodes
+.SUBCKT   LBatt_100MVAR_ctrl  L1 L2 L3 ctrl
++	PARAMS:
++   VN=110e3;
++   fn={fn1}
++   Q=100e6
++   r_x=0.001
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++	L ={(VN*VN)/(QN*omega)}
+* Delta
+Rctrl ctrl 0 1e12
+LL1 L1 L2x flux={L}/v(ctrl)*x
+GR1 L2x L2 VALUE={v(L2x,L2)/((L/v(ctrl))*omega*r_x)} tripdv={tdv} tripdt={tdt}
+LL2 L2 L3x flux={L}/v(ctrl)*x
+GR2 L3x L3 VALUE={v(L3x,L3)/((L/v(ctrl))*omega*r_x)} tripdv={tdv} tripdt={tdt}
+LL3 L3 L1x flux={L}/v(ctrl)*x
+GR3 L1x L1 VALUE={v(L1x,L1)/((L/v(ctrl))*omega*r_x)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT   LBatt_100MVAR_GND_ctrl  L1 L2 L3 ctrl
++	PARAMS:
++   VN=110e3;
++   fn={fn1}
++   Q=100e6
++   r_x=0.001
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++	L ={(VN*VN)/(3*QN*omega)}
+* Delta
+Rctrl ctrl 0 1e12
+LL1 L1 L1x flux={L}/v(ctrl)*x
+GR1 L1x N VALUE={v(L2x,L2)/((L/v(ctrl))*omega*r_x)} tripdv={tdv} tripdt={tdt}
+LL2 L2 L2x flux={L}/v(ctrl)*x
+GR2 L2x N VALUE={v(L3x,L3)/((L/v(ctrl))*omega*r_x)} tripdv={tdv} tripdt={tdt}
+LL3 L3 L3x flux={L}/v(ctrl)*x
+GR3 L3x N VALUE={v(L1x,L1)/((L/v(ctrl))*omega*r_x)} tripdv={tdv} tripdt={tdt}
+RGND N 0 1e-3
+.ENDS
+
+* capacitance for voltage regulation
+.SUBCKT   CBatt  L1 L2 L3
++	PARAMS:
++   VN=110e3;
++   fn={fn1}
++   Q=50e6
++   r_x=0.001
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++   C={QN/omega/VN/VN}
+* Delta
+CL1 L1 L2 {C} Rser={(1/(C*omega))*r_x}
+CL2 L2 L3 {C} Rser={(1/(C*omega))*r_x}
+CL3 L3 L1 {C} Rser={(1/(C*omega))*r_x}
+.ENDS
+
+
+.SUBCKT   CBatt_exp  L1 L2 L3
++	PARAMS:
++   VN=110e3;
++   fn={fn1}
++   Q=50e6
++   TD=0
++   Texp=5ms
++   r_x=0.001 
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++   C={QN/omega/VN/VN}
+* Delta
+XCL1 L1 L2 C_exp1 params: C={C1} fn={fn} TD={TD} Texp={Texp} Rser={(1/(C*omega))*r_x}
+XCL2 L2 L3 C_exp1 params: C={C1} fn={fn} TD={TD} Texp={Texp} Rser={(1/(C*omega))*r_x}
+XCL3 L3 L1 C_exp1 params: C={C1} fn={fn} TD={TD} Texp={Texp} Rser={(1/(C*omega))*r_x}
+.ENDS
+
+* capacitance for voltage regulation
+.SUBCKT   CBatt_50MVAR  L1 L2 L3
++	PARAMS:
++   VN=110e3;
++   fn={fn1}
++   Q=50e6
++   r_x=0.001
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++   C={QN/omega/VN/VN}
+* Delta
+CL1 L1 L2 {C} Rser={(1/(C*omega))*r_x}
+CL2 L2 L3 {C} Rser={(1/(C*omega))*r_x}
+CL3 L3 L1 {C} Rser={(1/(C*omega))*r_x}
+.ENDS
+
+.SUBCKT   CBatt_50MVAR_GND  L1 L2 L3
++	PARAMS:
++   VN=110e3;
++   fn={fn1}
++   Q=50e6
++   r_x=0.001
++   RGND=1e-3
++   LGND=1e-6
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++   C={3*QN/omega/VN/VN}
+* Delta
+CL1 L1 N {C} Rser={(1/(C*omega))*r_x}
+CL2 L2 N {C} Rser={(1/(C*omega))*r_x}
+CL3 L3 N {C} Rser={(1/(C*omega))*r_x}
+RGND N N1 {RGND}
+LGND N1 0 {LGND}
+.ENDS
+
+* capacitance for voltage regulation
+.SUBCKT   CBatt_100MVAR  L1 L2 L3
++	PARAMS:
++   VN=110e3;
++   fn={fn1}
++   Q=100e6
++   r_x=0.001
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++   C={QN/omega/VN/VN}
+* Delta
+CL1 L1 L2 {C} Rser={(1/(C*omega))*r_x}
+CL2 L2 L3 {C} Rser={(1/(C*omega))*r_x}
+CL3 L3 L1 {C} Rser={(1/(C*omega))*r_x}
+.ENDS
+
+.SUBCKT   CBatt_100MVAR_GND  L1 L2 L3
++	PARAMS:
++   VN=110e3;
++   fn={fn1}
++   Q=100e6
++   r_x=0.001
++   RGND=1e-3
++   LGND=1e-6
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++   C={QN*3/omega/VN/VN}
+* Delta
+CL1 L1 N {C} Rser={(1/(C*omega))*r_x}
+CL2 L2 N {C} Rser={(1/(C*omega))*r_x}
+CL3 L3 N {C} Rser={(1/(C*omega))*r_x}
+RGND N N1 {RGND}
+LGND N1 0 {LGND}
+.ENDS
+
+* capacitance for voltage regulation with control node
+.SUBCKT   CBatt_100MVAR_ctrl  L1 L2 L3 ctrl
++	PARAMS:
++   VN=110e3;
++   fn={fn1}
++   Q=100e6
++   r_x=0.001
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++   C={QN/omega/VN/VN}
+* Delta
+Rctrl ctrl 0 1e12
+CL1 L1 L2a q={C}*v(ctrl)*x
+RL1 L2a L2 {(1/(C*omega))*r_x}
+CL2 L2 L3a q={C}*v(ctrl)*x
+RL2 L3a L3 {(1/(C*omega))*r_x}
+CL3 L3 L1a q={C}*v(ctrl)*x
+RL3 L1a L1 {(1/(C*omega))*r_x}
+.ENDS
+
+.SUBCKT   CBatt_100MVAR_GND_ctrl  L1 L2 L3 ctrl
++	PARAMS:
++   VN=110e3;
++   fn={fn1}
++   Q=100e6
++   r_x=0.001
++   RGND=1e-3
++   LGND=1e-6
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++   C={3*QN/omega/VN/VN}
+* Wye
+Rctrl ctrl 0 1e12
+CL1 L1 L1a q={C}*v(ctrl)*x
+RL1 L1a N {(1/(C*omega))*r_x}
+CL2 L2 L2a q={C}*v(ctrl)*x
+RL2 L2a N {(1/(C*omega))*r_x}
+CL3 L3 L3a q={C}*v(ctrl)*x
+RL3 L3a N {(1/(C*omega))*r_x}
+RGND N N1 {RGND}
+LGND N1 0 {LGND}
+.ENDS
+
+* compensation of the capacitance of a line
+.SUBCKT   Line_comp_gnd  L1 L2 L3
++	PARAMS:
++   VN=400e3;
++   fn={fn1}
++   Q=50e6
++   r_x=0.001
++   RGND=1e-3
++   LGND=1e-6
+.PARAM
++   QN={Q/3}
++   V={VN/sqrt(3)}
++   omega={2*3.14156*fn}
++	L ={(V*V)/(QN*omega)}
+* Wye
+LL1 L1 0 {L} Rser={L*omega*r_x}
+LL2 L2 0 {L} Rser={L*omega*r_x}
+LL3 L3 0 {L} Rser={L*omega*r_x}
+RGND N N1 {RGND}
+LGND N1 0 {LGND}
+.ENDS
+
+* compensation of the capacitance of a line
+.SUBCKT   Line_comp  L1 L2 L3
++	PARAMS:
++   VN=400e3;
++   fn={fn1}
++   Q=50e6
++   r_x=0.001
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++	L ={(VN*VN)/(QN*omega)}
+* Wye
+LL1 L1 L2 {L} Rser={L*omega*r_x}
+LL2 L2 L3 {L} Rser={L*omega*r_x}
+LL3 L3 L1 {L} Rser={L*omega*r_x}
+.ENDS
+
+* compensation of the capacitance of a line
+.SUBCKT   Line_comp_50MVAR  L1 L2 L3
++	PARAMS:
++   VN=400e3;
++   fn={fn1}
++   Q=50e6
++   r_x=0.001
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++	L ={(VN*VN)/(QN*omega)}
+* Delta
+LL1 L1 L2 {L} Rser={L*omega*r_x}
+LL2 L2 L3 {L} Rser={L*omega*r_x}
+LL3 L3 L1 {L} Rser={L*omega*r_x}
+.ENDS
+
+* compensation of the capacitance of a line
+.SUBCKT   Line_comp_70MVAR  L1 L2 L3
++	PARAMS:
++   VN=400e3;
++   fn={fn1}
++   Q=70e6
++   r_x=0.001
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++	L ={(VN*VN)/(QN*omega)}
+* Delta
+LL1 L1 L2 {L} Rser={L*omega*r_x}
+LL2 L2 L3 {L} Rser={L*omega*r_x}
+LL3 L3 L1 {L} Rser={L*omega*r_x}
+.ENDS
+
+* compensation of the capacitance of a line
+.SUBCKT   Line_comp_150MVAR  L1 L2 L3
++	PARAMS:
++   VN=400e3;
++   fn={fn1}
++   Q=150e6
++   r_x=0.001
+.PARAM
++   QN={Q/3}
++   omega={2*3.14156*fn}
++	L ={(VN*VN)/(QN*omega)}
+* Delta
+LL1 L1 L2 {L} Rser={L*omega*r_x}
+LL2 L2 L3 {L} Rser={L*omega*r_x}
+LL3 L3 L1 {L} Rser={L*omega*r_x}
+.ENDS
+
+* compensation of the inductance of a line
+.SUBCKT   Serial_comp  L1a L2a L3a L1b L2b L3b 
++	PARAMS:
++   fn={fn1}
++   C=50u
++   r_x=0.001
+.PARAM
++   omega={2*3.14156*fn}
+* WYE 
+CL1 L1a L1b {C} Rser={C*omega*r_x}
+CL2 L2a L2b {C} Rser={C*omega*r_x}
+CL3 L3a L3b {C} Rser={C*omega*r_x}
+.ENDS
+
+* Another shunt reactor with iron core
+.SUBCKT ShuntReactor  1U  1V  1W 
++	PARAMS:
++	Q=50e6
++	U1Nenn=400k
++	fn={fn1}
++	N1=1000
++	uR=0.02
++	uX=0.04
++	i0=0.05
++	p0=0.005
++   a=0.75
++   m=7 ; Set this 1 for a linear core 
++   psi_0=0 ;
++   psir=1
++   psis=-0.5
++   psit=-0.5
++   tpsi0=1000s ;
++   tpsid=0.1ms
++   ron=0.00001 ;
++   bf=0    ;
++   rkessel=6e5 ; magn. resistance of the kettle filled with oil / reduce it for an effect (e.g. 1e6)
++   l_=0
++   middle=0
++   stproz=1.0
++   ctrl={1+(l_-middle)*stproz/100}
++   omega={2*3.14156*fn}
++   L={U1Nenn*U1Nenn/Q/omega}
+Xu	1U	1N	magn1	magn2	Trafoschenkel1_Yy
++ PARAMS:
++ Q={Q/3}
++ U1N={U1Nenn/sqrt(3)}
++ L={L}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,1.2)}
++ p0={p0*IF(bf==0,1,1.2)}
++ a={a}
++ m={m}
++ psi_0={psir*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
++ ctrl={ctrl}
+Xv	1V	1N	magn1	magn2	Trafoschenkel1_Yy
++ PARAMS:
++ Q={Q/3}
++ U1N={U1Nenn/sqrt(3)}
++ L={L}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,0.6)}
++ p0={p0*IF(bf==0,1,0.6)}
++ a={a}
++ m={m}
++ psi_0={psis*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
++ ctrl={ctrl}
+Xw	1W	1N	magn1	magn2	Trafoschenkel1_Yy
++ PARAMS:
++ Q={Q/3}
++ U1N={U1Nenn/sqrt(3)}
++ L={L}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf<=0,1,1.2)}
++ p0={p0*IF(bf<=0,1,1.2)}
++ a={a}
++ m={m}
++ psi_0={psit*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
++ ctrl={ctrl}
+*Rm	magn1	0	1MEG
+Rkessel magn1 magn2 {rkessel}
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+.ENDS
+
+.SUBCKT   Trafoschenkel1_Yy  1_1 1_2  magnP1 magnP2
++	PARAMS:
++	Q=10kVA
++	U1N=400V
++   L=10
++	fn={fn1}
++	N1=1000
++	uR=0.01
++	uX=0.08
++	i0=0.05
++	p0=0.005
++   a={0.3} ; FS
++   m={7} ; FS
++   psi_0=0 ; Remanenzparameter zwischen 0,1,-1
++   tpsi0=40ms
++   tpsid=0.1ms
++   ron=0.00001
++   calib_rfe=1 ; Kalibrierungsfactor für Aufteilung auf mehrere SCHENKEL_Yy
++   calib_imy=1 ; Kalibrierungsfactor für Aufteilung auf mehrere SCHENKEL_Yy
++   ctrl=1
+.PARAM
++	I1N={Q/U1N}
++	Z1N={U1N/I1N}
++	omegaN={(2*pi)*fN}
++	R1={Z1N*uR}
++	L1s={Z1N*uX/omegaN}
++	RFe={U1N*U1N/(p0*Q)}
++   Xh={(U1N*U1N)/(Q*sqrt(i0*i0-p0*p0))} ;FS
++   iu={U1N/Xh} ;FS
++   ImyN={sqrt(2)*iu} ;FS
++	phiN={sqrt(2)*U1N/omegaN/N1}
++   a={a} ; FS
++   m={m} ; FS
+*	Wicklungsstroeme
+Gi1	1_1	1_2	VALUE={v(a,magnP1)/(N1*ctrl)} tripdv={tdv} tripdt={tdt}
+Rpi1	1_1	1_2	1000MEG
+*	Wicklungen
+X_W1	magnP1	a	1_1	1_2	WICKLUNG1_Yy
++PARAMS:  R={R1}  N={N1}  Rphis={N1*N1/L1s} psi_0={psi_0*phiN} tpsi0={tpsi0} tpsid={tpsid} ron={ron} ctrl={ctrl}
+*	EisenSchenkel
+X_SCH	a	magnP2	SCHENKEL1_Yy   PARAMS:
++	N={N1}  RFe={RFe*calib_rfe}  ImyN={ImyN*calib_imy}  ctrl={ctrl} L={L}
++	phiN={phiN}	a={a}   m={m}
+.ENDS
+
+.SUBCKT WICKLUNG1_Yy  ma  mb  ea  eb
++PARAMS:   R=1   N=1    Rphis=1 psi_0=0 tpsi0=1000s tpsid=0.1ms ron=0.00001 ctrl=1
+Gphi	ma	mb	VALUE={v(phi)} tripdv={tdv} tripdt={tdt} 
+Rphis	ma	mb	{Rphis*ctrl*ctrl}
+*****************************************************************************
+Gp	0	phi	VALUE={(v(ea,eb)-R*ctrl*v(mb,ma)/(N*ctrl))/(N*ctrl)} tripdv={tdv} tripdt={tdt}
+Cp  phi 0 1 IC=0 
+Rp	phi 0	1000MEG
+Vctrl ctrl 0 pwl 0s 0v {tpsi0+1p} 0v {tpsi0+tpsid+2p} 1V {tpsi0+2*tpsid+3p} 1v {tpsi0+3*tpsid+4p} 0v
+S1 phi phix ctrl 0 MS1
+.model MS1 SW(Ron={Ron} Roff=1e9 Vt=0.9 Vh=0 Lser=0 Vser=0)
+E1 phix 0 value={psi_0} tripdv={tdv} tripdt={tdt} ; das ist die Spannungsquelle mit psi_0 der den Kondensator Cp auflädt !!!
+.ENDS ;  WICKLUNG_Yy
+*$
+
+* 15b  Eisenschenkel
+*
+*
+.SUBCKT SCHENKEL1_Yy  m1  m2
++PARAMS:   N=1  RFe=1  ImyN=1  a=1  phiN=1 m=9 ctrl=1 L=10
+LRFe	m1	mh	{N*ctrl*N*ctrl/RFe} Rser={0.001m*N*N/RFe}  ; Rser=parasitic Value zur besseren Konvergenz
+vphi	mh	mh1a	0
+Rm      mh1a mh1  {N*N/L}
+rphi    mh  0 1e12 
+Eimy	mh1	m2
++VALUE={N*imyN*(a*i(vphi)/phiN+(1-a)*PWRS(i(vphi)/phiN,m))} tripdv={tdv} tripdt={tdt}
+.ENDS;  SCHENKEL_Yy

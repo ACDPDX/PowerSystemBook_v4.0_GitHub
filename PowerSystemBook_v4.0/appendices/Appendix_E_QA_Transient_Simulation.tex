@@ -1,0 +1,531 @@
+\chapter[Q\&A: Transient Simulation]
+{Questions and Answers for Transient Simulation}
+\label{app:qa-transient-simulation}
+\index{transient simulation!questions and answers}
+\index{LTspice!troubleshooting}
+
+This appendix collects practical questions that frequently arise when using
+the transient-simulation toolbox. The answers refer to the conventions and
+models used in this book.
+
+\section{Basic Simulation Setup}
+
+\begin{formulaBox}{Which parameters should be present on every schematic?}
+The following global parameters are recommended:
+\begin{lstlisting}[style=LTspice]
+.param tdv=1 tdt=1
+.param fn1=50 omega_n={2*pi*fn1}
+.options vntol=1m abstol=1u
+\end{lstlisting}
+
+Use \texttt{fn1=60} for a \SI{60}{\hertz} system. The values
+\texttt{vntol=1m} and \texttt{abstol=1u} correspond to
+\SI{1}{\milli\volt} and \SI{1}{\micro\ampere}; they are included in the
+toolbox template \texttt{template.asc}.
+
+For a \SIrange{50}{60}{\hertz} system, a useful maximum transient time step is
+between \SI{0.1}{\milli\second} and \SI{0.6}{\milli\second}. A smaller step
+improves temporal resolution but increases simulation time. The alternate
+solver is recommended under \textsc{Tools} $\rightarrow$
+\textsc{Control Panel} $\rightarrow$ \textsc{SPICE}.
+
+If a result is physically implausible, first check transformer orientation and
+all engineering prefixes. In LTspice, \texttt{m} means milli; use
+\texttt{Meg} for mega. A value of \texttt{400} means \SI{400}{\volt}, not
+\SI{400}{\kilo\volt}.
+\end{formulaBox}
+
+\begin{formulaBox}{How can steady state be reached quickly?}
+The voltage-source parameters \texttt{texp} and \texttt{tpwl} can be used to
+ramp the source voltage. Values between approximately
+\SI{10}{\milli\second} and \SI{100}{\milli\second} normally produce a final
+voltage buildup over roughly \SIrange{50}{500}{\milli\second}.
+
+Transformer energization can additionally be improved by coordinating the
+residual-flux parameter \texttt{psi\_0} with the switching instant. For a
+phase-R voltage zero crossing followed by a positive voltage half-cycle:
+\begin{itemize}
+\item \texttt{psi\_0=-1} can place the flux close to its steady-state path;
+\item \texttt{psi\_0=0} can produce approximately twice rated peak flux;
+\item \texttt{psi\_0=1} can produce approximately three times rated peak flux.
+\end{itemize}
+At a voltage maximum, \texttt{psi\_0=0} normally gives the smallest flux
+offset. The exact polarity depends on the winding and voltage sign convention.
+\end{formulaBox}
+
+\begin{formulaBox}{What can be done if the circuit does not converge?}
+Use the following sequence:
+\begin{enumerate}
+\item Verify units, polarities, initial conditions, floating nodes, and switch
+      timing.
+\item Reduce the maximum time step.
+\item Use the alternate solver.
+\item Provide realistic parasitic resistances and DC paths.
+\item If necessary, relax \texttt{vntol}, \texttt{abstol}, or
+      \texttt{reltol} moderately.
+\end{enumerate}
+Increasing tolerances can help convergence but reduces numerical accuracy;
+repeat the final simulation with tighter tolerances as a check.
+\end{formulaBox}
+
+\begin{formulaBox}{How can subcircuit currents and voltages be accessed?}
+Open
+\begin{center}
+\textsc{Tools} $\rightarrow$ \textsc{Control Panel} $\rightarrow$
+\textsc{Save Defaults}
+\end{center}
+and enable \textbf{Save Subcircuit Node Voltages} and
+\textbf{Save Subcircuit Device Currents}. Restart or rerun the simulation after
+changing these settings.
+\end{formulaBox}
+
+\begin{formulaBox}{How are power, energy, and current direction displayed?}
+Hold \textsc{Alt} and click a component to plot its instantaneous power, based
+on the voltages and currents at its pins. Hold \textsc{Ctrl} and click the
+power trace label to integrate the trace over the displayed interval and obtain
+energy.
+
+LTspice defines device-pin currents as positive into the pin. Resistors,
+capacitors, and inductors display a current arrow. Mirroring a symbol also
+mirrors this reference direction.
+\end{formulaBox}
+
+\begin{formulaBox}{What must be considered for LTspice inductors?}
+LTspice inductors may contain a default series resistance of
+\SI{1}{\milli\ohm}. Right-click the inductor and set \texttt{Rser=0} if an
+ideal inductor is required. The global default can be changed under
+\textsc{Tools} $\rightarrow$ \textsc{Control Panel} $\rightarrow$
+\textsc{Hacks} by enabling the option that defaults inductors to
+\texttt{Rser=0}.
+
+Removing all loss can create an undamped resonant circuit and may worsen
+convergence. Use a physically meaningful resistance whenever possible.
+\end{formulaBox}
+
+\section{Transformer Models and Magnetic Quantities}
+
+\begin{formulaBox}{How is a nonlinear transformer changed to a linear model?}
+Right-click the transformer and set
+\begin{lstlisting}[style=LTspice]
+m=1
+\end{lstlisting}
+in the value or parameter field. This removes the high-order nonlinear term in
+the toolbox magnetization characteristic.
+\end{formulaBox}
+
+\begin{formulaBox}{Which parameters determine the magnetization curve?}
+The characteristic is controlled primarily by \texttt{a} and \texttt{m}:
+\begin{equation}
+i_\mu(\Phi)=I_{\mu N}
+\left[
+a\frac{\Phi}{\Phi_N}
++(1-a)\left(\frac{\Phi}{\Phi_N}\right)^m
+\right].
+\label{eq:qa-magnetization-curve}
+\end{equation}
+
+The parameter $a$ determines the linear share and the small-signal slope,
+while $m$ controls the sharpness of saturation. Typical large-transformer
+examples use $m=7$ or $m=9$. 
+
+The quantities $I_{\mu N}$ and $\Phi_N$ must use the same amplitude convention.
+If peak flux is used, the rated peak values are
+\begin{equation}
+\Phi_N=\frac{\sqrt{2}\,U_{N,\mathrm{ph}}}{\omega N},
+\qquad
+I_{\mu N}=\sqrt{2}\,I_{\mu N,\mathrm{rms}}.
+\end{equation}
+\end{formulaBox}
+
+\begin{formulaBox}{How is residual flux specified?}
+Use the transformer parameter \texttt{psi\_0} for a predefined residual-flux
+pattern. Where supported, phase-specific parameters should be used for an
+arbitrary residual-flux vector. The initialization time must match the desired
+switching event.
+\end{formulaBox}
+
+\begin{formulaBox}{How is residual flux applied at an arbitrary time?}
+The model briefly connects an initialization voltage source to the
+\SI{1}{\farad} flux-integrator capacitor. The switch on-resistance and duration
+determine the charging accuracy:
+\begin{equation}
+\tau=R_{\mathrm{on}}C.
+\end{equation}
+For example,
+\begin{equation}
+R_{\mathrm{on}}=10^{-5}\,\Omega,\quad C=\SI{1}{\farad}
+\quad\Longrightarrow\quad
+\tau=\SI{0.01}{\milli\second}.
+\end{equation}
+A closing duration of \SI{0.1}{\milli\second} corresponds to $10\tau$ and
+charges the capacitor essentially to its final value. The rapid initialization
+can produce a narrow voltage or current spike at the charging instant.
+\end{formulaBox}
+
+\begin{formulaBox}{Where can introductory LTspice tutorials be found?}
+An introductory tutorial collection is available at
+\url{http://www.simonbramble.co.uk/lt_spice/ltspice_lt_spice.htm}.
+\end{formulaBox}
+
+\begin{formulaBox}{How is the JUSTUS transformer model composed?}
+The model combines an electrical circuit with a magnetic equivalent circuit.
+Iron loss, leakage, and core paths can therefore be represented with magnetic
+quantities. Under the magnetic-electrical duality used in the model:
+\begin{itemize}
+\item electrical series connections correspond to magnetic parallel paths;
+\item electrical parallel connections correspond to magnetic series paths;
+\item resistance corresponds to conductance under the chosen analogy;
+\item voltage-source and current-source roles are interchanged;
+\item T and $\Pi$ topologies are dual representations.
+\end{itemize}
+
+E.g to convert a inductance to a reluctance or a resistance to a reluctance for a winding with $N$ turns,
+\begin{align}
+\Rmag_\sigma&=\frac{N^2}{L_\sigma},\\
+\Rmag_{R\mathrm{Fe}}&=\frac{N^2}{R_{\mathrm{Fe}}},
+\end{align}
+according to the scaling convention of the toolbox model. The placement of the
+corresponding branches follows the electrical-magnetic duality described above.
+\end{formulaBox}
+
+\begin{formulaBox}{How can approximate data for a \SI{300}{\mega\volt\ampere} transformer be estimated?}
+Assume a \SI{400}{\kilo\volt}/\SI{120}{\kilo\volt} Yy transformer,
+$N_1=1000$, magnetic path length $l_m=\SI{10}{\metre}$, rated flux density
+$B_N=\SI{1.8}{\tesla}$, and RMS magnetizing current
+$I_{\mu N}=\SI{0.5}{\ampere}$.
+
+Using RMS sinusoidal quantities,
+\begin{align}
+\Psi_{1N,\mathrm{rms}}
+ &=\frac{U_{1N,LL}}{\sqrt{3}\,\omega}
+  =\SI{735.1}{\weber},\\
+\Phi_{N,\mathrm{rms}}
+ &=\frac{\Psi_{1N,\mathrm{rms}}}{N_1}
+  =\SI{0.7351}{\weber},\\
+A_{\mathrm{Fe}}
+ &=\frac{\Phi_{N,\mathrm{rms}}}{B_N}
+  \approx\SI{0.408}{\metre\squared},\\
+\Theta_{\mu N}&=N_1I_{\mu N}=\SI{500}{\ampere},\\
+H_N&=\frac{\Theta_{\mu N}}{l_m}=\SI{50}{\ampere\per\metre},\\
+\mu_r&=\frac{B_N}{\mu_0H_N}\approx2.86\times10^4,\\
+\Rmag_m&=\frac{\Theta_{\mu N}}{\Phi_{N,\mathrm{rms}}}
+ \approx\SI{680}{\per\henry},\\
+L_{1h}&=\frac{N_1^2}{\Rmag_m}\approx\SI{1470}{\henry}.
+\end{align}
+
+The equivalent peak convention gives
+$\widehat\Phi_N=\sqrt{2}\Phi_{N,\mathrm{rms}}
+=\SI{1.0396}{\weber}$ and
+$\widehat I_{\mu N}=\sqrt{2}I_{\mu N}$, leaving reluctance and inductance
+unchanged. RMS and peak quantities must not be mixed in one calculation.
+\end{formulaBox}
+
+\begin{formulaBox}{What does the nonlinear curve predict at one, two, and three times rated flux?}
+For $a=0.75$, $m=9$, and a reference current of
+$I_{\mu N}=\SI{0.5}{\ampere}$ in a consistent amplitude convention,
+\begin{align}
+i_\mu(1\Phi_N)&=\SI{0.5}{\ampere},\\
+i_\mu(2\Phi_N)&=\SI{64.75}{\ampere},\\
+i_\mu(3\Phi_N)&=\SI{2461.5}{\ampere}.
+\end{align}
+
+For $l_m=\SI{10}{\metre}$ and $B_N=\SI{1.8}{\tesla}$, the corresponding
+approximate magnetic quantities are
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{ccccc}
+\toprule
+$\Phi/\Phi_N$ & $B$ & $H$ & $\mu_r$ & $L_{1h}$ \\
+\midrule
+1 & \SI{1.8}{\tesla} & \SI{50}{\ampere\per\metre} & $2.86\times10^4$ & \SI{1470}{\henry} \\
+2 & \SI{3.6}{\tesla} & \SI{6475}{\ampere\per\metre} & 442 & \SI{22.7}{\henry} \\
+3 & \SI{5.4}{\tesla} & \SI{2.46e5}{\ampere\per\metre} & 17.5 & \SI{0.90}{\henry} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+These are point estimates based on the assumed algebraic curve. In a dynamic
+simulation, winding voltage drop, leakage flux, and waveform distortion reduce
+the effective flux and RMS current. Even at three times rated flux, the
+estimated main inductance remains above the example leakage inductance
+$L_\sigma\approx\SI{0.1697}{\henry}$.
+\end{formulaBox}
+
+\begin{formulaBox}{How can tank reluctance be estimated?}
+The tank path is strongly geometry- and frequency-dependent. A placeholder
+inductance of a few henries, or roughly 10 to 100 times the winding leakage
+inductance, may be useful for sensitivity studies, but it is not a validated
+transformer parameter. Measurements or field calculations are required for an
+accurate value.
+\end{formulaBox}
+
+\begin{formulaBox}{How can transformer voltage and phase be regulated?}
+The rudimentary tap parameter \texttt{l\_} changes the voltage in steps. For
+example, \texttt{l\_=3} and \texttt{stproz=1.5} correspond to a nominal
+\SI{4.5}{\percent} change, subject to the model sign convention.
+
+The models \texttt{trafo\_tap\_l} and \texttt{trafo\_tap\_s} provide voltage
+and phase-angle regulation. Versions with fixed parameters and versions with
+control pins are available; the latter can be driven by a PWL source during a
+transient simulation.
+\end{formulaBox}
+
+\section{Selecting and Analysing Models}
+
+\begin{formulaBox}{How are alternative models selected?}
+Right-click the element and open the \textbf{SpiceModel} drop-down list. It
+contains models from the associated \texttt{.lib} file. The model
+pin count and pin order must match the symbol! 
+\end{formulaBox}
+
+\begin{formulaBox}{How is a transient model converted to AC analysis?}
+Replace transient sources by sources with AC magnitude and phase definitions,
+and replace the \texttt{.tran} directive by an \texttt{.ac} directive. AC
+analysis linearizes the circuit about its operating point; it is generally not
+suitable for studying switching events or strongly nonlinear large-signal
+behaviour.
+\end{formulaBox}
+
+\begin{formulaBox}{How can reactive-power transfer be recognized?}
+Reactive-power transfer produces a phase displacement between the fundamental
+voltage and current. For sinusoidal RMS phasors,
+\begin{equation}
+Q=\sqrt{3}\,U_{LL}I_L\sin\varphi.
+\end{equation}
+For distorted waveforms, calculate average active power from $u(t)i(t)$ and
+use a harmonic-aware definition of reactive power.
+\end{formulaBox}
+
+\begin{formulaBox}{Why do many elements have control pins?}
+Control pins allow parameters such as voltage level, tap position, phase shift,
+switch state, or model coefficient to change during the simulation. A PWL
+source is commonly used to drive a discrete or continuous control input.
+\end{formulaBox}
+
+\section{Inductive Coupling and Flux}
+
+\begin{formulaBox}{How is leakage between two coupled inductors calculated?}
+For self-inductances $L_1,L_2$ and mutual inductance $M$,
+\begin{align}
+k&=\frac{M}{\sqrt{L_1L_2}},\\
+\sigma&=1-\frac{M^2}{L_1L_2}=1-k^2.
+\end{align}
+If the individual leakage factors are $\sigma_1$ and $\sigma_2$,
+\begin{equation}
+\sigma=\sigma_1+\sigma_2-\sigma_1\sigma_2.
+\end{equation}
+For a symmetric transformer, $\sigma_1=\sigma_2$, hence
+\begin{equation}
+\sigma=2\sigma_1-\sigma_1^2,
+\qquad k=1-\sigma_1,
+\qquad L_{1\sigma}=(1-k)L_1.
+\end{equation}
+
+With $L_{1\sigma}=\SI{0.1697}{\henry}$ and
+$L_1=\SI{1470}{\henry}$,
+\begin{align}
+\sigma_1&=1.1544\times10^{-4},\\
+\sigma&=2.3087\times10^{-4},\\
+k&=\boxed{0.9998846}.
+\end{align}
+The voltage ratio and inductances satisfy
+\begin{equation}
+\frac{N_1}{N_2}=\sqrt{\frac{L_1}{L_2}}
+\end{equation}
+when both inductances use the same magnetic path and reference convention.
+\end{formulaBox}
+
+\begin{formulaBox}{What is the rated peak flux for 1000 turns?}
+For sinusoidal phase voltage $U_{N,\mathrm{ph}}$,
+\begin{equation}
+\widehat\Psi_N=\frac{\sqrt{2}\,U_{N,\mathrm{ph}}}{\omega},
+\qquad
+\widehat\Phi_N=\frac{\widehat\Psi_N}{N}.
+\end{equation}
+
+At \SI{50}{\hertz} and $N=1000$:
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{lcc}
+\toprule
+Voltage applied to winding & Connection interpretation & $\widehat\Phi_N$ \\
+\midrule
+\(\SI{10}{\kilo\volt}/\sqrt{3}\) & \SI{10}{\kilo\volt} star phase & \SI{0.0260}{\weber} \\
+\SI{10}{\kilo\volt} & Winding voltage & \SI{0.0450}{\weber} \\
+\(\SI{20}{\kilo\volt}/\sqrt{3}\) & \SI{20}{\kilo\volt} star phase & \SI{0.0520}{\weber} \\
+\SI{20}{\kilo\volt} & Winding voltage & \SI{0.0900}{\weber} \\
+\(\SI{110}{\kilo\volt}/\sqrt{3}\) & \SI{110}{\kilo\volt} star phase & \SI{0.286}{\weber} \\
+\SI{110}{\kilo\volt} & Winding voltage & \SI{0.495}{\weber} \\
+\(\SI{220}{\kilo\volt}/\sqrt{3}\) & \SI{220}{\kilo\volt} star phase & \SI{0.572}{\weber} \\
+\SI{220}{\kilo\volt} & Winding voltage & \SI{0.990}{\weber} \\
+\(\SI{400}{\kilo\volt}/\sqrt{3}\) & \SI{400}{\kilo\volt} star phase & \SI{1.0396}{\weber} \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{formulaBox}
+
+\begin{formulaBox}{What are the time constants of RL and RC circuits?}
+\begin{equation}
+\tau_{RL}=\frac{L}{R},
+\qquad
+\tau_{RC}=RC.
+\end{equation}
+A first-order response reaches approximately \SI{99.3}{\percent} of its final
+change after $5\tau$ and \SI{99.995}{\percent} after $10\tau$.
+\end{formulaBox}
+
+\begin{formulaBox}{What do \texttt{tpsid} and \texttt{ron} mean?}
+The parameter \texttt{tpsid} specifies how long the initialization source is
+connected to the \SI{1}{\farad} flux-integrator capacitor. The parameter
+\texttt{ron} is the switch on-resistance. Suitable example values are
+\begin{lstlisting}[style=LTspice]
+tpsid=0.1m  ron=1e-5
+\end{lstlisting}
+giving $\tau=R_{\mathrm{on}}C=\SI{0.01}{\milli\second}$ and an initialization
+interval of $10\tau$.
+\end{formulaBox}
+
+\begin{formulaBox}{How can the magnetization curve be plotted?}
+Open the transformer secondary. In the waveform viewer, change the horizontal
+axis from time to primary current and plot internal flux or flux linkage versus
+that current. A nonzero iron-loss parameter \texttt{p0} produces a loop-like
+separation because the loss current is superimposed; it should not be confused
+with a fully physical hysteresis model unless the model explicitly contains
+hysteresis state equations.
+\end{formulaBox}
+
+\section{Lines, Cables, and Compensation}
+
+\begin{formulaBox}{How is cable charging power calculated?}
+For line-to-line RMS voltage $U_N$, phase-to-earth capacitance $C_E$, and
+phase-to-phase capacitance $C_L$ per phase set,
+\begin{align}
+Q_0&=Q_{CE}+Q_{CL}
+   =U_N^2\omega C_E+3U_N^2\omega C_L,\\
+I_0&=\frac{Q_0}{\sqrt{3}U_N}.
+\end{align}
+For a shielded single-core cable, $C_L$ is commonly negligible and
+$Q_0\approx Q_{CE}$. The capacitive earth-fault current is then approximately
+\begin{equation}
+I_E=3I_0=\frac{3Q_{CE}}{\sqrt{3}U_N}.
+\end{equation}
+\end{formulaBox}
+
+\begin{formulaBox}{How are Petersen coils and shunt reactors sized?}
+For a Petersen coil connected from the transformer neutral to earth,
+\begin{align}
+X_L&=\frac{U_N/\sqrt{3}}{I_N}, &
+L&=\frac{X_L}{\omega}.
+\end{align}
+For an example with $U_N=\SI{110}{\kilo\volt}$ and
+$I_N=\SI{250}{\ampere}$, the coil loss may initially be estimated with
+$R\approx X_L/100$ and later replaced by measured data.
+
+For a three-phase reactor with total rating $Q_N$:
+\begin{align}
+L_\Delta&=\frac{3U_N^2}{\omega Q_N},\\
+L_Y&=\frac{U_N^2}{\omega Q_N}.
+\end{align}
+Each delta branch sees $U_N$, whereas each star branch sees $U_N/\sqrt{3}$.
+
+If $C_E=\SI{1000}{\nano\farad}$ at \SI{110}{\kilo\volt},
+\begin{align}
+Q_0&=U_N^2\omega C_E\approx\SI{3.80}{\mega\varunit},\\
+I_0&=\frac{Q_0}{\sqrt{3}U_N}\approx\SI{19.95}{\ampere},\\
+I_E&=3I_0\approx\SI{59.85}{\ampere}.
+\end{align}
+A Petersen coil rated approximately \SI{110}{\kilo\volt} and
+\SI{60}{\ampere} therefore provides the required compensation.
+\end{formulaBox}
+
+\begin{formulaBox}{How does coupling influence parallel lines?}
+Lines on the same route have mutual inductive and capacitive coupling. Depending
+on current direction and phase arrangement, mutual induction can reduce or
+increase the effective series inductance. In the idealized same-direction case,
+$k\rightarrow1$ makes the differential leakage inductance approach zero.
+
+The toolbox contains coupled-line models for one, two, and four circuits. Their
+coupling matrices were calculated with ATP/ATPDraw and converted to LTspice
+format with the supplied Excel conversion file.
+\end{formulaBox}
+
+\begin{formulaBox}{How is source impedance obtained from short-circuit power?}
+For a balanced three-phase network,
+\begin{equation}
+Z_N=\frac{U_N^2}{S_k}.
+\end{equation}
+Examples are
+\begin{align}
+U_N=\SI{400}{\kilo\volt},\quad S_k=\SI{40}{\giga\volt\ampere}
+&\Rightarrow Z_N=\SI{4.0}{\ohm},\\
+U_N=\SI{110}{\kilo\volt},\quad S_k=\SI{7.5}{\giga\volt\ampere}
+&\Rightarrow Z_N=\SI{1.613}{\ohm}.
+\end{align}
+If no resistance information is available, the first approximation is an
+inductive source impedance $jX_N$ with $X_N\approx Z_N$.
+\end{formulaBox}
+
+\begin{formulaBox}{How is the total capacitance of an overhead line calculated?}
+With phase-to-earth capacitance $C_E$ and phase-to-phase capacitance $C_L$, the
+effective positive-sequence charging capacitance is
+\begin{equation}
+C_{\mathrm{sum}}=C_E+3C_L.
+\end{equation}
+The capacitive reactive power is
+\begin{equation}
+Q_C=U_N^2\omega C_{\mathrm{sum}}
+   =\frac{U_N^2}{X_C}.
+\end{equation}
+\end{formulaBox}
+
+\begin{formulaBox}{How is the reactive power of a shunt reactor calculated?}
+For a balanced three-phase reactor connected in star,
+\begin{equation}
+Q_L=\frac{U_N^2}{X_L}
+   =\frac{U_N^2}{\omega L},
+\end{equation}
+where $L$ is the inductance of each phase branch.
+\end{formulaBox}
+
+\begin{formulaBox}{What is the difference between star and delta loads with identical branch impedances?}
+If the same branch resistance or impedance is used in both connections at the
+same line-to-line voltage, each delta branch receives $\sqrt{3}$ times the star
+branch voltage. Therefore,
+\begin{equation}
+P_\Delta=3P_Y,
+\qquad Q_\Delta=3Q_Y.
+\end{equation}
+\end{formulaBox}
+
+\section{Plot Files and Verification}
+
+\begin{formulaBox}{How is a saved plot configuration displayed?}
+Many examples include saved plot-setting files. In the waveform viewer, use
+\textsc{Plot Settings} $\rightarrow$ \textsc{Open Plot Settings} and select
+the required file. If several configurations are supplied, open them one at a
+time to reproduce the intended trace groups.
+\end{formulaBox}
+
+\begin{formulaBox}{How should a transient simulation be verified?}
+Always repeat the simulation with a smaller maximum time step. A credible
+result should change only slightly as the time step is reduced. Also check:
+\begin{itemize}
+\item energy and power balance;
+\item expected steady-state RMS values and phase sequence;
+\item sensitivity to tolerances and parasitic resistances;
+\item agreement between transient, AC, and hand calculations where applicable;
+\item correct current reference directions and voltage bases;
+\item plausibility of resonant frequencies and decay time constants.
+\end{itemize}
+\end{formulaBox}
+
+\begin{chaptersummary}[Appendix Summary]
+Reliable transient simulation begins with consistent global parameters,
+correct units, suitable time steps, and physically meaningful damping. Source
+ramps and coordinated residual flux reduce initialization transients, while
+the alternate solver and carefully selected tolerances improve numerical
+robustness. Every important result should be repeated with a
+smaller time step and compared with analytical estimates.
+\end{chaptersummary}

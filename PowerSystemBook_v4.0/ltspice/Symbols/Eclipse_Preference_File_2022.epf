@@ -1,0 +1,103 @@
+#Tue Jan 20 01:10:07 CET 2026
+\!/=
+/configuration/org.eclipse.core.net/org.eclipse.core.net.hasMigrated=true
+/configuration/org.eclipse.epp.mpc.ui/showOpenFavoritesNotification=false
+/configuration/org.eclipse.equinox.p2.garbagecollector/gc_enabled=false
+/configuration/org.eclipse.ui.ide/MAX_RECENT_WORKSPACES=10
+/configuration/org.eclipse.ui.ide/RECENT_WORKSPACES=C\:\\Users\\fried\\Documents\\Workspace\nC\:\\Users\\fried\\Documents\\eclipse-workspace_perl\nC\:\\Users\\fried\\Documents\\eclipse_workspace_py\nC\:\\Users\\fried\\Documents\\eclipse-workspace\nC\:\\Users\\fried\\eclipse-workspace2\nC\:\\Users\\fried\\eclipse-workspace
+/configuration/org.eclipse.ui.ide/RECENT_WORKSPACES_PROTOCOL=3
+/configuration/org.eclipse.ui.ide/SHOW_RECENT_WORKSPACES=true
+/configuration/org.eclipse.ui.ide/SHOW_WORKSPACE_SELECTION_DIALOG=true
+/configuration/org.eclipse.ui.ide/WARN_ABOUT_WORKSPACE_INCOMPATIBILITY=false
+/instance/org.eclipse.core.resources/encoding=UTF-8
+/instance/org.eclipse.core.resources/version=1
+/instance/org.eclipse.debug.core/prefWatchExpressions=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\r\n<watchExpressions/>\r\n
+/instance/org.eclipse.debug.ui/org.eclipse.debug.ui.PREF_LAUNCH_PERSPECTIVES=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\r\n<launchPerspectives/>\r\n
+/instance/org.eclipse.debug.ui/org.eclipse.debug.ui.user_view_bindings=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\r\n<viewBindings>\r\n    <view id\="org.eclipse.debug.ui.VariableView">\r\n        <perspective id\="org.eclipse.debug.ui.DebugPerspective" userAction\="closed"/>\r\n    </view>\r\n    <view id\="org.eclipse.debug.ui.DebugView">\r\n        <perspective id\="org.eclipse.debug.ui.DebugPerspective" userAction\="closed"/>\r\n    </view>\r\n    <view id\="org.eclipse.debug.ui.ExpressionView">\r\n        <perspective id\="org.eclipse.debug.ui.DebugPerspective" userAction\="closed"/>\r\n    </view>\r\n    <view id\="org.eclipse.debug.ui.BreakpointView">\r\n        <perspective id\="org.eclipse.debug.ui.DebugPerspective" userAction\="closed"/>\r\n    </view>\r\n    <view id\="org.eclipse.ui.console.ConsoleView">\r\n        <perspective id\="org.eclipse.debug.ui.DebugPerspective" userAction\="closed"/>\r\n    </view>\r\n</viewBindings>\r\n
+/instance/org.eclipse.debug.ui/pref_state_memento.org.eclipse.debug.ui.DebugVieworg.eclipse.debug.ui.DebugView=<?xml version\="1.0" encoding\="UTF-8"?>\r\n<DebugViewMemento org.eclipse.debug.ui.BREADCRUMB_DROPDOWN_AUTO_EXPAND\="false"/>
+/instance/org.eclipse.debug.ui/pref_state_memento.org.eclipse.debug.ui.ExpressionView=<?xml version\="1.0" encoding\="UTF-8"?>\r\n<VariablesViewMemento org.eclipse.debug.ui.SASH_DETAILS_PART\="315" org.eclipse.debug.ui.SASH_VIEW_PART\="684">\r\n<PRESENTATION_CONTEXT_PROPERTIES IMemento.internal.id\="org.eclipse.debug.ui.ExpressionView">\r\n<BOOLEAN BOOLEAN\="true" IMemento.internal.id\="PRESENTATION_SHOW_LOGICAL_STRUCTURES"/>\r\n</PRESENTATION_CONTEXT_PROPERTIES>\r\n</VariablesViewMemento>
+/instance/org.eclipse.debug.ui/pref_state_memento.org.eclipse.debug.ui.VariableView=<?xml version\="1.0" encoding\="UTF-8"?>\r\n<VariablesViewMemento org.eclipse.debug.ui.SASH_DETAILS_PART\="315" org.eclipse.debug.ui.SASH_VIEW_PART\="684">\r\n<PRESENTATION_CONTEXT_PROPERTIES IMemento.internal.id\="org.eclipse.debug.ui.VariableView">\r\n<BOOLEAN BOOLEAN\="true" IMemento.internal.id\="PRESENTATION_SHOW_LOGICAL_STRUCTURES"/>\r\n</PRESENTATION_CONTEXT_PROPERTIES>\r\n</VariablesViewMemento>
+/instance/org.eclipse.debug.ui/preferredDetailPanes=DefaultDetailPane\:DefaultDetailPane|
+/instance/org.eclipse.debug.ui/preferredTargets=default\:default|
+/instance/org.eclipse.e4.ui.css.swt.theme/themeid=org.eclipse.e4.ui.css.theme.e4_classic
+/instance/org.eclipse.e4.ui.workbench.renderers.swt/USE_ROUND_TABS=false
+/instance/org.eclipse.e4.ui.workbench.renderers.swt/enableMRU=true
+/instance/org.eclipse.e4.ui.workbench.renderers.swt/themeEnabled=true
+/instance/org.eclipse.jdt.core/org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled
+/instance/org.eclipse.jdt.core/org.eclipse.jdt.core.compiler.codegen.targetPlatform=18
+/instance/org.eclipse.jdt.core/org.eclipse.jdt.core.compiler.compliance=18
+/instance/org.eclipse.jdt.core/org.eclipse.jdt.core.compiler.problem.assertIdentifier=error
+/instance/org.eclipse.jdt.core/org.eclipse.jdt.core.compiler.problem.enumIdentifier=error
+/instance/org.eclipse.jdt.core/org.eclipse.jdt.core.compiler.release=enabled
+/instance/org.eclipse.jdt.core/org.eclipse.jdt.core.compiler.source=18
+/instance/org.eclipse.jdt.launching/org.eclipse.jdt.launching.PREF_VM_XML=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\r\n<vmSettings defaultVM\="57,org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType13,1768696601812">\r\n    <vmType id\="org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType">\r\n        <vm id\="1768696601812" name\="jdk-18.0.2.1" path\="C\:\\Program Files\\Java\\jdk-18.0.2.1"/>\r\n    </vmType>\r\n</vmSettings>\r\n
+/instance/org.eclipse.jdt.ui/content_assist_proposals_background=255,255,255
+/instance/org.eclipse.jdt.ui/content_assist_proposals_foreground=0,0,0
+/instance/org.eclipse.jdt.ui/org.eclipse.jdt.internal.ui.navigator.layout=2
+/instance/org.eclipse.jdt.ui/org.eclipse.jdt.internal.ui.navigator.librariesnode=true
+/instance/org.eclipse.jdt.ui/org.eclipse.jdt.ui.formatterprofiles.version=22
+/instance/org.eclipse.jdt.ui/spelling_locale_initialized=true
+/instance/org.eclipse.jdt.ui/typefilter_migrated_2=true
+/instance/org.eclipse.jdt.ui/useAnnotationsPrefPage=true
+/instance/org.eclipse.jdt.ui/useQuickDiffPrefPage=true
+/instance/org.eclipse.jsch.core/org.eclipse.jsch.core.hasChangedDefaultWin32SshHome=true
+/instance/org.eclipse.jsch.core/org.eclipse.jsch.core.hasMigratedSsh2Preferences=true
+/instance/org.eclipse.m2e.discovery/org.eclipse.m2e.discovery.pref.projects=
+/instance/org.eclipse.oomph.workingsets/working.set.group=<?xml version\="1.0" encoding\="UTF-8"?>\n<workingsets\:WorkingSetGroup xmi\:version\="2.0" xmlns\:xmi\="http\://www.omg.org/XMI" xmlns\:workingsets\="http\://www.eclipse.org/oomph/workingsets/1.0"/>\n
+/instance/org.eclipse.team.core/file_types=confluence\n1\nfactorypath\n1\nbmp\n2\nproject\n1\npy\n1\npyx\n1\nmxsd\n1\npyw\n1\ntif\n2\nexe\n2\njava\n1\nico\n2\nxmi\n1\nxml\n1\noptions\n1\nMF\n1\nhtml\n1\njar\n2\nzip\n2\npng\n2\ntextile\n1\nindex\n1\nhistory\n1\nmediawiki\n1\ndoc\n2\necore\n1\ntwiki\n1\ntiff\n2\ngif\n2\nxsd\n1\nnst\n1\nemof\n1\nxsl\n1\nwsdl\n1\nmarkdown\n1\njpeg\n2\nso\n2\nclass\n2\npxd\n1\nasciidoc\n1\nhtm\n1\njpg\n2\npxi\n1\nclasspath\n1\ndll\n2\nini\n1\nlaunch\n1\nexsd\n1\nprefs\n1\ntracwiki\n1\ntxt\n1\njpage\n1\npdf\n2\nppt\n2\nxslt\n1\njardesc\n1\npl\n1\npm\n1\nproperties\n1\nxls\n2\ndadx\n1\n
+/instance/org.eclipse.ui.ide/platformState=1663434887091
+/instance/org.eclipse.ui.ide/quickStart=false
+/instance/org.eclipse.ui.ide/tipsAndTricks=false
+/instance/org.eclipse.ui.navigator/org.eclipse.ui.navigator.ProjectExplorer.filterActivation=\:org.eclipse.jdt.java.ui.filters.HidePackageDeclaration\:org.eclipse.jdt.java.ui.filters.HideOutputFolder\:org.eclipse.buildship.ui.navigator.filter.gradle.subProject\:org.eclipse.ui.navigator.resources.nested.HideTopLevelProjectIfNested\:org.python.pydev.navigator.filters.customFilters\:org.python.pydev.navigator.filters.endsWithClass\:org.python.pydev.navigator.filters.hidePyoFiles\:org.python.pydev.navigator.filters.Imports\:org.eclipse.buildship.ui.navigator.filter.gradle.buildfolder\:org.eclipse.jdt.java.ui.filters.HideEmptyInnerPackages\:org.eclipse.jdt.java.ui.filters.HideInnerClassFiles\:org.eclipse.ui.navigator.resources.filters.startsWithDot\:org.python.pydev.navigator.filters.hidePycFiles\:org.eclipse.jdt.java.ui.filters.HideEmptyLibraryContainers\:org.eclipse.jdt.java.ui.filters.HideImportDeclaration\:org.eclipse.jdt.java.ui.filters.HideSyntheticMembers\:org.eclipse.ui.navigator.resources.nested.HideFolderWhenProjectIsShownAsNested\:org.python.pydev.navigator.filters.hidePyTildaFiles\:org.python.pydev.navigator.filters.hidePycacheFolders\:
+/instance/org.eclipse.ui.workbench//org.eclipse.ui.commands/state/org.eclipse.ui.navigator.resources.nested.changeProjectPresentation/org.eclipse.ui.commands.radioState=false
+/instance/org.eclipse.ui.workbench/ColorsAndFontsPreferencePage.expandedCategories=Torg.eclipse.ui.workbenchMisc
+/instance/org.eclipse.ui.workbench/ColorsAndFontsPreferencePage.selectedElement=Forg.eclipse.jface.textfont
+/instance/org.eclipse.ui.workbench/PLUGINS_NOT_ACTIVATED_ON_STARTUP=;org.eclipse.m2e.discovery;
+/instance/org.eclipse.ui.workbench/editors=<?xml version\="1.0" encoding\="UTF-8"?>\r\n<editors>\r\n<descriptor class\="org.epic.perleditor.editors.PerlEditor" id\="org.epic.perleditor.editors.PerlEditor" image\="icons/epic.gif" internal\="true" label\="Epic Perl Editor" openMode\="1" open_in_place\="false" plugin\="org.epic.perleditor"/>\r\n<descriptor id\="org.eclipse.ui.browser.editorSupport" image\="$nl$/icons/obj16/internal_browser.png" internal\="false" label\="Web Browser" launcher\="org.eclipse.ui.internal.browser.BrowserLauncher" openMode\="4" open_in_place\="false" plugin\="org.eclipse.ui.browser"/>\r\n<descriptor class\="org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor" id\="org.eclipse.jdt.ui.ModuleInfoEditor" image\="$nl$/icons/full/obj16/jcu_obj.png" internal\="true" label\="Module-Info Editor" openMode\="1" open_in_place\="false" plugin\="org.eclipse.jdt.ui"/>\r\n<descriptor class\="org.eclipse.buildship.ui.internal.editor.GradleEditor" id\="org.eclipse.buildship.ui.gradlebuildscripteditor" image\="icons/full/obj16/gradle_file.png" internal\="true" label\="Gradle Build Script Editor" openMode\="1" open_in_place\="false" plugin\="org.eclipse.buildship.ui"/>\r\n<descriptor class\="org.eclipse.m2e.editor.pom.MavenPomEditor" id\="org.eclipse.m2e.editor.MavenPomEditor" image\="icons/editor-pom.gif" internal\="true" label\="Maven POM Editor" openMode\="1" open_in_place\="false" plugin\="org.eclipse.m2e.editor"/>\r\n<descriptor class\="org.eclipse.oomph.workingsets.presentation.WorkingSetsEditor" id\="org.eclipse.oomph.workingsets.presentation.WorkingSetsEditorID" image\="icons/full/obj16/WorkingSetsModelFile.gif" internal\="true" label\="Working Sets Editor" openMode\="1" open_in_place\="false" plugin\="org.eclipse.oomph.workingsets.editor"/>\r\n<descriptor class\="org.eclipse.jdt.internal.ui.javaeditor.ClassFileEditor" id\="org.eclipse.jdt.ui.ModuleInfoClassFileEditor" image\="$nl$/icons/full/obj16/classf_obj.png" internal\="true" label\="Module-Info Class File Viewer" openMode\="1" open_in_place\="false" plugin\="org.eclipse.jdt.ui"/>\r\n<descriptor class\="org.python.pydev.editor.PyEdit" id\="org.python.pydev.editor.PythonEditor" image\="platform\:/plugin/org.python.pydev.shared_ui/icons/python_file.gif" internal\="true" label\="Python Editor" openMode\="1" open_in_place\="false" plugin\="org.python.pydev"/>\r\n<descriptor id\="org.eclipse.jdt.ui.JARDescEditor" image\="$nl$/icons/full/obj16/jar_desc_obj.png" internal\="false" label\="JAR Export Wizard" launcher\="org.eclipse.jdt.internal.ui.jarpackager.OpenJarExportWizardEditorLauncher" openMode\="4" open_in_place\="false" plugin\="org.eclipse.jdt.ui"/>\r\n<descriptor class\="org.eclipse.oomph.setup.presentation.SetupEditor" id\="org.eclipse.oomph.setup.presentation.SetupEditorID" image\="icons/full/obj16/SetupModelFile.gif" internal\="true" label\="Setup Editor" openMode\="1" open_in_place\="false" plugin\="org.eclipse.oomph.setup.editor"/>\r\n<descriptor class\="org.eclipse.jdt.internal.ui.javaeditor.ClassFileEditor" id\="org.eclipse.jdt.ui.ClassFileEditorNoSource" image\="$nl$/icons/full/obj16/classf_obj.png" internal\="true" label\="Class File Viewer" openMode\="1" open_in_place\="false" plugin\="org.eclipse.jdt.ui"/>\r\n<descriptor class\="org.eclipse.eclemma.internal.ui.editors.ExecutionDataEditor" id\="org.eclipse.eclemma.ui.editors.executiondata" image\="icons/full/eview16/exec.png" internal\="true" label\="JaCoCo Execution Data Editor" openMode\="1" open_in_place\="false" plugin\="org.eclipse.eclemma.ui"/>\r\n<descriptor class\="org.eclipse.jdt.internal.ui.javaeditor.ClassFileEditor" id\="org.eclipse.jdt.ui.ModuleInfoClassFileEditorNoSource" image\="$nl$/icons/full/obj16/classf_obj.png" internal\="true" label\="Module-Info Class File Viewer" openMode\="1" open_in_place\="false" plugin\="org.eclipse.jdt.ui"/>\r\n<descriptor class\="org.eclipse.jdt.internal.debug.ui.snippeteditor.JavaSnippetEditor" id\="org.eclipse.jdt.debug.ui.SnippetEditor" image\="$nl$/icons/full/obj16/jsbook_obj.png" internal\="true" label\="Scrapbook" openMode\="1" open_in_place\="false" plugin\="org.eclipse.jdt.debug.ui"/>\r\n</editors>
+/instance/org.eclipse.ui.workbench/org.eclipse.compare.contentmergeviewer.TextMergeViewer=1|Comic Sans MS|14.25|0|WINDOWS|1|-19|0|0|0|400|0|0|0|0|3|2|1|66|Comic Sans MS;
+/instance/org.eclipse.ui.workbench/org.eclipse.debug.ui.DetailPaneFont=1|Comic Sans MS|14.25|0|WINDOWS|1|-19|0|0|0|400|0|0|0|0|3|2|1|66|Comic Sans MS;
+/instance/org.eclipse.ui.workbench/org.eclipse.debug.ui.MemoryViewTableFont=1|Comic Sans MS|14.25|0|WINDOWS|1|-19|0|0|0|400|0|0|0|0|3|2|1|66|Comic Sans MS;
+/instance/org.eclipse.ui.workbench/org.eclipse.debug.ui.consoleFont=1|Comic Sans MS|14.25|0|WINDOWS|1|-19|0|0|0|400|0|0|0|0|3|2|1|66|Comic Sans MS;
+/instance/org.eclipse.ui.workbench/org.eclipse.egit.ui.CommitMessageEditorFont=1|Comic Sans MS|14.25|0|WINDOWS|1|-19|0|0|0|400|0|0|0|0|3|2|1|66|Comic Sans MS;
+/instance/org.eclipse.ui.workbench/org.eclipse.egit.ui.CommitMessageFont=1|Comic Sans MS|14.25|0|WINDOWS|1|-19|0|0|0|400|0|0|0|0|3|2|1|66|Comic Sans MS;
+/instance/org.eclipse.ui.workbench/org.eclipse.egit.ui.DiffHeadlineFont=1|Comic Sans MS|14.25|0|WINDOWS|1|-19|0|0|0|400|0|0|0|0|3|2|1|66|Comic Sans MS;
+/instance/org.eclipse.ui.workbench/org.eclipse.jdt.internal.ui.compare.JavaMergeViewer=1|Comic Sans MS|14.25|0|WINDOWS|1|-19|0|0|0|400|0|0|0|0|3|2|1|66|Comic Sans MS;
+/instance/org.eclipse.ui.workbench/org.eclipse.jdt.internal.ui.compare.PropertiesFileMergeViewer=1|Comic Sans MS|14.25|0|WINDOWS|1|-19|0|0|0|400|0|0|0|0|3|2|1|66|Comic Sans MS;
+/instance/org.eclipse.ui.workbench/org.eclipse.jdt.ui.PropertiesFileEditor.textfont=1|Comic Sans MS|14.25|0|WINDOWS|1|-19|0|0|0|400|0|0|0|0|3|2|1|66|Comic Sans MS;
+/instance/org.eclipse.ui.workbench/org.eclipse.jdt.ui.editors.textfont=1|Comic Sans MS|14.25|0|WINDOWS|1|-19|0|0|0|400|0|0|0|0|3|2|1|66|Comic Sans MS;
+/instance/org.eclipse.ui.workbench/org.eclipse.jface.textfont=1|Comic Sans MS|14.25|0|WINDOWS|1|-19|0|0|0|400|0|0|0|0|3|2|1|66|Comic Sans MS;
+/instance/org.eclipse.ui.workbench/org.eclipse.mylyn.wikitext.ui.presentation.textFont=1|Comic Sans MS|14.25|0|WINDOWS|1|-19|0|0|0|400|0|0|0|0|3|2|1|66|Comic Sans MS;
+/instance/org.eclipse.ui.workbench/resourcetypes=<?xml version\="1.0" encoding\="UTF-8"?>\r\n<editors version\="3.1">\r\n<info extension\="ipl" name\="*">\r\n<editor id\="org.epic.perleditor.editors.PerlEditor"/>\r\n</info>\r\n<info extension\="html" name\="*">\r\n<editor id\="org.eclipse.ui.browser.editorSupport"/>\r\n</info>\r\n<info extension\="java" name\="module-info">\r\n<editor id\="org.eclipse.jdt.ui.ModuleInfoEditor"/>\r\n<defaultEditor id\="org.eclipse.jdt.ui.ModuleInfoEditor"/>\r\n</info>\r\n<info extension\="gradle" name\="*">\r\n<editor id\="org.eclipse.buildship.ui.gradlebuildscripteditor"/>\r\n</info>\r\n<info extension\="xml" name\="pom">\r\n<editor id\="org.eclipse.m2e.editor.MavenPomEditor"/>\r\n<defaultEditor id\="org.eclipse.m2e.editor.MavenPomEditor"/>\r\n</info>\r\n<info extension\="shtml" name\="*">\r\n<editor id\="org.eclipse.ui.browser.editorSupport"/>\r\n</info>\r\n<info extension\="pm" name\="*">\r\n<editor id\="org.epic.perleditor.editors.PerlEditor"/>\r\n</info>\r\n<info extension\="pl" name\="*">\r\n<editor id\="org.epic.perleditor.editors.PerlEditor"/>\r\n</info>\r\n<info extension\="workingsets" name\="*">\r\n<editor id\="org.eclipse.oomph.workingsets.presentation.WorkingSetsEditorID"/>\r\n</info>\r\n<info extension\="class" name\="module-info">\r\n<editor id\="org.eclipse.jdt.ui.ModuleInfoClassFileEditor"/>\r\n<defaultEditor id\="org.eclipse.jdt.ui.ModuleInfoClassFileEditor"/>\r\n</info>\r\n<info extension\="pyi" name\="*">\r\n<editor id\="org.python.pydev.editor.PythonEditor"/>\r\n<defaultEditor id\="org.python.pydev.editor.PythonEditor"/>\r\n</info>\r\n<info extension\="py" name\="*">\r\n<editor id\="org.python.pydev.editor.PythonEditor"/>\r\n<defaultEditor id\="org.python.pydev.editor.PythonEditor"/>\r\n</info>\r\n<info extension\="cgi" name\="*">\r\n<editor id\="org.epic.perleditor.editors.PerlEditor"/>\r\n</info>\r\n<info extension\="lib" name\="*">\r\n<editor id\="org.eclipse.ui.systemExternalEditor"/>\r\n<defaultEditor id\="org.eclipse.ui.systemExternalEditor"/>\r\n</info>\r\n<info extension\="jardesc" name\="*">\r\n<editor id\="org.eclipse.jdt.ui.JARDescEditor"/>\r\n<defaultEditor id\="org.eclipse.jdt.ui.JARDescEditor"/>\r\n</info>\r\n<info extension\="pom" name\="*">\r\n<editor id\="org.eclipse.m2e.editor.MavenPomEditor"/>\r\n<defaultEditor id\="org.eclipse.m2e.editor.MavenPomEditor"/>\r\n</info>\r\n<info extension\="pyw" name\="*">\r\n<editor id\="org.python.pydev.editor.PythonEditor"/>\r\n<defaultEditor id\="org.python.pydev.editor.PythonEditor"/>\r\n</info>\r\n<info extension\="pyx" name\="*">\r\n<editor id\="org.python.pydev.editor.PythonEditor"/>\r\n<defaultEditor id\="org.python.pydev.editor.PythonEditor"/>\r\n</info>\r\n<info extension\="t" name\="*">\r\n<editor id\="org.epic.perleditor.editors.PerlEditor"/>\r\n</info>\r\n<info extension\="setup" name\="*">\r\n<editor id\="org.eclipse.oomph.setup.presentation.SetupEditorID"/>\r\n</info>\r\n<info extension\="class without source" name\="*">\r\n<editor id\="org.eclipse.jdt.ui.ClassFileEditorNoSource"/>\r\n</info>\r\n<info extension\="exec" name\="*">\r\n<editor id\="org.eclipse.eclemma.ui.editors.executiondata"/>\r\n</info>\r\n<info extension\="class without source" name\="module-info">\r\n<editor id\="org.eclipse.jdt.ui.ModuleInfoClassFileEditorNoSource"/>\r\n<defaultEditor id\="org.eclipse.jdt.ui.ModuleInfoClassFileEditorNoSource"/>\r\n</info>\r\n<info extension\="epl" name\="*">\r\n<editor id\="org.epic.perleditor.editors.PerlEditor"/>\r\n</info>\r\n<info extension\="htm" name\="*">\r\n<editor id\="org.eclipse.ui.browser.editorSupport"/>\r\n</info>\r\n<info extension\="jpage" name\="*">\r\n<editor id\="org.eclipse.jdt.debug.ui.SnippetEditor"/>\r\n</info>\r\n<info extension\="pxi" name\="*">\r\n<editor id\="org.python.pydev.editor.PythonEditor"/>\r\n<defaultEditor id\="org.python.pydev.editor.PythonEditor"/>\r\n</info>\r\n<info extension\="pxd" name\="*">\r\n<editor id\="org.python.pydev.editor.PythonEditor"/>\r\n<defaultEditor id\="org.python.pydev.editor.PythonEditor"/>\r\n</info>\r\n</editors>
+/instance/org.eclipse.ui.workbench/terminal.views.view.font.definition=1|Comic Sans MS|14.25|0|WINDOWS|1|-19|0|0|0|400|0|0|0|0|3|2|1|66|Comic Sans MS;
+/instance/org.eclipse.ui/showIntro=false
+/instance/org.eclipse.urischeme/processedSchemes=,eclipse+command,eclipse+mpc
+/instance/org.epic.perleditor/comment1Color=5,173,64
+/instance/org.epic.perleditor/comment2Color=0,128,128
+/instance/org.epic.perleditor/functionColor=0,0,255
+/instance/org.epic.perleditor/keyword2Color=128,128,255
+/instance/org.epic.perleditor/literal1Color=0,128,64
+/instance/org.epic.perleditor/literal2Color=0,0,255
+/instance/org.epic.perleditor/numberColor=255,0,128
+/instance/org.epic.perleditor/operatorColor=0,0,0
+/instance/org.epic.perleditor/variableColor=255,128,64
+/instance/org.python.pydev/INTERPRETERS_CHECKED_ONCE=true
+@org.eclipse.core.resources=3.18.0.v20220828-0546
+@org.eclipse.debug.core=3.20.0.v20220811-0741
+@org.eclipse.debug.ui=3.17.0.v20220817-1312
+@org.eclipse.e4.ui.css.swt.theme=0.13.100.v20220310-1056
+@org.eclipse.e4.ui.workbench.renderers.swt=0.15.600.v20220715-1400
+@org.eclipse.jdt.core=3.31.0.v20220831-1439
+@org.eclipse.jdt.launching=3.19.700.v20220730-1850
+@org.eclipse.jdt.ui=3.27.0.v20220824-0714
+@org.eclipse.jsch.core=1.4.0.v20220813-1037
+@org.eclipse.m2e.discovery=2.0.0.20220705-1608
+@org.eclipse.oomph.workingsets=1.12.0.v20220421-1218
+@org.eclipse.team.core=3.9.500.v20220817-1539
+@org.eclipse.ui=3.201.100.v20220826-1037
+@org.eclipse.ui.ide=3.19.100.v20220820-0412
+@org.eclipse.ui.navigator=3.10.300.v20220817-1444
+@org.eclipse.ui.workbench=3.126.0.v20220823-0718
+@org.eclipse.urischeme=1.2.100.v20211001-1648
+@org.epic.perleditor=0.7.10
+@org.python.pydev=9.3.0.202203051235
+file_export_version=3.0

@@ -1,0 +1,76 @@
+1)Transformerleg formulas: for Phase 1,2,3
+
+LRfe=N1*N1/Rfe (same for phase 1,2,3)
+Theta_mu1=N1*ImueN*(a*Phi1/PhiN+(1-a)*(Phi1/PhiN)^m
+Theta_mu2=N1*ImueN*(a*Phi2/PhiN+(1-a)*(Phi2/PhiN)^m
+Theta_mu3=N1*ImueN*(a*Phi3/PhiN+(1-a)*(Phi3/PhiN)^m	
+
+2)Transformerwinding formulas: s=secondary p=primary
+
+	primary:
+Phi1p=Psi1p/N1=Integrate(U1p-R1*I1p)/N1 (I1p=N1/theta1)
+Phi2p=Psi2p/N1=Integrate(U2p-R1*I2p)/N1 (I2p=N1/theta2)
+Phi3p=Psi3p/N1=Integrate(U3p-R1*I3p)/N1 (I3p=N1/theta3)
+	secondary:
+Phi1s=Psi1s/N2=Integrate(U1s-R2*I1s)/N2 (I1s=N2/theta1)
+Phi2s=Psi2s/N2=Integrate(U2s-R2*I2s)/N2 (I2s=N2/theta2)
+Phi3s=Psi3s/N2=Integrate(U3s-R2*I3s)/N2 (I3s=N2/theta3)
+	Note:
+Phi1p = Phi1s = Phi1 (Psi1p=Phi1p*N1 Psi1s=Phi1s*N2)  Psi1p ist ungleich Psi1s (since Psi1p=f(U1p) and Psi1s=f(U1s))
+Phi2p = Phi2s = Phi2 (Psi2p=Phi2p*N1 Psi2s=Phi2s*N2)  Psi2p ist ungleich Psi2s 
+Phi3p = Phi3s = Phi3 (Ps3ip=Phi3p*N1 Psi3s=Phi3s*N2)  Psi3p ist ungleich Psi3s 	
+    Leakage:
+Phi1_sigma=Rphis/theta1
+Phi2_sigma=Rphis/theta2
+Phi3_sigma=Rphis/theta3
+
+3)Tank:
+Rkessel: (10x-100x) L1s/N1^2 (~10x-100x leakage inductance)
+Rkessel: 1e20 no tank present
+Rkessel: about 1e5 till 1e6 tank magn. resistance 
+
+Constant machine parameters for a 300MVA transformer:
+	
+SN=300e6
+U1Nenn=400e3 Nominal absolut voltage high voltage side
+U20=120e3 Nominal absolut voltage low voltage side
+fn=50 Nominal frequency
+N1=1000 Nr. of turns primary side
+uR=0.002 ohmic part of the relative short circuit voltage
+uX=0.2 inducitve part of the relative short circuit voltage (uK=sqrt(uR*uR+uX*uX))
+i0=0.0006 no load relative current of tranformer
+p0=0.0004 relative power lost of the tranformer (has to be smaller than i0 !!!!!!)
+a=0.75 (first parameter for the nonlinear magnetizing shape for the iron core)
+m=9 (second parameter) Formula is:  I=IN*(a*psi/psiN+(1-a)*(psi/PsiN)^m)
+
+computations for ONE leg: vector group Yy0
+SN=SN/3 one leg
+U1N=U1Nenn/sqrt(3) (line to ground voltage for Yy0)
+U20=U20/sqrt(3) (line to ground voltage for Yy0)
+I1N=SN/U1N Nominal absolut current
+Z1N=U1N/I1N Nominal absolut impedance
+omegaN=(2*pi)*fN Nominal angle speed
+R1=Z1N*uR/2 Nominal absolut winding resistor primary side
+L1s=Z1N*uX/2/omegaN Nominal absolut leakage inductance primary side 
+RFe=U1N*U1N/(p0*SN) Nominal absolut iron lost equivalent resistance (LRfe=Rfe/N1^2)
+N2=N1*U20/U1N  secondary windings
+R2=R1*N2/N1*N2/N1 secondary absolut winding resistance
+Rphis=N1*N1/L1s Absolute equivalent magnetic resistance to model leakage (Rphis=L1s/N1^2)	
+Xh=(U1N*U1N)/(SN*sqrt(i0*i0-p0*p0))} Main inductance absolut value
+iu=U1N/Xh nominal absolut magnetizing current 
+ImyN={sqrt(2)*iu} nominal absolut magnetizing current peak value 
+phiN={sqrt(2)*U1N/omegaN/N1} nominal absolut Flux peak value
+
+
+
+  
+HINT:
+Read also Q&A_TransientNetworkModels_englisch.docx
+for roughly dimensioning a 300MVA,400kV/120kV Transformer
+
+HINT:
+See also the Q&A section for
+use of behavioural sources in modelling 
+How can i solve a linear system of equations in LTspice and
+How can i integrate in LTspice
+

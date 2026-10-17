@@ -5,9 +5,7 @@ LINE Normal -6 0 -10 -3
 LINE Normal -6 0 -6 0
 LINE Normal -10 3 -6 0
 CIRCLE Normal -12 4 -20 -4
-TEXT -3 -9 Left 2 Z
-TEXT -19 -9 Left 2 X
-TEXT -35 -9 Left 2 R
+TEXT -28 -10 Left 2 Z
 SYMATTR SpiceLine fn=50  fc=3 zenable=100m
 SYMATTR Prefix x
 SYMATTR SpiceModel zmeter_RMS

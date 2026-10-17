@@ -1,0 +1,165 @@
+\chapter[LTspice Schematic Editor]
+{LTspice Schematic Editor: Menu Bar, Toolbar, and Basic Operation}
+\label{app:ltspice-schematic-editor}
+\index{LTspice!schematic editor}
+\index{LTspice!toolbar}
+
+\begin{figure}[htbp]
+  \centering
+  \IfFileExists{ltspice_editor_annotated.pdf}{%
+    \includegraphics[width=\textwidth]{ltspice_editor_annotated.pdf}%
+  }{%
+    \IfFileExists{figures/ltspice_editor_annotated.pdf}{%
+      \includegraphics[width=\textwidth]{figures/ltspice_editor_annotated.pdf}%
+    }{%
+      \fbox{\parbox[c][55mm][c]{0.92\textwidth}{\centering
+      Copy \texttt{ltspice\_editor\_annotated.pdf} into the same directory as
+      this \LaTeX{} file or into the book's \texttt{figures} directory.}}
+    }%
+  }
+  \caption{Annotated LTspice 24 schematic-editor window showing the title and
+  menu bars, functional toolbar groups, schematic drawing area, grid, and
+  status bar. The appearance of individual icons depends on the selected
+  toolbar style and LTspice version.}
+  \label{fig:ltspice-editor}
+\end{figure}
+
+\begin{noteBox}{Version note}
+This overview refers to the Windows schematic editor used in LTspice 24.0.12.
+The illustration shows the default LTspice 24 toolbar. Users who prefer the
+older, smaller icon set can select the legacy toolbar with
+\textsc{Tools} $\rightarrow$ \textsc{Settings} $\rightarrow$
+\textsc{Operation} $\rightarrow$ \textsc{Toolbar Style} $\rightarrow$
+\textsc{Legacy}.
+\end{noteBox}
+
+
+\section{Main Areas of the Schematic Editor}
+
+\begin{formulaBox}{1. Menu bar}
+The menu bar provides access to all drawing, simulation, display, and program
+configuration commands. A toolbar icon is available only for the most commonly
+used commands.
+\end{formulaBox}
+
+\begin{formulaBox}{2. Toolbar}
+The toolbar gives direct access to frequently used commands such as opening a
+schematic, starting a simulation, inserting components, drawing wires, and
+editing circuit elements. Moving the mouse pointer over an icon displays its
+function as a tooltip.
+\end{formulaBox}
+
+\begin{formulaBox}{3. Drawing area}
+Components, wires, node labels, comments, and SPICE directives are placed in
+the drawing area. The electrical reference node must be the ground node named
+\texttt{0}. A schematic without node \texttt{0} normally cannot be simulated.
+\end{formulaBox}
+
+\section{Menu Bar}
+
+\small
+\begin{tabularx}{\textwidth}{>{\bfseries}p{24mm} X}
+\toprule
+Menu & Purpose \\
+\midrule
+File & Creates, opens, closes, saves, and prints schematic files. It also
+       provides access to recently used files and program exit. \\
+Edit & Contains undo and editing operations such as delete, duplicate, move,
+       stretch, rotate, mirror, search, and selection commands. \\
+Hierarchy & Creates and manages hierarchical blocks, symbols, ports, and
+       multi-level schematics. \\
+View & Controls zoom, grid, anchors, unconnected-pin markers, netlist display,
+       SPICE error log, and other schematic or waveform views. \\
+Simulate & Starts, pauses, or stops a simulation and opens the dialog for
+       defining transient, AC, DC, noise, and operating-point analyses. \\
+Tools & Opens program settings and provides component, symbol, and library
+       management functions. \\
+Window & Selects and arranges open schematic, waveform, and text windows. \\
+Help & Opens the LTspice documentation, keyboard-shortcut information, and
+       version information. \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\section{Toolbar Symbols}
+
+\small
+\begin{tabularx}{\textwidth}{>{\bfseries}p{34mm} >{\ttfamily}p{17mm} X}
+\toprule
+Command & Shortcut & Function \\
+\midrule
+New Schematic & Ctrl+N & Creates a new empty schematic. \\
+Open & Ctrl+O & Opens an existing schematic or supported LTspice file. \\
+Save & Ctrl+S & Saves the active schematic. \\
+Control Panel / Settings & --- & Opens the general LTspice configuration. \\
+Run & --- & Starts the selected simulation. \\
+Stop / Halt & --- & Stops the active simulation. \\
+Zoom Area & Ctrl+Z & Enlarges a rectangular part of the schematic. \\
+Zoom Back & Ctrl+B & Returns to the preceding zoom level. \\
+Zoom to Fit & Space & Fits the complete schematic into the window. \\
+Wire & F3 & Draws an electrical connection between nodes. \\
+Ground & G & Places the mandatory reference node \texttt{0}. \\
+Label Net & F4 & Assigns a name to a node or electrical network. \\
+Component & F2 & Opens the component and symbol selection dialog. \\
+Resistor & R & Places a resistor. \\
+Capacitor & C & Places a capacitor. \\
+Inductor & L & Places an inductor. \\
+Diode & D & Places a diode. \\
+SPICE Directive & S & Places commands such as \texttt{.tran}, \texttt{.param},
+  \texttt{.options}, or \texttt{.measure}. \\
+Text Comment & T & Places explanatory text without electrical effect. \\
+Delete & F5 & Deletes selected components, wires, labels, or text. \\
+Duplicate / Copy & F6 & Creates a copy of the selected object. \\
+Move & F7 & Moves an object; connected wires are not stretched with it. \\
+Stretch / Drag & F8 & Moves an object while retaining and adapting its wires. \\
+Rotate & Ctrl+R & Rotates the selected component by 90 degrees. \\
+Mirror & Ctrl+E & Mirrors the selected component. \\
+Undo & F9$^{*}$ & Reverses the last editing action. \\
+\bottomrule
+\end{tabularx}
+
+\normalsize
+\medskip
+\noindent\footnotesize
+$^{*}$ The effective shortcut can depend on the active window and the configured
+hotkeys. LTspice displays the currently assigned keys in its menus and tooltips.
+\normalsize
+
+\section{Basic Workflow}
+
+\begin{formulaBox}{Creating and simulating a circuit}
+\begin{enumerate}
+  \item Create or open a schematic.
+  \item Insert the required components and assign their parameters.
+  \item Connect the circuit with the \textsc{Wire} tool.
+  \item Insert ground node \texttt{0} and assign useful net labels.
+  \item Define the simulation with
+        \textsc{Simulate} $\rightarrow$ \textsc{Configure Analysis} or place the
+        corresponding SPICE directive directly on the schematic.
+  \item Press \textsc{Run} and select node voltages or branch currents in the
+        waveform viewer.
+\end{enumerate}
+\end{formulaBox}
+
+\begin{noteBox}{Move and Stretch}
+\textsc{Move} changes the position of a component without preserving the exact
+wire geometry. \textsc{Stretch} moves the component together with its connected
+wires. Press \texttt{Esc} or the right mouse button to leave an active
+editing mode.
+\end{noteBox}
+
+\section{References}
+
+\begin{itemize}
+  \item Analog Devices,
+  \href{https://www.analog.com/en/resources/media-center/videos/6368296317112.html}%
+  {``LTspice Basics: Schematic Capture.''}
+  \item Analog Devices EngineerZone, information about the LTspice 24 toolbar
+  and the legacy toolbar style,
+  \href{https://ez.analog.com/design-tools-and-calculators/ltspice/f/q-a/581713/tool-bar-is-incomplete}%
+  {``Toolbar is Incomplete.''}
+  \item Interface illustration adapted from the LTspice schematic-entry
+  tutorial by LEnsE, Institut d'Optique Graduate School,
+  \href{https://lense.institutoptique.fr/mine/ltspice-saisir-un-schema/}%
+  {``LTspice: Schematic Entry.''}
+\end{itemize}

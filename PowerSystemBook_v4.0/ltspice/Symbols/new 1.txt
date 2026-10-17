@@ -1,0 +1,66 @@
+.subckt test a1 a4 a2 a5 a3 a6 b1 b4 b2 b5 b3 b6
++PARAMS:
++ XL11=7.37928E-04 XM12=6.26915E-04 XM13=6.17933E-04 XM14=6.84783E-04 XM15=6.26915E-04 XM16=6.17933E-04 
++ XM21=6.26915E-04 XL22=7.37923E-04 XM23=6.26915E-04 XM24=6.26915E-04 XM25=6.84779E-04 XM26=6.26915E-04 
++ XM31=6.17933E-04 XM32=6.26915E-04 XL33=7.37928E-04 XM34=6.17933E-04 XM35=6.26915E-04 XM36=6.84783E-04 
++ XM41=6.84783E-04 XM42=6.26915E-04 XM43=6.17933E-04 XL44=6.83987E-04 XM45=6.26915E-04 XM46=6.17933E-04 
++ XM51=6.26915E-04 XM52=6.84779E-04 XM53=6.26915E-04 XM54=6.26915E-04 XL55=6.83983E-04 XM56=6.26915E-04 
++ XM61=6.17933E-04 XM62=6.26915E-04 XM63=6.84783E-04 XM64=6.17933E-04 XM65=6.26915E-04 XL66=6.83987E-04 
+*input Ce and Cshield in F/m like in the ATP-Matrix
++ fn=50
++ omega={2*pi*fn}
+*input Ze(Ce) and Zshield(Cshield) in ohm/m like in the ATP-Matrix
++ Yce=1.3152e-7
++ Yshield=7.93242e-7
++ Ce={Yce/omega}
++ Cshield={Yshield/omega}
+*input R,Rsh like in the VERIFY command for a 1km line!!!
++ R=0.1017 Rsh=0.203 
++ length=1
++ length1={length*1000}
++ g=1e12
+.param Ce1={length1*Ce}
+.param Cshield1={length1*Cshield}
+.param Rnn={1.50820E-04}
+.param Rmm={2.52027E-04}
+.param Rmn={4.92345E-05}
+V1 a1 a1a 0
+V2 a2 a2a 0 
+V3 a3 a3a 0 
+V4 a4 a4a 0
+V5 a5 a5a 0 
+V6 a6 a6a 0 
+* 
+R1 a1a a1b {1e-5}
+R2 a2a a2b {1e-5}
+R3 a3a a3b {1e-5}
+R4 a4a a4b {1e-5}
+R5 a5a a5b {1e-5}
+R6 a6a a6b {1e-5}
+* Inductance matrix from ATP
+E1 a1b b1 VALUE={length1*(Rnn*I(V1)+Rmn*I(V2)+Rmn*I(V3)+Rmn*I(V4)+Rmn*I(V5)+Rmn*I(V6))+length1/omega*(XL11*DDT(I(V1))+XM12*DDT(I(V2))+XM13*DDT(I(V3))+XM14*DDT(I(V4))+XM15*DDT(I(V5))+XM16*DDT(I(V6)))} tripdv={tdv} tripdt={tdt}
+E2 a2b b2 VALUE={length1*(Rmn*I(V1)+Rnn*I(V2)+Rmn*I(V3)+Rmn*I(V4)+Rmn*I(V5)+Rmn*I(V6))+length1/omega*(XM21*DDT(I(V1))+XL22*DDT(I(V2))+XM23*DDT(I(V3))+XM24*DDT(I(V4))+XM25*DDT(I(V5))+XM26*DDT(I(V6)))} tripdv={tdv} tripdt={tdt}
+E3 a3b b3 VALUE={length1*(Rmn*I(V1)+Rmn*I(V2)+Rnn*I(V3)+Rmn*I(V4)+Rmn*I(V5)+Rmn*I(V6))+length1/omega*(XM31*DDT(I(V1))+XM32*DDT(I(V2))+XL33*DDT(I(V3))+XM34*DDT(I(V4))+XM35*DDT(I(V5))+XM36*DDT(I(V6)))} tripdv={tdv} tripdt={tdt}
+E4 a4b b4 VALUE={length1*(Rmn*I(V1)+Rmn*I(V2)+Rmn*I(V3)+Rmm*I(V4)+Rmn*I(V5)+Rmn*I(V6))+length1/omega*(XM41*DDT(I(V1))+XM42*DDT(I(V2))+XM43*DDT(I(V3))+XL44*DDT(I(V4))+XM45*DDT(I(V5))+XM46*DDT(I(V6)))} tripdv={tdv} tripdt={tdt}
+E5 a5b b5 VALUE={length1*(Rmn*I(V1)+Rmn*I(V2)+Rmn*I(V3)+Rmn*I(V4)+Rmm*I(V5)+Rmn*I(V6))+length1/omega*(XM51*DDT(I(V1))+XM52*DDT(I(V2))+XM53*DDT(I(V3))+XM54*DDT(I(V4))+XL55*DDT(I(V5))+XM56*DDT(I(V6)))} tripdv={tdv} tripdt={tdt}
+E6 a6b b6 VALUE={length1*(Rmn*I(V1)+Rmn*I(V2)+Rmn*I(V3)+Rmn*I(V4)+Rmn*I(V5)+Rmm*I(V6))+length1/omega*(XM61*DDT(I(V1))+XM62*DDT(I(V2))+XM63*DDT(I(V3))+XM64*DDT(I(V4))+XM65*DDT(I(V5))+XL66*DDT(I(V6)))} tripdv={tdv} tripdt={tdt}
+* Capacitance matrix from ATP only at right side 
+Gc1 b1 0  VALUE={ce1*DDT(v(b1))-ce1*DDT(v(b4))} tripdv={tdv} tripdt={tdt}
+Gc2 b2 0  VALUE={ce1*DDT(v(b2))-ce1*DDT(v(b5))} tripdv={tdv} tripdt={tdt}
+Gc3 b3 0  VALUE={ce1*DDT(v(b3))-ce1*DDT(v(b6))} tripdv={tdv} tripdt={tdt}
+Gc4 b4 0  VALUE={-ce1*DDT(v(b1))+Cshield1*DDT(v(b4))} tripdv={tdv} tripdt={tdt}
+Gc5 b5 0  VALUE={-ce1*DDT(v(b2))+Cshield1*DDT(v(b5))} tripdv={tdv} tripdt={tdt}
+Gc6 b6 0  VALUE={-ce1*DDT(v(b3))+Cshield1*DDT(v(b6))} tripdv={tdv} tripdt={tdt}
+Rgnd1 a1 0 {g}
+Rgnd2 a2 0 {g}
+Rgnd3 a3 0 {g}
+Rgnd4 a4 0 {g}
+Rgnd5 a5 0 {g}
+Rgnd6 a6 0 {g}
+Rgnd13 b1 0 {g}
+Rgnd14 b2 0 {g}
+Rgnd15 b3 0 {g}
+Rgnd16 b4 0 {g}
+Rgnd17 b5 0 {g}
+Rgnd18 b6 0 {g}
+.ends

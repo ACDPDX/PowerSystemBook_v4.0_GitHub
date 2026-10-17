@@ -12,10 +12,10 @@ LINE Normal 8 16 5 14
 LINE Normal 8 16 5 18
 LINE Normal 8 32 5 30
 LINE Normal 8 32 5 34
-LINE Normal 24 -7 -24 -7 2
-LINE Normal 24 39 24 -7 2
-LINE Normal -24 39 24 39 2
-LINE Normal -24 -7 -24 39 2
+LINE Normal 24 -7 -24 -7
+LINE Normal 24 39 24 -7
+LINE Normal -24 39 24 39
+LINE Normal -24 -7 -24 39
 LINE Normal -24 -16 -36 -16
 LINE Normal -27 -18 -24 -16
 LINE Normal -27 -14 -24 -16

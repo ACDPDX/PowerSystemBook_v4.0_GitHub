@@ -880,6 +880,8 @@ R_Ein Ein 0 1e9
 .param Rphase=0.018042
 .param Rshield=0.0676
 
+.param l={length}
+
 RAIN1 AIN AIN1 {Rphase*l/2}
 RBIN1 BIN BIN1 {Rphase*l/2}
 RCIN1 CIN CIN1 {Rphase*l/2}
@@ -913,7 +915,10 @@ V12 m6out1 m6out 0
 
 * T-Lines, TD's Z's E,G Lines all from Matlab .m file!
 
-.param l={length}
+******************************************
+* Paste following lines from matlab file
+******************************************
+
 
 .param TD1=  74.012us
 .param TD2=  30.287us
@@ -922,64 +927,69 @@ V12 m6out1 m6out 0
 .param TD5=   7.794us
 .param TD6=   7.794us
 
-.param Z1=  125.74Ohm
-.param Z2=   51.51Ohm
-.param Z3=   44.96Ohm
-.param Z4=   23.12Ohm
-.param Z5=   23.11Ohm
-.param Z6=   23.10Ohm
+.param Z1=   125.7Ohm
+.param Z2=    51.5Ohm
+.param Z3=    45.0Ohm
+.param Z4=    23.1Ohm
+.param Z5=    23.1Ohm
+.param Z6=    23.1Ohm
 
-T1 m1in 0 m1out1 0 Z0= 125.74 TD={74.0124us*l}
-T2 m2in 0 m2out1 0 Z0=  51.51 TD={30.2871us*l}
-T3 m3in 0 m3out1 0 Z0=  44.96 TD={26.4280us*l}
-T4 m4in 0 m4out1 0 Z0=  23.12 TD={7.7940us*l}
-T5 m5in 0 m5out1 0 Z0=  23.11 TD={7.7940us*l}
-T6 m6in 0 m6out1 0 Z0=  23.10 TD={7.7940us*l}
+T1 m1in 0 m1out1 0 Z0=  125.7 TD={74.0124us*l}
+T2 m2in 0 m2out1 0 Z0=   51.5 TD={30.2871us*l}
+T3 m3in 0 m3out1 0 Z0=   45.0 TD={26.4280us*l}
+T4 m4in 0 m4out1 0 Z0=   23.1 TD={7.7940us*l}
+T5 m5in 0 m5out1 0 Z0=   23.1 TD={7.7940us*l}
+T6 m6in 0 m6out1 0 Z0=   23.1 TD={7.7940us*l}
 
 
 **************************************************
 * INPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
 **************************************************
 
-Ein1 M1in1 0 VALUE={+4.1238e-05*V(Ain1)+4.2662e-05*V(Bin1)+4.1238e-05*V(Cin1)+8.0713e-01*V(ShAin1)+8.3501e-01*V(ShBin1)+8.0713e-01*V(ShCin1)} tripdv=1 tripdt=1
-Ein2 M2in1 0 VALUE={+3.2328e-04*V(Ain1)+5.5511e-16*V(Bin1)-3.2328e-04*V(Cin1)+1.0002e+00*V(ShAin1)+2.1789e-15*V(ShBin1)-1.0002e+00*V(ShCin1)} tripdv=1 tripdt=1
-Ein3 M3in1 0 VALUE={+2.5643e-04*V(Ain1)-4.9574e-04*V(Bin1)+2.5643e-04*V(Cin1)+5.9061e-01*V(ShAin1)-1.1418e+00*V(ShBin1)+5.9061e-01*V(ShCin1)} tripdv=1 tripdt=1
-Ein4 M4in1 0 VALUE={-5.7067e-01*V(Ain1)-5.9039e-01*V(Bin1)-5.7067e-01*V(Cin1)+5.7077e-01*V(ShAin1)+5.9050e-01*V(ShBin1)+5.7077e-01*V(ShCin1)} tripdv=1 tripdt=1
-Ein5 M5in1 0 VALUE={-7.0688e-01*V(Ain1)-2.3514e-10*V(Bin1)+7.0688e-01*V(Cin1)+7.0768e-01*V(ShAin1)+2.3541e-10*V(ShBin1)-7.0768e-01*V(ShCin1)} tripdv=1 tripdt=1
-Ein6 M6in1 0 VALUE={+4.1731e-01*V(Ain1)-8.0674e-01*V(Bin1)+4.1731e-01*V(Cin1)-4.1794e-01*V(ShAin1)+8.0797e-01*V(ShBin1)-4.1794e-01*V(ShCin1)} tripdv=1 tripdt=1
+Ein1 M1in1 0 VALUE={+0.0000*V(Ain1)+0.0000*V(Bin1)+0.0000*V(Cin1)+0.8071*V(ShAin1)+0.8350*V(ShBin1)+0.8071*V(ShCin1)} tripdv=1 tripdt=1
+Ein2 M2in1 0 VALUE={+0.0003*V(Ain1)+0.0000*V(Bin1)-0.0003*V(Cin1)+1.0002*V(ShAin1)+0.0000*V(ShBin1)-1.0002*V(ShCin1)} tripdv=1 tripdt=1
+Ein3 M3in1 0 VALUE={+0.0003*V(Ain1)-0.0005*V(Bin1)+0.0003*V(Cin1)+0.5906*V(ShAin1)-1.1418*V(ShBin1)+0.5906*V(ShCin1)} tripdv=1 tripdt=1
+Ein4 M4in1 0 VALUE={-0.5707*V(Ain1)-0.5904*V(Bin1)-0.5707*V(Cin1)+0.5708*V(ShAin1)+0.5905*V(ShBin1)+0.5708*V(ShCin1)} tripdv=1 tripdt=1
+Ein5 M5in1 0 VALUE={-0.7069*V(Ain1)-0.0000*V(Bin1)+0.7069*V(Cin1)+0.7077*V(ShAin1)+0.0000*V(ShBin1)-0.7077*V(ShCin1)} tripdv=1 tripdt=1
+Ein6 M6in1 0 VALUE={+0.4173*V(Ain1)-0.8067*V(Bin1)+0.4173*V(Cin1)-0.4179*V(ShAin1)+0.8080*V(ShBin1)-0.4179*V(ShCin1)} tripdv=1 tripdt=1
 
 **************************************************
 * OUTPUT E SOURCES (Phase -> Mode) Vmode=inv(T)*Vphase
 **************************************************
 
-Eout1 M1out 0 VALUE={+4.1238e-05*V(Aout1)+4.2662e-05*V(Bout1)+4.1238e-05*V(Cout1)+8.0713e-01*V(ShAout1)+8.3501e-01*V(ShBout1)+8.0713e-01*V(ShCout1)} tripdv=1 tripdt=1
-Eout2 M2out 0 VALUE={+3.2328e-04*V(Aout1)+5.5511e-16*V(Bout1)-3.2328e-04*V(Cout1)+1.0002e+00*V(ShAout1)+2.1789e-15*V(ShBout1)-1.0002e+00*V(ShCout1)} tripdv=1 tripdt=1
-Eout3 M3out 0 VALUE={+2.5643e-04*V(Aout1)-4.9574e-04*V(Bout1)+2.5643e-04*V(Cout1)+5.9061e-01*V(ShAout1)-1.1418e+00*V(ShBout1)+5.9061e-01*V(ShCout1)} tripdv=1 tripdt=1
-Eout4 M4out 0 VALUE={-5.7067e-01*V(Aout1)-5.9039e-01*V(Bout1)-5.7067e-01*V(Cout1)+5.7077e-01*V(ShAout1)+5.9050e-01*V(ShBout1)+5.7077e-01*V(ShCout1)} tripdv=1 tripdt=1
-Eout5 M5out 0 VALUE={-7.0688e-01*V(Aout1)-2.3514e-10*V(Bout1)+7.0688e-01*V(Cout1)+7.0768e-01*V(ShAout1)+2.3541e-10*V(ShBout1)-7.0768e-01*V(ShCout1)} tripdv=1 tripdt=1
-Eout6 M6out 0 VALUE={+4.1731e-01*V(Aout1)-8.0674e-01*V(Bout1)+4.1731e-01*V(Cout1)-4.1794e-01*V(ShAout1)+8.0797e-01*V(ShBout1)-4.1794e-01*V(ShCout1)} tripdv=1 tripdt=1
+Eout1 M1out 0 VALUE={+0.0000*V(Aout1)+0.0000*V(Bout1)+0.0000*V(Cout1)+0.8071*V(ShAout1)+0.8350*V(ShBout1)+0.8071*V(ShCout1)} tripdv=1 tripdt=1
+Eout2 M2out 0 VALUE={+0.0003*V(Aout1)+0.0000*V(Bout1)-0.0003*V(Cout1)+1.0002*V(ShAout1)+0.0000*V(ShBout1)-1.0002*V(ShCout1)} tripdv=1 tripdt=1
+Eout3 M3out 0 VALUE={+0.0003*V(Aout1)-0.0005*V(Bout1)+0.0003*V(Cout1)+0.5906*V(ShAout1)-1.1418*V(ShBout1)+0.5906*V(ShCout1)} tripdv=1 tripdt=1
+Eout4 M4out 0 VALUE={-0.5707*V(Aout1)-0.5904*V(Bout1)-0.5707*V(Cout1)+0.5708*V(ShAout1)+0.5905*V(ShBout1)+0.5708*V(ShCout1)} tripdv=1 tripdt=1
+Eout5 M5out 0 VALUE={-0.7069*V(Aout1)-0.0000*V(Bout1)+0.7069*V(Cout1)+0.7077*V(ShAout1)+0.0000*V(ShBout1)-0.7077*V(ShCout1)} tripdv=1 tripdt=1
+Eout6 M6out 0 VALUE={+0.4173*V(Aout1)-0.8067*V(Bout1)+0.4173*V(Cout1)-0.4179*V(ShAout1)+0.8080*V(ShBout1)-0.4179*V(ShCout1)} tripdv=1 tripdt=1
 
 **************************************************
 * INPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
 **************************************************
 
-G_Ain Ain1 0 VALUE={+4.1238e-05*I(V1)+3.2328e-04*I(V2)+2.5643e-04*I(V3)-5.7067e-01*I(V4)-7.0688e-01*I(V5)+4.1731e-01*I(V6)} tripdv=1 tripdt=1
-G_Bin Bin1 0 VALUE={+4.2662e-05*I(V1)+5.5511e-16*I(V2)-4.9574e-04*I(V3)-5.9039e-01*I(V4)-2.3514e-10*I(V5)-8.0674e-01*I(V6)} tripdv=1 tripdt=1
-G_Cin Cin1 0 VALUE={+4.1238e-05*I(V1)-3.2328e-04*I(V2)+2.5643e-04*I(V3)-5.7067e-01*I(V4)+7.0688e-01*I(V5)+4.1731e-01*I(V6)} tripdv=1 tripdt=1
-G_ShAin ShAin1 0 VALUE={+8.0713e-01*I(V1)+1.0002e+00*I(V2)+5.9061e-01*I(V3)+5.7077e-01*I(V4)+7.0768e-01*I(V5)-4.1794e-01*I(V6)} tripdv=1 tripdt=1
-G_ShBin ShBin1 0 VALUE={+8.3501e-01*I(V1)+2.1789e-15*I(V2)-1.1418e+00*I(V3)+5.9050e-01*I(V4)+2.3541e-10*I(V5)+8.0797e-01*I(V6)} tripdv=1 tripdt=1
-G_ShCin ShCin1 0 VALUE={+8.0713e-01*I(V1)-1.0002e+00*I(V2)+5.9061e-01*I(V3)+5.7077e-01*I(V4)-7.0768e-01*I(V5)-4.1794e-01*I(V6)} tripdv=1 tripdt=1
+G_Ain Ain1 0 VALUE={+0.0000*I(V1)+0.0003*I(V2)+0.0003*I(V3)-0.5707*I(V4)-0.7069*I(V5)+0.4173*I(V6)} tripdv=1 tripdt=1
+G_Bin Bin1 0 VALUE={+0.0000*I(V1)+0.0000*I(V2)-0.0005*I(V3)-0.5904*I(V4)-0.0000*I(V5)-0.8067*I(V6)} tripdv=1 tripdt=1
+G_Cin Cin1 0 VALUE={+0.0000*I(V1)-0.0003*I(V2)+0.0003*I(V3)-0.5707*I(V4)+0.7069*I(V5)+0.4173*I(V6)} tripdv=1 tripdt=1
+G_ShAin ShAin1 0 VALUE={+0.8071*I(V1)+1.0002*I(V2)+0.5906*I(V3)+0.5708*I(V4)+0.7077*I(V5)-0.4179*I(V6)} tripdv=1 tripdt=1
+G_ShBin ShBin1 0 VALUE={+0.8350*I(V1)+0.0000*I(V2)-1.1418*I(V3)+0.5905*I(V4)+0.0000*I(V5)+0.8080*I(V6)} tripdv=1 tripdt=1
+G_ShCin ShCin1 0 VALUE={+0.8071*I(V1)-1.0002*I(V2)+0.5906*I(V3)+0.5708*I(V4)-0.7077*I(V5)-0.4179*I(V6)} tripdv=1 tripdt=1
 
 **************************************************
 * OUTPUT G SOURCES (Mode -> Phase) Iphase=S*Imode
 **************************************************
 
-G_Aout 0  Aout  VALUE={+4.1238e-05*I(V7)+3.2328e-04*I(V8)+2.5643e-04*I(V9)-5.7067e-01*I(V10)-7.0688e-01*I(V11)+4.1731e-01*I(V12)} tripdv=1 tripdt=1
-G_Bout 0  Bout  VALUE={+4.2662e-05*I(V7)+5.5511e-16*I(V8)-4.9574e-04*I(V9)-5.9039e-01*I(V10)-2.3514e-10*I(V11)-8.0674e-01*I(V12)} tripdv=1 tripdt=1
-G_Cout 0  Cout  VALUE={+4.1238e-05*I(V7)-3.2328e-04*I(V8)+2.5643e-04*I(V9)-5.7067e-01*I(V10)+7.0688e-01*I(V11)+4.1731e-01*I(V12)} tripdv=1 tripdt=1
-G_ShAout 0  ShAout  VALUE={+8.0713e-01*I(V7)+1.0002e+00*I(V8)+5.9061e-01*I(V9)+5.7077e-01*I(V10)+7.0768e-01*I(V11)-4.1794e-01*I(V12)} tripdv=1 tripdt=1
-G_ShBout 0  ShBout  VALUE={+8.3501e-01*I(V7)+2.1789e-15*I(V8)-1.1418e+00*I(V9)+5.9050e-01*I(V10)+2.3541e-10*I(V11)+8.0797e-01*I(V12)} tripdv=1 tripdt=1
-G_ShCout 0  ShCout  VALUE={+8.0713e-01*I(V7)-1.0002e+00*I(V8)+5.9061e-01*I(V9)+5.7077e-01*I(V10)-7.0768e-01*I(V11)-4.1794e-01*I(V12)} tripdv=1 tripdt=1
+G_Aout 0  Aout  VALUE={+0.0000*I(V7)+0.0003*I(V8)+0.0003*I(V9)-0.5707*I(V10)-0.7069*I(V11)+0.4173*I(V12)} tripdv=1 tripdt=1
+G_Bout 0  Bout  VALUE={+0.0000*I(V7)+0.0000*I(V8)-0.0005*I(V9)-0.5904*I(V10)-0.0000*I(V11)-0.8067*I(V12)} tripdv=1 tripdt=1
+G_Cout 0  Cout  VALUE={+0.0000*I(V7)-0.0003*I(V8)+0.0003*I(V9)-0.5707*I(V10)+0.7069*I(V11)+0.4173*I(V12)} tripdv=1 tripdt=1
+G_ShAout 0  ShAout  VALUE={+0.8071*I(V7)+1.0002*I(V8)+0.5906*I(V9)+0.5708*I(V10)+0.7077*I(V11)-0.4179*I(V12)} tripdv=1 tripdt=1
+G_ShBout 0  ShBout  VALUE={+0.8350*I(V7)+0.0000*I(V8)-1.1418*I(V9)+0.5905*I(V10)+0.0000*I(V11)+0.8080*I(V12)} tripdv=1 tripdt=1
+G_ShCout 0  ShCout  VALUE={+0.8071*I(V7)-1.0002*I(V8)+0.5906*I(V9)+0.5708*I(V10)-0.7077*I(V11)-0.4179*I(V12)} tripdv=1 tripdt=1
+
+
+******************************************
+* End Paste lines from matlab file
+******************************************
 
 R_Aout1 Aout 0  1e9
 R_Bout2 Bout 0  1e9 

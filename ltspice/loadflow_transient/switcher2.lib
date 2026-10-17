@@ -1470,8 +1470,7 @@ G0 in2a out value={V(in2a,out)*v(G)} tripdv={tdv} tripdt={tdt}
 
 * mov ciruitry to prevent voltage spike 
 .subckt mov1 1 2 ; base generic
-+PARAMS: VBO=10 Vr=0.71 exp=9
-.param Vratio={VBO/Vr} 
++PARAMS: VBO=10 Vr=0.71 Vratio=VBO/{Vr} exp=9
 B1 1 2 I=if(V(1, 2)-0.5, (V(1, 2) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
 B2 2 1 I=if(V(2, 1)-0.5, (V(2, 1) / Vratio) ** exp, (1 / Vratio) ** exp) tripdv={tdv} tripdt={tdt}
 .ends

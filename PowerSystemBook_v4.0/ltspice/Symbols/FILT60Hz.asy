@@ -1,0 +1,18 @@
+Version 4
+SymbolType BLOCK
+LINE Normal -24 0 -32 -8
+LINE Normal -32 8 -24 0
+RECTANGLE Normal 16 16 -32 -16
+TEXT -8 -8 Center 2 60HZ
+TEXT -8 1 Center 2 Filter
+TEXT -23 9 Left 1 55Hz-65Hz
+SYMATTR Prefix x
+SYMATTR SpiceModel 60Hz
+SYMATTR Description 60Hz frequency filter
+SYMATTR ModelFile measure.lib
+PIN -32 0 NONE 0
+PINATTR PinName in
+PINATTR SpiceOrder 1
+PIN 16 0 NONE 0
+PINATTR PinName out
+PINATTR SpiceOrder 2

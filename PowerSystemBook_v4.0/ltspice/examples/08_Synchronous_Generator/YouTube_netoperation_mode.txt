@@ -1,0 +1,75 @@
+Today we will examine the synchronous generator in grid operation and in constant speed operation. We will simulate synchronization and the subsequent delivery of active and reactive power. We will also discuss short circuits near and far from the generator, particularly the single-pole ground fault.
+
+We will also demonstrate what happens when the maximum active power delivered by the machine is exceeded. Now for the circuit. The circuit contains from left to right, a synchronous generator with thirty-six hundred RPM at sixty hertz and a capacity of two hundred and fifty Megavar ampere, a speed governor, a small five megawatts load, an automatic voltage regulator on the thirteen and eight kilovolt side, a YD eleven transformer, a synchronization switch, a load rated at ten megawatts, a switch for the three-phase fault in the grid, a grid resistor and a two hundred and thirty kilovolt voltage source.
+
+The transformer has a delta winding on the secondary side due to the high generator currents and to filter third harmonic currents. The primary side is connected in a star configuration due to the high voltages on the grid side The transformer is set to linear, parameter M equals one, to avoid nonlinear transients after the generator is switched on at full voltage, parameter air equals one.
+
+The rated excitation voltage of the generator is two hundred volts. To maintain the rated voltage constantly at thirteen-point-eight kilovolts, an automatic voltage regulator, AVR, is provided, which is switched on at T equals point one seconds. The AVR has an excitation range from one hundred volts to four hundred volts to cover both overexcitation and underexcitation of the synchronous machine.
+
+The speed controller has a rated speed of thirty-six hundred RPM and is active from the start. At the start of the simulation, the synchronous generator has a speed of three thousand six hundred RPM. If the synchronous generator is synchronized with the grid after one second, the speed controller is switched off immediately thereafter, and the synchronous generator is ramped up from zero megawatts to a hundred and fifty megawatts of active power between two and ten seconds.
+
+The conversion from active power to the torque requirement for the synchronous generator is given by P equals N omega PM equals torque, P equals number of pole pairs. The number of pole pairs is one, making the generator a high-speed turbo generator. To synchronize the generator quickly starting at one second, the phase angle of the voltage source is set to three hundred and thirty degrees, DPHI equal three thirty.
+
+This ensures rapid synchronization for a three-phase transformer with a rotating connection group of YD eleven, eleven, thirty degrees, three hundred and thirty degrees. Additionally, the AVR has already reached the rated voltage of thirteen point eight kilovolts at the terminals. Synchronization and active power output.
+
+Now we start the simulation from zero to twelve seconds. You can see that the synchronization condition is well met at the one-second mark when looking at the voltage difference before and after the switch. In the top image, we see that the voltage difference is approximately four kilovolt. In the bottom image, we see that the frequency is very close to sixty hertz.
+
+Synchronization causes transients in active power and frequency. The frequency remains above sixty hertz as long as the generator increases the active power at a rate of twenty-five megawatts per second. When the change in active power becomes zero, the frequency returns to sixty hertz. The active power ramp is achieved via a torque ramp at the MPIN torque pin of the generator Note, the active power ramp of twenty-five megawatts per second is of course much too high and serves here only to keep the simulation time short.
+
+Three-pole generator short circuit to ground starting at twelve seconds. When the three-pole short circuit to ground occurs in the grid from twelve seconds to twelve point one seconds, zero point five seconds to zero point six seconds new time, the voltage dip is somewhat cushioned by the rise in the excitation voltage.
+
+The generator's torque angle approaches zero because the generator is relieved of active load. You see also that upon relief, the speed begins to rise steadily until the fault is cleared. The unloading thus results in an increase in kinetic energy and consequently in the machine's higher speed. Now the simulation end time is increased to thirteen seconds, and the time at which the simulation is saved is set to eleven point five seconds.
+
+Then the simulation is restarted The peak of the short circuit current is fifty-six kiloamperes, and the high current lasts zero point one seconds until the fault is cleared. Short circuit near the generator. Now the fault is placed directly on the generator bus bar. As shown in figure one, the torque angle now rises to over ninety degrees.
+
+The voltage drops even more sharply. The generator speed does not increase, but instead falls steadily. Why is this the case, even though the generator should be unloaded? We will now take a closer look at the fault scenario for a short circuit fault near the generator. The power dissipated at the fault point is higher here at approximately two hundred megawatts than the power supplied.
+
+The fifty-megawatt difference is drawn from the machine's potential energy, causing the machine speed to drop. The load angle approaches ninety degrees. The peak of the short circuit current is now higher than in the case of a short circuit far from the generator. The peak is about eighty kiloamperes.
+
+After the short circuit fault is cleared, it takes some time for the current amplitudes to settle back to the value prior to the occurrence of the short circuit. The current oscillation is accompanied by speed oscillation at two hertz. Generator side short circuit without clearing. We will now examine the short circuit current in a generator side short circuit if the fault is not cleared within zero point one seconds.
+
+This time, the generator is additionally operated without load. Input to the generator's torque pin M is only three K for friction. Then the switch's T stop parameter is set to one hundred seconds, which means deactivated, and the simulation is restarted. We see that the generator's active power output initially rises to four hundred and fifty megawatts, causing the generator to be heavily braked.
+
+The rotor angle becomes smaller and smaller, reaching zero at approximately seven hundred and fifty milliseconds, and then continuing to minus one eighty degrees, where the first tilt of the rotor occurs. From seven hundred and fifty milliseconds onward, the generator operates in motor mode, driven by the grid's voltage source.
+
+One can see that due to the negative load angle and additionally by the active power consumption, positive active power at seven hundred and fifty milliseconds Furthermore, a brief acceleration of the rotor can be observed. All of this then repeats continuously. Generator side short circuit at constant speed.
+
+If the generator is driven at constant speed, the peak short circuit current increases even further to approx. ninety-five kiloampere. The torque converted to power results in a peak of over nine hundred megawatts at the onset of the fault. Uh, in the current curve, one can clearly see the very short sub-transient portion of the short circuit current, followed by a longer transient portion of the short circuit current, followed by the steady state short circuit current Although the excitation voltage is constant, the excitation current increases due to induction currents from the stator up to four point four kiloamperes before it slowly drops back to the nominal value of two hundred amperes.
+
+The voltage at the generator terminals approaches zero. The load angle of the generator is approximately ninety degrees. Single-phase ground fault near the generator. We will now examine the ground fault. To do this, the generator's neutral point is grounded. Then the simulation is started. We observe that the peak of the short-circuit current at one ten kiloamps is now even higher than in the three-phase short-circuit.
+
+The transients of the damper winding, the field winding, and the load angle lasted only about one hundred milliseconds in the three-phase short-circuit In the case of the ground short circuit fault, the transients remain high throughout the entire short circuit fault. No stable steady state condition is established.
+
+The system can be translated into a positive omega and a negative minus omega system. The negative system rotates in the opposite direction to the rotor and induces a voltage with double the frequency into the excitation system and the damper system. These fields can now also be divided into two rotating fields, one with plus omega and one with minus omega.
+
+The field with plus omega compensates for the stator field, and the field with minus omega now has three times omega relative to the stator and induces voltages there at triple the frequency. This continues to repeat, but only the fields with two x to four x the frequency are significant. You can see this by zooming in on the excitation currents and the stator currents from six hundred milliseconds to eight hundred milliseconds and applying LTspice's FFT analysis to the excitation current.
+
+Peaks are visible at sixty hertz, hundred and twenty hertz, and two hundred and forty hertz. In the stator current, peaks are visible at sixty hertz and one hundred and eighty hertz. This also occurs on a smaller scale in a synchronous generator with an asymmetrical load. Phasor diagram during a continuous short circuit after approximately five seconds and then after fifteen point nine five milliseconds.
+
+We will now examine the phasor diagram from the example above at a constant speed at the five-second mark, i.e., when the system has reached steady state. To do this, we have to get the following values at t equal five seconds from the waveform diagram in LTspice. The values are Usx, Usy, Isx, Imy. Then we input the values into the WX Maxima file synchrongenerator.wxmx.
+
+There, the values for the phasor diagram are scaled and additional values are calculated for the phasor diagram. The remaining required values for Xd and Xq are taken from the file synchrongeneratordata.wxmx. Then the following values calculated in the script are entered into the GeoGebra script synchrongenerator.ggb, and the phasor diagram is then drawn automatically.
+
+Since the values Usx and Usy are so small they are barely visible, when added vectorially, they result in the terminal voltage U, which is nearly zero. The pole wheel voltage is large and is at a right angle to the stator side equivalent excitation current Ie prime. The pole wheel voltage is always on the Q axis, and thus Iepy is parallel to the D axis.
+
+The stator current I lies on the negative X axis, while the terminal voltage lies on the positive X axis. This means that the machine delivers pure active power. As shown in the waveform viewer, this power loss due to the internal resistance is approximately two megawatts. This can also be seen in the calculations in the file synchrongenerator.wxml.
+
+To better distinguish the individual vectors, each vector or point can be individually shown or hidden in GeoGebra. Zooming in on the diagram is also helpful. Here I have zoomed in on the terminal voltage U. For a phasor diagram very shortly after the short circuit fault at fifteen point nine five milliseconds, first zoom from five hundred milliseconds to five hundred and twenty milliseconds.
+
+Then place the cursor at five fifty point nine five milliseconds and get the values like above. Additionally, the values for IDX and IDY. After scaling in the file synchrongeneratorwithdamper.wxml and entering into GeoGebra, you can see the influence of the damper winding very shortly after the short circuit.
+
+Delivery of active power and reactive power. We have already seen the generator's active power output. It is specified by changing the torque at the generator's M pin. Of course, the speed controller must be switched off beforehand. In our example, the machine is first ramped up to an active power of one hundred megawatts.
+
+While ramping up the machine to one hundred megawatts, the load angle rises to approximately ten degrees. Before the simulation, the fault duration is set to one hundred seconds and thus deactivated. Reactive power output is achieved by changing the voltage of the exciter motor at the machine's Vair pin from two hundred volts to one hundred volts between eleven and thirteen seconds, and then from one hundred volts to four hundred volts between thirteen and fifteen seconds It is interesting to note that increasing the excitation reduces the load angle.
+
+Therefore, the overexcited machine becomes more stable. Since the voltage supplied by the grid is relatively stable, the twenty kilovolt voltage is little affected by the excitation. This is different in isolated operation. Here, a change in excitation will cause the voltage to change relatively significantly.
+
+Therefore, it is important to activate voltage regulation during isolated operation. To reduce the time delay between a change in the excitation voltage and a change in reactive power, I briefly set the generator's excitation resistance RE to one E four. This clearly demonstrates the relationship between excitation and reactive power without time delay.
+
+At U equals two hundred volts, the generator is within the rated range and the reactive power output is zero. When the excitation voltage drops from two hundred volts to one hundred volts, the generator will draw reactive power from the grid. When the excitation voltage rises from two hundred volts to four hundred volts, the generator will supply reactive power to the grid.
+
+Maximum active power output. What happens if you force the generator to supply more and more active power to the grid or to reduce the excitation further and further? At a certain point, theta approximately seventy to ninety degrees, depending on the machine earlier for salient pole machines, the load angle becomes increasingly higher, and at a load angle of one hundred and eighty degrees, the machine's rotor begins to tilt or slip.
+
+The machine is therefore operated up to a load angle of sixty degrees at most. It is therefore important to always keep an eye on the load angle when increasing active power and possibly increase the excitation to lower the load angle again. In isolated operation, this slippage does not occur. In addition to slipping, a severe voltage sag occurs.
+
+This operating condition should be avoided at all costs. Now we are done with the simulation for today. Good luck simulating

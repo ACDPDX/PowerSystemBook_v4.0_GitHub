@@ -1,0 +1,142 @@
+\clearpage
+\thispagestyle{empty}
+
+\begingroup
+\setlength{\parindent}{0pt}
+\sffamily
+
+\begin{tikzpicture}[remember picture,overlay]
+
+% Dunkelblauer Kopfbereich
+\fill[BookBlueDark]
+  (current page.north west)
+  rectangle
+  ([yshift=-108mm]current page.north east);
+
+% Blauer Trennstreifen
+\fill[BookBlue]
+  ([yshift=-108mm]current page.north west)
+  rectangle
+  ([yshift=-112mm]current page.north east);
+
+% Überschrift
+\node[
+  anchor=north west,
+  text=white,
+  text width=150mm,
+  align=left,
+  inner sep=0pt
+] at ([xshift=30mm,yshift=-34mm]current page.north west) {%
+  {\fontsize{28}{34}\selectfont\bfseries
+   About this book\par}
+
+  \vspace{11mm}
+
+  {\fontsize{13.5}{19}\selectfont
+   A practical introduction for everyone interested in the
+   simulation of high-voltage electrical power networks.\par}
+};
+
+% Haupttext
+\node[
+  anchor=north west,
+  text=BookGray,
+  text width=150mm,
+  align=left,
+  inner sep=0pt
+] at ([xshift=30mm,yshift=-129mm]current page.north west) {%
+  \begin{minipage}{150mm}
+  \fontsize{9.5}{13.2}\selectfont
+
+  {\color{BookBlueDark}
+   \fontsize{10.4}{14.4}\selectfont
+   Over the past 25 years, I have developed two educational
+   toolboxes for LTspice. The first supports nonlinear load-flow
+   calculations; the second is designed for the transient
+   simulation of electrical power networks.\par}
+
+  \vspace{2.5mm}
+
+  The toolboxes contain the essential components required to build
+  realistic power-system models:
+
+  \begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \setlength{\parsep}{0pt}
+    \setlength{\topsep}{1mm}
+    \setlength{\partopsep}{0pt}
+
+    \item buses and sources;
+    \item synchronous machines and transformers;
+    \item overhead lines and power cables;
+    \item loads and shunt reactors; and
+    \item surge-protection devices, Petersen coils, and many
+          other elements.
+  \end{itemize}
+
+  Some elements provide parameters that can be changed directly by
+  the user. Others are supplied with carefully selected presets,
+  which can also be overwridden whenever a study requires different
+  values.
+
+  \vspace{1.5mm}
+
+  The transformer library ranges from simple models to sophisticated
+  representations with a nonlinear iron core, hysteresis, and
+  remanent flux. Eight vector groups and voltage levels from
+  \SI{400}{\kilo\volt} down to \SI{400}{\volt} are included.
+  Additional vector groups can be created by editing the
+  macro-models, because all \texttt{.lib} files are freely accessible
+  and editable.
+
+  \vspace{1.5mm}
+
+  Hundreds of examples for both toolboxes are available on my
+  website, ranging from simple introductory circuits to complex
+  networks. Many schematic files contain their own documentation,
+  and the first nine examples are explained in detail in this book.
+
+  \vspace{1.5mm}
+
+  These toolboxes are intended especially for students of electrical
+  engineering, but they are equally useful to teachers, engineers,
+  and anyone who wants to explore power-system behaviour through
+  simulation.
+
+  \vspace{2.5mm}
+
+  {\color{BookBlueDark}
+   \fontsize{10.4}{14.4}\selectfont
+   I hope you enjoy experimenting with these simulations as much as
+   I do. Your feedback is always welcome.\par}
+  \end{minipage}
+};
+
+% Trennlinie im Fußbereich
+\draw[LightBlue,line width=0.8pt]
+  ([xshift=30mm,yshift=34mm]current page.south west) --
+  ([xshift=-30mm,yshift=34mm]current page.south east);
+
+% Autor
+\node[
+  anchor=south west,
+  text=BookBlueDark,
+  inner sep=0pt,
+  font=\fontsize{10.5}{15}\selectfont
+] at ([xshift=30mm,yshift=23mm]current page.south west)
+  {Friedrich Schmidt};
+
+% Website
+\node[
+  anchor=south east,
+  text=BookBlue,
+  inner sep=0pt,
+  font=\fontsize{10.5}{15}\selectfont\bfseries
+] at ([xshift=-30mm,yshift=23mm]current page.south east)
+  {www.friedrichschmidt.at};
+
+\end{tikzpicture}
+
+\null
+\clearpage
+\endgroup

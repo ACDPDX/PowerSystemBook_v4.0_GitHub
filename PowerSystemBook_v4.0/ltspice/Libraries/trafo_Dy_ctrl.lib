@@ -1,0 +1,1032 @@
+* My special thank to Emer. Prof. Dr. Otto Justus who
+* allowed me to use his models of transformer and synchronous generator
+* 
+* rkessel = tank magn. resistance
+*
+
+.SUBCKT Trafo3Dy5_ctrl  1U  1V  1W   2U  2V  2W  2N ctrl
++	PARAMS:
++	SN=10kVA
++	U1Nenn=400V
++	U20=400V
++	fn={fn1}
++	N1=1000
++	uR=0.04
++	uX=0.08
++	i0=0.05
++	p0=0.005
++   a=0.75
++   m=9
++   psi_0=0
++   psir=1
++   psis=-0.5
++   psit=-0.5
++   tpsi0=1000s
++   tpsid=0.1ms
++   ron=0.00001
++   bf=0    ;
++   rkessel=6e5 ;magn. resistance of the kettle tank filled with oil / reduce it for an effect (e.g. 1e6)
+Rctrl ctrl 0 1e12
+Xu	1U	1V	2N	2U	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,1.2)}
++ p0={p0*IF(bf==0,1,1.2)}
++ a={a}
++ m={m}
++ psi_0={psir*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+Xv	1V	1W	2N	2V	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,0.6)}
++ p0={p0*IF(bf==0,1,0.6)}
++ a={a}
++ m={m}
++ psi_0={psis*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+Xw	1W	1U	2N	2W	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf<=0,1,1.2)}
++ p0={p0*IF(bf<=0,1,1.2)}
++ a={a}
++ m={m}
++ psi_0={psit*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+*Rm	magn1	0	1MEG
+Rkessel magn1 magn2 {rkessel}
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+RGND2N 2N 0 1e12
+.ENDS
+
+.SUBCKT Trafo3Dy5_simple_ctrl  1U  1V  1W   2U  2V  2W  2N ctrl
++	PARAMS:
++	SN=10kVA
++	U1Nenn=400V
++	U20=400V
++	fn={fn1}
++	N1=1000
++	uR=0.04
++	uX=0.08
++	i0=0.05
++	p0=0.005
++ bf=0
+Rctrl ctrl 0 1e12
+Xu	1U	1V	2N	2U	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,1.2)}
++ p0={p0*IF(bf==0,1,1.2)}
+Xv	1V	1W	2N	2V	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,0.6)}
++ p0={p0*IF(bf==0,1,0.6)}
+Xw	1W	1U	2N	2W	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf<=0,1,1.2)}
++ p0={p0*IF(bf<=0,1,1.2)}
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+RGND2N 2N 0 1e12
+.ENDS
+
+.SUBCKT Trafo3Dy5_ideal_ctrl  1U  1V  1W  2U  2V  2W  2N ctrl
++	PARAMS:
++	U1Nenn=400V
++	U20=400V
++   k=1
+.param N1={N1} N2={N1*U20/(U1Nenn*sqrt(3))}
+Rctrl ctrl 0 1e12
+* Dy5
+Xu  1U	1V	2N	2U  ctrl N1N2_ctrl_Dy params: N1={N1} N2={N2} k={k}
+Xv  1V	1W	2N	2V  ctrl N1N2_ctrl_Dy params: N1={N1} N2={N2} k={k}
+Xw  1W	1U	2N	2W  ctrl N1N2_ctrl_Dy params: N1={N1} N2={N2} k={k}
+* Dy11
+*Xu	1U	1V	2U	2N ctrl N1N2_ctrl_Dy params: N1={N1} N2={N2} k={k}
+*Xv	1V	1W	2V	2N ctrl N1N2_ctrl_Dy params: N1={N1} N2={N2} k={k}
+*Xw	1W	1U	2W	2N ctrl N1N2_ctrl_Dy params: N1={N1} N2={N2} k={k}
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+RGND2N 2N 0 1e12
+.ENDS
+
+
+.SUBCKT RUDy5_110k_10k_40MVA_ctrl  1U  1V  1W   2U  2V  2W  2N ctrl
++	PARAMS:
++	SN=40e6
++	U1Nenn=110e3
++	U20=10.6e3
++	fn={fn1}
++	N1=1000
++	uR=0.003
++	uX=0.2
++	i0=0.0015
++	p0=0.0004
++   a=0.75
++   m=9
++   psi_0=0 ; Remanenzparameter 0,1,-1
++   psir=1
++   psis=-0.5
++   psit=-0.5
++   tpsi0=1000s ; Remanenzzeitpunkt
++   tpsid=0.1ms  ; Dauer des Schalter ein für Remanenz
++   ron=0.00001 ; ron - Parameter des Schalters für Remanenz (siehe sub WICKLUNG_Dy)
++   bf=0
++   rkessel=6e5
+Rctrl ctrl 0 1e12
+Xu	1U	1V	2N	2U	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,1.2)}
++ p0={p0*IF(bf==0,1,1.2)}
++ a={a}
++ m={m}
++ psi_0={psir*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+Xv	1V	1W	2N	2V	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,0.6)}
++ p0={p0*IF(bf==0,1,0.6)}
++ a={a}
++ m={m}
++ psi_0={psis*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+Xw	1W	1U	2N	2W	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf<=0,1,1.2)}
++ p0={p0*IF(bf<=0,1,1.2)}
++ a={a}
++ m={m}
++ psi_0={psit*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+*Rm	magn1	0	1MEG
+Rkessel magn1 magn2 {rkessel}
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+RGND2N 2N 0 1e12
+.ENDS
+
+.SUBCKT RUDy5_110k_10k_40MVA_simple_ctrl  1U  1V  1W   2U  2V  2W  2N ctrl
++	PARAMS:
++	SN=40e6
++	U1Nenn=110e3
++	U20=10.6e3
++	fn={fn1}
++	N1=1000
++	uR=0.003
++	uX=0.2
++	i0=0.0015
++	p0=0.0004
++ bf=0
+Rctrl ctrl 0 1e12
+Xu	1U	1V	2N	2U	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,1.2)}
++ p0={p0*IF(bf==0,1,1.2)}
+Xv	1V	1W	2N	2V	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,0.6)}
++ p0={p0*IF(bf==0,1,0.6)}
+Xw	1W	1U	2N	2W	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf<=0,1,1.2)}
++ p0={p0*IF(bf<=0,1,1.2)}
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+RGND2N 2N 0 1e12
+.ENDS
+
+.SUBCKT RUDy5_110k_20k_40MVA_ctrl  1U  1V  1W   2U  2V  2W  2N ctrl
++	PARAMS:
++	SN=40e6
++	U1Nenn=110e3
++	U20=20e3
++	fn={fn1}
++	N1=1000
++	uR=0.003
++	uX=0.2
++	i0=0.002
++	p0=0.0004
++   a=0.75
++   m=9
++   psi_0=0 ; Remanenzparameter 0,1,-1
++   psir=1
++   psis=-0.5
++   psit=-0.5
++   tpsi0=1000s ; Remanenzzeitpunkt
++   tpsid=0.1ms  ; Dauer des Schalter ein für Remanenz
++   ron=0.00001 ; ron - Parameter des Schalters für Remanenz (siehe sub WICKLUNG_Dy)
++   bf=0
++   rkessel=6e5
+Rctrl ctrl 0 1e12
+Xu	1U	1V	2N	2U	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,1.2)}
++ p0={p0*IF(bf==0,1,1.2)}
++ a={a}
++ m={m}
++ psi_0={psir*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+Xv	1V	1W	2N	2V	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,0.6)}
++ p0={p0*IF(bf==0,1,0.6)}
++ a={a}
++ m={m}
++ psi_0={psis*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+Xw	1W	1U	2N	2W	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf<=0,1,1.2)}
++ p0={p0*IF(bf<=0,1,1.2)}
++ a={a}
++ m={m}
++ psi_0={psit*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+*Rm	magn1	0	1MEG
+Rkessel magn1 magn2 {rkessel}
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+RGND2N 2N 0 1e12
+.ENDS
+
+.SUBCKT RUDy5_110k_20k_40MVA_simple_ctrl  1U  1V  1W   2U  2V  2W  2N ctrl
++	PARAMS:
++	SN=40e6
++	U1Nenn=110e3
++	U20=20e3
++	fn={fn1}
++	N1=1000
++	uR=0.003
++	uX=0.2
++	i0=0.002
++	p0=0.0004
++ bf=0
+Rctrl ctrl 0 1e12
+Xu	1U	1V	2N	2U	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,1.2)}
++ p0={p0*IF(bf==0,1,1.2)}
+Xv	1V	1W	2N	2V	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,0.6)}
++ p0={p0*IF(bf==0,1,0.6)}
+Xw	1W	1U	2N	2W	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf<=0,1,1.2)}
++ p0={p0*IF(bf<=0,1,1.2)}
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+RGND2N 2N 0 1e12
+.ENDS
+
+.SUBCKT Trafo3Dy11_ctrl  1U  1V  1W   2U  2V  2W  2N ctrl
++	PARAMS:
++	SN=10kVA
++	U1Nenn=400V
++	U20=400V
++	fn={fn1}
++	N1=1000
++	uR=0.04
++	uX=0.08
++	i0=0.05
++	p0=0.005
++   a=0.75 ;FS
++   m=9   ;FS
++   psi_0=0 ; Remanenzparameter 0,1,-1
++   psir=1
++   psis=-0.5
++   psit=-0.5
++   tpsi0=1000s ; Remanenzzeitpunkt
++   tpsid=0.1ms  ; Dauer des Schalter ein für Remanenz
++   ron=0.00001 ; ron - Parameter des Schalters für Remanenz (siehe sub WICKLUNG_Dy)
++   bf=0    ; 1=unsymm. length of iron-way
++   rkessel=6e5
+Rctrl ctrl 0 1e12
+Xu	1U	1V	2U	2N	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,1.2)}
++ p0={p0*IF(bf==0,1,1.2)}
++ a={a}
++ m={m}
++ psi_0={psir*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+Xv	1V	1W	2V	2N	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,0.6)}
++ p0={p0*IF(bf==0,1,0.6)}
++ a={a}
++ m={m}
++ psi_0={psis*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+Xw	1W	1U	2W	2N	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf<=0,1,1.2)}
++ p0={p0*IF(bf<=0,1,1.2)}
++ a={a}
++ m={m}
++ psi_0={psit*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+*Rm	magn1	0	1MEG
+Rkessel magn1 magn2 {rkessel}
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+RGND2N 2N 0 1e12
+.ENDS
+
+
+.SUBCKT Trafo3Dy11_simple_ctrl  1U  1V  1W   2U  2V  2W  2N ctrl
++	PARAMS:
++	SN=10kVA
++	U1Nenn=400V
++	U20=400V
++	fn={fn1}
++	N1=1000
++	uR=0.04
++	uX=0.08
++	i0=0.05
++	p0=0.005
++ bf=0
+Rctrl ctrl 0 1e12
+Xu	1U	1V	2U	2N	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,1.2)}
++ p0={p0*IF(bf==0,1,1.2)}
+Xv	1V	1W	2V	2N	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,0.6)}
++ p0={p0*IF(bf==0,1,0.6)}
+Xw	1W	1U	2W	2N	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf<=0,1,1.2)}
++ p0={p0*IF(bf<=0,1,1.2)}
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+RGND2N 2N 0 1e12
+.ENDS
+
+.SUBCKT Trafo3Dy11_ideal_ctrl  1U  1V  1W  2U  2V  2W  2N ctrl
++	PARAMS:
++	U1Nenn=400V
++	U20=400V
++   k=1
+.param N1={N1} N2={N1*U20/(U1Nenn*sqrt(3))}
+Rctrl ctrl 0 1e12
+* Dy5
+*Xu  1U	1V	2N	2U  ctrl N1N2_ctrl_Dy params: N1={N1} N2={N2} k={k}
+*Xv  1V	1W	2N	2V  ctrl N1N2_ctrl_Dy params: N1={N1} N2={N2} k={k}
+*Xw  1W	1U	2N	2W  ctrl N1N2_ctrl_Dy params: N1={N1} N2={N2} k={k}
+* Dy11
+Xu	1U	1V	2U	2N ctrl N1N2_ctrl_Dy params: N1={N1} N2={N2} k={k}
+Xv	1V	1W	2V	2N ctrl N1N2_ctrl_Dy params: N1={N1} N2={N2} k={k}
+Xw	1W	1U	2W	2N ctrl N1N2_ctrl_Dy params: N1={N1} N2={N2} k={k}
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+RGND2N 2N 0 1e12
+.ENDS
+
+.SUBCKT RUDy11_110k_10k_40MVA_ctrl  1U  1V  1W   2U  2V  2W  2N ctrl
++	PARAMS:
++	SN=40e6
++	U1Nenn=110e3
++	U20=10.6e3
++	fn={fn1}
++	N1=1000
++	uR=0.003
++	uX=0.2
++	i0=0.0015
++	p0=0.0004
++   a=0.75
++   m=9
++   psi_0=0 ; Remanenzparameter 0,1,-1
++   psir=1
++   psis=-0.5
++   psit=-0.5
++   tpsi0=1000s ; Remanenzzeitpunkt
++   tpsid=0.1ms  ; Dauer des Schalter ein für Remanenz
++   ron=0.00001 ; ron - Parameter des Schalters für Remanenz (siehe sub WICKLUNG_Dy)
++   bf=0
++   rkessel=6e5
+Rctrl ctrl 0 1e12
+Xu	1U	1V	2U	2N	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,1.2)}
++ p0={p0*IF(bf==0,1,1.2)}
++ a={a}
++ m={m}
++ psi_0={psir*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+Xv	1V	1W	2V	2N	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,0.6)}
++ p0={p0*IF(bf==0,1,0.6)}
++ a={a}
++ m={m}
++ psi_0={psis*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+Xw	1W	1U	2W	2N	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf<=0,1,1.2)}
++ p0={p0*IF(bf<=0,1,1.2)}
++ a={a}
++ m={m}
++ psi_0={psit*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+*Rm	magn1	0	1MEG
+Rkessel magn1 magn2 {rkessel}
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+RGND2N 2N 0 1e12
+.ENDS
+
+.SUBCKT RUDy11_110k_10k_40MVA_simple_ctrl  1U  1V  1W   2U  2V  2W  2N ctrl
++	PARAMS:
++	SN=40e6
++	U1Nenn=110e3
++	U20=10.6e3
++	fn={fn1}
++	N1=1000
++	uR=0.003
++	uX=0.2
++	i0=0.0015
++	p0=0.0004
++ bf=0
+Rctrl ctrl 0 1e12
+Xu	1U	1V	2U	2N	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,1.2)}
++ p0={p0*IF(bf==0,1,1.2)}
+Xv	1V	1W	2V	2N	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,0.6)}
++ p0={p0*IF(bf==0,1,0.6)}
+Xw	1W	1U	2W	2N	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf<=0,1,1.2)}
++ p0={p0*IF(bf<=0,1,1.2)}
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+RGND2N 2N 0 1e12
+.ENDS
+
+.SUBCKT RUDy11_110k_20k_40MVA_ctrl  1U  1V  1W   2U  2V  2W  2N ctrl
++	PARAMS:
++	SN=40e6
++	U1Nenn=110e3
++	U20=20e3
++	fn={fn1}
++	N1=1000
++	uR=0.003
++	uX=0.2
++	i0=0.0015
++	p0=0.0004
++   a=0.75
++   m=9
++   psi_0=0 ; Remanenzparameter 0,1,-1
++   psir=1
++   psis=-0.5
++   psit=-0.5
++   tpsi0=1000s ; Remanenzzeitpunkt
++   tpsid=0.1ms  ; Dauer des Schalter ein für Remanenz
++   ron=0.00001 ; ron - Parameter des Schalters für Remanenz (siehe sub WICKLUNG_Dy)
++   bf=0
++   rkessel=6e5
+Rctrl ctrl 0 1e12
+Xu	1U	1V	2U	2N	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,1.2)}
++ p0={p0*IF(bf==0,1,1.2)}
++ a={a}
++ m={m}
++ psi_0={psir*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+Xv	1V	1W	2V	2N	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,0.6)}
++ p0={p0*IF(bf==0,1,0.6)}
++ a={a}
++ m={m}
++ psi_0={psis*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+Xw	1W	1U	2W	2N	magn1	magn2 ctrl Trafoschenkel2_ctrl_Dy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf<=0,1,1.2)}
++ p0={p0*IF(bf<=0,1,1.2)}
++ a={a}
++ m={m}
++ psi_0={psit*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+*Rm	magn1	0	1MEG
+Rkessel magn1 magn2 {rkessel}
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+RGND2N 2N 0 1e12
+.ENDS
+
+.SUBCKT RUDy11_110k_20k_40MVA_simple_ctrl  1U  1V  1W   2U  2V  2W  2N ctrl
++	PARAMS:
++	SN=40e6
++	U1Nenn=110e3
++	U20=20e3
++	fn={fn1}
++	N1=1000
++	uR=0.003
++	uX=0.2
++	i0=0.0015
++	p0=0.0004
++ bf=0
+Rctrl ctrl 0 1e12
+Xu	1U	1V	2U	2N	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,1.2)}
++ p0={p0*IF(bf==0,1,1.2)}
+Xv	1V	1W	2V	2N	ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,0.6)}
++ p0={p0*IF(bf==0,1,0.6)}
+Xw	1W	1U	2W	2N  ctrl Trafo_N1N2_simple_ctrl_Dy2
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf<=0,1,1.2)}
++ p0={p0*IF(bf<=0,1,1.2)}
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+RGND2N 2N 0 1e12
+.ENDS
+
+.SUBCKT   Trafoschenkel2_ctrl_Dy  1_1 1_2  2_1 2_2  magnP1 magnP2 ctrl
++	PARAMS:
++	SN=10kVA
++	U1N=400V
++	U20=400V
++	fn={fn1}
++	N1=1000
++	uR=0.04
++	uX=0.08
++	i0=0.05
++	p0=0.005
++   a={0.3} ; FS
++   m={7} ; FS
++   psi_0=0 ; Remanenzparameter zwischen 0,1,-1
++   tpsi0=40ms
++   tpsid=0.1ms
++   ron=0.00001
+.PARAM
++	I1N={SN/U1N}
++	Z1N={U1N/I1N}
++	omegaN={(2*pi)*fN}
++	R1={Z1N*uR/2}
++	L1s={Z1N*uX/2/omegaN}
++	RFe={U1N*U1N/(p0*SN)}
++	N2={N1*U20/U1N}
++	R2={R1*N2/N1*N2/N1}
++   Xh={(U1N*U1N)/(SN*sqrt(i0*i0-p0*p0))} ;FS
++   iu={U1N/Xh} ;FS
++   ImyN={sqrt(2)*iu} ;FS
++	phiN={sqrt(2)*U1N/omegaN/N1}
++   a={a} ; FS
++   m={m} ; FS
+*	WICKLUNG_Dysstroeme
+Gi1	1_1	1_2	VALUE={v(a,magnP1)/(N1*v(ctrl))} tripdv={tdv} tripdt={tdt}
+Rpi1	1_1	1_2	1000MEG
+Gi2	2_1	2_2	VALUE={v(b,a)/(N2)} tripdv={tdv} tripdt={tdt}
+Rpi2	2_1	2_2	1000MEG
+*	WICKLUNG_Dyen
+X_W1	magnP1	a	1_1	1_2	ctrl WICKLUNG_ctrl_Dy2
++PARAMS:  R={R1}  N={N1}  Rphis={N1*N1/L1s} psi_0={psi_0*phiN} tpsi0={tpsi0} tpsid={tpsid} ron={ron}
+X_W2	a   b    2_1	2_2	 WICKLUNG_Dy2
++PARAMS:  R={R2}  N={N2}  Rphis={N1*N1/L1s} psi_0={psi_0*phiN} tpsi0={tpsi0} tpsid={tpsid} ron={ron}
+*	EisenSCHENKEL_Dy
+X_SCH	b	magnP2 ctrl SCHENKEL_Dy2   PARAMS:
++	N={N1}  RFe={RFe}  ImyN={ImyN}
++	phiN={phiN}	a={a}   m={m}
+.ENDS
+
+
+.SUBCKT SCHENKEL_Dy2  m1  m2 ctrl 
++PARAMS:   N=1  RFe=1  ImyN=1  a=1  phiN=1 m=9
+LRFe	m1	mh	flux={x*((N*N*v(ctrl)*v(ctrl))/RFe)} Rser={0.001m*N*N/RFe}  ; Rser=parasitic value for better convergence  
+vphi	mh	mh1	0
+rphi    mh  0 1e12 
+Eimy	mh1	m2
++VALUE={N*imyN*(a*i(vphi)/phiN+(1-a)*PWRS(i(vphi)/phiN,m))} tripdv={tdv} tripdt={tdt}
+.ENDS;  SCHENKEL_Dy2
+*$
+
+.SUBCKT WICKLUNG_ctrl_Dy2  ma  mb  ea  eb ctrl
++PARAMS:   R=1   N=1    Rphis=1 psi_0=0 tpsi0=1000s tpsid=0.1ms ron=0.00001 ;passt für 1ms Schaltzeit bei C mit 1Coulomb
+Gphi	ma	mb	VALUE={v(phi)} tripdv={tdv} tripdt={tdt}
+Gphis	ma	mb	VALUE={v(ma,mb)/(Rphis*v(ctrl)*v(ctrl))} tripdv={tdv} tripdt={tdt}
+Gp	0	phi	VALUE={(v(ea,eb)-R*v(ctrl)*v(mb,ma)/(N*v(ctrl)))/(N*v(ctrl))} tripdv={tdv} tripdt={tdt}
+Cp phi 0 1 IC=0
+Vctrl sctrl 0 pwl 0s 0v {tpsi0+1p} 0v {tpsi0+tpsid+2p} 1V {tpsi0+2*tpsid+3p} 1v {tpsi0+3*tpsid+4p} 0v
+S1 phi phix sctrl 0 MS1
+.model MS1 SW(Ron={Ron} Roff=1e9 Vt=0.9 Vh=0.0 Lser=0 Vser=0)
+E1 phix 0 value={psi_0} tripdv={tdv} tripdt={tdt} ; das ist die Spannungsquelle mit psi_0 der den Kondensator Cp auflädt !!!
+Rp	phi	0	1000MEG
+.ENDS ;  WICKLUNG_Dy
+
+.SUBCKT WICKLUNG_Dy2  ma  mb  ea  eb
++PARAMS:   R=1   N=1    Rphis=1 psi_0=0 tpsi0=1000s tpsid=0.1ms ron=0.00001 ;passt für 1ms Schaltzeit bei C mit 1Coulomb
+Gphi	ma	mb	VALUE={v(phi)} tripdv={tdv} tripdt={tdt}
+Rphis	ma	mb	{Rphis}
+Gp	0	phi	VALUE={(v(ea,eb)-R*v(mb,ma)/(N))/(N)} tripdv={tdv} tripdt={tdt}
+Cp phi 0 1 IC=0
+Vctrl ctrl 0 pwl 0s 0v {tpsi0+1p} 0v {tpsi0+tpsid+2p} 1V {tpsi0+2*tpsid+3p} 1v {tpsi0+3*tpsid+4p} 0v
+S1 phi phix ctrl 0 MS1
+.model MS1 SW(Ron={Ron} Roff=1e9 Vt=0.9 Vh=0.0 Lser=0 Vser=0)
+E1 phix 0 value={psi_0} tripdv={tdv} tripdt={tdt} ; das ist die Spannungsquelle mit psi_0 der den Kondensator Cp auflädt !!!
+Rp	phi	0	1000MEG
+.ENDS ;  WICKLUNG_Dy
+
+.subckt Trafo_N1N2_simple_ctrl_Dy2 p1  p2  s3  s4  ctrl
++	PARAMS:
++	SN=1kVA
++	U1N=230V
++	U20=230V
++	fn={fn1}
++	N1=1000
++	uR=0.04
++	uX=0.08
++	i0=0.05
++	p0=0.005
+.PARAM
++	I1N={SN/U1N}
++	Z1N={U1N/I1N}
++	omegaN={(2*pi)*fN}
++	R1={Z1N*uR/2}
++	L1s={Z1N*uX/2/omegaN}
++	RFe={U1N*U1N/(p0*SN)}
++	N2={N1*U20/U1N}
++	R2={R1*N2/N1*N2/N1}
++   Xh={(U1N*U1N)/(SN*sqrt(i0*i0-p0*p0))} ;FS
++   iu={U1N/Xh} ;FS
++   ImyN={sqrt(2)*iu} ;FS
++	phiN={sqrt(2)*U1N/omegaN/N1}
+Rcup  p1 x1 {R1}
+L1p    x1 p11 {L1s} rser=0
+Rfe1   p11 p2 {RFe}
+*LXh    p11 p2 {Xh/omegaN} rser=0
+LXh p11 p2 flux={Xh/omegaN*x*v(ctrl)*v(ctrl)} rser=0
+Rcus   s33  x2 {R2}
+L1s   x2 s3 {L1s*N2/N1*N2/N1} rser=0
+X_w1	p11 p2  s33  s4  ctrl  N1N2_ctrl_Dy2 params: N1={N1} N2={N2}
+.ends
+
+
+* ctrl node in verhältniseinheit
+* UE/UEN=1+stproz/100 (0.9 .. 1 .. 1.2)
+.subckt N1N2_ctrl_Dy2 in1 in2 out1 out2 ctrl
++params: proz=1 k=1 N1=1 N2=1
+.param ue={N1/N2}
+G1 0 M in1 in2 1
+G2 0 M VALUE={-k*((v(out1)-v(out2))*ue*v(ctrl))} tripdv={tdv} tripdt={tdt}
+G3 in1 in2 M 0 1
+G4 out1 out2 VALUE={-k*((v(m))*ue*v(ctrl))} tripdv={tdv} tripdt={tdt}
+Rl ctrl 0 1e12
+R2 M 0 1e10
+Rin1 in1 0 1e12
+Rin2 in2 0 1e12
+Rout1 out1 0 1e12
+Rout2 out2 0 1e12
+.ends

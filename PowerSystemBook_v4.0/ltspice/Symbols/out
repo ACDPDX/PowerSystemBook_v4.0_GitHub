@@ -1,0 +1,129 @@
+*Coupled resistors of ATP-matrix not used!
+*Resistor value of VERIFY command  connected in series at the input port
+.subckt template a1 a4 a2 a5 a3 a6 b1 b4 b2 b5 b3 b6
++PARAMS:
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INPUT ATP MATRIX HERE !! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 
++ fn=50
++ omega={2*pi*fn}
+*input Yt(C)matrix elements ->Yce(CE) and Yshield(Cshield) in mohm/m like in the ATP-Matrix
++ Yce=...
++ Yshield=...
++ Ce={Yce/omega}
++ Cshield={Yshield/omega}
+*input R,Rsh from the VERIFY command for a 1km line!!!
++ R=.... Rsh= .... 
++ length=1
++ length1={length*1000}
++ g=1e12
++ fact=1
+.param R1={R*length}
+.param Rsh1={Rsh*length*fact}
+.param Ce1={length1*Ce}
+.param Cshield1={length1*Cshield}
+.param k12={XM12/sqrt(XL11*XL22)}
+.param k13={XM13/sqrt(XL11*XL33)}
+.param k14={XM14/sqrt(XL11*XL44)}
+.param k15={XM15/sqrt(XL11*XL55)}
+.param k16={XM16/sqrt(XL11*XL66)}
+.param k23={XM23/sqrt(XL22*XL33)}
+.param k24={XM24/sqrt(XL22*XL44)}
+.param k25={XM25/sqrt(XL22*XL55)}
+.param k26={XM26/sqrt(XL22*XL66)}
+.param k34={XM34/sqrt(XL33*XL44)}
+.param k35={XM35/sqrt(XL33*XL55)}
+.param k36={XM36/sqrt(XL33*XL66)}
+.param k45={XM45/sqrt(XL44*XL55)}
+.param k46={XM46/sqrt(XL44*XL66)}
+.param k56={XM56/sqrt(XL55*XL66)}
+*resistance left side
+R1 a1 a1a {R1/2}
+R2 a2 a2a {R1/2}
+R3 a3 a3a {R1/2}
+R4 a4 a4a {Rsh1/2}
+R5 a5 a5a {Rsh1/2}
+R6 a6 a6a {Rsh1/2}
+*self inductance left side
+L1 a1a b1a {length1/2/omega*(XL11)} rser=0
+L2 a2a b2a {length1/2/omega*(XL22)} rser=0
+L3 a3a b3a {length1/2/omega*(XL33)} rser=0
+L4 a4a b4a {length1/2/omega*(XL44)} rser=0
+L5 a5a b5a {length1/2/omega*(XL55)} rser=0
+L6 a6a b6a {length1/2/omega*(XL66)} rser=0
+* Capacitance matrix from ATP 
+* Conductor:
+Gc1 b1a 0  VALUE={ce1*DDT(v(b1))-ce1*DDT(v(b4))} tripdv={tdv} tripdt={tdt}
+Gc2 b2a 0  VALUE={ce1*DDT(v(b2))-ce1*DDT(v(b5))} tripdv={tdv} tripdt={tdt}
+Gc3 b3a 0  VALUE={ce1*DDT(v(b3))-ce1*DDT(v(b6))} tripdv={tdv} tripdt={tdt}
+* Shield:
+Gc4 b4a 0  VALUE={-ce1*DDT(v(b1))+Cshield1*DDT(v(b4))} tripdv={tdv} tripdt={tdt}
+Gc5 b5a 0  VALUE={-ce1*DDT(v(b2))+Cshield1*DDT(v(b5))} tripdv={tdv} tripdt={tdt}
+Gc6 b6a 0  VALUE={-ce1*DDT(v(b3))+Cshield1*DDT(v(b6))} tripdv={tdv} tripdt={tdt}
+*self inductance right side
+L1a b1a b1b {length1/2/omega*(XL11)} rser=0
+L2a b2a b2b {length1/2/omega*(XL22)} rser=0
+L3a b3a b3b {length1/2/omega*(XL33)} rser=0
+L4a b4a b4b {length1/2/omega*(XL44)} rser=0
+L5a b5a b5b {length1/2/omega*(XL55)} rser=0
+L6a b6a b6b {length1/2/omega*(XL66)} rser=0
+*resistance right side
+R1a b1b b1 {R1/2}
+R2a b2b b2 {R1/2}
+R3a b3b b3 {R1/2}
+R4a b4b b4 {Rsh1/2}
+R5a b5b b5 {Rsh1/2}
+R6a b6b b6 {Rsh1/2}
+*coupling left side:
+K12 L1 L2 {k12}
+K13 L1 L3 {k13}
+K14 L1 L4 {k14}
+K15 L1 L5 {k15}
+K16 L1 L6 {k16}
+*
+K23 L2 L3 {k23}
+K24 L2 L4 {k24}
+K25 L2 L5 {k25}
+K26 L2 L6 {k26}
+*
+K34 L3 L4 {k34}
+K35 L3 L5 {k35}
+K36 L3 L6 {k36}
+*
+K45 L4 L5 {k45}
+K46 L4 L6 {k46}
+*
+K56 L5 L6 {K56}
+* coupling right side:
+K12a L1a L2a {k12}
+K13a L1a L3a {k13}
+K14a L1a L4a {k14}
+K15a L1a L5a {k15}
+K16a L1a L6a {k16}
+*
+K23a L2a L3a {k23}
+K24a L2a L4a {k24}
+K25a L2a L5a {k25}
+K26a L2a L6a {k26}
+*
+K34a L3a L4a {k34}
+K35a L3a L5a {k35}
+K36a L3a L6a {k36}
+*
+K45a L4a L5a {k45}
+K46a L4a L6a {k46}
+*
+K56a L5a L6a {K56}
+Rgnd1 a1 0 {g}
+Rgnd2 a2 0 {g}
+Rgnd3 a3 0 {g}
+Rgnd4 a4 0 {g}
+Rgnd5 a5 0 {g}
+Rgnd6 a6 0 {g}
+Rgnd7 b1 0 {g}
+Rgnd8 b2 0 {g}
+Rgnd9 b3 0 {g}
+Rgnd10 b4 0 {g}
+Rgnd11 b5 0 {g}
+Rgnd12 b6 0 {g}
+*******************************
+.ENDS

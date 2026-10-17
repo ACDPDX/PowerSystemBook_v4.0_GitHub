@@ -1,0 +1,314 @@
+% ============================================================
+% PowerSystemBook 3.2 -- central preamble
+% Engine: LuaLaTeX | Bibliography: Biber | Index: MakeIndex
+% ============================================================
+
+% 1. Language, fonts, typography
+\usepackage[english]{babel}
+\usepackage{csquotes}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage{microtype}
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
+\setmonofont{Libertinus Mono}[Scale=MatchLowercase]
+\setmathfont{Libertinus Math}
+\setlength{\emergencystretch}{2em}
+\raggedbottom
+
+% 2. Colour palette
+\usepackage{xcolor}
+\definecolor{BookBlue}{RGB}{24,72,120}
+\definecolor{BookBlueDark}{RGB}{17,50,84}
+\definecolor{BookGreen}{RGB}{42,105,70}
+\definecolor{BookOrange}{RGB}{181,105,22}
+\definecolor{BookRed}{RGB}{155,45,45}
+\definecolor{BookGray}{RGB}{88,92,96}
+\definecolor{LightBlue}{RGB}{241,247,252}
+\definecolor{LightGreen}{RGB}{242,249,244}
+\definecolor{LightYellow}{RGB}{255,249,230}
+\definecolor{LightRed}{RGB}{253,242,242}
+\definecolor{LightGray}{RGB}{246,247,248}
+% Formula-sheet colours (formerly defined locally in the appendices).
+\definecolor{navy}{HTML}{17365D}
+\definecolor{blue}{HTML}{2F75B5}
+\definecolor{sky}{HTML}{EAF3FA}
+\definecolor{gold}{HTML}{D69E2E}
+\definecolor{ink}{HTML}{243447}
+\definecolor{muted}{HTML}{617285}
+\definecolor{shadecolor}{HTML}{F1F6FA}
+
+% 3. Mathematics and units
+\usepackage{amsmath,mathtools,bm}
+\usepackage{siunitx}
+\DeclareSIUnit{\varunit}{var}
+\DeclareSIUnit{\rpm}{rpm}
+\DeclareSIUnit{\pu}{p.u.}
+\sisetup{
+  per-mode=symbol,
+  separate-uncertainty=true,
+  detect-all,
+  exponent-product=\cdot,
+  output-decimal-marker={.},
+  group-minimum-digits=4
+}
+\newcommand{\vect}[1]{\bm{#1}}
+\newcommand{\mat}[1]{\bm{#1}}
+\newcommand{\e}{\mathrm{e}}
+\newcommand{\imag}{\mathrm{j}}
+\newcommand{\diff}{\mathop{}\!\mathrm{d}}
+\newcommand{\Rmag}{\mathcal{R}}
+\newcommand{\sign}{\operatorname{sign}}
+\newcommand{\eqsep}{\addlinespace[2pt]}
+\newcommand{\formulaTableStretch}{1.18}
+
+% 4. Graphics, plots, captions, tables
+\usepackage{graphicx}
+\usepackage{tikz}
+\graphicspath{{figures/}{figures/common/}{figures/transformers/}{figures/lines/}{figures/generators/}}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{booktabs,longtable,tabularx,array,multirow}
+\usepackage{placeins}
+\usepackage{pdflscape}
+\usepackage{framed}
+
+% Full-page landscape figure.
+% Usage:
+% \begin{widefigure}{Caption text}{fig:label}
+%   \includegraphics[width=.95\linewidth]{drawing.pdf}
+% \end{widefigure}
+\NewDocumentEnvironment{widefigure}{O{p} m m}{%
+  \begin{landscape}%
+  \begin{figure}[#1]%
+  \centering
+}{%
+  \caption{#2}%
+  \label{#3}%
+  \end{figure}%
+  \end{landscape}%
+}
+\captionsetup{
+  font=small,
+  labelfont={bf,color=BookBlueDark},
+  textfont=small,
+  justification=raggedright,
+  singlelinecheck=false,
+  skip=6pt
+}
+\renewcommand{\arraystretch}{1.15}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+% 5. Lists
+\usepackage{enumitem}
+\setlist{topsep=4pt,itemsep=2pt,parsep=0pt}
+\setlist[itemize,1]{label=\textcolor{BookBlue}{\small\textbullet}}
+
+% 6. Page design, headings, headers and footers
+\usepackage[automark,headsepline=.4pt]{scrlayer-scrpage}
+\setkomafont{pageheadfoot}{\small\sffamily\color{BookGray}}
+\setkomafont{pagenumber}{\bfseries\color{BookBlueDark}}
+\clearpairofpagestyles
+\ihead{\headmark}
+\ohead{\pagemark}
+\ifoot{Friedrich Schmidt}
+\ofoot{Power System Simulation with LTspice}
+\pagestyle{scrheadings}
+\renewcommand*{\chapterpagestyle}{plain}
+
+\setkomafont{chapter}{\normalfont\sffamily\bfseries\color{BookBlueDark}}
+\setkomafont{section}{\normalfont\sffamily\bfseries\color{BookBlue}}
+\setkomafont{subsection}{\normalfont\sffamily\bfseries\color{BookBlueDark}}
+\setkomafont{disposition}{\normalfont\sffamily\bfseries}
+\RedeclareSectionCommand[beforeskip=0pt,afterskip=1.4\baselineskip]{chapter}
+\RedeclareSectionCommand[beforeskip=1.7\baselineskip,afterskip=.55\baselineskip]{section}
+\RedeclareSectionCommand[beforeskip=1.3\baselineskip,afterskip=.4\baselineskip]{subsection}
+
+% 7. Hyperlinks and cross-references
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=BookBlueDark,
+  citecolor=BookGreen,
+  urlcolor=BookBlue,
+  pdfborder={0 0 0},
+  pdftitle={Power System Simulation with LTspice},
+  pdfauthor={Friedrich Schmidt},
+  pdfsubject={Power-system modelling and simulation}
+}
+\usepackage[nameinlink,noabbrev,capitalise]{cleveref}
+
+% 8. Instructional boxes
+% Robust tcolorbox setup for MiKTeX/LuaLaTeX.
+% Deliberately no "most", "skins", "enhanced" or TikZ "fadings" library.
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable,theorems}
+
+% Common appearance: rounded corners, integrated coloured title bar,
+% thin frame, generous spacing and automatic page breaks.
+\tcbset{
+  bookbox/.style={
+    breakable,
+    boxrule=.55pt,
+    arc=1.6mm,
+    outer arc=1.6mm,
+    left=3.5mm,
+    right=3.5mm,
+    top=3.0mm,
+    bottom=3.0mm,
+    before skip=12pt,
+    after skip=12pt,
+    fonttitle=\sffamily\bfseries,
+    coltitle=white,
+    separator sign={\enspace--},
+    description delimiters parenthesis,
+    before upper={\setlength{\parindent}{0pt}},
+    titlerule=.4pt
+  }
+}
+
+\newtcbtheorem[number within=chapter]{definition}{Definition}{
+  bookbox,
+  colback=LightBlue,
+  colframe=BookBlue,
+  colbacktitle=BookBlue
+}{def}
+
+\newtcbtheorem[number within=chapter]{remark}{Remark}{
+  bookbox,
+  colback=LightGray,
+  colframe=BookGray,
+  colbacktitle=BookGray
+}{rem}
+
+\newtcbtheorem[number within=chapter]{example}{Example}{
+  bookbox,
+  colback=LightGreen,
+  colframe=BookGreen,
+  colbacktitle=BookGreen
+}{ex}
+
+\newtcbtheorem[number within=chapter]{important}{Important}{
+  bookbox,
+  colback=LightRed,
+  colframe=BookRed,
+  colbacktitle=BookRed
+}{imp}
+
+\newtcbtheorem[number within=chapter]{simulation}{Simulation}{
+  bookbox,
+  colback=white,
+  colframe=BookBlue,
+  colbacktitle=BookBlue
+}{sim}
+
+\newtcbtheorem[number within=chapter]{calculation}{Calculation}{
+  bookbox,
+  colback=white,
+  colframe=BookOrange,
+  colbacktitle=BookOrange,
+  before upper={
+    \setlength{\parindent}{0pt}
+    \setlength{\abovedisplayskip}{6pt}
+    \setlength{\belowdisplayskip}{6pt}
+  }
+}{calc}
+
+\newtcbtheorem[number within=chapter]{result}{Result}{
+  bookbox,
+  colback=LightGreen,
+  colframe=BookGreen,
+  colbacktitle=BookGreen,
+  fontupper=\bfseries
+}{res}
+
+\newtcolorbox{chaptersummary}[1][Chapter Summary]{
+  bookbox,
+  title={#1},
+  colback=LightBlue,
+  colframe=BookBlueDark,
+  colbacktitle=BookBlueDark,
+  before upper={
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{.4\baselineskip}
+  }
+}
+
+\newtcolorbox{warningbox}[1][Warning]{
+  bookbox,
+  title={#1},
+  colback=LightRed,
+  colframe=BookRed,
+  colbacktitle=BookRed
+}
+
+% Formula sheets: lightweight, fading-free design based on the transformer
+% appendix.  Both formula appendices use only these central definitions.
+\newenvironment{formulaBox}[1]{%
+  \par\medskip
+  {\sffamily\bfseries\large\color{navy}#1}\par\nobreak\smallskip
+  \def\FrameCommand{\hspace{1pt}{\color{blue}\vrule width 2.2pt}\hspace{8pt}}%
+  \MakeFramed{\advance\hsize-11.2pt\FrameRestore}%
+  \setlength{\parindent}{0pt}\setlength{\parskip}{5pt}%
+}{\endMakeFramed\par\smallskip}
+
+\newenvironment{noteBox}{%
+  \par\smallskip
+  \def\FrameCommand{\hspace{1pt}{\color{gold}\vrule width 2.2pt}%
+    \colorbox{shadecolor}}%
+  \MakeFramed{\advance\hsize-2\width\advance\hsize-2\fboxsep\FrameRestore}%
+  \setlength{\parindent}{0pt}\setlength{\parskip}{5pt}%
+}{\endMakeFramed\par\smallskip}
+
+\newcommand{\formulasheettitle}[2]{%
+  \refstepcounter{chapter}%
+  \addcontentsline{toc}{chapter}{\protect\numberline{\thechapter}#1}%
+  \markboth{#1}{Formula sheet}%
+  \begingroup
+  \setlength{\fboxsep}{8mm}%
+  \noindent\colorbox{navy}{%
+    \parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
+      {\sffamily\bfseries\fontsize{25}{29}\selectfont\color{white}#1}\par
+      \vspace{2mm}%
+      {\sffamily\fontsize{15}{18}\selectfont\color{white!85}#2}%
+    }}%
+  \endgroup
+  \vspace{3mm}%
+}
+
+\crefname{definition}{definition}{definitions}
+\crefname{remark}{remark}{remarks}
+\crefname{example}{example}{examples}
+\crefname{important}{important note}{important notes}
+\crefname{simulation}{simulation}{simulations}
+\crefname{calculation}{calculation}{calculations}
+\crefname{result}{result}{results}
+
+% 9. MATLAB, LTspice and generic code listings
+\usepackage{listings}
+\renewcommand{\lstlistlistingname}{List of Listings}
+\renewcommand{\lstlistingname}{Listing}
+\lstdefinestyle{CommonCode}{
+  basicstyle=\ttfamily\small,
+  numbers=left,numberstyle=\scriptsize\color{BookGray},numbersep=8pt,
+  frame=single,framerule=.4pt,rulecolor=\color{BookGray},
+  backgroundcolor=\color{LightGray},
+  breaklines=true,breakatwhitespace=false,
+  showstringspaces=false,tabsize=4,columns=fullflexible,keepspaces=true,
+  aboveskip=10pt,belowskip=10pt,
+  captionpos=b
+}
+\lstdefinestyle{Matlab}{style=CommonCode,language=Matlab,keywordstyle=\bfseries\color{BookBlue},commentstyle=\itshape\color{BookGreen},stringstyle=\color{BookOrange}}
+\lstdefinestyle{LTspice}{style=CommonCode,numbers=none,numbersep=0pt,morecomment=[l]{*},morecomment=[l]{;},keywordstyle=\bfseries\color{BookBlue}}
+\lstdefinestyle{PlainText}{style=CommonCode,numbers=none}
+
+% 10. Bibliography
+\usepackage[backend=biber,style=ieee,sorting=none,maxbibnames=99]{biblatex}
+\addbibresource{bibliography.bib}
+
+% 11. Index and document depth
+\usepackage{imakeidx}
+\makeindex[title=Index,intoc]
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+\listfiles

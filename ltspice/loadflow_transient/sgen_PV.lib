@@ -269,7 +269,7 @@ Ctheta theta 0 10u
 * current RMS of generator
 Ei i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))}  tripdv={tdv} tripdt={tdt}
 * voltage RMS of generator
-Ev Us 0 VALUE={1.73205/sqrt(2)*sqrt(v(usx)*v(usx)+v(usy)*v(usy))}  tripdv={tdv} tripdt={tdt}
+Ev Us 0 VALUE={1.73205/1.414*sqrt(v(usx)*v(usx)+v(usy)*v(usy))}  tripdv={tdv} tripdt={tdt}
 * Active power output of generator commented because sometimes slows down the simulation extremly
 * Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
 * Reactive power output of generator commented because sometimes slows down the simulation extremly

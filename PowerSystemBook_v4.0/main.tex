@@ -1,0 +1,84 @@
+% !TeX program = lualatex
+% !BIB program = biber
+\documentclass[
+  11pt,
+%  left=12.7mm
+%  right=6.35mm
+%  top=6.35mm
+%  bottom=6.35mm
+  a4paper,
+  twoside=true,
+  open=right,
+  headings=big,
+  numbers=noenddot,
+  bibliography=totoc,
+  index=totoc,
+  listof=totoc,
+  BCOR=8mm,
+  DIV=12
+]{scrbook}
+
+\input{preamble}
+
+\begin{document}
+
+% ============================================================
+% Front matter: Roman page numbers
+% ============================================================
+\frontmatter
+\pagestyle{plain}
+%\input{frontmatter/titlepage}
+\input{frontmatter/copyright}
+\input{frontmatter/dedication}
+\input{frontmatter/preface}
+\input{frontmatter/acknowledgements}
+\input{frontmatter/how_to_use}
+%\input{frontmatter/symbols}
+%\input{frontmatter/abbreviations}
+
+\tableofcontents
+\cleardoublepage
+\listoffigures
+\cleardoublepage
+\listoftables
+\cleardoublepage
+\lstlistoflistings
+\cleardoublepage
+
+% ============================================================
+% Main matter: Arabic page numbers
+% ============================================================
+\mainmatter
+\pagestyle{scrheadings}
+\include{chapters/01 Transformer und Shunt Reactor/01_Transformer_and_ShuntReactor.tex}
+\include{chapters/02_Shortcircuitcurrent in the medium voltage grid/02_Shortcircuit_Current_in_medium_voltage_power_grid.tex}
+\include{chapters/03_Initializing Transformers with Residual Flux/03_Initializing_Transformers_with_Residual_Flux.tex}
+\include{chapters/04_Switching Lines/04_Switching_Lines.tex}
+\include{chapters/05_Earth Faults in 110 kV and 10 kV Power Grids/05_Earth_Faults_in_110kV_and_10kV_Power_Grids.tex}
+\include{chapters/06_Switching Whole Networks/06_Switching_Whole_Networks.tex}
+\include{chapters/07_Coupled Lines with Resonance/07_Coupled_Lines_with_Resonance.tex}
+\include{chapters/08_Synchronous Generator/08_Synchronous_Generator_Operating_Modes.tex}
+\include{chapters/09_Synchronous Generator Characteristic Curves/09_Characteristic_Curves_of_a_Synchronous_Generator.tex}
+% Add further chapters here:
+% \include{chapters/02_Transmission_Lines}
+
+% ============================================================
+% Appendices
+% ============================================================
+\appendix
+\include{appendices/SynchronousGenerator_Formulas.tex}
+\include{appendices/Transformator_Formulas.tex}
+\include{appendices/Appendix_C_Behavioral_Sources_LTspice.tex}
+\include{appendices/Appendix_D_Installing_LTspice_and_Toolboxes.tex}
+\include{appendices/Appendix_E_QA_Transient_Simulation.tex}
+\include{appendices/Appendix_F_LTspice_Schematic_Editor.tex}
+\include{appendices/Appendix_G_Most_used_devices.tex}
+% ============================================================
+% Back matter
+% ============================================================
+\backmatter
+\input{backmatter/bibliography}
+\printindex
+\input{backmatter/about_author}
+%\input{backmatter/backcover}
+\end{document}

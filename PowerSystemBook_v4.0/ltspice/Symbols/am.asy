@@ -1,0 +1,40 @@
+Version 4
+SymbolType BLOCK
+LINE Normal 7 -27 16 -32
+LINE Normal 6 -7 16 0
+LINE Normal 10 -16 16 -16
+LINE Normal -11 -17 -17 -11
+LINE Normal -6 -11 -11 -17
+LINE Normal -1 -17 -6 -11
+LINE Normal -11 -15 -17 -9
+LINE Normal -6 -9 -11 -15
+LINE Normal -1 -15 -6 -9
+LINE Normal -11 -13 -17 -7
+LINE Normal -6 -7 -11 -13
+LINE Normal -1 -13 -6 -7
+CIRCLE Normal 10 1 -27 -35
+TEXT -17 -23 Left 2 DAM
+SYMATTR Prefix X
+SYMATTR SpiceModel DAM
+SYMATTR ModelFile dam.lib
+SYMATTR Description asynchronous motor
+SYMATTR Value2 I0rel=0.6 Ikrel=5 rbg=0.1 taumech=0.25 n0=0 nN=1420
+SYMATTR Value UN_verkettet=400V IN=21A cos_PhiN=0.82 fn={fn1} p=2 PN=10kW
+PIN 16 -32 VLEFT 2
+PINATTR PinName U1
+PINATTR SpiceOrder 1
+PIN 16 -16 VLEFT 2
+PINATTR PinName V1
+PINATTR SpiceOrder 2
+PIN 16 0 VLEFT 2
+PINATTR PinName W1
+PINATTR SpiceOrder 3
+PIN -32 -32 VBOTTOM 2
+PINATTR PinName n
+PINATTR SpiceOrder 4
+PIN -32 -16 VBOTTOM 2
+PINATTR PinName ML
+PINATTR SpiceOrder 5
+PIN -32 0 VBOTTOM 2
+PINATTR PinName n1
+PINATTR SpiceOrder 6

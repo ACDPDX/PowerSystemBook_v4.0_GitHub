@@ -30,7 +30,7 @@
 +	ZN={UN/IN}
 +	Rs={ZN*rcu}
 +	omega_el={(2*pi)*fN}
-+	g={IE0/((1+Streuung)*Kc*IN*sqrt(2))}
++	g={IE0/((1+Streuung)*Kc*IN*1.414)}
 +	Ls={Streuung*ZN/Kc/omega_el}
 +	PsiN={sqrt(2)*UN/omega_el}
 +	RE={UE0/IE0}
@@ -200,12 +200,12 @@ Eiy	iy	0	VALUE={ (i(V_i2)+i(V_i3))*sin(v(th))
 +	 rbg=0.1	 	; [M_Reibung/MNenn]
 +	 taumech=38ms	; [J*2*pi*nN/MN]
 +	 rcu=0.04   	; [Rs/(UN/IN))]
-+	 urot=0.9  		; [Rotationsspannung/(UN*sqrt(2))]
++	 urot=0.9  		; [Rotationsspannung/(UN*1.414)]
 +    Mvz=1
 .PARAM
 +	 UN={UN_verkettet/1.732}
 +	 Ld={UN/Ik0/(2*3.1416*fN)}
-+    PsiE={Urot*sqrt(2)*UN/(2*3.1416*fN)}
++    PsiE={Urot*1.414*UN/(2*3.1416*fN)}
 +	 MN={p*PN/(2*3.1416*fN)}
 +	 Rs={rcu*UN/IN}
 +	 J={taumech*MN/(2*3.1416*fN/p)}

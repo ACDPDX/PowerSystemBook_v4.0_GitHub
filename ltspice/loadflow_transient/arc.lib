@@ -32,8 +32,8 @@
 
 
 * cassie / mayr model
-*(1-exp(-i*i/(I0*I0)))*v*i/(E0*E0) cassie
-*(exp(-i*i/(I0*I0)))*i*i/P0   mayr 
+*(1-exp(-i*i/(I0*I0))) -> *v*i/(E0*E0) cassie
+*(exp(-i*i/(I0*I0)))   -> *i*i/P0   mayr 
 .subckt arc in out params: e0=0.0028 i0=6 p0=0.02 gmin=1e-7 theta=1e-4 ginit=0
 V0 in in1 0
 E1 a1 0 VALUE={(1-exp(-(i(v0)*i(v0))/(I0*I0)))*((v(in1,out)*i(v0))/(E0*E0))} tripdv={tdv} tripdt={tdt}

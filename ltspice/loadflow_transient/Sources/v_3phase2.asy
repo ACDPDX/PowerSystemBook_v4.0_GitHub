@@ -21,6 +21,7 @@ LINE Normal -15 0 -32 0
 LINE Normal -15 16 -32 16
 LINE Normal -15 32 -32 32
 LINE Normal -15 48 -32 48
+RECTANGLE Normal 34 -14 30 -18
 ARC Normal -15 1 -9 -5 3 -3 -27 -2
 ARC Normal -9 1 -3 -5 9 -3 -21 -2
 ARC Normal -3 1 3 -5 15 -3 -15 -2

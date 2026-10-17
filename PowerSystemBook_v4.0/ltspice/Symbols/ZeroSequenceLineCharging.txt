@@ -1,0 +1,20 @@
+Zero sequence line charging. Q0
+
+   Each phase of a circuit is connected to a 1 V amplitude voltage source with zero phase angle.
+
+   The other end of the line is open. 
+
+   Q0 is the injected reactive power multiplied by the square of the user specified base voltage (multiplied with 2/n).
+
+   All phase conductors of other phases are open.
+
+*  Positive sequence line charging. Q+
+
+   The phases of a circuit are connected to a 1 V amplitude voltage source with phase angle -360*(i-1)/n where i is the phase number and n is the number of phases of the tested circuit.
+
+  The other end of the line is open. 
+
+   Q+ is calculated as the average injected reactive power multiplied by the square of the user specified base voltage (multiplied with 2/n).
+
+   All phase conductors of other phases are open.
+

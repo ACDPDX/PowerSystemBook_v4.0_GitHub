@@ -1,0 +1,40 @@
+********************************************************************************
+*
+*  Various other functions/additions that don't fit in the one- or two-variable
+* categories.
+*
+*							Vlad, ©2008 - 2014
+*
+********************************************************************************
+*
+*
+* [CONTENTS]
+*
+* - The list of symbols in [Math], in alphabetical order:
+*
+* - Const	- constant
+* - Math1	- one input functions (separate .sub file)
+* - Math2	- two inputs functions (separate .sub file)
+* - Math5r	- 5 input summer
+*
+*
+* [GENERAL]
+*
+* - The updates for all the files in [Math] will be mentioned at the end of this
+* file.
+*
+********************************
+*
+*	Constant value
+*
+********************************
+*
+* [NOTES]
+*
+* - Since it's a B-source, {c} can have expressions, as well.
+*
+********************************
+.subckt Const out params: c=1
+B1 0 out i={c} tripdv={tdv} tripdt={tdt}
+R1 out 0 1
+.ends Const

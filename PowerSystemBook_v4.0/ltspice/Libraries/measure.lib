@@ -1,0 +1,2581 @@
+*********************************************************
+* Some meatering code is obtained from ©Vlad
+* http://ltspicegoodies.ltwiki.org/index.html
+* other RMS-measuring code from Prof. Robert Heinemann www.spicelab.de
+* Book: PSPICE: Einführung in die Elektroniksimulation
+*********************************************************
+
+
+
+
+*NOTE: The accuracy of the meters is about 0.5%
+*For smoother measurement set fc=0.5
+
+* bus element with measures of rms of voltages (one per phase)
+.SUBCKT bus_Veff vin1 vin2 vin3 v1 v2 v3
++ params: fc=3 tenable=1us tdv=1 tdt=1 rgnd=1e12 vfactor=sqrt(3)
+*
+Rg1 VIN1 0 {Rgnd}
+Rg2 VIN2 0 {Rgnd}
+Rg3 VIN3 0 {Rgnd}
+*
+Xv1 vin1 v1 vmeter_RMS1a
++params: fc={fc} tdv={tdv} tenable={tenable} tdt={tdt} vfactor={vfactor}
+Xv2 vin2 v2 vmeter_RMS1a
++params: fc={fc} tdv={tdv} tenable={tenable} tdt={tdt} vfactor={vfactor}
+Xv3 vin3 v3 vmeter_RMS1a
++params: fc={fc} tdv={tdv} tenable={tenable} tdt={tdt} vfactor={vfactor}
+.ENDS
+
+.SUBCKT bus_V0_AC vin1 vin2 vin3 v1 v2 v3
++ params: tdv=1 tdt=1 rgnd=1e12 vfactor=1
+Rg1 VIN1 0 {Rgnd}
+Rg2 VIN2 0 {Rgnd}
+Rg3 VIN3 0 {Rgnd}
+Rvm1 v1 0 {Rgnd}
+Rvm2 v2 0 {Rgnd}
+Rvm3 v3 0 {Rgnd}
+bv1 V1 0 v=vfactor*v(VIN1) tripdv={tdv} tripdt={tdt}
+bv2 V2 0 v=vfactor*v(VIN2) tripdv={tdv} tripdt={tdt}
+bv3 V3 0 v=vfactor*v(VIN3) tripdv={tdv} tripdt={tdt}
+* Measurements
+bVL1 L1 0 v=v(v1) tripdv={tdv} tripdt={tdt}
+bVL2 L2 0 v=v(v2) tripdv={tdv} tripdt={tdt}
+bVL3 L3 0 v=v(v3) tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* bus element with measures of rms of voltages (one per phase)
+.SUBCKT bus_1phase_Veff vin1 v1
++ params: fc=3 tdv=1 tdt=1 vfactor=sqrt(3)
+Rser vin1 vin2 1u
+Xv1 vin2 0 v1 vmeter_RMS_d
++ params: fc={fc} tenable=1us tdv={tdv} tdt={tdt} vfactor={vfactor}
+.ENDS
+
+* Meas of RMS value (mean value of all three phases VRMS*1.73205)
+.SUBCKT bus_Veff_1 L1 L2 L3 out
++PARAMS: tripdv={tdv} tripdt={tdt} rgnd=1e12 factor=1 tenable=1u
+* Measurement with MINMAX
+E1 L1a 0 Value={IF(time>tenable,v(L1),0)} tripdv={tdv} tripdt={tdt}
+E2 L2a 0 Value={IF(time>tenable,v(L2),0)} tripdv={tdv} tripdt={tdt}
+E3 L3a 0 Value={IF(time>tenable,v(L3),0)} tripdv={tdv} tripdt={tdt}
+RL1 L1 0 1e12
+RL2 L2 0 1e12
+RL3 L3 0 1e12
+Rout out 0 {Rgnd}
+Ep out_p1 0 VALUE={MAX(V(L1a),MAX(V(L2a),V(L3a)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1a),MIN(V(L2a),V(L3a)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700µ
+R2 out_p out_n 28.55
+Eout out 0 VALUE={factor*v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* bus elements with measures of rms of voltges u-v v-w w-u
+.SUBCKT bus_Veff_uv_vw_wu vin1 vin2 vin3 v1 v2 v3
++ params: fc=3 tdv=1 tdt=1 vfactor=1 rgnd=1e12
+*
+Rg1 VIN1 0 {Rgnd}
+Rg2 VIN2 0 {Rgnd}
+Rg3 VIN3 0 {Rgnd}
+*
+Buv 0 uv i=v(vin1,vin2) tripdv={tdv} tripdt={tdv} rpar=1
+Bvw 0 vw i=v(vin2,vin3) tripdv={tdv} tripdt={tdv} rpar=1
+Bwu 0 wu i=v(vin3,vin1) tripdv={tdv} tripdt={tdv} rpar=1
+*
+Xv1 uv v1 vmeter_RMS1
++params:  fc={fc} tdv={tdv} tdt={tdt} vfactor={vfactor}
+Xv2 vw v2 vmeter_RMS1
++params:  fc={fc} tdv={tdv} tdt={tdt} vfactor={vfactor}
+Xv3 wu v3 vmeter_RMS1
++params:  fc={fc} tdv={tdv} tdt={tdt} vfactor={vfactor}
+.ENDS
+
+* bus elements with measures of rms of voltages ph-ph, ph-0, phaseangle all of phase1
+.SUBCKT bus_Veff_phase vin1 vin2 vin3 v1 v2 ph
++ params: fc=3 fn=50 tenable=1us tdv=1 tdt=1 vfactor=sqrt(3) rgnd=1e12
+*
+Rg1 VIN1 0 {Rgnd}
+Rg2 VIN2 0 {Rgnd}
+Rg3 VIN3 0 {Rgnd}
+*
+Xv1 vin1 v1 vmeter_RMS1a
++params: fc={fc} tenable={tenable} vfactor={vfactor} tdv={tdv} tdt={tdt}
+Xv2 vin1 v2 vmeter_RMS1a
++params: fc={fc} tenable={tenable} vfactor=1 tdv={tdv} tdt={tdt}
+Xph vin1 ph PhaseDet
++params: fn={fn} deg=1 Rpar=1G tdv={tdv} tdt={tdt}
+.ENDS
+
+* 1 phase RMS voltage meter
+.subckt vmeter_RMS1 vin V
++ params: fc=3 vfactor=1.73205 tdv=1 tdt=1 rgnd=1e12
+XU4 vin V1 RMS fc={fc} b0=1 b1=3
+Eout V 0 VALUE={vfactor*v(v1)} tripdv={tdv} tripdt={tdt}
+Rgnd V 0 {rgnd}
+.ends
+
+* 1 phase RMS voltage meter
+* tenable because sometimes the first timesteps
+* in the simulation makes large spikes
+* e.g. set err0=1 in the generator models
+* default=1us
+.subckt vmeter_RMS1a vin V
++ params: fc=3 vfactor=1.73205 tdv=1 tdt=1 tenable=1u rgnd=1e12
+Eenable vin2 0 VALUE={IF(time>tenable,v(vin),0)} tripdv={tdv} tripdt={tdt}
+XU4 vin2 V1 RMS fc={fc} b0=1 b1=3
+Eout V 0 VALUE={vfactor*v(v1)} tripdv={tdv} tripdt={tdt}
+Rv v 0 {Rgnd}
+.ends
+
+* bus elements with measures of phaseangle for all three phases
+.SUBCKT bus_phase_all vin1 vin2 vin3 ph1 ph2 ph3
++ params: fn=50 rgnd=1e12 tdv=1 tdt=1
+*
+Rg1 VIN1 0 {Rgnd}
+Rg2 VIN2 0 {Rgnd}
+Rg3 VIN3 0 {Rgnd}
+*
+Xph1 vin1 ph1 PhaseDet
++params: fn={fn} deg=1 Rpar=1G tdv={tdv} tdt={tdt}
+Xph2 vin2 ph2 PhaseDet
++params: fn={fn} deg=1 Rpar=1G tdv={tdv} tdt={tdt}
+Xph3 vin3 ph3 PhaseDet
++params: fn={fn} deg=1 Rpar=1G tdv={tdv} tdt={tdt}
+.ENDS
+
+
+* bus element with measurement of instantaneous value with multiplicator
+*
+.SUBCKT bus_V IN1 IN2 IN3 Vm1 Vm2 Vm3
++params: rgnd=1e12 vfactor={1.732/sqrt(2)} tdv=1 tdt=1
+Rg1 IN1 0 {Rgnd}
+Rg2 IN2 0 {Rgnd}
+Rg3 IN3 0 {Rgnd}
+Rvm1 vm1 0 {Rgnd}
+Rvm2 vm2 0 {Rgnd}
+Rvm3 vm3 0 {Rgnd}
+bv1 Vm1 0 v=vfactor*v(IN1) tripdv={tdv} tripdt={tdt}
+bv2 Vm2 0 v=vfactor*v(IN2) tripdv={tdv} tripdt={tdt}
+bv3 Vm3 0 v=vfactor*v(IN3) tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT bus_V_AC IN1 IN2 IN3 Vm1 Vm2 Vm3
++params: rgnd=1e12 vfactor={1.732} tdv=1 tdt=1
+Rg1 IN1 0 {Rgnd}
+Rg2 IN2 0 {Rgnd}
+Rg3 IN3 0 {Rgnd}
+Rvm1 vm1 0 {Rgnd}
+Rvm2 vm2 0 {Rgnd}
+Rvm3 vm3 0 {Rgnd}
+bv1 Vm1 0 v=vfactor*v(IN1) tripdv={tdv} tripdt={tdt}
+bv2 Vm2 0 v=vfactor*v(IN2) tripdv={tdv} tripdt={tdt}
+bv3 Vm3 0 v=vfactor*v(IN3) tripdv={tdv} tripdt={tdt}
+* Measurements
+bVL1 L1 0 v=v(vm1) tripdv={tdv} tripdt={tdt}
+bVL2 L2 0 v=v(vm2) tripdv={tdv} tripdt={tdt}
+bVL3 L3 0 v=v(vm3) tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+* measure of instantaneous value of current with multiplier
+
+.SUBCKT ameter_raw IN OUT M_I
++ params: factor={1/sqrt(2)} tdv=1 tdt=1 rgnd=1e12
+vm IN OUT 0
+ev M_I 0 VALUE={factor*i(vm)} tripdv={tdv} tripdt={tdt}
+Rmi M_I 0 {Rgnd}
+.ENDS
+
+* measure of instantaneous value of voltage with multiplier
+*
+.SUBCKT vmeter_raw IN OUT M_I
++ params: factor={sqrt(3)/sqrt(2)} tdv=1 tdt=1 rgnd=1e12
+vm IN OUT 0
+ev M_I 0 VALUE={factor*v(IN)} tripdv={tdv} tripdt={tdt}
+Rmi M_I 0 {Rgnd}
+.ENDS
+
+* measurement of instantaneous apparent power value with multiplier
+
+.SUBCKT smeter_raw  IN1 OUT1 M_S1
++params: sfactor=1 tdv=1 tdt=1 factor={1/2} rgnd=1e12 ; sqrt(2)*sqrt(2)
+VU IN1 OUT1 0
+*************************** Voltage Veff ************************
+Ev1 m_s1 0 VALUE={sfactor*factor*V(IN1)*I(VU)} tripdv={tdv} tripdt={tdt}
+Rms1 m_s1 0 {Rgnd}
+.ENDS
+
+
+* 3 phase measurement of instantaneous apparent power value with multiplier
+.SUBCKT smeter_uvw_raw  IN1 IN2 IN3 OUT1 OUT2 OUT3 M_S1 M_S2 M_S3
++params: sfactor=3 tdv=1 tdt=1 factor={1/2} rgnd=1e12 ; sqrt(2)*sqrt(2)
+VU IN1 OUT1 0
+VV IN2 OUT2 0
+VW IN3 OUT3 0
+*************************** Voltage Veff ************************
+Ev1 m_s1 0 VALUE={sfactor*factor*V(IN1)*I(VU)} tripdv={tdv} tripdt={tdt}
+Ev2 m_s2 0 VALUE={sfactor*factor*V(IN2)*I(VV)} tripdv={tdv} tripdt={tdt}
+Ev3 m_s3 0 VALUE={sfactor*factor*V(IN3)*I(VW)} tripdv={tdv} tripdt={tdt}
+Rms1 m_s1 0 {Rgnd}
+Rms2 m_s2 0 {Rgnd}
+Rms3 m_s3 0 {Rgnd}
+.ENDS
+
+
+
+
+* 3 phase measure of rms of effective power with RMS device from @Vlad
+
+.SUBCKT pmeter_uvw vin1 vin2 vin3 vout1 vout2 vout3 P1 P2 P3
++params: fn=50 fc=3 sfactor=1 tdv=1 tdt=1
+Xpm1 vin1 vout1 p1 pmeter_RMS
++params: fn={fn} fc={fc} sfactor={sfactor} tdv={tdv} tdt={tdt}
+Xpm2 vin2 vout2 p2 pmeter_RMS
++params: fn={fn} fc={fc} sfactor={sfactor} tdv={tdv} tdt={tdt}
+Xpm3 vin3 vout3 p3 pmeter_RMS
++params: fn={fn} fc={fc} sfactor={sfactor} tdv={tdv} tdt={tdt}
+.ENDS
+
+* 3 phase measure of rms of reacitve power with with RMS device from @Vlad
+
+.SUBCKT qmeter_uvw  vin1 vin2 vin3 vout1 vout2 vout3  Q1 Q2 Q3
++params: fn=50 fc=3 sfactor=1 tdv=1 tdt=1
+Xpm1 vin1 vout1 q1 qmeter_RMS
++params: fn={fn} fc={fc} sfactor={sfactor} tdv={tdv} tdt={tdt}
+Xpm2 vin2 vout2 q2 qmeter_RMS
++params: fn={fn} fc={fc} sfactor={sfactor} tdv={tdv} tdt={tdt}
+Xpm3 vin3 vout3 q3 qmeter_RMS
++params: fn={fn} fc={fc} sfactor={sfactor} tdv={tdv} tdt={tdt}
+.ENDS
+
+* 3 phase measure of rms of reacitve power with with RMS device from @Vlad
+
+.SUBCKT qmeter_uvw_sgn  vin1 vin2 vin3 vout1 vout2 vout3  Q1 Q2 Q3
++params: fn=50 fc=3 sfactor=1 tdv=1 tdt=1
+Xpm1 vin1 vout1 q1 qmeter_RMS
++params: fn={fn} fc={fc} sfactor={sfactor} tdv={tdv} tdt={tdt}
+Xpm2 vin2 vout2 q2 qmeter_RMS
++params: fn={fn} fc={fc} sfactor={sfactor} tdv={tdv} tdt={tdt}
+Xpm3 vin3 vout3 q3 qmeter_RMS
++params: fn={fn} fc={fc} sfactor={sfactor} tdv={tdv} tdt={tdt}
+.ENDS
+
+* 3 phase measure of rms of apparent power with with RMS device from @Vlad
+*
+.SUBCKT smeter_uvw vin1 vin2 vin3 vout1 vout2 vout3 s1 s2 s3
++params:fn=50 fc=3 sfactor=1 tdv=1 tdt=1
+Xpm1 vin1 vout1 s1 smeter_RMS
++params:fn={fn} fc={fc} sfactor={sfactor} tdv={tdv} tdt={tdt}
+Xpm2 vin2 vout2 s2 smeter_RMS
++params:fn={fn} fc={fc} sfactor={sfactor} tdv={tdv} tdt={tdt}
+Xpm3 vin3 vout3 s3 smeter_RMS
++params:fn={fn} fc={fc} sfactor={sfactor} tdv={tdv} tdt={tdt}
+.ENDS
+
+.SUBCKT smeter_1_uvw L1_1 L2_1 L3_1 L1_2 L2_2 L3_2 s
++params: tdv=1 tdt=1 rgnd=1e12
+Xam L1_1 L2_1 L3_1 L1_2a L2_2a L3_2a m_i ameter_1_uvw
+Xvm L1_2a L2_2a L3_2a L1_2 L2_2 L3_2 m_v vmeter_1_uvw
+Es s 0 VALUE={v(m_v)*v(m_i)*sqrt(3)} tripdv={tdv} tripdt={tdt}
+Rs s 0 {Rgnd}
+.ENDS
+
+
+.SUBCKT pqsmeter_1_uvw L1_1 L2_1 L3_1 L1_2 L2_2 L3_2 m_p m_q m_s
++params: fn=50 tdv=1 tdt=1 rgnd=1e12
+Xsm L1_1 L2_1 L3_1 L1_2a L2_2 L3_2 m_s smeter_1_uvw
+Xpmc L1_2a L1_2b phii phasemeter_current params:fn={fn}
+Xpmv L1_2b L1_2 phiv phasemeter params:fn={fn}
+Edphi dphi 0 VALUE={v(phii)-v(phiv)} tripdv={tdv} tripdt={tdt}
+Ephi phi 0 VALUE={IF(v(dphi)>90,v(dphi)-180,IF(v(dphi)<-90,v(dphi)+180,v(dphi)))} tripdv={tdv} tripdt={tdt}
+Ep_m m_p 0 VALUE={IF(v(dphi)<90 & v(dphi)>-90,v(m_s)*cos(V(phi)*pi/180),-v(m_s)*cos(V(phi)*pi/180))}  tripdv={tdv} tripdt={tdt}
+Eq_m m_q 0 VALUE={IF(v(dphi)<90 & v(dphi)>-90,-v(m_s)*sin(V(phi)*pi/180),v(m_s)*sin(V(phi)*pi/180))}  tripdv={tdv} tripdt={tdt}
+Rmp m_p 0 {Rgnd}
+Rmq m_q 0 {Rgnd}
+Rms m_s 0 {Rgnd}
+.ENDS
+
+
+* 1 phase measure of rms of acitve power with integral
+* DEPRECATED  use instead new xxx_RMS devices
+
+.SUBCKT pmeter  vin vout P
++params: att=1000 fn=50  tripdt=1u  tripdv=100  off=1v  tripdt2=10n sfactor=1
+Vamper vin vout 0
+Gvolt 0 filt vin 0 {1/att}
+Cf filt 0 {1/4/pi/fn} Lser=0 Rpar=0 Cpar=0 RLshunt=0 ic=0 Rpar=1
+Bper 0 per i=idt( 0, idt( 1,0,v(res) ), v(clk) ) tripdt={tripdt} tripdv={tripdv} rpar=1
+B_per 0 _per i=idt( 0, idt( 1,0,v(_res) ), v(_clk) ) tripdt={tripdt} tripdv={tripdv} rpar=1
+Bclk 0 clk i=u( ddt( sgn(v(filt)) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+B_clk 0 _clk i=u( ddt( sgn(-v(filt)) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+Bres 0 res i=u( ddt( sgn(v(filt)-off) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+B_res 0 _res i=u( ddt( sgn(-v(filt)-off) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+*
+BV 0 V i=idt( 0, idt( i(Gvolt)**2,0,v(res) ) / v(per), v(clk) )**0.5 + idt( 0, idt( i(Gvolt)**2,0,v(_res) ) / v(_per), v(_clk) )**0.5 tripdt={tripdt} tripdv={tripdv} rpar={att/2}
+BI 0 I i=idt( 0, idt( i(Vamper)**2/att**2,0,v(res) ) / v(per), v(clk) )**0.5 + idt( 0, idt( i(Vamper)**2/att**2,0,v(_res) ) / v(_per), v(_clk) )**0.5 tripdt={tripdt} tripdv={tripdv} rpar={att/2}
+BS 0 S i=V(V)*V(I)/att**2 tripdt={tripdt} tripdv={tripdv} rpar={att**2}
+BP 0 P i=sfactor*idt( 0, idt( I(Gvolt)*I(Vamper)/att,0,v(res) ) / v(per), v(clk) ) + sfactor*idt( 0, idt( I(Gvolt)*I(Vamper)/att,0,v(_res) ) / v(_per), v(_clk) ) tripdt={tripdt} tripdv={tripdv} rpar={att**2/2}
+BQ 0 Q i=sqrt(V(S)**2-V(P)**2)/att tripdt={tripdt} tripdv={tripdv} rpar={att}
+.ENDS
+
+
+* 1 phase measure of rms of reacitve power with integral
+*DEPRECATED  use instead new _RMS devices
+
+.SUBCKT qmeter  vin vout Q
++params: att=1000 fn=50  tripdt=1u  tripdv=100  off=1v  tripdt2=10n sfactor=1
+Vamper vin vout 0
+Gvolt 0 filt vin 0 {1/att}
+Cf filt 0 {1/4/pi/fn} Lser=0 Rpar=0 Cpar=0 RLshunt=0 ic=0 Rpar=1
+Bper 0 per i=idt( 0, idt( 1,0,v(res) ), v(clk) ) tripdt={tripdt} tripdv={tripdv} rpar=1
+B_per 0 _per i=idt( 0, idt( 1,0,v(_res) ), v(_clk) ) tripdt={tripdt} tripdv={tripdv} rpar=1
+Bclk 0 clk i=u( ddt( sgn(v(filt)) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+B_clk 0 _clk i=u( ddt( sgn(-v(filt)) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+Bres 0 res i=u( ddt( sgn(v(filt)-off) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+B_res 0 _res i=u( ddt( sgn(-v(filt)-off) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+*
+BV 0 V i=idt( 0, idt( i(Gvolt)**2,0,v(res) ) / v(per), v(clk) )**0.5 + idt( 0, idt( i(Gvolt)**2,0,v(_res) ) / v(_per), v(_clk) )**0.5 tripdt={tripdt} tripdv={tripdv} rpar={att/2}
+BI 0 I i=idt( 0, idt( i(Vamper)**2/att**2,0,v(res) ) / v(per), v(clk) )**0.5 + idt( 0, idt( i(Vamper)**2/att**2,0,v(_res) ) / v(_per), v(_clk) )**0.5 tripdt={tripdt} tripdv={tripdv} rpar={att/2}
+BS 0 S i=V(V)*V(I)/att**2 tripdt={tripdt} tripdv={tripdv} rpar={att**2}
+BP 0 P i=idt( 0, idt( I(Gvolt)*I(Vamper)/att,0,v(res) ) / v(per), v(clk) ) + idt( 0, idt( I(Gvolt)*I(Vamper)/att,0,v(_res) ) / v(_per), v(_clk) ) tripdt={tripdt} tripdv={tripdv} rpar={att**2/2}
+BQ 0 Q i=sfactor*sqrt(V(S)**2-V(P)**2)/att tripdt={tripdt} tripdv={tripdv} rpar={att}
+.ENDS
+
+* DEPRECATED  use instead new _RMS devices
+.SUBCKT qmeter_sgn  vin vout Qsgn
++params: att=1000 fn=50  tripdt=1u  tripdv=100  off=1v  tripdt2=10n sfactor=1
+Vamper vin vout 0
+Gvolt 0 filt vin 0 {1/att}
+Cf filt 0 {1/4/pi/fn} Lser=0 Rpar=0 Cpar=0 RLshunt=0 ic=0 Rpar=1
+Bper 0 per i=idt( 0, idt( 1,0,v(res) ), v(clk) ) tripdt={tripdt} tripdv={tripdv} rpar=1
+B_per 0 _per i=idt( 0, idt( 1,0,v(_res) ), v(_clk) ) tripdt={tripdt} tripdv={tripdv} rpar=1
+Bclk 0 clk i=u( ddt( sgn(v(filt)) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+B_clk 0 _clk i=u( ddt( sgn(-v(filt)) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+Bres 0 res i=u( ddt( sgn(v(filt)-off) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+B_res 0 _res i=u( ddt( sgn(-v(filt)-off) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+*
+BV 0 V i=idt( 0, idt( i(Gvolt)**2,0,v(res) ) / v(per), v(clk) )**0.5 + idt( 0, idt( i(Gvolt)**2,0,v(_res) ) / v(_per), v(_clk) )**0.5 tripdt={tripdt} tripdv={tripdv} rpar={att/2}
+BI 0 I i=idt( 0, idt( i(Vamper)**2/att**2,0,v(res) ) / v(per), v(clk) )**0.5 + idt( 0, idt( i(Vamper)**2/att**2,0,v(_res) ) / v(_per), v(_clk) )**0.5 tripdt={tripdt} tripdv={tripdv} rpar={att/2}
+BS 0 S i=V(V)*V(I)/att**2 tripdt={tripdt} tripdv={tripdv} rpar={att**2}
+BP 0 P i=idt( 0, idt( I(Gvolt)*I(Vamper)/att,0,v(res) ) / v(per), v(clk) ) + idt( 0, idt( I(Gvolt)*I(Vamper)/att,0,v(_res) ) / v(_per), v(_clk) ) tripdt={tripdt} tripdv={tripdv} rpar={att**2/2}
+BQ 0 Q i=sfactor*sqrt(V(S)**2-V(P)**2)/att tripdt={tripdt} tripdv={tripdv} rpar={att}
+xphv vin phiv PhaseDet params: fn={fn} deg=1 Rpar=1G
+xphii iin phii PhaseDet params: fn={fn} deg=1 Rpar=1G
+bphi 0 iin i=i(Vamper) rpar=1 tripdv={tdv} tripdt={tdt}
+bsgn Qsgn 0 v=if(abs(v(phiv)-v(phii))>180,-v(Q)*sgn(v(phiv)-v(phii)),v(Q)*sgn(v(phiv)-v(phii))) tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+* 1 phase measure of rms apparent power with integral
+* DEPRECATED  use instead new _RMS devices
+*
+.SUBCKT smeter  vin vout S
++params: att=1000 fn=50  tripdt=1u  tripdv=100  off=1v  tripdt2=10n sfactor=1
+Vamper vin vout 0
+Gvolt 0 filt vin 0 {1/att}
+Cf filt 0 {1/4/pi/fn} Lser=0 Rpar=0 Cpar=0 RLshunt=0 ic=0 Rpar=1
+Bper 0 per i=idt( 0, idt( 1,0,v(res) ), v(clk) ) tripdt={tripdt} tripdv={tripdv} rpar=1
+B_per 0 _per i=idt( 0, idt( 1,0,v(_res) ), v(_clk) ) tripdt={tripdt} tripdv={tripdv} rpar=1
+Bclk 0 clk i=u( ddt( sgn(v(filt)) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+B_clk 0 _clk i=u( ddt( sgn(-v(filt)) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+Bres 0 res i=u( ddt( sgn(v(filt)-off) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+B_res 0 _res i=u( ddt( sgn(-v(filt)-off) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+*
+BV 0 V i=idt( 0, idt( i(Gvolt)**2,0,v(res) ) / v(per), v(clk) )**0.5 + idt( 0, idt( i(Gvolt)**2,0,v(_res) ) / v(_per), v(_clk) )**0.5 tripdt={tripdt} tripdv={tripdv} rpar={att/2}
+BI 0 I i=idt( 0, idt( i(Vamper)**2/att**2,0,v(res) ) / v(per), v(clk) )**0.5 + idt( 0, idt( i(Vamper)**2/att**2,0,v(_res) ) / v(_per), v(_clk) )**0.5 tripdt={tripdt} tripdv={tripdv} rpar={att/2}
+BS 0 S i=sfactor*V(V)*V(I)/att**2 tripdt={tripdt} tripdv={tripdv} rpar={att**2}
+BP 0 P i=idt( 0, idt( I(Gvolt)*I(Vamper)/att,0,v(res) ) / v(per), v(clk) ) + idt( 0, idt( I(Gvolt)*I(Vamper)/att,0,v(_res) ) / v(_per), v(_clk) ) tripdt={tripdt} tripdv={tripdv} rpar={att**2/2}
+BQ 0 Q i=sqrt(V(S)**2-V(P)**2)/att tripdt={tripdt} tripdv={tripdv} rpar={att}
+.ENDS
+
+* 1 phase RMS voltage meter
+*DEPRECATED  use instead new _RMS devices
+.subckt vmeter vin vout V
++ params: att=1000 fn=50  tripdt=1u  tripdv=100  off=1v  tripdt2=10n vfactor=sqrt(3)
+Vamper vin vout1 0
+Ramper vout1 vout 1u
+Gvolt 0 filt vin 0 {1/att}
+Cf filt 0 {1/4/pi/fn} Lser=0 Rpar=0 Cpar=0 RLshunt=0 ic=0 Rpar=1
+Bper 0 per i=idt( 0, idt( 1,0,v(res) ), v(clk) ) tripdt={tripdt} tripdv={tripdv} rpar=1
+B_per 0 _per i=idt( 0, idt( 1,0,v(_res) ), v(_clk) ) tripdt={tripdt} tripdv={tripdv} rpar=1
+Bclk 0 clk i=u( ddt( sgn(v(filt)) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+B_clk 0 _clk i=u( ddt( sgn(-v(filt)) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+Bres 0 res i=u( ddt( sgn(v(filt)-off) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+B_res 0 _res i=u( ddt( sgn(-v(filt)-off) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+*
+BV 0 V i=vfactor*idt( 0, idt( i(Gvolt)**2,0,v(res) ) / v(per), v(clk) )**0.5 + vfactor*idt( 0, idt( i(Gvolt)**2,0,v(_res) ) / v(_per), v(_clk) )**0.5 tripdt={tripdt} tripdv={tripdv} rpar={att/2}
+.ends
+
+
+* 1 phase RMS ampere meter
+*DEPRECATED  use instead new _RMS devices
+.subckt ameter vin vout I
++ params: att=1000 fn=50  tripdt=1u  tripdv=100  off=1v  tripdt2=10n
+Vamper vin vout 0
+Gvolt 0 filt vin 0 {1/att}
+Cf filt 0 {1/4/pi/fn} Lser=0 Rpar=0 Cpar=0 RLshunt=0 ic=0 Rpar=1
+Bper 0 per i=idt( 0, idt( 1,0,v(res) ), v(clk) ) tripdt={tripdt} tripdv={tripdv} rpar=1
+B_per 0 _per i=idt( 0, idt( 1,0,v(_res) ), v(_clk) ) tripdt={tripdt} tripdv={tripdv} rpar=1
+Bclk 0 clk i=u( ddt( sgn(v(filt)) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+B_clk 0 _clk i=u( ddt( sgn(-v(filt)) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+Bres 0 res i=u( ddt( sgn(v(filt)-off) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+B_res 0 _res i=u( ddt( sgn(-v(filt)-off) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+*
+BI 0 I i=idt( 0, idt( i(Vamper)**2/att**2,0,v(res) ) / v(per), v(clk) )**0.5 + idt( 0, idt( i(Vamper)**2/att**2,0,v(_res) ) / v(_per), v(_clk) )**0.5 tripdt={tripdt} tripdv={tripdv} rpar={att/2}
+.ends
+
+* 3 phase balanced vRMS meter for 50Hz
+.subckt vmeter_3ph_RMS_50 u1 v1 w1 u2 v2 w2 V
++ params: fn1=50 vfactor=sqrt(3)
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eus    V     0  VALUE={sqrt(v(usx)*v(usx)+v(usy)*v(usy))/sqrt(2)*vfactor} tripdv={tdv} tripdt={tdt}
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+.ends
+
+* 3 phase balanced vRMS meter for 60Hz
+.subckt vmeter_3ph_RMS_60 u1 v1 w1 u2 v2 w2 V
++ params: fn1=60 vfactor=sqrt(3)
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eus    V     0  VALUE={sqrt(v(usx)*v(usx)+v(usy)*v(usy))/sqrt(2)*vfactor} tripdv={tdv} tripdt={tdt}
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+.ends
+
+* 3 phase balanced aRMS meter for 50Hz
+.subckt ameter_3ph_RMS_50 u1 v1 w1 u2 v2 w2 I
++ params: fn1=50 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eis    I     0  VALUE={sqrt(v(isx)*v(isx)+v(isy)*v(isy))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+.ends
+
+* 3 phase balanced aRMS meter for 60Hz
+.subckt ameter_3ph_RMS_60 u1 v1 w1 u2 v2 w2 I
++ params: fn1=60
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eis    I     0  VALUE={sqrt(v(isx)*v(isx)+v(isy)*v(isy))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+.ends
+
+
+* 3 phase balanced pRMS meter for 50Hz
+.subckt pmeter_3ph_RMS_50 u1 v1 w1 u2 v2 w2 P
++ params: fn1=50 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+*X50Hz Pin Pin2 50Hz params: tenable=1u
+*X1Hz Pin2 P 1Hz params:tenable=1u
+Eap P 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+*Eaq Q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+.ends
+
+* 3 phase balanced pRMS meter for 50Hz
+.subckt pmeter_3ph_RMS_50_filtered_1Hz u1 v1 w1 u2 v2 w2 P
++ params: fn1=50 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+X50Hz Pin Pin2 50Hz params: tenable=1u
+X1Hz Pin2 P 1Hz params:tenable=1u
+Eap Pin 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+*Eaq Q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+.ends
+
+* 3 phase balanced pRMS meter for 50Hz
+.subckt pmeter_3ph_RMS_50_filtered_1Hz_TEST u1 v1 w1 u2 v2 w2 P
++ params: fn1=50 alpha_0=0
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={alpha_0+v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+X50Hz Pin Pin2 50Hz params: tenable=1u
+X1Hz Pin2 P 1Hz params:tenable=1u
+Eap Pin 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+*Eaq Q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+
+.ends
+
+* 3 phase balanced pRMS meter for 50Hz
+.subckt pmeter_3ph_RMS_50_filtered_5Hz u1 v1 w1 u2 v2 w2 P
++ params: fn1=50 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+X50Hz Pin Pin2 50Hz params: tenable=1u
+X5Hz Pin2 P 5Hz params:tenable=1u
+Eap Pin 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+*Eaq Q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+.ends
+
+* 3 phase balanced pRMS meter for 50Hz
+.subckt pmeter_3ph_RMS_50_filtered_10Hz u1 v1 w1 u2 v2 w2 P
++ params: fn1=50 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+X50Hz Pin Pin2 50Hz params: tenable=1u
+X5Hz Pin2 P 10Hz params:tenable=1u
+Eap Pin 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+*Eaq Q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+.ends
+
+* 3 phase balanced pRMS meter for 60Hz
+.subckt pmeter_3ph_RMS_60 u1 v1 w1 u2 v2 w2 P
++ params: fn1=60 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+*X60Hz Pin Pin2 60Hz params: tenable=1u
+*X1Hz Pin2 P 1Hz params:tenable=1u
+Eap P 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+*Eaq Q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+
+.ends
+
+* 3 phase balanced pRMS meter for 60Hz
+.subckt pmeter_3ph_RMS_60_filtered_1Hz u1 v1 w1 u2 v2 w2 P
++ params: fn1=60 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+X60Hz Pin Pin2 60Hz params: tenable=1u
+X1Hz Pin2 P 1Hz params:tenable=1u
+Eap Pin 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+*Eaq Q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+.ends
+
+* 3 phase balanced pRMS meter for 60Hz
+.subckt pmeter_3ph_RMS_60_filtered_5Hz u1 v1 w1 u2 v2 w2 P
++ params: fn1=60 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+X60Hz Pin Pin2 60Hz params: tenable=1u
+X5Hz Pin2 P 5Hz params:tenable=1u
+Eap Pin 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+*Eaq Q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+.ends
+
+* 3 phase balanced pRMS meter for 60Hz
+.subckt pmeter_3ph_RMS_60_filtered_10Hz u1 v1 w1 u2 v2 w2 P
++ params: fn1=60 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+X60Hz Pin Pin2 60Hz params: tenable=1u
+X5Hz Pin2 P 10Hz params:tenable=1u
+Eap Pin 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+*Eaq Q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+.ends
+
+* 3 phase balanced qRMS meter for 50Hz
+.subckt qmeter_3ph_RMS_50 u1 v1 w1 u2 v2 w2 Q
++ params: fn1=50 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+*X50Hz Qin Q 50Hz params: tenable=1u
+*Eap P 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+Eaq Q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+
+.ends
+
+* 3 phase balanced qRMS meter for 50Hz
+.subckt qmeter_3ph_RMS_50_filtered_1Hz u1 v1 w1 u2 v2 w2 Q
++ params: fn1=50 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+X50Hz Qin Q 1Hz params: tenable=1u
+*Eap P 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+Eaq Qin 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+.ends
+
+* 3 phase balanced qRMS meter for 50Hz
+.subckt qmeter_3ph_RMS_50_filtered_5Hz u1 v1 w1 u2 v2 w2 Q
++ params: fn1=50 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+X50Hz Qin Q 5Hz params: tenable=1u
+*Eap P 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+Eaq Qin 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+.ends
+
+* 3 phase balanced qRMS meter for 50Hz
+.subckt qmeter_3ph_RMS_50_filtered_10Hz u1 v1 w1 u2 v2 w2 Q
++ params: fn1=50 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+X50Hz Qin Q 10Hz params: tenable=1u
+*Eap P 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+Eaq Qin 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+.ends
+
+
+
+* 3 phase balanced qRMS meter for 60Hz
+.subckt qmeter_3ph_RMS_60 u1 v1 w1 u2 v2 w2 Q
++ params: fn1=60 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+*X60Hz Qin Q 60Hz params: tenable=1u
+*Eap P 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+Eaq Q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+.ends
+
+* 3 phase balanced qRMS meter for 60Hz
+.subckt qmeter_3ph_RMS_60_filtered_1Hz u1 v1 w1 u2 v2 w2 Q
++ params: fn1=60 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+X60Hz Qin Q 1Hz params: tenable=1u
+*Eap P 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+Eaq Qin 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+.ends
+
+* 3 phase balanced qRMS meter for 60Hz
+.subckt qmeter_3ph_RMS_60_filtered_5Hz u1 v1 w1 u2 v2 w2 Q
++ params: fn1=60 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+X60Hz Qin Q 5Hz params: tenable=1u
+*Eap P 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+Eaq Qin 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+.ends
+
+* 3 phase balanced qRMS meter for 60Hz
+.subckt qmeter_3ph_RMS_60_filtered_10Hz u1 v1 w1 u2 v2 w2 Q
++ params: fn1=60 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+X60Hz Qin Q 10Hz params: tenable=1u
+*Eap P 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+Eaq Qin 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+.ends
+
+* 3 phase balanced sRMS meter for 50Hz
+.subckt smeter_3ph_RMS_50 u1 v1 w1 u2 v2 w2 S
++ params: fn1=50 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+
+Eap P 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+Eaq Q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+Eas S 0 VALUE={sqrt(v(P)*v(P)+v(Q)*v(Q))} tripdv={tdv} tripdt={tdt} 
+.ends
+
+* 3 phase balanced sRMS meter for 60Hz
+.subckt smeter_3ph_RMS_60 u1 v1 w1 u2 v2 w2 S
++ params: fn1=60 
+Vu1 u1 u2 0v
+Vv1 v1 v2 0v
+Vw1 w1 w2 0v
+EuxS   usxS  0  VALUE={(2*v(u1,0)-v(v1,0)-v(w1,0))/3} tripdv={tdv} tripdt={tdt} 
+EuyS   usyS  0  VALUE={(v(v1,0)-v(w1,0))/1.732} tripdv={tdv} tripdt={tdt} 
+Eux    usx   0  VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Euy    usy   0  VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+EixS   isxS  0  VALUE={(2*i(Vu1)-i(Vv1)-i(Vw1))/3} tripdv={tdv} tripdt={tdt} 
+EiyS   isyS  0  VALUE={(i(Vv1)-i(Vw1))/1.732} tripdv={tdv} tripdt={tdt} 
+Eix    isx   0  VALUE={ v(isxS)*cos(v(alpha))+v(isyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt} 
+Eiy    isy   0  VALUE={-v(isxS)*sin(v(alpha))+v(isyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt} 
+
+Ealpha alpha 0  VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={2*pi*fn1} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+
+Eap P 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt} 
+Eaq Q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt} 
+Eas S 0 VALUE={sqrt(v(P)*v(P)+v(Q)*v(Q))} tripdv={tdv} tripdt={tdt} 
+.ends
+
+* 1 phase RMS ampere meter
+* tenable because sometimes the first timesteps
+* in the simulation makes large spikes
+* e.g. setting err0=1 in the generator models
+* default=1us
+
+.subckt ameter_RMS vin vout I
++ params: fc=3 tdv=1 tdt=1 tenable=1u
+Vamper vin vout 0
+Eamper I1 0 VALUE={IF(time>tenable,I(Vamper),0)} tripdv={tdv} tripdt={tdt}
+XU4 I1 I RMS fc={fc} b0=1 b1=3
+.ends
+
+.subckt ameter_RMS_50_filtered_1Hz vin vout I
++ params: fc=3 tdv=1 tdt=1 tenable=1u
+Vamper vin vout 0
+Eamper I1 0 VALUE={IF(time>tenable,I(Vamper),0)} tripdv={tdv} tripdt={tdt}
+X50Hz Pin Pin2 50Hz params: tenable=1u
+X1Hz Pin2 I 1Hz params:tenable=1u
+XU4 I1 Pin RMS fc={fc} b0=1 b1=3
+.ends
+
+.subckt ameter_RMS_50_filtered_5Hz vin vout I
++ params: fc=3 tdv=1 tdt=1 tenable=1u
+Vamper vin vout 0
+Eamper I1 0 VALUE={IF(time>tenable,I(Vamper),0)} tripdv={tdv} tripdt={tdt}
+X50Hz Pin Pin2 50Hz params: tenable=1u
+X5Hz Pin2 I 5Hz params:tenable=1u
+XU4 I1 Pin RMS fc={fc} b0=1 b1=3
+.ends
+
+.subckt ameter_RMS_50_filtered_10Hz vin vout I
++ params: fc=3 tdv=1 tdt=1 tenable=1u
+Vamper vin vout 0
+Eamper I1 0 VALUE={IF(time>tenable,I(Vamper),0)} tripdv={tdv} tripdt={tdt}
+X50Hz Pin Pin2 50Hz params: tenable=1u
+X10Hz Pin2 I 10Hz params:tenable=1u
+XU4 I1 Pin RMS fc={fc} b0=1 b1=3
+.ends
+
+
+.subckt ameter_RMS_60_filtered_10Hz vin vout I
++ params: fc=3 tdv=1 tdt=1 tenable=1u
+Vamper vin vout 0
+Eamper I1 0 VALUE={IF(time>tenable,I(Vamper),0)} tripdv={tdv} tripdt={tdt}
+X60Hz Pin Pin2 60Hz params: tenable=1u
+X10Hz Pin2 I 10Hz params:tenable=1u
+XU4 I1 Pin RMS fc={fc} b0=1 b1=3
+.ends
+
+.subckt ameter_RMS_60_filtered_5Hz vin vout I
++ params: fc=3 tdv=1 tdt=1 tenable=1u
+Vamper vin vout 0
+Eamper I1 0 VALUE={IF(time>tenable,I(Vamper),0)} tripdv={tdv} tripdt={tdt}
+X60Hz Pin Pin2 60Hz params: tenable=1u
+X5Hz Pin2 I 5Hz params:tenable=1u
+XU4 I1 Pin RMS fc={fc} b0=1 b1=3
+.ends
+
+.subckt ameter_RMS_60_filtered_1Hz vin vout I
++ params: fc=3 tdv=1 tdt=1 tenable=1u
+Vamper vin vout 0
+Eamper I1 0 VALUE={IF(time>tenable,I(Vamper),0)} tripdv={tdv} tripdt={tdt}
+X60Hz Pin Pin2 60Hz params: tenable=1u
+X1Hz Pin2 I 1Hz params:tenable=1u
+XU4 I1 Pin RMS fc={fc} b0=1 b1=3
+.ends
+
+
+* 1 phase RMS voltage meter
+* tenable because sometimes the first timesteps
+* in the simulation makes large spikes
+* e.g. set err0=1 in the generator models
+* default=1us
+.subckt vmeter_RMS vin vout V
++ params: fc=3 vfactor=1.73205 tdv=1 tdt=1 tenable=1u rgnd=1e12
+Eenable vin2 0 VALUE={IF(time>tenable,v(vin),0)} tripdv={tdv} tripdt={tdt}
+Vamper vin vout 0
+XU4 vin2 V1 RMS fc={fc} b0=1 b1=3
+Eout V 0 VALUE={vfactor*v(v1)} tripdv={tdv} tripdt={tdt}
+Rv v 0 {Rgnd}
+.ends
+
+.subckt vmeter_RMS_50_filtered_1Hz vin vout V
++ params: fc=3 vfactor=1.73205 tdv=1 tdt=1 tenable=1u rgnd=1e12
+Eenable vin2 0 VALUE={IF(time>tenable,v(vin),0)} tripdv={tdv} tripdt={tdt}
+Vamper vin vout 0
+XU4 vin2 V1 RMS fc={fc} b0=1 b1=3
+X50Hz Pin Pin2 50Hz params: tenable=1u
+X1Hz Pin2 v 1Hz params:tenable=1u
+Eout Pin 0 VALUE={vfactor*v(v1)} tripdv={tdv} tripdt={tdt}
+Rv v 0 {Rgnd}
+.ends
+
+.subckt vmeter_RMS_50_filtered_5Hz vin vout V
++ params: fc=3 vfactor=1.73205 tdv=1 tdt=1 tenable=1u rgnd=1e12
+Eenable vin2 0 VALUE={IF(time>tenable,v(vin),0)} tripdv={tdv} tripdt={tdt}
+Vamper vin vout 0
+XU4 vin2 V1 RMS fc={fc} b0=1 b1=3
+X50Hz Pin Pin2 50Hz params: tenable=1u
+X1Hz Pin2 v 5Hz params:tenable=1u
+Eout Pin 0 VALUE={vfactor*v(v1)} tripdv={tdv} tripdt={tdt}
+Rv v 0 {Rgnd}
+.ends
+
+.subckt vmeter_RMS_50_filtered_10Hz vin vout V
++ params: fc=3 vfactor=1.73205 tdv=1 tdt=1 tenable=1u rgnd=1e12
+Eenable vin2 0 VALUE={IF(time>tenable,v(vin),0)} tripdv={tdv} tripdt={tdt}
+Vamper vin vout 0
+XU4 vin2 V1 RMS fc={fc} b0=1 b1=3
+X50Hz Pin Pin2 50Hz params: tenable=1u
+X1Hz Pin2 v 10Hz params:tenable=1u
+Eout Pin 0 VALUE={vfactor*v(v1)} tripdv={tdv} tripdt={tdt}
+Rv v 0 {Rgnd}
+.ends
+
+.subckt vmeter_RMS_60_filtered_1Hz vin vout V
++ params: fc=3 vfactor=1.73205 tdv=1 tdt=1 tenable=1u rgnd=1e12
+Eenable vin2 0 VALUE={IF(time>tenable,v(vin),0)} tripdv={tdv} tripdt={tdt}
+Vamper vin vout 0
+XU4 vin2 V1 RMS fc={fc} b0=1 b1=3
+X50Hz Pin Pin2 60Hz params: tenable=1u
+X1Hz Pin2 v 1Hz params:tenable=1u
+Eout Pin 0 VALUE={vfactor*v(v1)} tripdv={tdv} tripdt={tdt}
+Rv v 0 {Rgnd}
+.ends
+
+.subckt vmeter_RMS_60_filtered_5Hz vin vout V
++ params: fc=3 vfactor=1.73205 tdv=1 tdt=1 tenable=1u rgnd=1e12
+Eenable vin2 0 VALUE={IF(time>tenable,v(vin),0)} tripdv={tdv} tripdt={tdt}
+Vamper vin vout 0
+XU4 vin2 V1 RMS fc={fc} b0=1 b1=3
+X50Hz Pin Pin2 60Hz params: tenable=1u
+X1Hz Pin2 v 5Hz params:tenable=1u
+Eout Pin 0 VALUE={vfactor*v(v1)} tripdv={tdv} tripdt={tdt}
+Rv v 0 {Rgnd}
+.ends
+
+.subckt vmeter_RMS_60_filtered_10Hz vin vout V
++ params: fc=3 vfactor=1.73205 tdv=1 tdt=1 tenable=1u rgnd=1e12
+Eenable vin2 0 VALUE={IF(time>tenable,v(vin),0)} tripdv={tdv} tripdt={tdt}
+Vamper vin vout 0
+XU4 vin2 V1 RMS fc={fc} b0=1 b1=3
+X50Hz Pin Pin2 60Hz params: tenable=1u
+X1Hz Pin2 v 10Hz params:tenable=1u
+Eout Pin 0 VALUE={vfactor*v(v1)} tripdv={tdv} tripdt={tdt}
+Rv v 0 {Rgnd}
+.ends
+
+.subckt vmeter_RMS_d vin vout V
++ params: fc=3 vfactor=1.73205 tdv=1 tdt=1 tenable=1u rgnd=1e12
+Eenable vin2 0 VALUE={IF(time>tenable,v(vin),v(vout))} tripdv={tdv} tripdt={tdt}
+XU4 vin2 V1 RMS fc={fc} b0=1 b1=3
+Eout V 0 VALUE={vfactor*v(v1)} tripdv={tdv} tripdt={tdt}
+Rv v 0 {Rgnd}
+.ends
+
+
+* 1 phase RMS apparent power meter
+* tenable because sometimes the first timesteps
+* in the simulation makes large spikes
+* e.g. set err0=1 in the generator models
+* default=1us
+.subckt smeter_RMS vin vout S
++ params: fc=3 sfactor=1 tdv=1 tdt=1 tenable=1u rgnd=1e12
+Eenable vin2 0 VALUE={IF(time>tenable,v(vin),0)} tripdv={tdv} tripdt={tdt}
+Vamper vin vout 0
+Eamper I1 0 VALUE={IF(time>tenable,I(Vamper),0)} tripdv={tdv} tripdt={tdt}
+XU5 I1 I RMS fc={fc} b0=1 b1=3
+XU4 vin2 V RMS fc={fc} b0=1 b1=3
+Eout S 0 Value={V(I)*V(v)*sfactor} tripdv={tdv} tripdt={tdt}
+Rs s 0 {Rgnd}
+.ends
+
+* 1 phase RMS active power meter
+* tenable because sometimes the first timesteps
+* in the simulation makes large spikes
+* e.g. set err0=1 in the generator models
+* default=1us
+
+.subckt pmeter_RMS in out P_RMS
++ params: fn=50 fc=3 sfactor=3 tenable=1u tdv=1 tdt=1 penable=1e-10 rgnd=1e12
+Eenable in2 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+Vamper in vout1 0
+Eamper I1 0 VALUE={IF(time>tenable,I(Vamper),penable)} tripdv={tdv} tripdt={tdt}
+XU5 I1 I RMS fc={fc} b0=1 b1=3
+XU4 in2 V RMS fc={fc} b0=1 b1=3
+Eout S 0 Value={V(I)*V(v)*sfactor} tripdv={tdv} tripdt={tdt}
+Xpmc Vout1 Vout2 phii phasemeter_current params: fn={fn} tenable={tenable}
+Xpmv Vout2 out phiv phasemeter params:fn={fn} tenable={tenable}
+Edphi dphi 0 VALUE={v(phii)-v(phiv)} tripdv={tdv} tripdt={tdt}
+Ephi phi 0 VALUE={IF(v(dphi)>90,v(dphi)-180,IF(v(dphi)<-90,v(dphi)+180,v(dphi)))} tripdv={tdv} tripdt={tdt}
+Ep_m P_RMS 0 VALUE={IF(v(dphi)<90 & v(dphi)>-90,v(s)*cos(V(phi)*pi/180),-v(s)*cos(V(phi)*pi/180))} tripdv={tdv} tripdt={tdt}
+Rp P_RMS 0 {Rgnd}
+.ends
+
+* 1 phase RMS reactive power meter
+* tenable because sometimes the first timesteps
+* in the simulation makes large spikes
+* e.g. set err0=1 in the generator models
+* default=1us
+
+.subckt qmeter_RMS vin vout Q
++ params: fn=50 fc=3 sfactor=1 tdv=1 tdt=1 tenable=1u rgnd=1e12
+Eenable vin2 0 VALUE={IF(time>tenable,v(vin),0)} tripdv={tdv} tripdt={tdt}
+Vamper vin vout1 0
+Eamper I1 0 VALUE={IF(time>tenable,I(Vamper),0)} tripdv={tdv} tripdt={tdt}
+XU5 I1 I RMS fc={fc} b0=1 b1=3
+XU4 vin2 V RMS fc={fc} b0=1 b1=3
+Eout S 0 Value={V(I)*V(v)*sfactor} tripdv={tdv} tripdt={tdt}
+Xpmc Vout1 Vout2 phii phasemeter_current params:fn={fn} tenable={tenable}
+Xpmv Vout2 vout phiv phasemeter  params:fn={fn} tenable={tenable}
+Edphi dphi 0 VALUE={v(phii)-v(phiv)} tripdv={tdv} tripdt={tdt}
+Ephi phi 0 VALUE={IF(v(dphi)>90,v(dphi)-180,IF(v(dphi)<-90,v(dphi)+180,v(dphi)))} tripdv={tdv} tripdt={tdt}
+Eq_m q 0 VALUE={IF(v(dphi)<90 & v(dphi)>-90,-v(s)*sin(V(phi)*pi/180),v(s)*sin(V(phi)*pi/180))}  tripdv={tdv} tripdt={tdt}
+Rq q 0 {Rgnd}
+.ends
+
+* impedance meter device
+.subckt zmeter_RMS in out R X Z
++ params: fn=50 fc=3 factor=1 tenable=1u tdv=1 tdt=1 zenable=1e-10 rgnd=1e12
+Eenable in2 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+Vamper in vout1 0
+Eamper I1 0 VALUE={IF(time>tenable,I(Vamper),1e-10)} tripdv={tdv} tripdt={tdt}
+XU5 I1 I RMS fc={fc} b0=1 b1=3
+XU4 in2 V RMS fc={fc} b0=1 b1=3
+EZ Z 0 Value={if(time>zenable,factor*V(V)/V(I),0)} tripdv={tdv} tripdt={tdt}
+ER R 0 Value={abs((v(Z)*cos(v(phi)*pi/180)))} tripdv={tdv} tripdt={tdt}
+EX1 X1 0 Value={(V(Z)*sin(v(phi)*pi/180))} tripdv={tdv} tripdt={tdt}
+EX  X  0 VALUE={IF(v(dphi)<90 & v(dphi)>-90,-v(X1),v(X1))}  tripdv={tdv} tripdt={tdt}
+Xpmc Vout1 Vout2 phii phasemeter_current params: fn={fn} tenable={tenable}
+Xpmv Vout2 out phiv phasemeter params:fn={fn} tenable={tenable}
+Edphi dphi 0 VALUE={v(phii)-v(phiv)} tripdv={tdv} tripdt={tdt}
+Ephi phi 0 VALUE={IF(v(dphi)>90,v(dphi)-180,IF(v(dphi)<-90,v(dphi)+180,v(dphi)))} tripdv={tdv} tripdt={tdt}
+RR R 0 {Rgnd}
+RX X 0 {Rgnd}
+.ends
+
+* impedance meter device with external voltage measurement
+.subckt zmeter2_RMS in out R X Z neg pos
++ params: fn=50 fc=3 factor=1 tenable=1u tdv=1 tdt=1 zenable=1e-10 rgnd=1e12
+Eenable in2 0 VALUE={IF(time>tenable,v(pos,neg),0)} tripdv={tdv} tripdt={tdt}
+Vamper in vout1 0
+Eamper I1 0 VALUE={IF(time>tenable,I(Vamper),1e-10)} tripdv={tdv} tripdt={tdt}
+XU5 I1 I RMS fc={fc} b0=1 b1=3
+XU4 in2 V RMS fc={fc} b0=1 b1=3
+EZ Z 0 Value={if(time>zenable,factor*V(V)/V(I),0)} tripdv={tdv} tripdt={tdt}
+ER R 0 Value={abs((v(Z)*cos(v(phi)*pi/180)))} tripdv={tdv} tripdt={tdt}
+EX1 X1 0 Value={(V(Z)*sin(v(phi)*pi/180))} tripdv={tdv} tripdt={tdt}
+EX  X  0 VALUE={IF(v(dphi)<90 & v(dphi)>-90,-v(X1),v(X1))}  tripdv={tdv} tripdt={tdt}
+Xpmc Vout1 Vout2 phii phasemeter_current params: fn={fn} tenable={tenable}
+Rv Vout2 out 1e-6
+Xpmv in2 in3 phiv phasemeter params:fn={fn} tenable={tenable}
+Rp in3 0 1e12
+Edphi dphi 0 VALUE={v(phii)-v(phiv)} tripdv={tdv} tripdt={tdt}
+Ephi phi 0 VALUE={IF(v(dphi)>90,v(dphi)-180,IF(v(dphi)<-90,v(dphi)+180,v(dphi)))} tripdv={tdv} tripdt={tdt}
+RR R 0 {Rgnd}
+RX X 0 {Rgnd}
+.ends
+
+
+.subckt rmeter_DC in out R 
++ params: factor=1 td=0 tenable=1u rgnd=1e12
+Vamper in out 0
+ER R 0 value={if(time>td+tenable,factor*v(in)/i(Vamper),0)} tripdv={tdv} tripdt={tdt}
+RR R 0 {Rgnd}
+.ends
+
+************************************************************
+* models for rms2 are from prof. robert heinemanns website !!
+************************************************************
+* NOTE: for 60Hz set T=N*16.6667ms !!!!
+.SUBCKT RMS2 v+ rms params: T=20ms tenable=1us
+Gcu 0 V value={v(V+,0)}  tripdv={tdv} tripdt={tdt}
+Ru  V 0 1
+Cu  V 0 {T/1Meg}IC=0
+Evu V1  0 value={if(time>tenable,v(V),0)}  tripdv={tdv} tripdt={tdt}
+Tvu V1  0 V2  0 Z0=75 TD={T}
+R2u V2  0 75
+Grmsu 0 rms  value={sqrt(v(idt1)/T)*STP(time-T)}  tripdv={tdv} tripdt={tdt}
+R4u rms  0 1
+G1x 0 idt1 VALUE={pwr(v(V1),2)-pwr(v(V2),2)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+.ENDS
+
+* NOTE: for 60Hz set T=N*16.6667ms !!!!
+.SUBCKT RMSm v+ rms params: T=20ms tenable=1us
+E1 rms 0 Value={if(Time>tenable,sqrt((idt(V(v+)^2)-delay(idt(V(V+)^2),T))/T),0)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* new 28.09.2020 abs() added to prevent output of (sometimes) neg. RMS value which is nonsense
+* use this model with tstep<=0.1ms (at 50,60Hz)
+* from @Vlad
+.SUBCKT RMS3 in out params: fc=3 b0=1 b1=3 
+C1 1 0 {.5/pi/fc}
+C2 outx 0 {.5/pi/fc}
+G1 0 1 VALUE = {(v(IN)^2/(v(OUTx)+1e-12)-v(OUTx))*{b0/b1}} tripdv={tdv} tripdt={tdt}
+G2 outx 0 1 outx {-b1} 
+R1 outx 0 1e12
+Eout out 0 value={abs(v(outx))} tripdv={tdv} tripdt={tdt}
+R2 1 0 1e12
+R3 in 0 1e12
+RG2 1 out 1G ;added at g2 
+.ENDS RMS3
+
+; T has to be a multiple of 20ms for 50Hz and a multiple of 16.67ms for 60Hz
+.SUBCKT vmeter_RMS2  v+ v- Urms
++PARAMS: fn={fn1}  vfactor=1.73205 tenable=1us
+.param T={1/fn}
+Vi  v+  v-  0
+Gcu 0 V value={v(V+,0)}  tripdv={tdv} tripdt={tdt}
+Ru  V 0 1
+Cu  V 0 {T/1meg}IC=0
+Evu V1  0 value={if(time>tenable,v(V),0)}  tripdv={tdv} tripdt={tdt}
+Tvu V1  0 V2  0 Z0=75 TD={T}
+R2u V2  0 75
+Grmsu 0 Urms  value={vfactor*sqrt(v(idt1)/T)*stp(time-T)}  tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={pwr(v(V1),2)-pwr(v(V2),2)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+R4u Urms  0 1
+.ENDS
+
+.SUBCKT vmeter_RMS2_d  v+ v- Urms
++PARAMS: fn={fn1}  vfactor=1.73205 tenable=1us
+.param T={1/fn}
+Gcu 0 V value={v(v+,v-)}  tripdv={tdv} tripdt={tdt}
+Ru  V 0 1
+Cu  V 0 {T/1meg}IC=0
+Evu V1  0 value={if(time>tenable,v(V),0)}  tripdv={tdv} tripdt={tdt}
+Tvu V1  0 V2  0 Z0=75 TD={T}
+R2u V2  0 75
+Grmsu 0 Urms  value={vfactor*sqrt(v(idt1)/T)*stp(time-T)}  tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={pwr(v(V1),2)-pwr(v(V2),2)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+R4u Urms  0 1
+.ENDS
+
+; T has to be a multiple of 20ms for 50Hz and a multiple of 16.67ms for 60Hz
+.SUBCKT ameter_RMS2  v+ v- Irms
++PARAMS: fn={fn1} tenable=1us
+.param T={1/fn}
+Vi  v+  v-  0
+Gc  0 Ic  value={i(Vi)} tripdv={tdv} tripdt={tdt}
+R Ic  0 1
+C Ic  0 {T/1meg}IC=0
+Ev  I1 0 value={if(time>tenable,v(ic),0)}  tripdv={tdv} tripdt={tdt}
+Tv  I1 0 I2 0 Z0=75 TD={T}
+R2  I2 0 75
+Grmsi 0 Irms  value={sqrt(v(idt1)/T)*stp(time-T)}  tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={pwr(v(I1),2)-pwr(v(I2),2)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+R4  Irms  0 1
+.ENDS
+
+
+.SUBCKT pmeter_RMS2x  v+ v- prms
++PARAMS: T=20ms sfactor=3  tenable=1u
+Vi  v+  v-  0
+Gc  0 Ic  value={i(Vi)} tripdv={tdv} tripdt={tdt}
+R Ic  0 1
+C Ic  0 {T/1meg}IC=0
+Ev  I1 0 value={if(time>tenable,v(ic),0)}  tripdv={tdv} tripdt={tdt}
+Gcu 0 V value={v(V+,0)}  tripdv={tdv} tripdt={tdt}
+Ru  V 0 1
+Cu  V 0 {T/1meg}IC=0
+Evu V1  0 value={if(time>tenable,v(V),0)}  tripdv={tdv} tripdt={tdt}
+Gpt 0 pt  value={v(I1)*V(V1)}  tripdv={tdv} tripdt={tdt}
+Rpt pt  0 1
+Epw 1pw 0 value={v(pt)}  tripdv={tdv} tripdt={tdt}
+Tvpw  1pw 0 2pw 0 Z0=75 TD={T}
+R2pw  2pw 0 75
+Gpw 0 Prms  value={sfactor*(v(idt1)/T)*stp(time-T)}  tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(1pw,2pw)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+R3pw  Prms  0 1
+.ENDS
+
+* New sum measurement of active power in a 3 phase system
+.SUBCKT pmeter_RMS2a  v1in v2in v3in v1out v2out v3out prms
++PARAMS:
+V1a v1in v1out 0
+V2a v2in v2out 0
+V3a v3in v3out 0
+EPrms prms 0 value={v(v1in)*i(V1a)+v(v2in)*i(V2a)+v(v3in)*i(V3a)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+; T has to be a multiple of 20ms for 50Hz and a multiple of 16.67ms for 60Hz
+.subckt pmeter_RMS2 in out P_RMS
++ params: fn={fn1} sfactor=3 tenable=1u phenable=20m tdv=1 tdt=1 rgnd=1e12
+.param T={1/fn}
+Eenable in2 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+Vamper in vout1 0
+Eamper I1 0 VALUE={IF(time>tenable,I(Vamper),tenable)} tripdv={tdv} tripdt={tdt}
+XU5 I1 I RMS2 params: T={T} tenable={tenable}
+XU4 in2 V RMS2 params: T={T} tenable={tenable}
+Eout S 0 Value={V(I)*V(v)*sfactor} tripdv={tdv} tripdt={tdt}
+Xpmc Vout1 Vout2 phii phasemeter_current params: fn={fn} tenable={tenable} phenable={phenable}
+Xpmv Vout2 out phiv phasemeter params:fn={fn} tenable={tenable} phenable={phenable}
+Edphi dphi 0 VALUE={v(phii)-v(phiv)} tripdv={tdv} tripdt={tdt}
+Ephi phi 0 VALUE={IF(v(dphi)>90,v(dphi)-180,IF(v(dphi)<-90,v(dphi)+180,v(dphi)))} tripdv={tdv} tripdt={tdt}
+Ep_m P_RMS 0 VALUE={IF(v(dphi)<90 & v(dphi)>-90,v(s)*cos(V(phi)*pi/180),-v(s)*cos(V(phi)*pi/180))} tripdv={tdv} tripdt={tdt}
+Rp P_RMS 0 {Rgnd}
+.ends
+
+; T has to be a multiple of 20ms for 50Hz and a multiple of 16.67ms for 60Hz
+.SUBCKT qmeter_RMS2  vin vout Q
++ params:  fn={fn1} sfactor=3 tdv=1 tdt=1 tenable=1u phenable=20m rgnd=1e12
+.param T={1/fn}
+Eenable vin2 0 VALUE={IF(time>tenable,v(vin),0)} tripdv={tdv} tripdt={tdt}
+Vamper vin vout1 0
+Eamper I1 0 VALUE={IF(time>tenable,I(Vamper),0)} tripdv={tdv} tripdt={tdt}
+XU5 I1 I RMS2 params: T={T} tenable={tenable}
+XU4 vin2 V RMS2 params: T={T} tenable={tenable}
+Eout S 0 Value={V(I)*V(v)*sfactor} tripdv={tdv} tripdt={tdt}
+Xpmc Vout1 Vout2 phii phasemeter_current params: fn={fn} tenable={tenable} phenable={phenable}
+Xpmv Vout2 vout phiv phasemeter  params: fn={fn} tenable={tenable} phenable={phenable}
+Edphi dphi 0 VALUE={v(phii)-v(phiv)} tripdv={tdv} tripdt={tdt}
+Ephi phi 0 VALUE={IF(v(dphi)>90,v(dphi)-180,IF(v(dphi)<-90,v(dphi)+180,v(dphi)))} tripdv={tdv} tripdt={tdt}
+Eq_m q 0 VALUE={IF(v(dphi)<90 & v(dphi)>-90,-v(s)*sin(V(phi)*pi/180),v(s)*sin(V(phi)*pi/180))}  tripdv={tdv} tripdt={tdt}
+Rq q 0 {Rgnd}
+.ENDS
+
+; T has to be a multiple of 20ms for 50Hz and a multiple of 16.67ms for 60Hz
+.SUBCKT smeter_RMS2  v+ v- srms
++PARAMS: fn={fn1}
+.param T={1/fn}
+Vi  V+  V-  0
+Gc  0 Ic  value={i(Vi)} tripdv={tdv} tripdt={tdt}
+R Ic  0 1
+C Ic  0 {T/1meg}IC=0
+Ev  I1  0 value={v(Ic)} tripdv={tdv} tripdt={tdt}
+Tv  I1  0 I2  0 Z0=75 TD={T}
+R2  I2  0 75
+Grmsi 0 Irms  value={sqrt(v(idt1)/T)*stp(time-T)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={pwr(v(I1),2)-pwr(v(I2),2)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+R4  Irms  0 1
+*
+Gcu 0 V value={v(V+,0)}  tripdv={tdv} tripdt={tdt}
+Ru  V 0 1
+Cu  V 0 {T/1meg}IC=0
+Evu V1  0 value={v(V)}  tripdv={tdv} tripdt={tdt}
+Tvu V1  0 V2  0 Z0=75 TD={T}
+R2u V2  0 75
+Grmsu 0 Urms  value={sqrt(v(idt1)/T)*stp(time-T)}  tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={pwr(v(V1),2)-pwr(v(V2),2)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+R4u Urms  0 1
+*
+Gpt 0 pt  value={v(I1)*V(V1)}  tripdv={tdv} tripdt={tdt}
+Rpt pt  0 1
+Epw 1pw 0 value={v(pt)}  tripdv={tdv} tripdt={tdt}
+Tvpw  1pw 0 2pw 0 Z0=75 TD={T}
+R2pw  2pw 0 75
+Gpw 0 Prms  value={(v(idt1)/T)*stp(time-T)}  tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(1pw,2pw)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+R3pw  Prms  0 1
+*
+Gsapp 0 SRMS  value={sfactor*v(Urms)*v(Irms)}  tripdv={tdv} tripdt={tdt}
+Rsapp SRMS  0 1
+.ENDS
+
+
+.subckt uimeter_u in1 out1 eout
++ params: factor=1.0
+vin1 in1 out1 0
+Gout 0 eout VALUE={factor*v(in1)*i(vin1)} rpar=1 tripdv={tdv} tripdt={tdt}
+.ends
+
+
+.subckt uimeter_uvw in1 in2 in3 out1 out2 out3 eout
+vin1 in1 out1 0v
+vin2 in2 out2 0v
+vin3 in3 out3 0v
+Gout 0 eout VALUE={v(in1)*i(vin1)+v(in2)*i(vin2)+v(in3)*i(vin3)} rpar=1 tripdv={tdv} tripdt={tdt}
+.ends
+
+.subckt emeter_u in1 out1 eout
++ params: factor=1.0
+vin1 in1 out1 0
+Gout1 0 eout1 VALUE={factor*v(in1)*i(vin1)} rpar=1 tripdv={tdv} tripdt={tdt}
+Gout 0 eout VALUE={v(idt1)} rpar=1 tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(eout1)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+.ends
+
+
+.subckt emeter_uvw in1 in2 in3 out1 out2 out3 eout
+vin1 in1 out1 0v
+vin2 in2 out2 0v
+vin3 in3 out3 0v
+Gout1 0 eout1 VALUE={v(in1)*i(vin1)+v(in2)*i(vin2)+v(in3)*i(vin3)} rpar=1 tripdv={tdv} tripdt={tdt}
+Gout 0 eout VALUE={v(idt1)} rpar=1 tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(eout1)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1
+R1x idt1 0 1e10
+.ends
+
+
+.subckt plus in1 in2 out
+*Gout 0 out VALUE={v(in1)+v(in2)} rpar=1 tripdv={tdv} tripdt={tdt}
+Eout out 0 VALUE={v(in1)+v(in2)} tripdv={tdv} tripdt={tdt}
+.ends
+
+.subckt minus in1 in2 out
+*Gout 0 out VALUE={v(in1)-v(in2)} rpar=1 tripdv={tdv} tripdt={tdt}
+Eout out 0 VALUE={v(in1)-v(in2)} tripdv={tdv} tripdt={tdt}
+.ends
+
+.subckt absminus in1 in2 out
+*Gout 0 out VALUE={abs(v(in1)-v(in2))} rpar=1 tripdv={tdv} tripdt={tdt}
+Eout out 0 VALUE={abs(v(in1)-v(in2))} tripdv={tdv} tripdt={tdt}
+.ends
+
+.subckt plusplusminus in1 in2 in3 out
+*Gout 0 out VALUE={(v(in1)+v(in2)-v(in3))} rpar=1 tripdv={tdv} tripdt={tdt}
+Eout out 0 VALUE={(v(in1)+v(in2)-v(in3))} tripdv={tdv} tripdt={tdt}
+.ends
+
+
+.SUBCKT ameter_1_uvw L1_1 L2_1 L3_1 L1_2 L2_2 L3_2 out
++params: tdv=1 tdt=1 rgnd=1e12
+* Measurement with MINMAX
+V1 L1_1 L1_2 0
+V2 L2_1 L2_2 0
+V3 L3_1 L3_2 0
+Ep out_p1 0 VALUE={MAX(I(V1),MAX(I(V2),I(V3)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(I(V1),MIN(I(V2),I(V3)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700µ
+R2 out_p out_n 28.55
+Eout out 0 VALUE={v(out_p,out_n)/sqrt(3)} tripdv={tdv} tripdt={tdt}
+Rout out 0 {rgnd}
+.ENDS
+
+.SUBCKT vmeter_1_uvw L1_1 L2_1 L3_1 L1_2 L2_2 L3_2 out
++params: tdv=1 tdt=1 rgnd=1e12
+* Measurement with MINMAX
+V1 L1_1 L1_2 0
+V2 L2_1 L2_2 0
+V3 L3_1 L3_2 0
+Ep out_p1 0 VALUE={MAX(V(L1_1),MAX(V(L2_1),V(L3_1)))} tripdv={tdv} tripdt={tdt}
+En out_n 0 VALUE={MIN(V(L1_1),MIN(V(L2_1),V(L3_1)))} tripdv={tdv} tripdt={tdt}
+R1 out_p1 out_p 10
+C1 out_p out_n 4700µ
+R2 out_p out_n 28.55
+Eout out 0 VALUE={v(out_p,out_n)} tripdv={tdv} tripdt={tdt}
+Rout out 0 {Rgnd}
+.ENDS
+
+
+* 1 phase frequency meter of voltage
+.SUBCKT fmeter vin vout f
+* limit=0.1m = 10khz
++params: limit=0.1m fn={fn1} tripdt=limit/1k tdv=1 tdt=1 rgnd=1e12
+v0 vin vout 0
+vpwl drop 0 pwl (0s  0v  {1/(fn)} 0  {1u+1/(fn)} 1)
+bf f 0 v=fn*(1-v(drop))+v(f1)*v(drop) tripdv={tdv} tripdt={tdt}
+Rf f 0 {Rgnd}
+XU1 vin f1 FreqDet
++params: limit={limit} tripdt={tripdt}
+.ENDS
+
+.SUBCKT fmeter_old_5Hz vin vout f
+* limit=0.1m = 10khz
++params: limit=0.1m fn=50 tenable=1us tripdt=limit/1k tdv=1 tdt=1 rgnd=1e12
+v0 vin vout 0
+vpwl drop 0 pwl (0s  0v  {1/(fn)} 0  {1u+1/(fn)} 1)
+bf f2 0 v=fn*(1-v(drop))+v(f1)*v(drop) tripdv={tdv} tripdt={tdt}
+Rf f2 0 {Rgnd}
+XU1 vin f1 FreqDet_old params: limit={limit} tripdt={tripdt}
+XLp1Hz f2 f 1Hz params: tenable={tenable}
+.ENDS
+
+.SUBCKT fmeter_old_1Hz vin vout f
+* limit=0.1m = 10khz
++params: limit=0.1m fn=50 tenable=1us tripdt=limit/1k tdv=1 tdt=1 rgnd=1e12
+v0 vin vout 0
+vpwl drop 0 pwl (0s  0v  {1/(fn)} 0  {1u+1/(fn)} 1)
+bf f2 0 v=fn*(1-v(drop))+v(f1)*v(drop) tripdv={tdv} tripdt={tdt}
+Rf f2 0 {Rgnd}
+XU1 vin f1 FreqDet_old params: limit={limit} tripdt={tripdt}
+XLp5Hz f2 f 5Hz params: tenable={tenable}
+.ENDS
+
+* This model has ripples and is only for testing purpose, use rather the model above
+* 1 phase frequency meter of voltage (model2)
+* measures vin1 at the inductance
+* measures the current through the inductance
+* Now the impedance is computed as XL=vin/i(L1) and
+* XL is now multiplied by the nominal frequency
+* RMS2 device (short timedelay)
+.SUBCKT fmeter2 vin1 vout1 f
++params: fn=50 tenable=0m rser=1 rgnd=1e12 T=20m XL=1
+v0 vin1 vout1 0
+E1 vin 0 VALUE={v(vin1)} tripdv={tdv} tripdt={tdt}
+R1 vin vin2 {rser}
+L1 vin2 0 {XL/2/pi/fN} ; XL=2*pi*fn*L 
+E1a xl 0 value={XL}
+Eamper iin 0 VALUE={IF(time>1m,I(L1),0)} tripdv={tdv} tripdt={tdt}
+x1 vin2 vout RMS2 params: T={T} tenable={tenable} 
+x2 iin iout RMS2 params: T={T} tenable={tenable}  
+Efreq f 0 VALUE={If(time>tenable,fN*(1/XL)*v(vout)/v(iout),0)} tripdv={tdv} tripdt={tdt}
+Rf f 0 {Rgnd}
+.ENDS
+
+* measures vin1 at the inductance
+* measures the current through the inductance
+* Now the impedance is computed as XL=vin/i(L1) and
+* XL is now multiplied by the nominal frequency
+* RMS device (no timedelay)
+.SUBCKT fmeter3 vin1 vout1 f
++params: fn=50 fci=75 fcv=7.5 b0=3 b1=3 lim=1g 
++        tenable=20m rgnd=1e9 rser=1 XL=1
+v0 vin1 vout1 0
+E1 vin 0 VALUE={v(vin1)} tripdv={tdv} tripdt={tdt}
+R1 vin vin2 {rser}
+L1 vin2 0 {XL/2/pi/fN} ; XL=2*pi*fn*L L=1
+Eamper iin 0 VALUE={IF(time>1m,I(L1),0)} tripdv={tdv} tripdt={tdt}
+x1 vin2 vout RMS params: fc={fcv} b0={b0} b1={b1} tenable={tenable} 
+x2 iin iout RMS params: fc={fci} b0={b0} b1={b1} tenable={tenable}  
+Efreq f 0 VALUE={If(time>tenable,fN*(1/XL)*v(vout)/v(iout),0)} tripdv={tdv} tripdt={tdt}
+Rf f 0 {Rgnd}
+.ENDS
+
+
+
+* 1 phase frequency meter of current
+* limit=0.1m = 10khz
+.SUBCKT fmeter_current vin vout f
++params: limit=0.1m fn={fn1} tripdt=limit/1k tdv=1 tdt=1 rgnd=1e12
+v0 vin vout 0
+vpwl drop 0 pwl (0s  0v  {1/(fn)} 0  {1u+1/(fn)} 1)
+bf f 0 v=fn*(1-v(drop))+v(f1)*v(drop) tripdv={tdv} tripdt={tdt}
+Rf f 0 {Rgnd}
+XU1 vin f1 FreqDet
++params: limit={limit} tripdt={tripdt}
+.ENDS
+
+* 1 phase frequency meter of voltage
+.SUBCKT fmeter_old vin vout f
+* limit=0.1m = 10khz
++params: limit=0.1m fn=50 tripdt=limit/1k tdv=1 tdt=1 rgnd=1e12
+v0 vin vout 0
+vpwl drop 0 pwl (0s  0v  {1/(fn)} 0  {1u+1/(fn)} 1)
+bf f 0 v=fn*(1-v(drop))+v(f1)*v(drop) tripdv={tdv} tripdt={tdt}
+Rf f 0 {Rgnd}
+XU1 vin f1 FreqDet_old
++params: limit={limit} tripdt={tripdt}
+.ENDS
+
+.subckt step2pulse1 in res params: td1=100u td2=200u
+A1 IN N001 0 0 0 0 res 0 AND Td={td1}
+A2 IN 0 0 0 0 N001 0 0 BUF Td={td2}
+* R1 Vx N001 100
+* V1 Vx 0 pwl 0s 1v
+.ends
+
+* 1 phase frequency meter of voltage
+.SUBCKT fmeter_new vin vout f params: fenable=20ms finit=50Hz vnull=1m tdv=1 tdt=1
+v0 vin vout 0
+E1 1 0 value={IF((V(vin))>vnull,1,0)} tripdv={tdv} tripdt={tdt}
+E2 2 0 value={IF((V(vin))<=vnull,1,0)} tripdv={tdv} tripdt={tdt}
+XU2 1 reset step2pulse1 params: td1=1n td2=2n ; from misc.lib
+XU3 2 reset2 step2pulse1 params: td1=1n td2=2n ; from misc.lib
+Eac ac 0 value={SDT(V(1),0,v(reset))} tripdv={tdv} tripdt={tdt}
+Ebd bd 0 value={SDT(V(2),0,v(reset2))} tripdv={tdv} tripdt={tdt}
+Eout1 period 0 value={ v(ac)*v(2) + v(bd)*v(1) } tripdv={tdv} tripdt={tdt}
+Efrequ f 0 value={ IF(time<fenable,finit,0.5/v(period)) } tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* 1 phase frequency meter of current
+* limit=0.1m = 10khz
+.SUBCKT fmeter_current_old vin vout f
++params: limit=0.1m fn=50 tripdt=limit/1k tdv=1 tdt=1 rgnd=1e12
+v0 vin vout 0
+vpwl drop 0 pwl (0s  0v  {1/(fn)} 0  {1u+1/(fn)} 1)
+bf f 0 v=fn*(1-v(drop))+v(f1)*v(drop) tripdv={tdv} tripdt={tdt}
+Rf f 0 {Rgnd}
+XU1 vin f1 FreqDet_old
++params: limit={limit} tripdt={tripdt}
+.ENDS
+
+* 1 phase frequency meter of current with lowpass
+* limit=0.1m = 10khz
+.SUBCKT fmeter_current_old_1Hz vin vout f
++params: limit=0.1m fn=50 tenable=1u tripdt=limit/1k tdv=1 tdt=1 rgnd=1e12
+v0 vin vout 0
+vpwl drop 0 pwl (0s  0v  {1/(fn)} 0  {1u+1/(fn)} 1)
+bf f2 0 v=fn*(1-v(drop))+v(f1)*v(drop) tripdv={tdv} tripdt={tdt}
+Rf f2 0 {Rgnd}
+XU1 vin f1 FreqDet_old params: limit={limit} tripdt={tripdt}
+XLp5Hz f2 f 1Hz params: tenable={tenable}
+.ENDS
+
+* 1 phase frequency meter of current with lowpass
+* limit=0.1m = 10khz
+.SUBCKT fmeter_current_old_5Hz vin vout f
++params: limit=0.1m fn=50 tenable=1u tripdt=limit/1k tdv=1 tdt=1 rgnd=1e12
+v0 vin vout 0
+vpwl drop 0 pwl (0s  0v  {1/(fn)} 0  {1u+1/(fn)} 1)
+bf f2 0 v=fn*(1-v(drop))+v(f1)*v(drop) tripdv={tdv} tripdt={tdt}
+Rf f2 0 {Rgnd}
+XU1 vin f1 FreqDet_old params: limit={limit} tripdt={tripdt}
+XLp5Hz f2 f 5Hz params: tenable={tenable}
+.ENDS
+
+* 1 phase phasemeter of voltage
+.SUBCKT phasemeter vin vout phi
++params: fn=50 deg=1 Rpar=1G tdt=1 tdv=1 tenable=1u phenable=10m phinit=0
+v01 vin vout 0
+e1 phi 0 Value={IF(time>phenable,v(phi1),phinit)} tripdt={tdt} tripdv={tdv}
+e02 vin1 0 Value={IF(time>tenable,v(vin),0)} tripdt={tdt} tripdv={tdv}
+xph1 vin1 phi1 PhaseDet
++params: fn={fn} deg={deg} Rpar={Rpar} tdt={tdt} tdv={tdv}
+.ENDS
+
+* 1 phase phasemeter of current
+.SUBCKT phasemeter_current vin vout phi
++params: fn=50 deg=1 Rpar=1G tdt=1 tdv=1 tenable=1u phenable=10m phinit=0
+v01 vin vout 0
+e1 i 0 VALUE={i(v01)} tripdt={tdt} tripdv={tdv}
+e3 i1 0 Value={IF(time>phenable,v(i),phinit)} tripdt={tdt} tripdv={tdv}
+e2 phi 0 Value={IF(time>tenable,v(phi1),0)} tripdt={tdt} tripdv={tdv}
+xph1 i1 phi1 PhaseDet
++params: fn={fn} deg={deg} Rpar={Rpar} tdt={tdt} tdv={tdv}
+.ENDS
+
+* Output rout=skin dependent resistor for input R=RDC
+* The model is obtained for a line with 3x630mm2 area
+* a DCresistance of 0.01439ohm(0.0431/Line)
+* and the parameter where obtained by curveexpert pro
+.SUBCKT rfcomp fin rout
++ params: RDC=0.0296 tdv=1 tdt=1
+E1 rout 0 VALUE={(RDC/0.01439)*(2.715e-2+(-1.3571e-2)*(0.998425)**v(fin)+(1.814156e-5)*v(fin))} tripdv={tdv} tripdt={tdt}
+Rout rout 0 {Rgnd}
+.ENDS
+
+*******************************************************************************************************
+* 1 phase measurement of apparent power,active power,reactive power,voltage angle,current angle,voltage,current
+*******************************************************************************************************
+.SUBCKT Multimeter vin vout s p q phiu phii v i
++params: fc=3 fn=50 tdv=1 tdt=1 tenable=1u vfactor=sqrt(3) sfactor=1
+Xs vin vin2 s smeter_RMS  fc={fc} tenable={tenable} sfactor={sfactor}  tdv={tdv} tdt={tdt}
+Xp vin2 vin3 p pmeter_RMS  fc={fc} tenable={tenable} sfactor={sfactor} tdv={tdv} tdt={tdt}
+Xq vin3 vin4 q qmeter_RMS  fc={fc} tenable={tenable}sfactor={sfactor} tdv={tdv} tdt={tdt}
+Xv vin4 vin5 v vmeter_RMS  fc={fc} tenable={tenable} vfactor={vfactor} tdv={tdv} tdt={tdt}
+Xi vin5 vin6 i ameter_RMS  fc={fc} tenable={tenable} tdv={tdv} tdt={tdt}
+Vi1 vin6 vout 0
+bi1 0 i1 i=i(vi1) Rpar=1 tripdv={tdv} tripdt={tdt}
+Xphmi  i1 phii PhaseDet
++params: fn={fn}  deg=1 Rpar=1G tdv={tdv} tdt={tdt}
+Xphmv vin phiu PhaseDet
++params: fn={fn}  deg=1 Rpar=1G tdv={tdv} tdt={tdt}
+.ENDS
+
+*****************************************
+* same as multimeter but for three phases
+*****************************************
+.SUBCKT Multimeter_uvw vin1 vin2 vin3 vout1 vout2 vout3 s[0] s[1] s[2] p[0] p[1] p[2] q[0] q[1] q[2] phiu[0] phiu[1] phiu[2] phii[0] phii[1] phii[2] v[0] v[1] v[2] i[0] i[1] i[2]
++params: fc=3 fn=50 tdv=1 tdt=1 vfactor=sqrt(3) sfactor=1 tenable=1u
+*
+Xwm1 vin1 vout1 s[0] p[0] q[0] phiu[0] phii[0] v[0] i[0] Multimeter
++params: fc={fc} fn={fn} tenable={tenable} vfactor={vfactor} sfactor={sfactor} tdv={tdv} tdt={tdt}
+*
+Xwm2 vin2 vout2 s[1] p[1] q[1] phiu[1] phii[1] v[1] i[1] Multimeter
++params: fc={fc} fn={fn} tenable={tenable} vfactor={vfactor} sfactor={sfactor} tdv={tdv} tdt={tdt}
+*
+Xwm3 vin3 vout3 s[2] p[2] q[2] phiu[2] phii[2] v[2] i[2] Multimeter
++params: fc={fc} fn={fn} tenable={tenable} vfactor={vfactor} sfactor={sfactor} tdv={tdv} tdt={tdt}
+.ENDS
+
+.SUBCKT CosPhimeter vin vout cosphi
++params: fc=3 fn=50 tdv=1 tdt=1 tenable=1u vfactor=sqrt(3) sfactor=3
+Xs vin vin2 s smeter_RMS  fc={fc} tenable={tenable} sfactor={sfactor} tdv={tdv} tdt={tdt}
+Xq vin2 vout q qmeter_RMS  fc={fc} tenable={tenable} sfactor={sfactor} tdv={tdv} tdt={tdt}
+Ecosphi cosphi 0 VALUE={cos(v(q)/v(s))} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* 3-phase phasemeter of voltages
+.SUBCKT phasemeter_uvw in1 in2 in3 out1 out2 out3 phi1 phi2 phi3
++params: fn=50 deg=1 Rpar=1G tdv=1 tdt=1
+v01 in1 out1 0
+v02 in2 out2 0
+v03 in3 out3 0
+xph1 in1 phi1 PhaseDet
++params: fn={fn} deg={deg} Rpar={Rpar} tdv={tdv} tdt={tdt}
+xph2 in2 phi2 PhaseDet
++params: fn={fn} deg={deg} Rpar={Rpar} tdv={tdv} tdt={tdt}
+xph3 in3 phi3 PhaseDet
++params: fn={fn} deg={deg} Rpar={Rpar} tdv={tdv} tdt={tdt}
+.ENDS
+
+* 3-phase phasemeter of currents
+.SUBCKT phasemeter_uvw_current in1 in2 in3 out1 out2 out3 phi1 phi2 phi3
++params: fn=50 deg=1 Rpar=1G tdv=1 tdt=1
+v01 in1 out1 0
+v02 in2 out2 0
+v03 in3 out3 0
+b01 0 i1 i=i(v01) rpar=1 tripdv={tdv} tripdt={tdt}
+b02 0 i2 i=i(v02) rpar=1 tripdv={tdv} tripdt={tdt}
+b03 0 i3 i=i(v03) rpar=1 tripdv={tdv} tripdt={tdt}
+xph1 i1 phi1 PhaseDet
++params: fn={fn} deg={deg} Rpar={Rpar} tdv={tdv} tdt={tdt}
+xph2 i2 phi2 PhaseDet
++params: fn={fn} deg={deg} Rpar={Rpar} tdv={tdv} tdt={tdt}
+xph3 i3 phi3 PhaseDet
++params: fn={fn} deg={deg} Rpar={Rpar} tdv={tdv} tdt={tdt}
+.ENDS
+
+* 3-phase frequency meter of voltages
+.SUBCKT fmeter_uvw in1 in2 in3 out1 out2 out3 f1 f2 f3
++params: fn=50 limit=0.1m tripdt=limit/1k fn={fn1}
+xf1 in1 out1 f1 fmeter
++params: limit={limit} tripdt={tripdt} fn={fn}
+xf2 in2 out2 f2 fmeter
++params: limit={limit} tripdt={tripdt} fn={fn}
+xf3 in3 out3 f3 fmeter
++params: limit={limit} tripdt={tripdt} fn={fn}
+.ENDS
+
+
+* 3-phase frequency meter of currents
+.SUBCKT fmeter_uvw_current in1 in2 in3 out1 out2 out3 f1 f2 f3
++params: fn=50 limit=0.1m tripdt=limit/1k fn={fn1}
+xf1 in1 out1 f1 fmeter_current
++params: limit={limit} tripdt={tripdt} fn={fn}
+xf2 in2 out2 f2 fmeter_current
++params: limit={limit} tripdt={tripdt} fn={fn}
+xf3 in3 out3 f3 fmeter_current
++params: limit={limit} tripdt={tripdt} fn={fn}
+.ENDS
+
+
+*******************************************************************
+*
+*
+*				WattMeter - Wattmeter by Vlad, Â©2008 - 2014
+*
+********************************************************************************
+*
+* [PARAMETERS]
+*tri
+* att		= attenuation to avoid slow-downs for calculations due to large
+*		processed numbers;
+* f	[Hz]	= working frequency;
+*
+* - Hidden:
+*
+* tripdv,tripdt,tripdt2	= LTspice's specific parameters for A-devices;
+* off	[V]	= offset tweak for the clock generators;
+*
+*
+* [CHARACTERISTICS]
+*
+* - The voltage sensing has floating input and the current sensing is a zero-
+* resistance series voltage source.
+*
+* - The output resistances for pins 'V' and 'I' is Ro=att/2, for 'S' and 'P' is
+* Ro=att^2/2, while for 'Q' and 'PF' is Ro=att.
+*
+* [NOTES]
+*
+* - The hidden parameters shouldn't need tinkering but, if needed:
+*	- {tripdv} and {tripdt} control the timestep for the behavioural sources
+*	calculating the powers (default <100V/1us>), these can be tinkered with;
+*	- {tripdt2} controls the timestep of the clock and resetting pulses and
+*	it should be tighter than {tripdt} because the resetting pulses are set
+*	to be very narrow for a minimal impact (default 10n);
+*	- {off} is slighty more complicated: the clock is a function of sgn(Vin)
+*	and the reset is sgn(Vin +/- off), so {off} should be at least 1000x
+*	less than the peak input voltage, to have as little errors as possible.
+*
+********************************
+*
+*				  current sensing input
+*		 		  |  voltage sensing positive input
+*		  		  |  |	voltage sensing negative input
+*		  		  |  |	|  current sensing output
+*		 		  |  |	|  |  apparent power output
+*		 		  |  |	|  |  |	active power
+*		 		  |  |	|  |  |	| reactive power
+*		 		  |  |	|  |  |	| | power factor
+*		 		  |  |	|  |  |	| | |  RMS voltage
+*		 		  |  |	|  |  |	| | |  | RMS current
+*		 		  |  |	|  |  |	| | |  | |
+.subckt WattMeter I+ V+ V- I- S P Q PF V I
++ params: att=1  fn=50  tripdt=1u  tripdv=100  off=1  tripdt2=10n
+Vamper I+ I- 0
+Gvolt 0 filt V+ V- {1/att}
+Cf filt 0 {1/4/pi/fn} Lser=0 Rpar=0 Cpar=0 RLshunt=0 ic=0 Rpar=1
+Bper 0 per i=idt( 0, idt( 1,0,v(res) ), v(clk) ) tripdt={tripdt} tripdv={tripdv} rpar=1
+B_per 0 _per i=idt( 0, idt( 1,0,v(_res) ), v(_clk) ) tripdt={tripdt} tripdv={tripdv} rpar=1
+Bclk 0 clk i=u( ddt( sgn(v(filt)) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+B_clk 0 _clk i=u( ddt( sgn(-v(filt)) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+Bres 0 res i=u( ddt( sgn(v(filt)-off) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+B_res 0 _res i=u( ddt( sgn(-v(filt)-off) ) ) tripdt={tripdt2} tripdv=0.4 rpar=2
+BV 0 V i=idt( 0, idt( i(Gvolt)**2,0,v(res) ) / v(per), v(clk) )**0.5 + idt( 0, idt( i(Gvolt)**2,0,v(_res) ) / v(_per), v(_clk) )**0.5 tripdt={tripdt} tripdv={tripdv} rpar={att/2}
+BI 0 I i=idt( 0, idt( i(Vamper)**2/att**2,0,v(res) ) / v(per), v(clk) )**0.5 + idt( 0, idt( i(Vamper)**2/att**2,0,v(_res) ) / v(_per), v(_clk) )**0.5 tripdt={tripdt} tripdv={tripdv} rpar={att/2}
+BS 0 S i=V(V)*V(I)/att**2 tripdt={tripdt} tripdv={tripdv} rpar={att**2}
+BP 0 P i=idt( 0, idt( I(Gvolt)*I(Vamper)/att,0,v(res) ) / v(per), v(clk) ) + idt( 0, idt( I(Gvolt)*I(Vamper)/att,0,v(_res) ) / v(_per), v(_clk) ) tripdt={tripdt} tripdv={tripdv} rpar={att**2/2}
+BQ 0 Q i=sqrt(V(S)**2-V(P)**2)/att tripdt={tripdt} tripdv={tripdv} rpar={att}
+BPF 0 PF i=limit( 0, V(P)/V(S)/att, 1/att ) tripdt={tripdt} tripdv={tripdv} rpar={att}
+.ends WattMeter
+
+
+********************************************************************************
+
+********************************************************************************
+*
+*			PhaseDet - Phase detector by Vlad, Â©2008 - 2014
+*
+********************************************************************************
+*
+* [PARAMETERS]
+*
+* f	[Hz]	= working frequency;
+* deg=<0,1>	= whether output is in radians <0> or degrees <1>.
+*
+* - Hidden:
+*
+* Rpar	[Ohm]	= parallel resistance across integrating capacitors, default 1G.
+*
+*
+* [NOTES]
+*
+* - Output is delayed by one period but, if there is no offset at the input, it
+* can be changed to one half (per=0.5/f) for a faster response.
+*
+********************************************************************************
+.subckt PhaseDet in out
++params: fn=50 deg=1 Rpar=1G tdv=1  tdt=1
+Asc 0 in 0 0 0 2 1 0 MODULATOR mark={fn} space=0
+Ts 1 0 11 0 Td={1/fn} Z0=1
+Rs 11 0 1
+Gs 0 s 1 11 1
+Cs s 0 {1/fn} ic=0 Rpar={Rpar}
+Tc 2 0 22 0 Td={1/fn} Z0=1
+Rc 22 0 1
+Gc 0 c 2 22 1
+Cc c 0 {1/fn} ic=0 Rpar={Rpar}
+Br 0 out I=atan2(v(c),v(s)) Rpar={(180/pi)**u(deg)} tripdv={tdv} tripdt={tdt}
+.ends PhaseDet
+
+
+********************************************************************************
+.subckt FreqDet_oldx in out
++params: limit=0.1m tripdt=limit/1k
+Gdiff 0 i in 0 1
+Ldiff i 0 {1/limit} Rpar={1/limit}
+Aper i 0 0 0 0 2 1 0 BUF ref=0 tripdt={tripdt*2}
+Cx1 1 0 {tripdt}
+Cx2 2 0 {tripdt}
+Bx  x 0 v=idt(v(1),0,v(2)) tripdv={tdv} tripdt={tdt}
+By  y 0 v=idt(v(2),0,v(1)) tripdv={tdv} tripdt={tdt}
+Bper1 0 per1 I=idt(0,v(x),i(cx1)) Rpar=1 tripdv={tdv} tripdt={tdt}
+Bper2 0 per2 I=idt(0,v(y),i(cx2)) Rpar=1 tripdv={tdv} tripdt={tdt}
+Bper 0 per I=v(per1)+v(per2) Rpar=2 tripdv={tdv} tripdt={tdt}
+Bout 0 out I=if(v(per)<limit,1/limit,1/v(per)) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends FreqDet
+********************************************************************************
+
+********************************************************************************
+.subckt FreqDet_old in out
++params: limit=0.1m tripdt=limit/1k
+Gdiff 0 i in 0 1
+Ldiff i 0 {1/limit} Rpar={1/limit}
+Aper i 0 0 0 0 2 1 0 BUF ref=0 tripdt={tripdt*2}
+Cx1 1 0 {tripdt}
+Cx2 2 0 {tripdt}
+Bper 0 per I=idt(0,idt(v(1),0,v(2)),i(cx1))+idt(0,idt(v(2),0,v(1)),i(cx2)) Rpar=2 tripdv={tdv} tripdt={tdt}
+Bout 0 out I=if(v(per)<limit,1/limit,1/v(per)) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends FreqDet
+********************************************************************************
+
+
+*
+* FreqDet - Frequency detector
+*
+********************************************************************************
+*
+* [SYMBOL]
+*
+* 1,2 = differential inputs, floating;
+* out = output, Rout=1.
+*
+* [PARAMETERS]
+*
+* limit [s] = the lowest estimate for the period, default 1m=1khz maximal frequency
+* gain=<-inf..inf>  = sets the gain for the input differentiator for the cases
+*   when the input signals are too weak /strong, default 1.
+*
+* - Hidden:
+*
+* tripdt [s]  = LTspice's specific for A-devices, default 1u;
+* lim = internal limits to avoid clipping, default minimum 1g.
+*
+********************************************************************************
+.subckt FreqDet 1 out params: limit=1m gain=1
++ tripdt=limit/1k lim=1/limit
+.param rgnd=1e12
+* input differentiator, discrete to avoid giga-spikes
+Gin 0 diffin 1 0 {gain}
+Rdiff diffdel 0 1
+Tdiff diffin 0 diffdel 0 Td={limit} Z0=1
+* interweaved clock
+Adiff diffin diffdel 0 0 0 _clk clk 0 SCHMITT vt=0 vh=0 tripdt={tripdt}
+* calculate period with resettable integrators + S&H
+Aidt1 0 clk 0 0 0 0 idt1 0 ota vhigh={lim} vlow=0 rout=1g cout=1 linear ic=0
+Aidtsh1 idt1 0 clk 0 0 0 _idt1 0 SAMPLEHOLD ref=0.9 tripdt={tripdt}
+Aspl1 idt1 _idt1 _clk 0 0 0 sum 0 SAMPLEHOLD ref=0.1 tripdt={tripdt} ic={limit}
+Aidt2 0 _clk 0 0 0 0 idt2 0 ota vhigh={lim} vlow=0 rout=1g cout=1 linear ic=0
+Aidtsh2 idt2 0 _clk 0 0 0 _idt2 0 SAMPLEHOLD ref=0.9 tripdt={tripdt}
+Aspl2 idt2 _idt2 clk 0 0 0 sum 0 SAMPLEHOLD ref=0.1 tripdt={tripdt}
+* f=1/T, implicit division
+Aper_lf _out 0 0 0 0 0 out 0 ota ref=0.5 vhigh={lim} cout={1n*limit} rout=1g iout={lim}
+Aper 0 out sum 0 0 0 _out 0 ota vhigh={lim} rout=1 linear ; ic=0
+Rout out 0 {rgnd}
+.ends FreqDet
+
+********************************************************************************
+*
+* RMS - RMS and peak value
+*
+********************************************************************************
+*
+* [GENERAL]
+*
+* - It's based on LTspice's brilliantly simple, frequency-independent method.
+*
+*
+* [PARAMETERS]
+*
+* fc [Hz] = corner frequency for the 2nd order filter, default 100;
+* b1,b0 = terms for the filter's denominator, default Bessel.
+*
+* - Hidden:
+*
+* lim = internal limit to avoid clipping, default 1g.
+*
+*
+* [CHARACTERISTICS]
+*
+* - The output impedance is {-j/(2*pi*fc)}.
+*
+********************************************************************************
+.subckt RMS in out params: fc=100 b0=3 b1=3 lim=1g
+.param rgnd=1e12
+* Squarer
+Asq 0 in in 0 0 0 sq 0 ota vhigh={lim} rout=1 linear
+* Divider:
+Adiv_lf _sq sq 0 0 0 0 div 0 ota vhigh={lim} rout=1g cout={1n/fc} linear
+Adiv 0 div out 0 0 0 _sq 0 ota vhigh={lim} rout=1 linear
+* Two stage amplifiers: for lowpass filtering
+Ab0 out div 0 0 0 0 1 0 ota vhigh={lim} vlow={-lim} cout={.5/pi/fc} rout=1g g={b0/b1} linear
+Ab1 out 1 0 0 0 0 out 0 ota vhigh={lim} vlow={-lim} cout={.5/pi/fc} rout=1g g={b1} linear
+Rout out 0 {Rgnd}
+.ends RMS
+
+* in this model fc is controlled from outside
+* so you can start with a high fc for faster measuring
+* and decrease fc later for smoother traces without ripples
+.subckt RMS_ctrl in out ctrl params: fc=5 b0=3 b1=3 lim=1g
+.param rgnd=1e12
+* Squarer:
+Asq 0 in in 0 0 0 sq 0 ota vhigh={lim} rout=1 linear
+* Divider:
+Adiv_lf _sq sq 0 0 0 0 div 0 ota vhigh={lim} rout=1g linear
+GCout3 div 0  VALUE={DDT(v(div))*1n/(fc*v(ctrl))} tripdv={tdv} tripdt={tdt} rpar=1e12
+Adiv 0 div out 0 0 0 _sq 0 ota vhigh={lim} rout=1 linear
+* Two stage amplifiers for lowpass filtering
+Ab0 out div 0 0 0 0 1 0 ota vhigh={lim} vlow={-lim}  rout=1g g={b0/b1} linear
+Ab1 out 1 0 0 0 0 out 0 ota vhigh={lim} vlow={-lim}  rout=1g g={b1} linear
+GCout1 1 0  VALUE={DDT(v(1))*.5/pi/(fc*v(ctrl))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCout2 out 0  VALUE={DDT(v(out))*.5/pi/(fc*v(ctrl))} tripdv={tdv} tripdt={tdt} rpar=1e12
+.ends RMS_ctrl
+
+* Lowpass
+* Butterworth
+* Order=3
+* Cutoff frequ=1Hz
+* Exact
+* Input impedance=0 Output impedance=1000ohm
+* decoupled from the input (no load for the input) !!!!!!!! 
+* therefore it is used normally after a measurement device output pin
+.subckt 1Hz in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 212.2H
+C1 in1 0 238.7uF
+C3 out 0 79.58uF
+R1 out 0 1000ohm
+.ends
+
+* Lowpass
+.subckt 5Hz in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 42.44H
+C1 in1 0 47.75uF
+C3 out 0 15.92uF
+R1 out 0 1000ohm
+.ends
+
+* Lowpass
+.subckt 10Hz in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 21.22H
+C1 in1 0 23.87uF
+C3 out 0 7.958uF
+R1 out 0 1000ohm
+.ends
+
+* Lowpass
+.subckt 15Hz in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 14.15H
+C1 in1 0 15.92uF
+C3 out 0 5.305uF
+R1 out 0 1000ohm
+.ends
+
+* Lowpass
+.subckt 20Hz in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 10.61H
+C1 in1 0 11.94uF
+C3 out 0 3.979uF
+R1 out 0 1000ohm
+.ends
+
+* Lowpass
+.subckt 25Hz in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 8.488H
+C1 in1 0 9.549uF
+C3 out 0 3.183uF
+R1 out 0 1000ohm
+.ends
+
+* Lowpass
+.subckt 30Hz in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 7.074H
+C1 in1 0 7.958uF
+C3 out 0 2.653uF
+R1 out 0 1000ohm
+.ends
+
+* Lowpass
+.subckt 35Hz in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 6.063H
+C1 in1 0 6.821uF
+C3 out 0 2.274uF
+R1 out 0 1000ohm
+.ends
+
+* Lowpass
+.subckt 40Hz in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 5.305H
+C1 in1 0 5.968uF
+C3 out 0 1.989uF
+R1 out 0 1000ohm
+.ends
+
+
+* 50Hz lowpass cutoff=50Hz 
+* Shunt first,order2,Butterworth,Lowpass,100kohm outputimpedance,comp. values exact
+* coupled device (connected to input) therefore
+* this device is used e.g. at the output of a Rectifiercircuit
+* for a example see:
+* ..\ltspice\loadflow_transient_examples\OtherTestingModelling\Three_Phase_Rectifier\ThreePhaseRectifier3.asc
+* E1=disabled, R1 from 1000 to 1e6, L2*1e6/1000,C1*1000/1e6
+.subckt 50Hz_lp in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L2 in1 out 2251H
+C1 in1 0 4.502nF
+R1 out 0 1e6
+.ends
+
+* Bandstop
+* 45-55Hz
+.subckt 50Hz in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 909.4mH
+C1 in1 out 11.25uF
+L2 out L1rms2 22.51H
+C2 L1rms2 0 454.7n
+R1 out 0 1000ohm
+.ends
+
+* 55-65Hz Bandstop
+.subckt 60Hz in out params: tenable=1u
+* Butterworth filter 2nd orger, Series first
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 629.6mH
+C1 in1 out 11.25uF
+L2 out L1rms2 22.51H
+C2 L1rms2 0 314.8n
+R1 out 0 1000ohm
+.ends
+
+
+* Bandpass
+* <48-52Hz>
+.subckt 5th_order_48Hz_52Hz_pass in out params: tenable=1u
+* Butterworth filter,series first,fifth order,bandpass,ri=0,ra=1000
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+C1 in1 x1 165.1nF
+L1 x1 in2 61.48H
+C2 in2 0 67.42uF
+L2 in2 0 150.5mH
+C3 in2 x2 184.6nF
+L3 x2 in3 54.99H
+C4 in3 0 35.59uF
+L4 in3 0 285.2mH
+C5 in3 x3 825.4nF
+L5 x3 out 12.30H
+R1 out 0 1000ohm
+.ends
+
+* 48-52Hz Bandstop
+.subckt 5th_order_48Hz_52Hz_stop in out params: tenable=1u
+* Butterworth bandstop filter 5nd order, Series first,Rin=0!!,Rout=1000
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 in2 394.1mH
+C1 in1 in2 25.75uF
+C2 in2 x2 432.2nF
+L2 x2 0 23.48H 
+L3 in2 in3 352.5mH
+C3 in2 in3 28.79uF
+C4 in3 x3 228.1nF
+L4 x3 0 44.49H
+L5 in3 out 78.82mH
+C5 in3 out 128.8uF
+RL out 0 1000ohm
+.ends
+
+* Bandpass
+* <58-62Hz>
+.subckt 5th_order_58Hz_62Hz_pass in out params: tenable=1u
+* Butterworth filter,series first,fifth order,bandpass,ri=0,ra=1000
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+C1 in1 x1 114.6nF
+L1 x1 in2 61.48H
+C2 in2 0 67.42uF
+L2 in2 0 104.5mH
+C3 in2 x2 128.1nF
+L3 x2 in3 54.99H
+C4 in3 0 35.59uF
+L4 in3 0 197.9mH
+C5 in3 x3 572.9nF
+L5 x3 out 12.30H
+R1 out 0 1000ohm
+.ends
+
+
+
+* 58-62Hz Bandstop
+.subckt 5th_order_58Hz_62Hz_stop in out params: tenable=1u
+* Butterworth bandstop filter 5nd order, Series first,Rin=0!!,Rout=1000
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 in2 273.5mH
+C1 in1 in2 25.75uF
+C2 in2 x2 300nF
+L2 x2 0 23.48H 
+L3 in2 in3 244.7mH
+C3 in2 in3 28.79uF
+C4 in3 x3 158.3nF
+L4 x3 0 44.49H
+L5 in3 out 54.71mH
+C5 in3 out 128.8uF
+RL out 0 1000ohm
+.ends
+
+.subckt fmeter50Hz_uvw U1 V1 W1 U2 V2 W2 f params:
++  U1Nenn=400k p=2 n0=1500 J=0.001 Rcu=0.2 fn1=50
++  fn1={fn1}
+V1 U1 U2 0V
+V2 V1 V2 0V
+V3 W1 W2 0V
+eU1 1U 0 value={v(U1)} tripdv={tdv} tripdt={tdt} 
+eV1 1V 0 value={v(V1)} tripdv={tdv} tripdt={tdt}
+eW1 1W 0 value={v(W1)} tripdv={tdv} tripdt={tdt}
+xtrafo 1U  1V  1W  2U  2V  2W 50Hz_Trafo3Yy0_ideal params: U1Nenn={U1Nenn} U20=400
+Ef f 0 VALUE={v(n)*p/60}  tripdv={tdv} tripdt={tdt} 
+xsgen  2U 2V 2W n 50Hz_sgen params: p={p} n0={n0} J={J} Rcu={Rcu} fn1={fn1}
+.ends
+
+.subckt fmeter1500Hz_uvw U1 V1 W1 U2 V2 W2 f params:
++  U1Nenn=400k p=2 n0=45000 J=0.0001 Rcu=0.06 fn1=1500
++  fn1={fn1}
+V1 U1 U2 0V
+V2 V1 V2 0V
+V3 W1 W2 0V
+eU1 1U 0 value={v(U1)} tripdv={tdv} tripdt={tdt} 
+eV1 1V 0 value={v(V1)} tripdv={tdv} tripdt={tdt}
+eW1 1W 0 value={v(W1)} tripdv={tdv} tripdt={tdt}
+xtrafo 1U  1V  1W  2U  2V  2W 50Hz_Trafo3Yy0_ideal params: U1Nenn={U1Nenn} U20=400
+Ef f 0 VALUE={v(n)*p/60}  tripdv={tdv} tripdt={tdt} 
+xsgen  2U 2V 2W n 50Hz_sgen params: p={p} n0={n0} J={J} Rcu={Rcu} fn1={fn1}
+.ends
+
+.subckt fmeter15000Hz_uvw U1 V1 W1 U2 V2 W2 f params:
++  U1Nenn=400k p=2 n0=450000 J=0.0001 Rcu=0.002 fn1=15000
++  fn1={fn1}
+V1 U1 U2 0V
+V2 V1 V2 0V
+V3 W1 W2 0V
+eU1 1U 0 value={v(U1)} tripdv={tdv} tripdt={tdt} 
+eV1 1V 0 value={v(V1)} tripdv={tdv} tripdt={tdt}
+eW1 1W 0 value={v(W1)} tripdv={tdv} tripdt={tdt}
+xtrafo 1U  1V  1W  2U  2V  2W 50Hz_Trafo3Yy0_ideal params: U1Nenn={U1Nenn} U20=400
+Ef f 0 VALUE={v(n)*p/60}  tripdv={tdv} tripdt={tdt} 
+xsgen  2U 2V 2W n 50Hz_sgen params: p={p} n0={n0} J={J} Rcu={Rcu} fn1={fn1}
+.ends
+
+.subckt 50Hz_sgen U1 V1 W1 n params:
++	UN_verkettet=400V
++	IN=21A
++	Pel=12kW  ;UN_verkettet*IN*sqrt(3)*cosphi of 0.8
++	fn={fn1}
++	Kc=0.5
++	UE0=48V ; Power of exciter = 0.25-5% * SN machine (smaller values for higher SN)
++	IE0=5A
++	p=2
++	Streuung=0.05
++	rcu=0.05
++	rbg=0.05
++	Schenkelpolfaktor=1 ;(1=cylindrical pole 0.5=Salient pole)
++	Daempferfaktor=1
++   taumech=2.3 ; parameter for inertia J={p*taumech*MN/omega_el}
++  n0=1500 ; initial speed
++  alpha_0=0
++  err0=0
++   Mvz=1
++   J=1
+.PARAM
++	UN={UN_verkettet/sqrt(3)}
++	ZN={UN/IN}
++   XD={UN/IN/Kc}
++   XQ={XD*Schenkelpolfaktor}
++	Rs={ZN*rcu}
++	omega_el={(2*pi)*fN}
+;+	 g={IE0/((1+Streuung)*Kc*IN*sqrt(2))}
++	Ls={Streuung*ZN/Kc/omega_el}
++	PsiN={sqrt(2)*UN/omega_el}
++	RE={UE0/IE0}
++	RD={Rs/Daempferfaktor}
++  RDx={RD} ; can be overwritten by setting this parameters directly here to a numerical value
++  RDy={RD} ; can be overwritten by setting this parameters directly here to a numerical value
++  LDx={Ls} ; can be overwritten by setting this parameters directly here to a numerical value
++  LDy={Ls} ; can be overwritten by setting this parameters directly here to a numerical value
++  LE={Ls} ; can be overwritten by setting this parameters directly here to a numerical value
++  R0={Rs} ; can be overwritten by setting this parameters directly here to a numerical value
++  L0={Ls} ; can be overwritten by setting this parameters directly here to a numerical value(X0 is 0.03-0.1 p.u)
++  Lsd={Ls}
++  Lsq={Ls}
++  Lhd3={XD/(2*pi*fn)-Lsd}
++  Lhq3={XQ/(2*pi*fn)-Lsq}
++   g={UE0/(UN*sqrt(2)*RE/(XD-omega_el*Lsd))}
++	MN={Pel*(1-rbg-rcu)*p/omega_el}
+* magnetic voltage  UE0, IE0
+* NOTE: Measurement of g: set g=1 see the voltage output of generator
+* make now g smaller until the nominal voltage of the generator is present
+Vf1 f1 0 {UE0}
+Vm  m  0  0
+* Null-System
+Gi0    0    i0    VALUE=
++ {((v(U1,U2)+v(V1,V2)+v(W1,W2))/3-R0*v(i0))/L0} tripdv={tdv} tripdt={tdt}
+Ci0    i0    0    1    IC=0
+Ri0    i0    0    1E6
+*    Stator voltages in the d-q system
+Guxs    0    usxs    VALUE={2/3*v(U1,U2)-v(V1,V2)/3-v(W1,W2)/3} tripdv={tdv} tripdt={tdt}; statorfix
+Guys    0    usys    VALUE={(v(V1,V2)-v(W1,W2))/sqrt(3)} tripdv={tdv} tripdt={tdt}; statorfix
+Ruxs    usxs    0    1
+Ruys    usys    0    1
+Guxr    0    usx    VALUE={v(usxs)*v(cosa)+v(usys)*v(sina)} tripdv={tdv} tripdt={tdt}; rotorfix
+Guyr    0    usy    VALUE={v(usys)*v(cosa)-v(usxs)*v(sina)} tripdv={tdv} tripdt={tdt}; rotorfix
+Ruxr    usx    0    1
+Ruyr    usy    0    1
+*    Magnetic fluxes in the d-q system
+Gpsx    0    psisx    VALUE={v(usx)-Rs*v(isx)+p*(pi/30)*v(n)*v(psisy)} tripdv={tdv} tripdt={tdt}
+Gpe     0    psie     VALUE={v(F1)*g  -RE*g*g*v(iE)                } tripdv={tdv} tripdt={tdt}
+Gpdx    0    psidx    VALUE={0     -RDx*v(idx)              } tripdv={tdv} tripdt={tdt}
+Rpsx    psisx        0        1MEG
+Rpe     psie         0        1MEG
+Rpdx    psidx        0        1MEG
+Cpsx    psisx        0        1    IC={err0*psiN}
+Cpe     psie         0        1    IC={err0*psiN*(1+Streuung)}
+Cpdx    psidx        0        1    IC={err0*psiN}
+Gpsy    0    psisy    VALUE={v(usy)-Rs*v(isy)-p*(pi/30)*v(n)*v(psisx)} tripdv={tdv} tripdt={tdt}
+Gpdy    0    psidy    VALUE={0     -RDy*v(idy)              } tripdv={tdv} tripdt={tdt}
+Rpsy    psisy        0        1MEG
+Rpdy    psidy        0        1MEG
+Cpsy    psisy        0        1    IC=0
+Cpdy    psidy        0        1    IC=0
+*    Currents in the d-q system
+Gisx    0    isx    VALUE={Lsd*v(isx)+Lhd3*(v(isx)+v(ie)+v(idx))-v(psisx)} tripdv={tdv} tripdt={tdt}
+Gie     0    ie     VALUE={LE *v(ie)+Lhd3*(v(isx)+v(ie)+v(idx))-v(psie)} tripdv={tdv} tripdt={tdt}
+Gidx    0    idx    VALUE={LDx*v(idx)+Lhd3*(v(isx)+v(ie)+v(idx))-v(psidx)} tripdv={tdv} tripdt={tdt}
+Risx    isx        0        1MEG
+Rie     ie         0        1MEG
+Ridx    idx        0        1MEG
+Gisy    0    isy     VALUE={Lsq*v(isy)+Lhq3*(v(isy)+v(idy))-v(psisy)} tripdv={tdv} tripdt={tdt}
+Gidy    0    idy     VALUE={LDy*v(idy)+Lhq3*(v(isy)+v(idy))-v(psidy)} tripdv={tdv} tripdt={tdt}
+Risy    isy        0        1MEG
+Ridy    idy        0        1MEG
+*    inner torque
+Gm1     0    mi      VALUE={ Lhd3*(v(isx)+v(ie)+v(idx))*v(isy)} tripdv={tdv} tripdt={tdt}
+Gm2     0    mi      VALUE={-Lhq3*(v(isy)+v(idy))      *v(isx)} tripdv={tdv} tripdt={tdt}
+Rm      mi         0 {3/2*p}
+*    Speed n
+En    n        0     VALUE={n0+60/(2*pi)/J*V(n1)} tripdv={tdv} tripdt={tdt}
+Gn    0       n1     VALUE={(v(mi)+v(M)*Mvz)} tripdv={tdv} tripdt={tdt}
+Cn    n1       0      1    IC=0                    
+Rn    n1       0      1MEG
+*    angle alpha
+Gal   0       alpha  VALUE={p/60*(2*pi)*v(n)} tripdv={tdv} tripdt={tdt}
+Cal   alpha   0      1    IC={alpha_0*pi/180}
+Ral   alpha   0      1E10
+Gcos  0       cosa   VALUE={cos(v(alpha))} tripdv={tdv} tripdt={tdt}
+Gsin  0       sina   VALUE={sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+Rcos  cosa    0      1
+Rsin  sina    0      1
+*    stator currents u,v,w system double translation
+Gi1    U1    U2     VALUE={v(isx)*v(cosa)-v(isy)*v(sina)+v(i0)} tripdv={tdv} tripdt={tdt}
+Gi2a   V1    V2     VALUE={ ((sqrt(3)/2)*v(isy)-v(isx)/2)*v(cosa)} tripdv={tdv} tripdt={tdt}
+Gi2b   V1    V2     VALUE={ (v(isy)/2+(sqrt(3)/2)*v(isx))*v(sina) +v(i0)} tripdv={tdv} tripdt={tdt}
+Gi3a   W1    W2     VALUE={-((sqrt(3)/2)*v(isy)+v(isx)/2)*v(cosa)} tripdv={tdv} tripdt={tdt}
+Gi3b   W1    W2     VALUE={ (v(isy)/2-(sqrt(3)/2)*v(isx))*v(sina) +v(i0)} tripdv={tdv} tripdt={tdt}
+GiE2	F1	0	VALUE={v(ie)*g} tripdv={tdv} tripdt={tdt}
+*    Starpoint
+R2     v2    GND1  1u
+R12    u2    v2   1u
+R23    v2    w2   1u
+Rgnd1 GND1 0 1e9
+.ends
+
+.SUBCKT 50Hz_Trafo3Yy0_ideal  1U  1V  1W   2U  2V  2W  
++	PARAMS:
++	U1Nenn=400V
++	U20=400V
++   k=1
++   N1=1000
++   l_=0
++   stproz=1
++   ueN={U1Nenn/U20}
++   ue={ueN+ueN*l_*stproz/100}
+.param N1={N1} N2={N1/ue}   
+* YY0
+Xu 1U 1N 2U 2N 50Hz_N1N2_Yy params: N1={N1} N2={N2} k={k}
+Xv 1V 1N 2V 2N 50Hz_N1N2_Yy params: N1={N1} N2={N2} k={k}
+Xw 1W 1N 2W 2N 50Hz_N1N2_Yy params: N1={N1} N2={N2} k={k}
+RGND3N1 1N 0 1u
+RGND3N2 2N 0 1u 
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+.ENDS
+*$
+
+.subckt 50Hz_N1N2_Yy in1 in2 out1 out2
++params: N1=1 N2=1 k=1
+.param ue={N1/N2}
+G1 0 M in1 in2 1
+G2 0 M out1 out2 {-1/k*ue}
+G3 in1 in2 M 0 1
+G4 out1 out2 M 0 {-1/k*ue}
+R2 M 0 1e12
+Rin1 in1 0 1e12
+Rin2 in2 0 1e12
+Rout1 out1 0 1e12
+Rout2 out2 0 1e12
+.ends
+
+* Computed with the online filter design tool
+* https://rf-tools.com/lc-filter/
+* https://markimicrowave.com/technical-resources/tools/lc-filter-design-tool/
+* Bandstopp 100Hz:
+* Butterworth
+* Order 2
+* Lower frequency 95
+* Upper Frequency 105
+* Input resistance 0 ohm
+* output resistance 1000ohm
+* shunt first
+* exact
+* 95-105Hz
+* uncoupled device (not connected to input)
+.subckt 100Hz in out params: tenable=1u
+* Butterworth filter 95-105Hz
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 225.6mH
+C1 in1 out 11.25uF
+L2 out L1rms2 22.51H
+C2 L1rms2 0 112.8n
+R1 out 0 1000ohm
+.ends
+
+* 115-125Hz
+* uncoupled device (not connected to input)
+.subckt 120Hz in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 156.6m
+C1 in1 out 11.25u
+L2 out L1rms2 22.51H
+C2 L1rms2 0 78.29nF
+R1 out 0 1000ohm
+.ends
+
+* 145-155Hz bandpass
+* uncoupled device (not connected to input)
+.subckt 150Hz in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L2 in1 out 11.25H
+C1 in1 0 22.51u
+R1 out 0 1000ohm
+.ends
+
+
+* 195-205Hz
+* uncoupled device (not connected to input)
+.subckt 200Hz in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 56.3mH
+C1 in1 out 11.25uF
+L2 out L1rms2 22.51H
+C2 L1rms2 0 28.15n
+R1 out 0 1000ohm
+.ends
+
+* 235-245Hz
+* uncoupled device (not connected to input)
+.subckt 240Hz in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 39.09m
+C1 in1 out 11.25u
+L2 out L1rms2 22.51H
+C2 L1rms2 0 19.55n
+R1 out 0 1000ohm
+.ends
+
+* 290-310Hz
+* uncoupled device (not connected to input)
+.subckt 300Hz in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 50.07mH
+C1 in1 out 5.627uF
+L2 out L1rms2 11.25H
+C2 L1rms2 0 25.04nF
+R1 out 0 1000ohm
+.ends
+
+* 350-370Hz
+* uncoupled device (not connected to input)
+.subckt 360Hz in out params: tenable=1u
+* Butterworth filter
+E1 in1 0 VALUE={IF(time>tenable,v(in),0)} tripdv={tdv} tripdt={tdt}
+L1 in1 out 34.76m
+C1 in1 out 5.627uF
+L2 out L1rms2 11.25H
+C2 L1rms2 0 17.38nF
+R1 out 0 1000ohm
+.ends

@@ -1,0 +1,114 @@
+Version 4
+SymbolType BLOCK
+LINE Normal -16 -32 -32 -32
+LINE Normal 16 -32 32 -32
+LINE Normal -16 32 -32 32
+LINE Normal 16 32 32 32
+LINE Normal -16 0 -32 0
+LINE Normal 16 0 32 0
+LINE Normal 0 63 0 54
+LINE Normal 8 63 0 63
+LINE Normal -8 63 0 63
+LINE Normal 6 66 -6 66
+LINE Normal 32 -16 -32 -16
+LINE Normal 32 16 -32 16
+LINE Normal 32 48 -32 48
+LINE Normal -16 -144 -32 -144
+LINE Normal 16 -144 32 -144
+LINE Normal -16 -80 -32 -80
+LINE Normal 16 -80 32 -80
+LINE Normal -16 -112 -32 -112
+LINE Normal 16 -112 32 -112
+LINE Normal 0 -49 0 -58
+LINE Normal 8 -49 0 -49
+LINE Normal -8 -49 0 -49
+LINE Normal 6 -46 -6 -46
+LINE Normal 32 -128 -32 -128
+LINE Normal 32 -96 -32 -96
+LINE Normal 32 -64 -32 -64
+RECTANGLE Normal 16 -28 -16 -36
+RECTANGLE Normal 16 4 -16 -4
+RECTANGLE Normal 16 36 -16 28
+RECTANGLE Normal 16 -140 -16 -148
+RECTANGLE Normal 16 -108 -16 -116
+RECTANGLE Normal 16 -76 -16 -84
+CIRCLE Normal -21 -36 -26 -41
+CIRCLE Normal -21 -148 -26 -153
+SYMATTR Prefix X
+SYMATTR SpiceModel line_cable_shield_400kV_1200mm2_10km_2system_horizontal
+SYMATTR ModelFile line_coupled.lib
+SYMATTR Description underground cable with cable shield two systems
+SYMATTR Value length=10  R=0.01845 Rsh=0.02313
+SYMATTR Value2 fact=1
+PIN -32 -144 NONE 8
+PINATTR PinName a1
+PINATTR SpiceOrder 1
+PIN -32 -128 NONE 8
+PINATTR PinName a7
+PINATTR SpiceOrder 2
+PIN -32 -112 NONE 8
+PINATTR PinName a2
+PINATTR SpiceOrder 3
+PIN -32 -96 NONE 8
+PINATTR PinName a8
+PINATTR SpiceOrder 4
+PIN -32 -80 NONE 8
+PINATTR PinName a3
+PINATTR SpiceOrder 5
+PIN -32 -64 NONE 8
+PINATTR PinName a9
+PINATTR SpiceOrder 6
+PIN -32 -32 NONE 8
+PINATTR PinName a4
+PINATTR SpiceOrder 7
+PIN -32 -16 NONE 8
+PINATTR PinName a10
+PINATTR SpiceOrder 8
+PIN -32 0 NONE 8
+PINATTR PinName a5
+PINATTR SpiceOrder 9
+PIN -32 16 NONE 8
+PINATTR PinName a11
+PINATTR SpiceOrder 10
+PIN -32 32 NONE 8
+PINATTR PinName a6
+PINATTR SpiceOrder 11
+PIN -32 48 NONE 8
+PINATTR PinName a12
+PINATTR SpiceOrder 12
+PIN 32 -144 NONE 8
+PINATTR PinName b1
+PINATTR SpiceOrder 13
+PIN 32 -128 NONE 8
+PINATTR PinName b7
+PINATTR SpiceOrder 14
+PIN 32 -112 NONE 8
+PINATTR PinName b2
+PINATTR SpiceOrder 15
+PIN 32 -96 NONE 8
+PINATTR PinName b8
+PINATTR SpiceOrder 16
+PIN 32 -80 NONE 8
+PINATTR PinName b3
+PINATTR SpiceOrder 17
+PIN 32 -64 NONE 8
+PINATTR PinName b9
+PINATTR SpiceOrder 18
+PIN 32 -32 NONE 8
+PINATTR PinName b4
+PINATTR SpiceOrder 19
+PIN 32 -16 NONE 8
+PINATTR PinName b10
+PINATTR SpiceOrder 20
+PIN 32 0 NONE 8
+PINATTR PinName b5
+PINATTR SpiceOrder 21
+PIN 32 16 NONE 8
+PINATTR PinName b11
+PINATTR SpiceOrder 22
+PIN 32 32 NONE 8
+PINATTR PinName b6
+PINATTR SpiceOrder 23
+PIN 32 48 NONE 8
+PINATTR PinName b12
+PINATTR SpiceOrder 24

@@ -1,0 +1,331 @@
+* Synchronous motor
+* from prof. otto justus
+* Danke an Prof Justus das er mir die Verwendung
+* seiner Modelle erlaubt hat.
+
+*6b DSM_Mechanik (changed Rlap from 1k to 100000k)!!!
+
+* Also J can be entered like in generator model instead of taumech(as hidden parameter)
+.SUBCKT DSM	U1 V1 W1  F1  n	MLast  n1
++	PARAMS:
++	UN_verkettet=400V
++	IN=21A
++	PN=10kW
++	fn={fn1}
++	Kc=0.5
++	UE0=48V
++	IE0=5A
++	p=2
++	Streuung=0.05
++	rcu=0.05
++	rbg=0.05
++	Schenkelpolfaktor=1
++	Daempferfaktor=1
++	n0=0
++	taumech=0.3s
++	err0=0
++   Mvz=1
+.PARAM
++	UN={UN_verkettet/1.732}
++	ZN={UN/IN}
++	Rs={ZN*rcu}
++	omega_el={(2*pi)*fN}
++	g={IE0/((1+Streuung)*Kc*IN*sqrt(2))}
++	Ls={Streuung*ZN/Kc/omega_el}
++	PsiN={sqrt(2)*UN/omega_el}
++	RE={UE0/IE0}
++	RD={Rs/Daempferfaktor}
++	ImNx={IE0/g}
++	ImNy={ImNx/Schenkelpolfaktor}
++	MN={PN*(1-rbg-rcu)*p/omega_el} ; same as generator
+;+	MN={p*PN/omega_el}
++	J={p*taumech*MN/omega_el}
++   XD={UN/IN/Kc}
+*	Wicklungsstroeme
+G1	U1	U2	VALUE={v(isxS)+v(i_Null)}  tripdv={tdv} tripdt={tdt}
+G2	V1	V2	VALUE={(-v(isxS)+v(isyS)*1.732)/2+v(i_Null)}  tripdv={tdv} tripdt={tdt}
+G3	W1	W2	VALUE={(-v(isxS)-v(isyS)*1.732)/2+v(i_Null)}  tripdv={tdv} tripdt={tdt}
+GiE	F1	0	VALUE={v(imx,iDx)*g}
+Rsp1 U2 V2 1m
+Rsp2 V2 W2 1m
+Rsp3 W2 U2 1m
+Rgnd U2 0 1e12
+*	Spannungskomponenten
+EuxS	usxS	0	VALUE={(2*v(u1,u2)-v(v1,v2)-v(w1,w2))/3}  tripdv={tdv} tripdt={tdt}
+EuyS	usyS	0	VALUE={(v(v1,v2)-v(w1,w2))/1.732}  tripdv={tdv} tripdt={tdt}
+Eux	usx	0	VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))}  tripdv={tdv} tripdt={tdt}
+Euy	usy	0	VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))}  tripdv={tdv} tripdt={tdt}
+*	Nullsystem
+Eu0	u_Null 0	VALUE={(v(u1,u2)+v(v1,v2)+v(w1,w2))/3}  tripdv={tdv} tripdt={tdt}
+Ei0	i_Null 0	VALUE={v(idt1)/Ls}  tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(u_Null)-Rs*v(i_null)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+* load angle of motor
+Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}  ;Lastwinkel!!!!
+Rtheta theta 0 1
+Ctheta theta 0 10u
+* Xd of generator
+Exd xd 0 VALUE={Xd}  tripdv={tdv} tripdt={tdt}
+
+Xipsi	F1  n  alpha  isxS isyS imx iDx usx usy  Mi DSM_i_Psi
++PARAMS: Ls={Ls}  ImNx={ImNx}  PsiN={PsiN}  ImNy={ImNy}  err0={err0}
++Streuung={Streuung}  RE={RE}  Rs={Rs}  RD={RD}  g={g}  p={p} Daempferfaktor={Daempferfaktor}
+Xmech		Mlast n   n1   alpha Mi DSM_Mechanik
++PARAMS:  MN={MN}  rbg={rbg}  J={J}  p={p}  n0={n0} Mvz={Mvz}
+.ENDS    ;  DSM
+
+
+.SUBCKT  DSM_i_Psi  F1  n  alpha isxS isyS imx iDx usx usy  Mi
++PARAMS:  Ls=1  ImNx=1  PsiN=1  ImNy=1  err0=1   g=1  p=1
++Streuung=1  RE=1   Rs=1  RD=1 Daempferfaktor=1
+*	Stromkomponenten
+EisxS		isxS	0
++VALUE={v(isx)*cos(v(alpha))-v(isy)*sin(v(alpha))}  tripdv={tdv} tripdt={tdt}
+EisyS		isyS	0
++VALUE={v(isy)*cos(v(alpha))+v(isx)*sin(v(alpha))}  tripdv={tdv} tripdt={tdt}
+*	magnetische Kopplung der Hauptachse mit Saettigung
+Gpsix		0	isx	VALUE={v(psisx)}  tripdv={tdv} tripdt={tdt}
+Rsx		isx	0	{1/Ls}
+Gpsidx	isx	iDx	VALUE={v(psiDx)}  tripdv={tdv} tripdt={tdt}
+Rsdx		iDx	isx	{1/Ls}
+GpsiEx	iDx	imx	VALUE={v(psiE)}  tripdv={tdv} tripdt={tdt}
+RsEx		imx	iDx	{1/Ls}
+vphx		imx	imxa	0
+Eimx		imxa	0	VALUE={ImNx*(0.9*i(vphx)/PsiN+0.1*PWRS(i(vphx)/PsiN,7))}  tripdv={tdv} tripdt={tdt}
+*	magnetische Kopplung der Querachse mit Saettigung
+Gpsiy		0	isy	VALUE={v(psisy)}  tripdv={tdv} tripdt={tdt}
+Rsy		isy	0	{1/Ls}
+Gpsidy	isy	imy	VALUE={v(psiDy)}  tripdv={tdv} tripdt={tdt}
+Rsdy		imy	isy	{1/Ls}
+vphy		imy	imya	0
+Eimy		imya	0	VALUE={ImNy*(0.9*i(vphy)/PsiN+0.1*PWRS(i(vphy)/PsiN,7))}  tripdv={tdv} tripdt={tdt}
+*	Flusskomponenten
+*	Flusskomponenten
+Epsi_sx	psisx	0  VALUE={err0*PsiN+v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={v(usx)-Rs*v(isx)+p*(2*pi)/60*v(n)*v(psisy)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC=0
+R1x idt1 0 1e10
+Epsi_sy	psisy	0  VALUE={v(idt2)} tripdv={tdv} tripdt={tdt}
+G2x 0 idt2  VALUE={v(usy)-Rs*v(isy)-p*(2*pi)/60*v(n)*v(psisx)} tripdv={tdv} tripdt={tdt}
+C2x idt2 0 1 IC=0
+R2x idt2 0 1e10
+Epsi_Dx	psiDx	0  VALUE={err0*psiN+v(idt3)} tripdv={tdv} tripdt={tdt}
+G3x 0 idt3  VALUE={-RD*v(iDx,iSx)} tripdv={tdv} tripdt={tdt}
+C3x idt3 0 1 IC=0
+R3x idt3 0 1e10
+Epsi_Dy	psiDy	0  VALUE={v(idt4)} tripdv={tdv} tripdt={tdt}
+G4x 0 idt4  VALUE={-RD*v(imy,isy)} tripdv={tdv} tripdt={tdt}
+C4x idt4 0 1 IC=0
+R4x idt4 0 1e10
+Epsi_E	psiE	0  VALUE={err0*psiN*(1+Streuung)+v(idt5)} tripdv={tdv} tripdt={tdt}
+G5x 0 idt5  VALUE={g*v(F1,0)-g*g*RE*v(imx,idx)} tripdv={tdv} tripdt={tdt}
+C5x idt5 0 1 IC=0
+R5x idt5 0 1e10
+Emi		Mi	0	VALUE={3/2*p*(i(vphx)*v(isy)-i(vphy)*v(isx))}  tripdv={tdv} tripdt={tdt}
+.ENDS   ;  DSM_i_Psi
+
+*$
+*$
+
+*6b DSM_Mechanik (changed Rlap from 1k to 100000k)
+
+*
+.SUBCKT  DSM_Mechanik MLast  n   n1   alpha  Mi
++PARAMS:  MN=1  rbg=1  J=1  p=1  n0=0 Mvz=1
+*	mechanische Groessen
+GRbg		0	Rbg	TABLE {v(n)} (-1,-1) (1,1)
+RRbg		Rbg	0	{MN*rbg}
+Rlap		Mlast	0	100000k
+En		n	0  VALUE={n0+60/(2*pi)/J*v(idt1)}  tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={v(Mi)-v(Rbg)+v(MLast)*Mvz} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC=0
+R1x idt1 0 1e10
+En1		n1	0  VALUE={v(n)}  tripdv={tdv} tripdt={tdt}
+Ealpha	alpha	0	VALUE={v(idt2)*p/60*(2*pi)}  tripdv={tdv} tripdt={tdt}
+G2x 0 idt2  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
+C2x idt2 0 1 IC=0
+R2x idt2 0 1e10
+.ENDS  ;  DSM_Mechanik
+
+*$
+
+.SUBCKT	DSMregler	nsoll	n	th	U1	V1	W1
++PARAMS:
++	Ilimit=4.4
++	Ulimit=325
++	Kp_n = 2
++	TN_n = 200
++	Kp_i = 3000
++	Tn_i = 10
++	p = 2
+
+Eiw	iw	0	VALUE={LIMIT(Kp_n*(v(nsoll,n)+1/Tn_n*v(idt1)),-Ilimit,Ilimit) }  tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(nsoll,n)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+Euq1	uq1	0	VALUE={ Kp_i*(v(iw,iy)+1/Tn_i*v(idt2)) }  tripdv={tdv} tripdt={tdt}
+G2x 0 idt2 VALUE={v(iw,iy)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+Eud1	ud1	0	VALUE={ -v(ix)*10k-v(idt3)*100k }  tripdv={tdv} tripdt={tdt}
+G3x 0 idt3 VALUE={v(ix)} tripdv=1 tripdt=1
+C3x idt3 0 1
+R3x idt3 0 1e10
+Eus	us	0	VALUE={ SQRT(v(uq1)*v(uq1)+v(ud1)*v(ud1)) }  tripdv={tdv} tripdt={tdt}
+Euslim	uslimit	0	VALUE={ LIMIT(v(us),0,Ulimit) }  tripdv={tdv} tripdt={tdt}
+Euq	uq	0	VALUE={ v(uslimit)*v(uq1)/v(us) }  tripdv={tdv} tripdt={tdt}
+Eud	ud	0	VALUE={ v(uslimit)*v(ud1)/v(us) }  tripdv={tdv} tripdt={tdt}
+Eux	ux	0	VALUE={ V(ud)*cos(v(th))-v(uq)*sin(v(th)) }  tripdv={tdv} tripdt={tdt}
+Euy	uy	0	VALUE={ v(ud)*sin(v(th))+v(uq)*cos(v(th)) }  tripdv={tdv} tripdt={tdt}
+Eu1	U1	0	VALUE={ V(ux) }  tripdv={tdv} tripdt={tdt}
+Eu2	U2	0	VALUE={ -V(ux)/2+V(uy)*0.866 }  tripdv={tdv} tripdt={tdt}
+Eu3	U3	0	VALUE={ -V(ux)/2-V(uy)*0.866 }  tripdv={tdv} tripdt={tdt}
+V_i2	U2	V1	DC 0
+V_i3	U3	W1	DC 0
+Eix	ix	0	VALUE={ -(i(V_i2)+i(V_i3))*cos(v(th))  
++ +(i(V_i2)-i(V_i3))/1.732*sin(v(th))   } tripdv={tdv} tripdt={tdt}
+Eiy	iy	0	VALUE={ (i(V_i2)+i(V_i3))*sin(v(th))  
++ +(i(V_i2)-i(V_i3))/1.732*cos(v(th))   } tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT  DSMResolver	U1	V1	W1	n	MLast	Th	n1
++PARAMS:
++    UN_verkettet=400V
++	 IN=3.1A
++	 fN=150Hz
++	 PN=1570W		; [mech.Nennleistung]
++	 p=3			; [Polpaarzahl]
++	 IK0=3.3A  		; [Stillstandstrom]
++	 rbg=0.1	 	; [M_Reibung/MNenn]
++	 taumech=38ms	; [J*2*pi*nN/MN]
++	 rcu=0.04   	; [Rs/(UN/IN))]
++	 urot=0.9  		; [Rotationsspannung/(UN*sqrt(2))]
++    Mvz=1
+.PARAM
++	 UN={UN_verkettet/1.732}
++	 Ld={UN/Ik0/(2*3.1416*fN)}
++    PsiE={Urot*sqrt(2)*UN/(2*3.1416*fN)}
++	 MN={p*PN/(2*3.1416*fN)}
++	 Rs={rcu*UN/IN}
++	 J={taumech*MN/(2*3.1416*fN/p)}
+Xstator	U1  V1  W1  th  ixS iyS ux uy  DSMres_Stator
+Xpsii th n ixS iyS ux uy iy DSMres_i_psi
++PARAMS: PsiE={PsiE} Ld={Ld} Rs={Rs} p={p}
+Xmech	 th MLast  n  n1  iy   DSMres_Mechanik
++PARAMS: PsiE={PsiE}  p={p}  rbg={rbg} MN={MN}  J={J} Mvz={Mvz}
+.ENDS  ;  DSMResolver
+
+.SUBCKT DSMres_Stator U1  V1  W1  th  ixS iyS ux uy
+*	Wicklungsstroeme
+G_Gi1         U1 Mp VALUE={ v(ixS) } tripdv={tdv} tripdt={tdt}
+G_Gi2         V1 Mp VALUE={ -v(ixS)/2+v(iyS)*0.866 } tripdv={tdv} tripdt={tdt}
+G_Gi3         W1 Mp VALUE={ -v(ixS)/2-v(iyS)*0.866 } tripdv={tdv} tripdt={tdt}
+RMp		Mp	0	1k
+*	Spannungskomponenten
+E_Eux         ux 0 VALUE={ v(U1)*COS(v(th)) + v(V1,W1)/1.732*SIN(v(th)) } tripdv={tdv} tripdt={tdt}
+E_Euy         uy 0 VALUE={ -v(U1)*SIN(v(th)) + v(V1,W1)/1.732*COS(v(th)) } tripdv={tdv} tripdt={tdt}
+.ENDS   ;  DSMres_Stator
+
+.SUBCKT  DSMres_Mechanik th MLast n n1  iy 
++PARAMS: PsiE=1  p=1  rbg=0.1  MN=1  J=1 mvz=1
+*	mechanische Groessen
+E_EM         Mi 0 VALUE={ 3/2*p*psiE*v(iy) } tripdv={tdv} tripdt={tdt}
+GRbg	0	Mrbg	TABLE {v(n)}  (-1,-1) (1,1)
+RRbg	Mrbg	0	{rbg*MN}
+Rlap	Mlast	0	1k
+E_Eomm         omm 0 VALUE={ 1/J*v(idt1) } tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(Mi)-v(MRbg)+v(MLast)*Mvz} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+E_Eth         th 0 VALUE={ p*v(idt2) } tripdv={tdv} tripdt={tdt}
+G2x 0 idt2 VALUE={v(omm)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+En	n	0	VALUE={v(omm)*60/2/3.1416} tripdv={tdv} tripdt={tdt}
+En2	n1	0	VALUE={v(n)} tripdv={tdv} tripdt={tdt}
+.ENDS ;  DSMres_Mechanik
+
+.SUBCKT DSMres_i_psi th n ixS iyS ux uy iy 
++PARAMS: PsiE=1  Ld=1  Rs=1  p=1
+*	Stromkomponenten
+E_Eix ix 0 VALUE={ (v(psix)-PsiE)/Ld } tripdv={tdv} tripdt={tdt}
+E_Eiy  iy 0 VALUE= { v(psiy)/Ld } tripdv={tdv} tripdt={tdt}
+E_EixS ixS 0 VALUE= { v(ix)*COS(v(th))-v(iy)*SIN(v(th)) } tripdv={tdv} tripdt={tdt}
+E_EiyS iyS 0 VALUE= { v(ix)*SIN(v(th))+v(iy)*COS(v(th)) } tripdv={tdv} tripdt={tdt}
+*	Flusskomponenten
+E_Epsx         psix 0 VALUE={ PsiE+v(idt1) } tripdv={tdv} tripdt={tdt}
+G1x 0 idt1 VALUE={v(ux)-Rs*v(ix)+p*0.1047*v(n)*v(psiy)} tripdv=1 tripdt=1
+C1x idt1 0 1
+R1x idt1 0 1e10
+E_Epsy         psiy 0 VALUE={ v(idt2) } tripdv={tdv} tripdt={tdt}
+G2x 0 idt2 VALUE={v(uy)-Rs*v(iy)-p*0.1047*v(n)*v(psix)} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+.ENDS   ;   DSMres_i_psi
+
+
+* For different loads see dam.lib 
+
+;.SUBCKT Last_Reibung  n M
+;+	PARAMS:
+;+	Drehmoment=1
+;*	Bei Reibung und zerspanender Arbeit ist das Lastmoment
+;*	konstant, aber drehrichtungsabhaengig !
+;G	0	M	TABLE {v(n)}=(-1,-1) (1,1)
+;R	M	0	{Drehmoment}
+;Rn	n	0	1k
+;.ENDS
+;***	Ende des SUBCIRCUITS Last_Reibung
+;*$
+
+*13*****   Last_Drehzahl  **********
+* mechanische Last bei drehzahlabhaengigem Lastmoment *
+*
+;.SUBCKT Last_Drehzahl  n M
+;+	PARAMS:
+;+	Nennmoment=0
+;+	Nenndrehzahl=3000
+;+	Hochzahl=1
+*	Bei vielen Lastfaellen ist das Lastmoment drehzahlabhaengig.
+*	MLast(n)=Nennmoment*(Drehzahl/Nenndrehzahl)^Hochzahl
+;G	0	M	Value = {PWRS(v(n)/Nenndrehzahl,Hochzahl)}  tripdv={tdv} tripdt={tdt}
+;R	M	0	{Nennmoment}
+;.ENDS
+***	Ende des SUBCIRCUITS Last_Drehzahl
+*$
+
+*14*****   Last_Winkel  **********
+* mechanische Last bei drehwinkelabhaengigem Lastmoment *
+*
+;.SUBCKT Last_Winkel  n M
+;+	PARAMS:
+;+	Nennmoment=1
+;+	Winkeluebersetzung=1
+*	Es wird die Abhaengigkeit des Lastmomentes vom Drehwinkel berechnet.
+*	Der Drehwinkel wird durch Integration der Drehzahl bestimmt.
+*	Die Winkeluebersetzung beruecksichtigt ein moegliches Getriebe.
+;E	Winkel  0	VALUE={Winkeluebersetzung*SDT(v(n))/60*6.2832} tripdv={tdv} tripdt={tdt}
+;G	0	M	Value = {sin(v(Winkel))}  tripdv={tdv} tripdt={tdt}
+;R	M	0	{Nennmoment}
+;.ENDS
+***	Ende des SUBCIRCUITS Last_Winkel
+*$
+
+*15*****   Last_Beschleunigung  **********
+* mechanische Last bei beschleunigsabhaengigem Lastmoment
+*
+;.SUBCKT Last_Beschleunigung  n M
+;+	PARAMS:
+;+	Nennmoment=1
+;+	Nenndrehzahl=1000
+;+	Anlaufzeit=1
+*	Es wird das Moment zur Beschleunigung der traegen Masse der Last
+*	berechnet.
+*	Das Massentraegheitsmoment der Last J_Last wird aus der Anlaufzeit
+*	bei konstant angenommenem Beschleunigungsmoment=Nennmoment berechnet.
+;.PARAM
+;+	J_Last={Anlaufzeit*Nennmoment/(6.2832*Nenndrehzahl/60)}
+;G	0	M	Value = {J_Last*6.2832/60*DDT(v(n))}  tripdv={tdv} tripdt={tdt}
+;R	M	0	1
+;.ENDS

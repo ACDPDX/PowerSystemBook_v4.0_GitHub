@@ -1,0 +1,198 @@
+********************************************************************************
+*
+*  A simplified and multi-functional approach to mathematical functions. Simply
+* place Math2(r) symbol in the schematic and then choose the desired math
+* function through the drop-down menu in the symbol's properties. Or simply
+* right-click on it's name and rename it, for example from '+' to 'x'.
+*  The reason for this is usability, easier workflow and, not lastly, a modular
+* approach, meaning many other functions can be added to the list without the
+* need to create a symbol for each.
+*
+*							Vlad, ©2008 - 2014
+*
+********************************************************************************
+*
+* [GENERAL]
+*
+* - Math2(r) means symbol with two variables. The following functions are
+* available:
+*
+*  function	|  list name
+* --------------+------------
+*	 a+b	|	+
+*	 a-b	|	-
+*	 b-a	|	-+
+*	 a*b	|	* or x2
+*	 a/b	|	/
+*	 b/a	|	/*
+*	a==b	|	~~
+*	a<>b	|	<>
+* atan2(a,b)	|	atan2
+* hypot(a,b)	|	hypot
+*   max(a,b)	|	max
+*   min(a,b)	|	min
+*   mod(a,b)	|	mod
+*
+*
+* [PARAMETERS]
+*
+* a,b		= control the signum of the inputs for atan2();
+* dc	[V]	= "DC" adjustment for atan2();
+* min	[V]	= minimum estimate value to avoid division by zero (a/b).
+*
+* - Hidden:
+*
+* tripdv,tripdt	= LTspice's specific for B-sources, default 0/0 (LTspice handles
+*		them).
+*
+*
+* [CHARACTERISTICS]
+*
+* - All the symbols have floating input and Rout = 1 Ohm.
+*
+*
+* [NOTES]
+*
+* - There is also a symbol named Math2r, which is added for compatibility with
+* the previous basic algebra functions, for easier replacing. It does the same
+* things as Math2.
+*
+************************
+*
+*	a+b
+*
+************************
+.subckt + a b out
+G1 0 out a 0 1
+G2 0 out b 0 1
+R1 0 out 1
+.ends +
+************************
+*
+*	a-b
+*
+************************
+.subckt - a b out
+G1 0 out a b 1
+R1 out 0 1
+.ends -
+************************
+*
+*	b-a
+*
+************************
+.subckt -+ a b out
+G1 0 out b a 1
+R1 0 out 1
+.ends -+
+************************
+*
+*	a*b
+*
+************************
+.subckt x a b out
+B1 0 out I=v(a)*v(b) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends x
+********************************
+*
+*	a*b v2.0 another version 
+*
+********************************
+.subckt x2 a b out
+G1 0 out a 0 1
+R1 out 0 R=v(b)
+;R2 out 0 R={if(v(b)==0,1u,v(b))} tripdv={tdv} tripdt={tdt}
+.ends x2
+************************
+*
+*	a/b
+*
+************************
+.subckt / a b out
+.param min=1e-12
+B1 0 out I=v(a)/if( abs(v(b))<min,min,v(b) ) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends /
+************************
+*
+*	b/a
+*
+************************
+.subckt /* a b out
+.param min=1e-12
+B1 0 out I=v(b)/if( abs(v(a))<min,min,v(a) ) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends /*
+************************
+*
+*	a==b
+*
+************************
+*
+* [NOTES]
+*
+* - Names with "=" won't be recognized by LTspice, while using "==" will make
+* the name visible in the list but not usable. Thus, its name is "~~".
+*
+************************
+.subckt ~~ a b out
+B1 0 out I=( v(a)==v(b) ) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends ~~
+************************
+*
+*	a=/=b
+*
+************************
+.subckt <> a b out
+B1 0 out I=inv( v(a)==v(b) ) Rpar=1 tripdv={tdv} tripdt={tdt}
+.ends <>
+************************
+*
+*	atan2(a,b)
+*
+************************
+.subckt atan2 a b out
+.param dc=0  a=1  b=1
+B1 0 out I=atan2(sgn(a)*v(a),sgn(b)*v(b))+dc rpar=1 tripdv={tdv} tripdt={tdt}
+.ends atan2
+************************
+*
+*	hypot(a,b)
+*
+************************
+.subckt hypot a b out
+B1 0 out I=hypot(v(a),v(b)) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends hypot
+************************
+*
+*	max(a,b)
+*
+************************
+.subckt max a b out
+B1 0 out I=max(v(a),v(b)) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends max
+************************
+*
+*	min(a,b)
+*
+************************
+.subckt min a b out
+B1 0 out I=min(v(a),v(b)) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends min
+************************
+*
+*	mod(a,b)
+*
+************************
+.subckt mod a b out
+B1 0 out I=v(a)-int(v(a)/v(b))/v(b) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends mod
+********************************************************************************
+*
+* [UPDATES]
+*
+* 2013.02.03	- Minor modifications and corrections to x2.
+* 2013.02.19	- Minor corrections in text.
+*		- Added -+ (b-a) and /* (b/a), increasing flexibility in design,
+*		along with a new symbol, Math2rT.asy.
+* 2014.04.08	- Modified mod to have int() instead of floor().
+*
+********************************************************************************

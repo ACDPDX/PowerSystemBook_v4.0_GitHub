@@ -1,0 +1,82 @@
+In the next three examples, I will demonstrate the different operating modes of a synchronous generator. These are 
+
+isolated operation mode 
+operation connected to a stable network 
+operation with fixed speed 
+
+Isolated operation mode of a synchronous generator:
+
+General:
+
+“Isolated mode” means that there is no voltage source in the grid to maintain a constant voltage. In an isolated grid, it is therefore absolutely necessary to use an AVR (automatic voltage regulator) to maintain a stable voltage level. A speed controller is also required to meet load demands. We will also demonstrate how to connect a second synchronous generator to the isolated grid. The more generators feeding into the isolated grid, the more stable the system becomes.
+ 
+Circuit design:
+ 
+The schematic shows a synchronous generator rated at four hundred megawatts and twenty kVols with a round rotor, a transformer from twenty kilovolts to four hundred kVols, and a switch that connects the generator to the unloaded network at one seconds.
+
+A load ramps from zero to fifty megawatts between two seconds and five seconds. An AVR, automatic voltage regulator, switches on at six seconds, and a speed controller, governor, is active for the entire simulation. The generator's main excitation field is supplied with a high voltage ramp during the first second, from six hundred volts to fourteen hundred volts and back to six hundred volts in order to quickly reach nominal voltage.
+
+The AVR measures on the high voltage side with a target voltage of four hundred kilovolts. The speed controller has a set point of fifteen hundred RPM and remains active throughout the simulation. Its switch is set to five hundred seconds. All external controllers are implemented as simple PI controllers to illustrate the basic behavior of a controlled synchronous machine.
+
+Their dynamics are intentionally fast to reduce simulation time. Notes on the AVR switching logic. The AVR switch must close shortly before the fixed field voltage switch opens. The magnetic field voltage must never drop to zero because the terminal voltage of the machine would also collapse. Since the AVR supplies high currents, the switch's on resistance must be very low to prevent the field voltage from dropping.
+
+The torque control switches are less critical. The electromagnetic torque may be zero for a short time because the turbine and generator have a large inertia defined by the machine's J parameter, so the speed cannot suddenly fall to zero. 
+
+Simulation start: 
+
+The machine starts from zero voltage. To quickly reach nominal voltage, the AVR is initially set to fourteen hundred volts. The stator copper resistance parameter Rcu is set to a relatively high value of zero point zero one to accelerate voltage buildup for faster simulation. 
+
+Voltage behavior:
+
+After one second, the nominal voltages of four hundred K volts network and twenty K volts generator are reached due to the initially high AVR setting. When the load ramps from zero to fifty megawatt between two seconds and five seconds, the current increases and the generator voltage drops slightly from four hundred K volts to about three hundred ninety-seven kilovolts. At six seconds, the AVR activates and quickly restores the bus voltage to four hundred K volts.
+In isolated mode, a change in voltage directly affects the generator's active power output because the load power depends on voltage. In grid-connected mode, the voltage is more stable, so active power does not change in this way. 
+
+
+Speed behavior: 
+
+During the load ramp, the speed falls below fifteen hundred RPM. Once the final load value is reached, the speed returns to fifteen hundred RPM. When the AVR switches on, the frequency briefly decreases because the rising voltage increases the load current, which increases torque demand. After the voltage stabilizes, the speed also stabilizes at fifteen hundred RPM.
+
+Load angle behavior: 
+
+The load angle increases during the load ramp and then stabilizes at about twelve degrees. Load step of thirty megawatt. A thirty-megawatt load step is introduced by setting V fact equals three at two seconds and adding a switch at three seconds. The load angle changes significantly, and the speed shows transient behavior. Additional load steps at five seconds and seven seconds cause further changes in frequency and load angle. The generator output jumps from thirty megawatt to sixty megawatts to ninety megawatt with a maximum load angle of about twenty-one degrees. 
+
+Salient pole machine comparison:
+
+Setting Schenkel pole factor 0.5 and KC 0.8 models a salient pole machine. After restarting the simulation, the load angle is only about seven degrees compared to twenty-one degrees for the round rotor machine. 
+
+Reactive power in isolated mode:
+
+Unlike a grid-connected generator, an isolated generator cannot change reactive power output by adjusting field voltage. Both active and reactive power are determined solely by the load. The field voltage only influences the terminal voltage. If the load is a constant power load, the AVR has no influence on active power. 
+
+Switching off loads:
+
+Loads one, two, and three are switched off at nine seconds, eleven seconds, and thirteen seconds. The load angle decreases accordingly. After the final load is removed, the frequency takes a long time to settle back to fifty hertz because only friction torque slows the generator. Nominal frequency is reached after about three point five seconds. When load is removed, frequency overshoots above nominal, the opposite of what happens during positive load steps. 
+
+Unit conversion for plots:
+
+To display values in correct units, load angle in degrees multiply by one degree or one volt.
+Frequency in hertz multiply by one hertz, one volt. Active power in watts multiply by one watt or one volt. 
+
+Synchronizing a second generator:
+
+A second generator is added on the right side, including its speed controller, but without an AVR. Simulation end time is set to thirty seconds. Load three switches at twenty seconds to show a load step after synchronization. Generator two is connected at twelve seconds. Its speed controller stops at twelve seconds, and constant torque begins at twelve point one seconds. A ramp from zero to twenty megawatts between fourteen seconds and eighteen seconds defines its active power output. 
+
+Synchronization conditions:
+
+At around nine point eight to ten point two seconds, the generator and network voltages have nearly the same magnitude, and generator two leads slightly in phase. To correct this, the speed controller set point can be adjusted to fifteen hundred RPM minus twenty millihertz, forty-nine point nine eight hertz. At twelve seconds, both voltages are in phase and synchronization is successful. 
+
+Power sharing:
+
+Generator two delivers twenty megawatts, so generator one reduces its output to forty megawatts. A subsequent thirty-megawatt load step is supplied entirely by generator one because generator two has no active speed controller. Final outputs, gen one delivers seventy megawatts, and gen two delivers twenty megawatts. Generator two shows larger frequency transients because there is no speed controller present.
+
+Conclusion:
+
+A synchronous generator operating in isolated mode requires voltage and speed control. The voltage in the island grid is highly dependent on the load. After the second generator has synchronized, the second generator must not have voltage or speed control. Active power is delivered here via an appropriate torque on the generator shaft.
+
+This completes the example. The next example will show a generator interacting with a network with fixed voltage sources, demonstrating active and reactive power behavior and stalling torque at high loads. The following example will than show a synchronous generator operating at fixed speed, including one-phase and three-phase short-circuit faults
+
+
+
+
+
+ 

@@ -1,0 +1,85 @@
+.subckt 750kV_1sys 1a 2a 3a 1b 2b 3b 
++PARAMS:
++ R1=1 R2=1 R3=1 
++ C11=1.201911E-08
++ C12=1.585750E-09 C22=1.222772E-08
++ C13=3.575683E-10 C23=1.585750E-09 C33=1.201911E-08
++ XL11=4.576542E-01
++ XM12=1.358979E-01 XL22=4.517972E-01
++ XM13=9.094776E-02 XM23=1.358979E-01 XL33=4.576542E-01
++ length=1
++ cl=1
++ g=1e10
++ fn={fn1}
+.PARAM
++ omega={fn*2*3.14159}
+*********************************
++ L11={XL11/omega} M12={XM12/omega} M13={XM13/omega} 
++ L22={XL22/omega} M23={XM23/omega} 
++ L33={XL33/omega} 
+*******************************************************************
+* geschaetzte BetriebsInduktivität/Phase bei symm. Betrieb(1,a,a*a)
+*******************************************************************
++ L1={L11-0.5*M12-0.5*M13} ;(not used)
++ L2={L22-0.5*M12-0.5*M23} ;(not used)
++ L3={L33-0.5*M13-0.5*M23} ;(not used)
+*********************************
++ k12={M12/sqrt(L11*L22)}
++ k13={M13/sqrt(L11*L33)}
++ k23={M23/sqrt(L22*L33)}
+*******************************
++ C_10={C11-C12-C13}
++ C_20={C22-C12-C23}
++ C_30={C33-C13-C23}
+************************************************
+* Leiter Leiter Kap(nur innerhalb einer Leitung)
+***********************************************
+**** geschaetzte LL-LE-Kap.je System ****
++ CE1={(C_10+C_20+C_30)/3} ;(not used)
++ CL1={(C12+C13+C23)/3} ;(not used)
+**** Ausgabe von XB1,2 CE1,2 CB1,2 ****
+VXB1 XB1 0 {length*omega*(L1+L2+L3)/3} ;(not used)
+VCE1 CE1 0 {length*CE1} ;(not used)
+VCL1 CL1 0 {length*CL1} ;(not used)
+VCB1 CB1 0 {length*CE1+3*CL1} ;(not used)
+*********************************
+R1a 1a 1ax {0.333333*length*R1}
+R1b 1ax 1ay {0.333333*length*R1}
+R1c 1bx 1b {0.333333*length*R1}
+R2a 2a 2ax {0.333333*length*R2}
+R2b 2ax 2ay {0.333333*length*R2}
+R2c 2bx 2b {0.333333*length*R2}
+R3a 3a 3ax {0.333333*length*R3}
+R3b 3ax 3ay {0.333333*length*R3}
+R3c 3bx 3b {0.333333*length*R3}
+*******************************
+L1 1ay 1bx {length*L11}
+L2 2ay 2bx {length*L22}
+L3 3ay 3bx {length*L33}
+*******************************
+k12 L1 L2 {k12}
+k13 L1 L3 {k13}
+k23 L2 L3 {k23}
+*******************************
+C_10a 1ax 0 {cl*length*C_10/2}
+C_10b 1bx 0 {cl*length*C_10/2}
+C_20a 2ax 0 {cl*length*C_20/2}
+C_20b 2bx 0 {cl*length*C_20/2}
+C_30a 3ax 0 {cl*length*C_30/2}
+C_30b 3bx 0 {cl*length*C_30/2}
+*******************************
+C12a 1ax 2ax {cl*length*C12/2}
+C12b 1bx 2bx {cl*length*C12/2}
+C13a 1ax 3ax {cl*length*C13/2}
+C13b 1bx 3bx {cl*length*C13/2}
+C23a 2ax 3ax {cl*length*C23/2}
+C23b 2bx 3bx {cl*length*C23/2}
+*******************************
+Rgnd1 1a 0 {g}
+Rgnd2 2a 0 {g}
+Rgnd3 3a 0 {g}
+Rgnd4 1b 0 {g}
+Rgnd5 2b 0 {g}
+Rgnd6 3b 0 {g}
+*******************************
+.ENDS

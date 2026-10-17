@@ -1,0 +1,45 @@
+Version 4
+SymbolType BLOCK
+LINE Normal -15 14 -15 16
+LINE Normal 15 16 15 16
+LINE Normal -15 30 -15 32
+LINE Normal 15 32 15 32
+LINE Normal -15 0 -32 0
+LINE Normal -15 16 -32 16
+LINE Normal -15 32 -32 32
+LINE Normal 15 0 32 0
+LINE Normal 15 16 32 16
+LINE Normal 15 32 32 32
+LINE Normal 0 48 0 39
+LINE Normal -8 48 0 48
+LINE Normal 0 48 8 48
+LINE Normal 6 51 -6 51
+RECTANGLE Normal 15 4 -15 -4
+RECTANGLE Normal -15 20 15 12
+RECTANGLE Normal -15 36 15 28
+SYMATTR Prefix X
+SYMATTR SpiceModel Line
+SYMATTR Value length=1 cl=1 g=1e12 fn={fn1}
+SYMATTR ModelFile line.lib
+SYMATTR Value2 R1=0.5 L1=0.001 XL1=0 Cb1=10n Ce1=10n
+SYMATTR SpiceLine R2=0.5 L2=0.001 XL2=0 Cb2=10n Ce2=10n
+SYMATTR SpiceLine2 R3=0.5 L3=0.001 XL3=0 Cb3=10n Ce3=10n
+SYMATTR Description Three phase line ( for 60Hz lines set fn=60 )
+PIN -32 0 NONE 8
+PINATTR PinName L1_1
+PINATTR SpiceOrder 1
+PIN -32 16 NONE 8
+PINATTR PinName L2_1
+PINATTR SpiceOrder 2
+PIN -32 32 NONE 8
+PINATTR PinName L3_1
+PINATTR SpiceOrder 3
+PIN 32 0 NONE 8
+PINATTR PinName L1_2
+PINATTR SpiceOrder 4
+PIN 32 16 NONE 8
+PINATTR PinName L2_2
+PINATTR SpiceOrder 5
+PIN 32 32 NONE 8
+PINATTR PinName L3_2
+PINATTR SpiceOrder 6

@@ -178,123 +178,6 @@ RGND1N 1N 0 1e12
 RGND2N 2N 0 1e12
 .ENDS
 
-
-.SUBCKT Trafo3Yy0_9limbs  1U  1V  1W  1N  2U  2V  2W  2N
-+	PARAMS:
-+	SN=10kVA ; nominal apparent power
-+	U1Nenn=400V ; nominal voltage high voltage side
-+	U20=400V ; Nominal voltage low voltage side
-+	fn={fn1} ; frequency
-+	N1=1000 ; nr. of windings high voltage side
-+	uR=0.04 ; ohmic part of the relative short circuit voltage
-+	uX=0.08 ; inducitve part of the relative short circuit voltage (uK=sqrt(uR*uR+uX*uX))
-+	i0=0.05 ; no load relative current of transformer
-+	p0=0.005 ; relative power lost of the transformer (has to be smaller than i0 !!!!!!)
-+   a=0.75 ; first parameter for the nonlinear magnetizing shape for the iron core
-+   m=9    ; second parameter: Formula is:  I=IN*(a*psi/psiN+(1-a)*(psi/PsiN)^m)
-+   psi_0=0 ; 0,1,-1 means no remanent flux, pos. remanent flux, neg. remanent flux with default per phase flux multiplicator of (psir,psis,psit)
-+   psir=1
-+   psis=-0.5
-+   psit=-0.5
-+   tpsi0=1000s ;  if psi_0<>0 tpsi0 should give the timepoint of adding the remanent flux
-+   tpsid=0.1ms ; The time during the voltage source for generating the remanent flux is active
-+   ron=0.00001 ; The resistance of the switch for the remanent flux capacitor is set so that the flux is at tpsid                            
-+   rkessel=2e6 ; magn. resistance of the tank filled with oil (high value=not considered, but should be changed if available !!!!!!)
-+   fact=0.39 ; calibration factor leg/limb for length of leg/limb
-+   fact2=2.8 ; calibration factor for rfe (iron lost)
-+   fact3=0.983 ; calibration factor leg/limb for area of leg/limb 
-Xu	1U	1N	2U	2N	magn_a1U magn_b1U	Trafoschenkel2_Yy_1; SCHENKEL_Yy U
-+ PARAMS: SN={SN/3} U1N={U1Nenn/sqrt(3)} U20={U20/sqrt(3)} fN={fN} N1={N1} uR={uR} uX={uX} i0={i0} p0={p0}
-+ a={a}
-+ m={m}
-+ psi_0={psir*psi_0}
-+ tpsi0={tpsi0}
-+ tpsid={tpsid}
-+ ron={ron}
-+ calib_rfe={1*fact2}   ; KFE*fact2
-+ calib_imy_a={1*fact3} ; KA*fact3
-+ calib_imy_l={1*fact}  ; KL*fact
-Xv	1V	1N	2V	2N	magn1 magn2	Trafoschenkel2_Yy_1; SCHENKEL_Yy V
-+ PARAMS: SN={SN/3} U1N={U1Nenn/sqrt(3)} U20={U20/sqrt(3)} fN={fN} N1={N1} uR={uR} uX={uX} i0={i0} p0={p0}
-+ a={a}
-+ m={m}
-+ psi_0={psis*psi_0}
-+ tpsi0={tpsi0}
-+ tpsid={tpsid}
-+ ron={ron}
-+ calib_rfe={1*fact2}
-+ calib_imy_a={1*fact3}
-+ calib_imy_l={1*fact}
-Xw	1W	1N	2W	2N	magn_a1W magn_b1W	Trafoschenkel2_Yy_1; SCHENKEL_Yy W
-+ PARAMS: SN={SN/3} U1N={U1Nenn/sqrt(3)} U20={U20/sqrt(3)} fN={fN} N1={N1} uR={uR} uX={uX} i0={i0} p0={p0}
-+ a={a}
-+ m={m}
-+ psi_0={psit*psi_0}
-+ tpsi0={tpsi0}
-+ tpsid={tpsid}
-+ ron={ron}
-+ calib_rfe={1*fact2}
-+ calib_imy_a={1*fact3}
-+ calib_imy_l={1*fact}
-XSch_l magn_b1U magn_b1U1 Trafoschenkel_Yy_1 ; Joch li-aussen
-+ PARAMS: SN={SN/3} U1N={U1Nenn/sqrt(3)} fN={fN} N1={N1} i0={i0} p0={p0}
-+ a={a}
-+ m={m}
-+ calib_rfe={0.25*fact2}
-+ calib_imy_a={2*fact3}
-+ calib_imy_l={2*fact}
-XSch_r magn_b1W magn_b1W1 Trafoschenkel_Yy_1 ; Joch re-aussen
-+ PARAMS: SN={SN/3} U1N={U1Nenn/sqrt(3)} fN={fN} N1={N1} i0={i0} p0={p0}
-+ a={a}
-+ m={m}
-+ calib_rfe={0.25*fact2}
-+ calib_imy_a={2*fact3}
-+ calib_imy_l={2*fact}
-XSch_ol magn_b1U magn2 Trafoschenkel_Yy_1 ; Joch oben links
-+ PARAMS: SN={SN/3} U1N={U1Nenn/sqrt(3)} fN={fN} N1={N1} i0={i0} p0={p0}
-+ a={a}
-+ m={m}
-+ calib_rfe={0.5*fact2}
-+ calib_imy_a={2*fact3}
-+ calib_imy_l={1*fact}
-XSch_or magn2 magn_b1W Trafoschenkel_Yy_1 ; Joch oben rechts
-+ PARAMS: SN={SN/3} U1N={U1Nenn/sqrt(3)} fN={fN} N1={N1} i0={i0} p0={p0}
-+ a={a}
-+ m={m}
-+ calib_rfe={0.5*fact2}
-+ calib_imy_a={2*fact3}
-+ calib_imy_l={1*fact}
-XSch_ul magn_a1U magn1 Trafoschenkel_Yy_1 ; Joch unten links
-+ PARAMS: SN={SN/3} U1N={U1Nenn/sqrt(3)} fN={fN} N1={N1} i0={i0} p0={p0}
-+ a={a}
-+ m={m}
-+ calib_rfe={0.5*fact2}
-+ calib_imy_a={2*fact3}
-+ calib_imy_l={1*fact}
-XSch_ur magn1 magn_a1W Trafoschenkel_Yy_1 ; Joch unten rechts
-+ PARAMS: SN={SN/3} U1N={U1Nenn/sqrt(3)} fN={fN} N1={N1} i0={i0} p0={p0}
-+ a={a}
-+ m={m}
-+ calib_rfe={0.5*fact2}
-+ calib_imy_a={2*fact3}
-+ calib_imy_l={1*fact}
-;
-Rm	magn1	0	1MEG
-Rkessel magn1 magn2 {rkessel}
-Rl  magn_b1U1 magn_a1U  1u
-Rr  magn_b1W1 magn_a1W  1u
-;
-RGND1U 1U 0 1e12
-RGND1V 1V 0 1e12
-RGND1W 1W 0 1e12
-RGND2U 2U 0 1e12
-RGND2V 2V 0 1e12
-RGND2W 2W 0 1e12
-RGND1N 1N 0 1e12
-RGND2N 2N 0 1e12
-.ENDS
-
-
 .SUBCKT Trafo3Yy0_9limbs_DAW  1U  1V  1W  1N  2U  2V  2W  2N
 +	PARAMS:
 +	SN=10kVA ; nominal apparent power
@@ -9677,7 +9560,7 @@ X_SCH	b	magnP2	SCHENKEL_Yy   PARAMS:
 .PARAM
 +	I1N={SN/U1N}
 +	Z1N={U1N/I1N}
-+   I3N={SN/U30} ; third winding normaly constructed ~1/3 SN but SN star/delta = 3x therefore SN/3*3
++   I3N={SN/3/U30}
 +   Z3N={U30/I3N}
 +	omegaN={(2*pi)*fN}
 +	R1={Z1N*uR/2}
@@ -9739,7 +9622,7 @@ X_SCH	c	magnP2	SCHENKEL_Yy   PARAMS:
 .PARAM
 +	I1N={SN/U1N}
 +	Z1N={U1N/I1N}
-+   I3N={SN/U30} ; third winding normaly constructed ~1/3 SN but SN star/delta = 3x therefore SN1/3*3
++   I3N={SN/3/U30}
 +   Z3N={U30/I3N}
 +	omegaN={(2*pi)*fN}
 +	R1={Z1N*uR/2}

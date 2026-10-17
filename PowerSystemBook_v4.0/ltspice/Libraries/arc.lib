@@ -1,0 +1,250 @@
+* Model of a electric arc
+* The model has its roots in the classical Cassie and Mayr
+* equations, which were used extensively in the past to explain the
+* physics of arc plasma operation. The equations of the proposed
+* model have been cast in a form suitable for implementation in
+* industrial-standard circuit simulators.
+
+* each half-cycle (10ms) of the AC supply voltage, the arc is
+* momentarily extinguished and then re-ignited
+
+*  From:
+*  Dynamic electric arc model for electronic circuit simulation
+*  Article in Electronics Letters · May 1996
+*
+*  see electric arc electric_arc_modelling.pdf in this folder
+*  (For the example in the pdf the value of gmin is changed from 1e-8 to 0.15e-3 to work correctly
+*   for the parameters p0 and e0 in this pdf)
+*
+* E0 = 28,
+* Io = 4.8,
+* Po = 30,
+* Gmin= 1*1e-8 (0.15e-3)
+* Theta=1e-4
+* Cassie Mayr:
+* G=Gmin+(1-exp(-i*i/(I0*I0))) *v*i/(E0*E0) +(exp(-i*i/(I0*I0)))*i*i/P0 -Theta*dG/dt
+* i=G.v
+* a1=(1-exp(-i*i/(I0*I0))) *v*i/(E0*E0)  v=v(in1,out) i=I(V0) oder I(G0)
+* b1=(exp(-i*i/(I0*I0)))*i*i/P0
+* FOR:
+* i0 very small: e-10000 = sehr klein a1=1 b1=0 hoher strom eher cassie model
+* i0 very high:  e-0.001 = 1  a1=0 b1=1 kleiner strom eher mayr model
+
+
+* cassie / mayr model
+*(1-exp(-i*i/(I0*I0)))*v*i/(E0*E0) cassie
+*(exp(-i*i/(I0*I0)))*i*i/P0   mayr 
+.subckt arc in out params: e0=0.0028 i0=6 p0=0.02 gmin=1e-7 theta=1e-4 ginit=0
+V0 in in1 0
+E1 a1 0 VALUE={(1-exp(-(i(v0)*i(v0))/(I0*I0)))*((v(in1,out)*i(v0))/(E0*E0))} tripdv={tdv} tripdt={tdt}
+E2 b1 0 VALUE={(exp(-(i(v0)*i(v0))/(I0*I0)))*((i(v0)*i(v0))/P0)} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={(-v(G)+Gmin+v(a1)+v(b1))/Theta} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC={ginit}
+R1x idt1 0 1e10
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ends
+
+* only mayr model (good for smaller currents)
+.subckt arc_mayr in out params: p0=0.06 gmin=1e-7 theta=1e-4 ginit=0
+V0 in in1 0
+E2 b1 0 VALUE={((i(v0)*i(v0))/P0)} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={(-v(G)+Gmin+v(b1))/Theta} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC={ginit}
+R1x idt1 0 1e10
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ends
+
+* only cassie model (good for higher currents)
+.subckt arc_cassie in out params: e0=0.0028 gmin=1e-7 theta=1e-4 ginit=0
+V0 in in1 0
+E1 a1 0 VALUE={((v(in1,out)*i(v0))/(E0*E0))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={(-v(G)+Gmin+v(a1))/Theta} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC={ginit}
+R1x idt1 0 1e10
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ends
+
+* only mayr model with controlling nodes (good for smaller currents)
+.subckt arc_mayr_ctrl in out P0 E0 Theta Gmin params: p0=0.06 gmin=1e-7 theta=1e-4 ginit=0
+V0 in in1 0
+E2 b1 0 VALUE={((i(v0)*i(v0))/(P0*v(P0)))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={(-v(G)+Gmin*v(Gmin)+v(b1))/(Theta*v(Theta))} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC={ginit}
+R1x idt1 0 1e10
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ends
+
+* only mayr model with controlling nodes (good for smaller currents)
+.subckt arc_cassie_ctrl in out P0 E0 Theta Gmin 
++ params: e0=100 gmin=1e-7 theta=1e-4 ginit=0
+V0 in in1 0
+E1 a1 0 VALUE={((v(in1,out)*i(v0))/(e0*e0)*v(e0)*v(e0))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={(-v(G)+Gmin*v(Gmin)+v(a1))/(Theta*v(Theta))} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC={ginit}
+R1x idt1 0 1e10
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ends
+
+* cassie / mayr model with controlling nodes
+.subckt arc_ctrl in out P0 E0 Theta Gmin params: e0=0.0028 i0=6 p0=0.02 gmin=1e-7 theta=1e-4 ginit=0
+V0 in in1 0
+E1 a1 0 VALUE={(1-exp(-(i(v0)*i(v0))/(I0*I0)))*((v(in1,out)*i(v0))/(E0*E0*v(e0)*v(e0)))} tripdv={tdv} tripdt={tdt}
+E2 b1 0 VALUE={(exp(-(i(v0)*i(v0))/(I0*I0)))*((i(v0)*i(v0))/(P0*v(p0)*v(p0)))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={(-v(G)+Gmin*v(Gmin)+v(a1)+v(b1))/(Theta*v(Theta))} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC={ginit}
+R1x idt1 0 1e10
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ends
+
+
+* Behavioural simple fuse model
+* If I>Imin_melt the current is integrated
+* until i2tmax is reached now the
+* fuse melts.
+* Means that i2tmax is very small
+* the melting is immdiately
+* If i2tmax is very high
+* the fuse can melt later and at higher currents
+.subckt fuse in out params: rfuse=0.5 i2tmax=0.07 Imin_melt=0.5 tsw=100m vt=0.5 vh=-0.4
+vIsense in in1 0
+rfuse in1 in2 {rfuse}
+s1 in2 out ctrl 0 myswitch
+bctrl ctrl1 0 v={if(v(i2t)>i2tmax,1,0)} tripdv={tdv} tripdt={tdt}
+Ectrl2 ctrl 0 value={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={(v(ctrl1)/tsw)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC=0
+R1x idt1 0 1e10
+bcond conditioned 0 v={if(abs(i(vIsense))>Imin_melt,abs(I(vIsense)),0)}   tripdv={tdv} tripdt={tdt}
+bi2t i2t 0 v=v(idt2) tripdv={tdv} tripdt={tdt}
+G2x 0 idt2 VALUE={v(conditioned)**2} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+.model myswitch SW ( ron=1e9 roff=0.01 vt={vt} vh={vh} )
+.ends
+
+
+.subckt ameter1 vin vout I
++ params: fc=3 tdv=1 tdt=1 tenable=1u
+Vamper vin vout 0
+Eamper I1 0 VALUE={IF(time>tenable,I(Vamper),0)} tripdv={tdv} tripdt={tdt}
+XU4 I1 I RMS3b fc={fc} b0=1 b1=3
+.ends
+
+.subckt RMS3b in out params: fc=3 b0=3 b1=3 lim=1g
+Asq 0 in in 0 0 0 sq 0 ota vhigh={lim} rout=1 linear
+Adiv_lf _sq sq 0 0 0 0 div 0 ota vhigh={lim} rout=1g cout={1n/fc} linear
+Adiv 0 div out 0 0 0 _sq 0 ota vhigh={lim} rout=1 linear
+Ab0 out div 0 0 0 0 1 0 ota vhigh={lim} vlow={-lim} cout={.5/pi/fc} rout=1g g={b0/b1} linear
+Ab1 out 1 0 0 0 0 out 0 ota vhigh={lim} vlow={-lim} cout={.5/pi/fc} rout=1g g={b1} linear
+.ends RMS1
+
+
+.subckt fuse_20A in out params: rfuse=0.01 i2tmax=0.07 Imin_melt=20 tsw=100m vt=0.5 vh=-0.4
+vIsense in in1 0
+rfuse in1 in2 {rfuse}
+s1 in2 out ctrl 0 myswitch
+bctrl ctrl1 0 v={if(v(i2t)>i2tmax,1,0)} tripdv={tdv} tripdt={tdt}
+Ectrl2 ctrl 0 value={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={(v(ctrl1)/tsw)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC=0
+R1x idt1 0 1e10
+bcond conditioned 0 v={if(abs(i(vIsense))>Imin_melt,abs(I(vIsense)),0)}   tripdv={tdv} tripdt={tdt}
+bi2t i2t 0 v=v(idt2) tripdv={tdv} tripdt={tdt}
+G2x 0 idt2 VALUE={v(conditioned)**2} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+.model myswitch SW ( ron=1e9 roff=0.01 vt=0.5 vh=-0.4 )
+.ends
+
+.subckt fuse_50A in out params: rfuse=0.01 i2tmax=0.07 Imin_melt=50 tsw=100m vt=0.5 vh=-0.4
+vIsense in in1 0
+rfuse in1 in2 {rfuse}
+s1 in2 out ctrl 0 myswitch
+bctrl ctrl1 0 v={if(v(i2t)>i2tmax,1,0)} tripdv={tdv} tripdt={tdt}
+Ectrl2 ctrl 0 value={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={(v(ctrl1)/tsw)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC=0
+R1x idt1 0 1e10
+bcond conditioned 0 v={if(abs(i(vIsense))>Imin_melt,abs(I(vIsense)),0)}   tripdv={tdv} tripdt={tdt}
+bi2t i2t 0 v=v(idt2) tripdv={tdv} tripdt={tdt}
+G2x 0 idt2 VALUE={v(conditioned)**2} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+.model myswitch SW ( ron=1e9 roff=0.01 vt=0.5 vh=-0.4 )
+.ends
+
+.subckt fuse_120A in out params: rfuse=0.01 i2tmax=0.07 Imin_melt=120 tsw=100m vt=0.5 vh=-0.4
+vIsense in in1 0
+rfuse in1 in2 {rfuse}
+s1 in2 out ctrl 0 myswitch
+bctrl ctrl1 0 v={if(v(i2t)>i2tmax,1,0)} tripdv={tdv} tripdt={tdt}
+Ectrl2 ctrl 0 value={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={(v(ctrl1)/tsw)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC=0
+R1x idt1 0 1e10
+bcond conditioned 0 v={if(abs(i(vIsense))>Imin_melt,abs(I(vIsense)),0)}   tripdv={tdv} tripdt={tdt}
+bi2t i2t 0 v=v(idt2) tripdv={tdv} tripdt={tdt}
+G2x 0 idt2 VALUE={v(conditioned)**2} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+.model myswitch SW ( ron=1e9 roff=0.01 vt=0.5 vh=-0.4 )
+.ends
+
+.subckt fuse_250A in out params: rfuse=0.01 i2tmax=0.07 Imin_melt=250 tsw=100m vt=0.5 vh=-0.4
+vIsense in in1 0
+rfuse in1 in2 {rfuse}
+s1 in2 out ctrl 0 myswitch
+bctrl ctrl1 0 v={if(v(i2t)>i2tmax,1,0)} tripdv={tdv} tripdt={tdt}
+Ectrl2 ctrl 0 value={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={(v(ctrl1)/tsw)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC=0
+R1x idt1 0 1e10
+bcond conditioned 0 v={if(abs(i(vIsense))>Imin_melt,abs(I(vIsense)),0)}   tripdv={tdv} tripdt={tdt}
+bi2t i2t 0 v=v(idt2) tripdv={tdv} tripdt={tdt}
+G2x 0 idt2 VALUE={v(conditioned)**2} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+.model myswitch SW ( ron=1e9 roff=0.01 vt=0.5 vh=-0.4 )
+.ends
+
+.subckt fuse_500A in out params: rfuse=0.01 i2tmax=0.07 Imin_melt=500 tsw=100m vt=0.5 vh=-0.4
+vIsense in in1 0
+rfuse in1 in2 {rfuse}
+s1 in2 out ctrl 0 myswitch
+bctrl ctrl1 0 v={if(v(i2t)>i2tmax,5,0)} tripdv={tdv} tripdt={tdt}
+Ectrl2 ctrl 0 value={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={(v(ctrl1)/tsw)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC=0
+R1x idt1 0 1e10
+bcond conditioned 0 v={if(abs(i(vIsense))>Imin_melt,abs(I(vIsense)),0)}   tripdv={tdv} tripdt={tdt}
+bi2t i2t 0 v=v(idt2) tripdv={tdv} tripdt={tdt}
+G2x 0 idt2 VALUE={v(conditioned)**2} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+.model myswitch SW ( ron=1e9 roff=0.01 vt=0.5 vh=-0.4 )
+.ends
+
+.subckt fuse_1000A in out params: rfuse=0.01 i2tmax=0.07 Imin_melt=1000 tsw=100m vt=0.5 vh=-0.4
+vIsense in in1 0
+rfuse in1 in2 {rfuse}
+s1 in2 out ctrl 0 myswitch
+bctrl ctrl1 0 v={if(v(i2t)>i2tmax,5,0)} tripdv={tdv} tripdt={tdt}
+Ectrl2 ctrl 0 value={v(idt1)} tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={(v(ctrl1)/tsw)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC=0
+R1x idt1 0 1e10
+bcond conditioned 0 v={if(abs(i(vIsense))>Imin_melt,abs(I(vIsense)),0)}   tripdv={tdv} tripdt={tdt}
+bi2t i2t 0 v=v(idt2) tripdv={tdv} tripdt={tdt}
+G2x 0 idt2 VALUE={v(conditioned)**2} tripdv=1 tripdt=1
+C2x idt2 0 1
+R2x idt2 0 1e10
+.model myswitch SW ( ron=1e9 roff=0.01 vt=0.5 vh=-0.4 )
+.ends
+
+

@@ -1,0 +1,873 @@
+* cassie mayr circuit breaker
+
+.SUBCKT Sw_1Phase_off_mayr in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ p0=0.1 ; 
++ p0_mult=7e9
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in out ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Switcher
+VP0 p0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {P0_mult} ; to stop the arc  
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1 0
+E2 b1 0 VALUE={((i(v0)*i(v0))/(P0*v(P0)))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+v(b1))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT Sw_1Phase_mayr in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ p0=0.1 ; 
++ p0_mult=7e9
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in1a in2a ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Switcher
+VP0 p0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {P0_mult} ; to stop the arc  
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1a 0
+E2 b1 0 VALUE={((i(v0)*i(v0))/(P0*v(P0)))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+v(b1))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in2a out value={V(in2a,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+.SUBCKT Sw_400kV_1Phase_off_mayr in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ p0=0.1 ; 
++ p0_mult=7e9
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in out ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Switcher
+VP0 p0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {P0_mult} ; to stop the arc  
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1 0
+E2 b1 0 VALUE={((i(v0)*i(v0))/(P0*v(P0)))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+v(b1))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+.SUBCKT Sw_400kV_1Phase_mayr in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ p0=0.1 ; 
++ p0_mult=7e9
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in1a in2a ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Switcher
+VP0 p0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {P0_mult} ; to stop the arc  
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1a 0
+E2 b1 0 VALUE={((i(v0)*i(v0))/(P0*v(P0)))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+v(b1))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in2a out value={V(in2a,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+.SUBCKT Sw_220kV_1Phase_off_mayr in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ p0=0.1 ; 
++ p0_mult=7e9
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in out ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Switcher
+VP0 p0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {P0_mult} ; to stop the arc  
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1 0
+E2 b1 0 VALUE={((i(v0)*i(v0))/(P0*v(P0)))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+v(b1))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+.SUBCKT Sw_220kV_1Phase_mayr in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ p0=0.1 ; 
++ p0_mult=7e9
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in1a in2a ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Switcher
+VP0 p0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {P0_mult} ; to stop the arc  
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1a 0
+E2 b1 0 VALUE={((i(v0)*i(v0))/(P0*v(P0)))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+v(b1))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in2a out value={V(in2a,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+ 
+.SUBCKT Sw_110kV_1Phase_off_mayr in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ p0=0.1 ; 
++ p0_mult=7e9
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in out ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Switcher
+VP0 p0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {P0_mult} ; to stop the arc  
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1 0
+E2 b1 0 VALUE={((i(v0)*i(v0))/(P0*v(P0)))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+v(b1))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+.SUBCKT Sw_110kV_1Phase_mayr in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ p0=0.1 ; 
++ p0_mult=7e9
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in1a in2a ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Switcher
+VP0 p0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {P0_mult} ; to stop the arc  
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1a 0
+E2 b1 0 VALUE={((i(v0)*i(v0))/(P0*v(P0)))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+v(b1))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in2a out value={V(in2a,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+
+
+.SUBCKT Sw_20kV_1Phase_off_mayr in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ p0=0.1 ; 
++ p0_mult=7e9
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in out ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Switcher
+VP0 p0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {P0_mult} ; to stop the arc  
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1 0
+E2 b1 0 VALUE={((i(v0)*i(v0))/(P0*v(P0)))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+v(b1))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+.SUBCKT Sw_20kV_1Phase_mayr in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ p0=0.1 ; 
++ p0_mult=7e9
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in1a in2a ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Switcher
+VP0 p0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {P0_mult} ; to stop the arc  
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1a 0
+E2 b1 0 VALUE={((i(v0)*i(v0))/(P0*v(P0)))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+v(b1))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in2a out value={V(in2a,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+
+.SUBCKT Sw_10kV_1Phase_off_mayr in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ p0=0.1 ; 
++ p0_mult=7e9
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in out ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Switcher
+VP0 p0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {P0_mult} ; to stop the arc  
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1 0
+E2 b1 0 VALUE={((i(v0)*i(v0))/(P0*v(P0)))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+v(b1))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+.SUBCKT Sw_10kV_1Phase_mayr in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ p0=0.1 ; 
++ p0_mult=7e9
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in1a in2a ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Switcher
+VP0 p0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {P0_mult} ; to stop the arc  
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1a 0
+E2 b1 0 VALUE={((i(v0)*i(v0))/(P0*v(P0)))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+v(b1))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in2a out value={V(in2a,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+
+.SUBCKT Sw_400V_1Phase_off_mayr in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ p0=0.1 ; 
++ p0_mult=7e9
++ Gmin=1e-5
++ theta=1e-4
++ ginit=1000 
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in out ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Switcher
+VP0 p0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {P0_mult} ; to stop the arc  
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1 0
+E2 b1 0 VALUE={((i(v0)*i(v0))/(P0*v(P0)))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+v(b1))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+.SUBCKT Sw_400V_1Phase_mayr in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ p0=0.1 ; 
++ p0_mult=7e9
++ Gmin=1e-5
++ theta=1e-4
++ ginit=1000 
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in1a in2a ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Switcher
+VP0 p0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {P0_mult} ; to stop the arc  
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1a 0
+E2 b1 0 VALUE={((i(v0)*i(v0))/(P0*v(P0)))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+v(b1))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in2a out value={V(in2a,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+* E0=0.1k is for 400kV / E0 should be set according to the voltage e.g 400V->E0=0.2 
+* E0=0.03k is for 110kV
+.SUBCKT Sw_1Phase_off_cassie in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ E0=0.01k ; arc on at startup
++ E0_mult=1e-4
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 ; arc on at startup
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in out ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Swticher
+VE0 E0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {E0_mult} ; to stop the arc
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1 0
+E1 a1 0 VALUE={((v(in1,out)*i(v0))/(e0*e0)*v(e0)*v(e0))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+abs(v(a1)))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* E0=0.1k is for 400kV / E0 should be set according to the voltage e.g 400V->E0=0.2 
+* E0=0.03k is for 110kV
+.SUBCKT Sw_1Phase_cassie in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ E0=0.01k ; arc on at startup
++ E0_mult=1e-4
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 ; arc on at startup
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in1a in2a ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Swticher
+VE0 E0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {E0_mult} ; to stop the arc
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1a 0
+E1 a1 0 VALUE={((v(in2a,out)*i(v0))/(e0*e0)*v(e0)*v(e0))} tripdv={tdv} tripdt={tdt}
+* abs(v(a1)) instead of v(a1) to prevent for negative g's
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+abs(v(a1)))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in2a out value={V(in2a,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+* E0=0.2k is for 400kV / E0 should be set according to the voltage e.g 400V->E0=0.2 
+* E0=0.05k is for 110kV
+.SUBCKT Sw_400kV_1Phase_off_cassie in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ E0=0.2k ; arc on at startup
++ E0_mult=1e-4
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 ; arc on at startup
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in out ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Swticher
+VE0 E0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {E0_mult} ; to stop the arc
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1 0
+E1 a1 0 VALUE={((v(in1,out)*i(v0))/(e0*e0)*v(e0)*v(e0))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+abs(v(a1)))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* E0=0.2k is for 400kV / E0 should be set according to the voltage e.g 400V->E0=0.2 
+* E0=0.05k is for 110kV
+.SUBCKT Sw_400kV_1Phase_cassie in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ E0=0.2k ; arc on at startup
++ E0_mult=1e-4
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 ; arc on at startup
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in1a in2a ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Swticher
+VE0 E0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {E0_mult} ; to stop the arc
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1a 0
+E1 a1 0 VALUE={((v(in2a,out)*i(v0))/(e0*e0)*v(e0)*v(e0))} tripdv={tdv} tripdt={tdt}
+* abs(v(a1)) instead of v(a1) to prevent for negative g's
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+abs(v(a1)))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in2a out value={V(in2a,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+
+
+* E0=0.2k is for 400kV / E0 should be set according to the voltage e.g 400V->E0=0.2 
+* E0=0.05k is for 110kV
+.SUBCKT Sw_220kV_1Phase_off_cassie in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ E0=0.1k ; arc on at startup
++ E0_mult=1e-4
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 ; arc on at startup
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in out ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Swticher
+VE0 E0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {E0_mult} ; to stop the arc
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1 0
+E1 a1 0 VALUE={((v(in1,out)*i(v0))/(e0*e0)*v(e0)*v(e0))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+abs(v(a1)))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* E0=0.2k is for 400kV / E0 should be set according to the voltage e.g 400V->E0=0.2 
+* E0=0.05k is for 110kV
+.SUBCKT Sw_220kV_1Phase_cassie in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ E0=0.1k ; arc on at startup
++ E0_mult=1e-4
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 ; arc on at startup
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in1a in2a ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Swticher
+VE0 E0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {E0_mult} ; to stop the arc
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1a 0
+E1 a1 0 VALUE={((v(in2a,out)*i(v0))/(e0*e0)*v(e0)*v(e0))} tripdv={tdv} tripdt={tdt}
+* abs(v(a1)) instead of v(a1) to prevent for negative g's
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+abs(v(a1)))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in2a out value={V(in2a,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+
+* E0=0.2k is for 400kV / E0 should be set according to the voltage e.g 400V->E0=0.2 
+* E0=0.05k is for 110kV
+.SUBCKT Sw_110kV_1Phase_off_cassie in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ E0=50 ; arc on at startup
++ E0_mult=1e-4
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 ; arc on at startup
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in out ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Swticher
+VE0 E0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {E0_mult} ; to stop the arc
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1 0
+E1 a1 0 VALUE={((v(in1,out)*i(v0))/(e0*e0)*v(e0)*v(e0))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+abs(v(a1)))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* E0=0.2k is for 400kV / E0 should be set according to the voltage e.g 400V->E0=0.2 
+* E0=0.05k is for 110kV
+.SUBCKT Sw_110kV_1Phase_cassie in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ E0=50 ; arc on at startup
++ E0_mult=1e-4
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 ; arc on at startup
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in1a in2a ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Swticher
+VE0 E0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {E0_mult} ; to stop the arc
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1a 0
+E1 a1 0 VALUE={((v(in2a,out)*i(v0))/(e0*e0)*v(e0)*v(e0))} tripdv={tdv} tripdt={tdt}
+* abs(v(a1)) instead of v(a1) to prevent for negative g's
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+abs(v(a1)))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in2a out value={V(in2a,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+* E0=0.2k is for 400kV / E0 should be set according to the voltage e.g 400V->E0=0.2 
+* E0=0.05k is for 110kV
+.SUBCKT Sw_20kV_1Phase_off_cassie in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ E0=10 ; arc on at startup
++ E0_mult=1e-4
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 ; arc on at startup
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in out ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Swticher
+VE0 E0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {E0_mult} ; to stop the arc
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1 0
+E1 a1 0 VALUE={((v(in1,out)*i(v0))/(e0*e0)*v(e0)*v(e0))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+abs(v(a1)))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* E0=0.2k is for 400kV / E0 should be set according to the voltage e.g 400V->E0=0.2 
+* E0=0.05k is for 110kV
+.SUBCKT Sw_20kV_1Phase_cassie in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ E0=10 ; arc on at startup
++ E0_mult=1e-4
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 ; arc on at startup
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in1a in2a ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Swticher
+VE0 E0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {E0_mult} ; to stop the arc
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1a 0
+E1 a1 0 VALUE={((v(in2a,out)*i(v0))/(e0*e0)*v(e0)*v(e0))} tripdv={tdv} tripdt={tdt}
+* abs(v(a1)) instead of v(a1) to prevent for negative g's
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+abs(v(a1)))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in2a out value={V(in2a,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+* E0=0.2k is for 400kV / E0 should be set according to the voltage e.g 400V->E0=0.2 
+* E0=0.05k is for 110kV
+.SUBCKT Sw_10kV_1Phase_off_cassie in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ E0=5 ; arc on at startup
++ E0_mult=1e-4
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 ; arc on at startup
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in out ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Swticher
+VE0 E0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {E0_mult} ; to stop the arc
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1 0
+E1 a1 0 VALUE={((v(in1,out)*i(v0))/(e0*e0)*v(e0)*v(e0))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+abs(v(a1)))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* E0=0.2k is for 400kV / E0 should be set according to the voltage e.g 400V->E0=0.2 
+* E0=0.05k is for 110kV
+.SUBCKT Sw_10kV_1Phase_cassie in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ E0=5 ; arc on at startup
++ E0_mult=1e-4
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 ; arc on at startup
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in1a in2a ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Swticher
+VE0 E0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {E0_mult} ; to stop the arc
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1a 0
+E1 a1 0 VALUE={((v(in2a,out)*i(v0))/(e0*e0)*v(e0)*v(e0))} tripdv={tdv} tripdt={tdt}
+* abs(v(a1)) instead of v(a1) to prevent for negative g's
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+abs(v(a1)))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in2a out value={V(in2a,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+
+* E0=0.2k is for 400kV / E0 should be set according to the voltage e.g 400V->E0=0.2 
+* E0=0.05k is for 110kV
+.SUBCKT Sw_400V_1Phase_off_cassie in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ E0=0.2 ; arc on at startup
++ E0_mult=1e-4
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 ; arc on at startup
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in out ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Swticher
+VE0 E0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {E0_mult} ; to stop the arc
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1 0
+E1 a1 0 VALUE={((v(in1,out)*i(v0))/(e0*e0)*v(e0)*v(e0))} tripdv={tdv} tripdt={tdt}
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+abs(v(a1)))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in1 out value={V(in1,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS
+
+* E0=0.2k is for 400kV / E0 should be set according to the voltage e.g 400V->E0=0.2 
+* E0=0.05k is for 110kV
+.SUBCKT Sw_400V_1Phase_cassie in out
++PARAMS:
++t_Stop=0.5
++t_Start=1e6
++tsw=100u toff=1m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
++ E0=0.2 ; arc on at startup
++ E0_mult=1e-4
++ Gmin=1e-7
++ theta=1e-4
++ ginit=1000 ; arc on at startup
+* arc model
+* ON-Switcher
+Vsw1 ctrl 0 PWL(0s 0 {t_Start} 0 {t_Start+tsw} 1 )
+S1 in1a in2a ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+* OFF-Swticher
+VE0 E0 0 pwl 0s 1 {t_Stop} 1 {t_Stop+toff} {E0_mult} ; to stop the arc
+VGmin Gmin 0 1
+VTheta theta 0 1
+V0 in in1a 0
+E1 a1 0 VALUE={((v(in2a,out)*i(v0))/(e0*e0)*v(e0)*v(e0))} tripdv={tdv} tripdt={tdt}
+* abs(v(a1)) instead of v(a1) to prevent for negative g's
+EG G 0 VALUE={SDT((-v(G)+Gmin*v(Gmin)+abs(v(a1)))/(Theta*v(Theta)),ginit)} tripdv={tdv} tripdt={tdt}
+G0 in2a out value={V(in2a,out)*v(G)} tripdv={tdv} tripdt={tdt}
+.ENDS

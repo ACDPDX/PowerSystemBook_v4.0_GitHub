@@ -1,0 +1,113 @@
+Welcome to the simulation with my two toolboxes, the load flow calculation and transient simulation of high voltage networks. Today it's about the load flow calculation. Normally, this is not to be done with LT Spice because the complex alternating current analysis in LT spice is linear, but some elements in the load flow calculation are not linear.
+
+This is especially true for loads that are modeled as constant power loads, and therefore do not depend linearly on the voltage To be able to calculate, nevertheless, the complex matrix system for load flow calculations is transferred in two real valued matrices. After that, the simulation can be carried out with the three nonlinear analyses in LTspice.
+
+These are the op analysis operating point analysis. To determine the working point, the transient analysis for the simulation in timeline and the DC analysis thought for the direct current simulation, but now also best suited for non-linear steady state load flow calculations. More detail can be read in the file named mathematical model description point doc.
+
+There the individual models are explained in detail. By disassembling a complex matrix into two real valued ones, the individual elements such as the voltage source load, overhead line, cable, and so on have twice as many connections. For example, a overhead line has now four connections instead of two.
+
+Two connections form the real part of the matrix of the element, and the other two connections form the imaginary part of the matrix of the element. The real connected elements have a cross in symbol output pin to better recognize them. It is important that only the elements with a cross may be connected to each other and the elements without a cross may also be connected to each other.
+
+Mixing is not allowed. Now to the circuit structure and the simulation. A circuit with three nodes is to be simulated In this example. It is assumed that the Ltspice simulator has already been configured as shown in my YouTube video and maybe even experimented a little with the surface. The LTspice simulator was originally developed for electronic simulations, but now with my models work also very well with load flow calculations and transient high voltage simulations.
+
+I've been simulating with my models for more than 25 years and am still enthusiastic. This is also due to the intuitive handling of LTspice from the circuit board generation to simulation, to representation and handling of the measured values, especially with the transient simulation of high voltage networks.
+
+And now for the generation of the three bus circuit, a template is loaded and immediately saved to a new name.
+
+Certain items necessary for the simulation are already predefined in this template. For example, the frequency is 50 hertz. The voltage factor is root three, and the power factor is three. The voltage factors and power factor are required for single phase simulation in order to correctly calculate the three phase parameters such as active power, reactive power, and voltage.
+
+PQV, the parameters vntol and abstol are the voltage and current tolerances for the simulation. In this case, one millivolt and one micro amp.  These values can be increased if necessary in the event of non convergence of the simulation. The default simulation type is transient analysis for the time domain.
+
+Now let's move on to the circuit. First, we need a voltage source, which is called a slack in load flow jargon. First, we click on the IC symbol. All symbols and models also called sub circuits are stored here. Then we select the folder, load flow, steady state and select the model. Pretty vri-slack two.
+
+While placing the symbol, control E is used to mirror and control R to rotate .The voltage of this slack is set to 400 kilovolt, either by right clicking on the symbol or directly in the parameter line below the symbol. The slack ensures that the power balance of the system is always fulfilled. The sum of the energy supplied to the circuit and the energy consumed in the circuit is therefore always zero.
+
+You can see the real connection pin with the cross, the imaginary connection pin without the cross, and the three measurement pins on the left . From top to bottom these are voltage measurement, active power measurement, and reactive power measurement. The voltage at the circuit output is the line to earth voltage as nominal voltage divided by square root of three.
+
+Now I start the simulation. By clicking on the measurement pins, you can see the values for nominal voltage, active power, and reactive power.
+
+By clicking on the connection pins, you can see the real and imaginary components of the line to earth voltage. An operating point analysis is performed before each transient analysis. If nothing has changed during the simulation in the time domain waveform values are all horizontal lines. The values of the OP analysis correspond to the values of the transient simulation at all time values.
+
+In this case, it is also sensible to display the simulation values of the op- simulation directly in the circuit as numerical values. However, if parameters are changed in the time domain, these numerical values only apply to the simulation time T equals zero. The op flags can be switched on and off globally.
+
+Right click on the drawing area, view show up data flags.
+
+Next, we draw the bus bar for bus one. First I draw the bus with lines. Then I add the symbols for the bus at the top and bottom.
+
+The upper bus symbol has the phase to phase voltage near the cross and the voltage angle as measurement pins.
+
+The lower bus symbol has the phase to ground voltage measurement.
+
+I now named the bus, bus one with a text box.
+
+Next I copy and name the bus twice for bus bars two and three.
+
+Busbar three is drawn horizontally.
+
+Now we create some space for the three overhead lines.
+
+Next we get a symbol for an overhead line. The symbol is called Pretty Line Special. We open the component editor again and double click on the Spice Model line.
+
+Here we select a 400 KV steel aluminum overhead line with a cross section of three by 365 square millimeters. We set the line length to 20 kilometers. This line is now copied twice and inserted further down in the circuit.
+
+We now name the lines.
+
+Next we create a little space again.
+
+A load element is inserted at the bottom of the circuit. The load element has three modes. K equal zero for constant impedance. K  one for constant current and K-two for constant power. This is the default value. Then we change the parameter values for the load. We change the active power to 500 megawatt, the reactive power to 400 Megavar, and the nominal voltage to 400 KV.
+
+We name the load load three.
+
+Finally we insert another PV element and name it PV two. The PV element has a constant voltage and a constant power. To achieve the constant voltage, reactive power is added to or removed from the circuit as needed. The PV element is the second non-linear element. After the constant power load model. I now enter the parameter values.
+
+Voltage magnitude Vmag is 401 kv .Active power is minus 200.  minus means a delivery. The reactive power limits are qlo with minus a hundred Megawatt, and QUP with zero. If the target voltage has not yet been reached, the  reactive power delivery will not fall below qlo. Now we connect all elements to each other, important: only pins with a cross  to each other and without a cross below to each other.
+
+Then we give all measurement pins a short node piece so that we can output the measured values later.
+
+We will now assign unique names to most of the measurement pins.
+
+We forgot to name the slack, so we will do that now.
+
+The simulation is now started, the Slack supplies 300 megawatt of active power and 267 Megavar of reactive power to the circuit. The PV element has a voltage of 399 KV and supplies, 200 megawatt of active power to the circuit. The reactive power is minus 100 Megavar, which is at the limit. As a result, the desired voltage of four one cannot be fully achieved.
+
+The load requires an active power of 500 megawatt and a reactive power of 400 megavar. The voltage at the load is a voltage sink of 396.8 kV.
+
+The load receives active power and of course reactive power from the two lines. Line 13 and line 23. The value of the active power at P4 of  line 13 is minus 266.8 megawatts. Since the reference arrow always points in the direction of the symbol, this means that 266.8 megawatts are supplied to the load.
+
+In addition, an active power of 233.2 megawatts is also supplied to the load at P5 of line 23. This results in a total of 500 megawatts. The reactive power value at pin Q4 of line 13 is minus 227.5 Megavars. The value of the reactive power at pin Q5 of line 23 is minus 172.5 Megavar. This results in a total of 400 Megavar.
+
+The distribution of active and reactive power between the two lines, line 13 and line 23 could be changed by adding a control transformer for voltage regulation and phase regulation in series to the above Line12. If I increase the active power feed of the PV element from 200 megawatts to 250 megawatts, I also achieve a better distribution of active power between lines line13 and line23
+
+
+
+For a better reactive power distribution between both lines, I increase the reactive power limit of PV two to minus 180 Megavar. The active and reactive power via lines 13 and 23 is now distributed approximately equally between both lines. I now look at the active power via the above line 12 and see that it is almost zero megawatts.
+
+A few more words about the PV element. A PV element models a synchronous generator with fixed active power output and voltage regulation. The voltage regulation is achieved by changing the excitation voltage, which is accompanied by a change in reactive power. The sum of active power and reactive power results in the apparent power  i.e the design point of the synchronous generator.
+
+I now change the PV element back to the original values for active power and reactive power limit.
+
+I am now interested in the currents over the lines. I right click on the waveform viewer window and can now select the two currents from line 12.
+
+To do this, I open a second plot. In the right click menu item, add plot above and move the currents from plot one to plot two. The current i1_m is the current from the start of the line into the line, and the current i2_m is the current at the end of the line. The start of the line is indicated by a small slanted line in the lower part of the overhead line symbol.
+
+The two currents are different because some current from the line still flows into the ground via the capacitances. Also interesting are the omic losses of the line and the reactive power balance of the line. Does the line act as a capacitor or does the inductive component predominate due to high currents flowing through the line?
+
+To find out, I delete plot one and create a new plot with p_vm and q_vm above it.
+
+As you can see, PVM is almost zero and q_vm is approximately minus 13 megawatts. The negative sign means that the line has a reactive power surplus i.e. it feeds reactive power into the grid. If the line were to carry more and more current, the inductive component of the line would consume more and more of the surplus.
+
+The omic power loss of the line is almost zero. Now I look at the voltage angle of bus two. I see that it's negative. The voltage angle of the slack is zero. Active power always flows from the higher to the lower voltage angle. The voltage angle of bus three is the smallest of all three busbar because the active power flows from both lines to the load.
+
+The same applies to the voltage level here. The reactive power always flows from the higher voltage to the lower voltage. The voltage of busbar three is the lowest.
+
+Another interesting simulation results from the addition of elements with control pins. I click on the IC symbol and get a load control symbol. Now I delete the load model and replace it with one with control pins. This allows me to generate a load profile changing over time. The load now has three additional connections, one for switching on and off, and two for changing the active power and reactive power during the simulation.
+
+I now place short nodes on the control pins of the load and name them on pf and qf.
+
+These control pins must now be connected to the controlling voltage sources. I enter these  picewise linear voltage sources as spice directive, the .T symbol in the menu. I have already prepared these lines in an external editor and now paste it into the circuit. Now I start the simulation again.
+
+I output the load profiles by clicking on P_load and Q_load.
+
+The voltage profile at the load is now also changed. The same applies to the currents e.g via line 13 or the active and reactive powers, P_Slack and Q_slack. So we are now finished with this brief introduction to load flow calculation. I hope you enjoyed it. If you like, you can also take a look at the even more interesting transient simulations with my models, which include many examples.
+
+Thank you.

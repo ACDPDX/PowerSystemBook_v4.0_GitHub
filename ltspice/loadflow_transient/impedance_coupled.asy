@@ -28,10 +28,10 @@ LINE Normal 15 36 15 36
 LINE Normal 15 28 15 36
 LINE Normal 15 28 15 28
 LINE Normal -15 28 15 28
-LINE Normal 41 -10 -41 -10 2
-LINE Normal 41 42 41 -10 2
-LINE Normal -41 42 41 42 2
-LINE Normal -41 -10 -41 42 2
+LINE Normal 41 -10 -41 -10
+LINE Normal 41 42 41 -10
+LINE Normal -41 42 41 42
+LINE Normal -41 -10 -41 42
 LINE Normal 0 5 0 11
 LINE Normal -1 6 0 5
 LINE Normal 0 5 -1 6

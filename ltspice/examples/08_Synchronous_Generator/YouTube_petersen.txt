@@ -1,0 +1,85 @@
+Peterson coil is an intelligent protection and stabilization element in medium voltage networks and in some cases, also in high voltage networks. It ensures that single pole ground faults can be controlled safely and without immediate shutdown. This makes it an indispensable component of modern power supply systems.
+
+The Peterson coil is an inductive coil that is connected to the neutral point of the transformer. In a three-phase AC network, capacitive currents flow between conductors and earth. If a ground fault occurs, a capacitive fault current flows through the fault location. This can be dangerously high. In the event of a fault, the Peterson coil generates an inductive current that is opposite to the capacitive fault current, and in the ideal case, compensates for it at the fault location.
+
+A small pure cable network with three hundred ampere earth fault current in the fault case is to be simulated. This is three times the capacitive load current of the cable. The full Earth fault current only occurs in the event of a fault. During normal operation, there is a low neutral point voltage at the Peterson, which means that the nominal current of the Peterson does not flow, but a much lower current.
+
+In the event of a fault with a full Earth fault, the full phase voltage is applied to the Peterson, and the nominal current of three hundred ampere flows. In this example, unless otherwise specified, the transformer is assumed first to be without load. The time at which the error occurs is stated at two hundred and five milliseconds.
+
+With the text parameter of the voltage source, the steady state is quickly reached. A star Delta five transformer was used for the simulation. The transformer data can be viewed in the... Here you look for XKOS. This is the sum of primary and secondary impedance of the transformer related to the primary side.
+
+Therefore, the primary side A impedance is about thirty ohm. Now about the adjustment of the Peterson at no fault condition. We now load the file Peterson without fault. We see the hundred and ten kilovolts voltage source with isolated star point, a reactive metering device, a net impedance, three line to Earth capacitances of the cable, a small line series impedance, and a YD five transformer.
+
+The Earth fault switcher is set to a very high time value of one thousand seconds, and so it is deactivated. The load is initially zero. The cable, a ten-kilometer oil cable with cross-section of one thousand square millimeter, has a line to Earth capacitance of five thousand and twelve nanofarad per phase.
+
+This corresponds to impedance of six hundred thirty-five point one ohm. The charging current is one hundred ampere RMS. Since the Earth current in the fault case is the triple of the charging current, the impedance of the Peterson coil is three hundred ampere RMS, and the inductance of the Peterson is not zero point six seven four Henry.
+
+At the network element Peterson, you can directly input nominal voltage and nominal current, in this case, hundred and ten kilovolts and three hundred ampere. Note, three hundred ampere is the first initial guess for the Peterson current. There is no inductive coupling between phases modeled in the series impedances of the line because our focus is the operation of the Peterson.
+
+With coupling, the earth fault current at the beginning of the fault would be a bit smaller than without coupling, but the same at the steady state. The transformer is assumed linear, and the magnetic resistance of the oil tank is assumed first very high at one E twenty. This means no oil or tank considered.
+
+The transformer core is a three-leg core. Now to the displacement voltage of the transformer star point seen in the transient analysis. In the faultless case, there is a displacement voltage at the star point of the transformer and therefore also at the Peterson coil. This displacement voltage is in our case one point two kilovolt peak and much smaller than the nominal voltage.
+
+The voltage depends of the asymmetry of the line to earth capacities, in our case CE plus CE one on phase one and CE at phase two and phase three. The more asymmetric the network, the higher the displacement voltage. I start now the transient simulation
+
+As can be seen, the displacement voltage builds up slowly and oscillates at a frequency of approximately one point two hertz. This indicates that the resonant circuit is not yet optimally tuned because this frequency does not yet correspond exactly to the working frequency of fifty hertz. The frequency can be easily seen in the waveform viewer if you span a zoom window between two maxima of a waveform.
+
+The frequency is then written to the status line below at left side. Now to the displacement voltage seen in the alternating current analysis. For the alternating current analysis of the circuit, the voltage source has to be changed to a alternating current source. The transient analysis line is changed to a analysis line.
+
+This is all
+
+You see after simulation that the voltage across the Peterson is in the resonant case approx four kV RMS. This is higher as the one point two kilovolt peak of the transient analysis. Note, to set up the Y-axis of the waveform viewer for magnitude values, right-click on the Y-axis and set option Bode and option linear to see the magnitude and phase values.
+
+In the optimal case, the displacement voltage has its maxima. One sees that the maximum voltage level is at forty-eight point eight hertz. This explains the difference frequency of the tran analysis with one point two hertz. At fifty hertz, the voltage level is at zero point eight kilovolt RMS. This is a peak value of about one point two kilovolt, what we have seen above in the tran analysis.
+
+Also, the AC analysis shows that the resonant circuit is not optimally adjusted. To compute the resonant frequency by hand, see the following formulas.
+
+We have seen that although arithmetical correct, the resonant circuit with cable capacitances and Peterson coil is not optimally compensated. The reason is in reduction of the star point voltage due to the internal primary impedance of the transformer. The impedance is at thirty point two five ohm. It is relatively high, and so the nominal values of the Peterson with nominal current of three hundred ampere cannot be reached.
+
+We try to adjust the Peterson to three hundred and fifteen ampere and restart the simulation
+
+You can see now the displacement voltage has its maxima at 50 hertz. This is the peak of the resonant curve. Now we set the initially chosen 1e20 value of the magnetic resistance for the oil tank to a more reasonable value like 1e6
+
+I think reasonable values for the oil tank resistance are 10 till 100 times of the leakage reactance of the transformer which is about 0.1 Henry. We set the oil tank reactance to one Henry. After setting Rkes the oil tank resistance to one E6, we restart the simulation
+
+Now we see that the resonant point is again lower than fifty hertz. The resonant point is now about forty-nine hertz, so we have to increase the Peterson value again. We choose three hundred and twenty-eight ampere. We restart the simulation
+
+Now the resonant point is again at about fifty hertz. To see why the inner resistance is now higher, we see the file Petersen with fault hierarchical model tran. After starting the simulation with R Kes equals one E six, we see that the current of the Petersen is about three thirty ampere
+
+We see that now high currents flow now as circular current in the secondary windings of the transformer. This is the reason about the doubling the voltage drop of the transformer. Note, we have seen above that the sum of all cable capacitances is not the sum of all Peterson values because of inner resistances of the transformer.
+
+We have to add about ten percent for Peterson current value to compensate the internal transformer voltage drop. Now from the practice, the automatic Peterson is normally working a little bit under-compensated, a uncompensated current, e.g. six ampere capacitive. Additionally, the Peterson automatic is switched off in the fault case because the optimal value of the Peterson is yet set at no-fault condition.
+
+Now to Peterson at fault condition. Now we have tuned our Peterson optimally, and we show how the Peterson coil work on fault condition. We start now again with a transient simulation to show the transients of the currents after begin of shorting phase one
+
+We see now the shorting time at 0.205 seconds at voltage maximum. The initial current at the fault position is about 4.3 kiloampere and goes to about 4.6 ampere peak after a long time
+
+If the starting time point is changed to zero point two seconds at voltage zero for phase one, the current is much smaller with a peak of eight hundred ampere and about four point six ampere after a long time
+
+Now we look again to the transients for the shorting time point of two point zero five seconds at voltage maximum in phase one. We zoom into the starting current and see that the currents are highly nonlinear. One frequency of the current is about two kilohertz
+
+Another frequency is about two hundred and fifty hertz. You can measure this again directly in the waveform viewer in the status line. You can also measure this by the FFT feature of LTspice
+
+You can see that in the fault case there appear some frequencies. The highest frequency is on the shorted cable capacitance of phase one. This is about one point two five kilohertz. The currents of the other capacitances and the phase voltages have a frequency of two hundred and fifty hertz
+
+We now explain the doubling of the reactive power at the beginning of the fault. This is done best without Peterson and with isolated star point in the file. Peterson with fault isolated star point tran or Peterson with fault isolated star point AC. Due to recharging, two capacitances are now at line to line voltage, and the third capacitance is discharging by the fault.
+
+The source current rises to the double value. Note at the Y delta transformation, the power will be three times higher. Since one phase fault is shorted, the capacitance is there zeroed. Therefore, the power is only two times high. One part of this doubled capacitive power is after swing in compensated with the Peterson coil, and the single capacitive power remains like at the state before the fault.
+
+Doubling the capacitive power cannot be observed directly at the begin of the simulation because it is overlaid with the high frequency transient responses Before the fault, fault of phase one, the capacitive reactive power is about minus six point three Mega VAR per phase, minus nineteen Mega VAR sum.
+
+At the beginning of the fault, the power rises due to recharging at higher frequencies. The reactive power of phase two and three reach the long time value of upper minus twenty Mega VAR. The sum after swing in is approximately forty Mega VAR and so more than doubled as at starting time. Why more than doubled?
+
+Because of the now higher voltage level, two point five kilovolt. Now we add additional load to the transformer. Since the Peterson current have to flow through the transformer windings, the transformer is additionally loaded. In our example, the Peterson current is one hundred amp per phase, and the nominal current of the trafo is about one hundred and ninety A at the primary side.
+
+Since the current is a vectorial sum and the Peterson current is purely inductive, there remains relative much active current. The reactive part of the load is about one-fifth of the active power. So in our example, approx seventy-five percent of the load remains. To the comparison of unloaded with loaded transformer.
+
+If you change the load from twenty E six to forty E six, you can see that the phase voltages and the star point voltage drops a little. Since also the voltage at the cable capacitances drops, there is no effect to the tuning of the Peterson. We now see a ten kV compensated network with external star point builder transformer.
+
+You see a Peterson in a medium voltage network. Due to the star point builder, a YD transformer can establish a star point at the secondary side for connecting a Peterson coil. Some words to Peterson on a YY transformer with three leg core. Since the YY transformer has no low ohmic return path for flux in the core of the transformer, the flux have to go through tank and oil.
+
+This is not the goal. Therefore, the star point should only be loaded by maximum of ten percent of the transformer nominal current. If the Y/Y transformer has a five leg core, the star point cannot deliver any current if the second star point is isolated. This is because the low reluctance of the outer legs short the magnetic core for same phased fluxes.
+
+If the second star point is also connected, current can flow from one into the other star points, but current should not be exchanged between the two star points. In short, the two star points of a five leg Y/Y transformer should be isolated. See file. Now to Petersen on a Y/Y transformer with five leg core with compensating third winding.
+
+The transformer can deliver full current at the star point. There is also no current transfer from one to the other star point. Now we are at the end of the Petersen example. I hoped you had fun with this short workshop. Good luck simulating

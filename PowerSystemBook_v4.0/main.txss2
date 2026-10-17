@@ -1,0 +1,48 @@
+{
+    "InternalPDFViewer": {
+        "Embedded": true,
+        "File": "main.pdf"
+    },
+    "Session": {
+        "Bookmarks": [
+        ],
+        "CurrentFile": "preamble.tex",
+        "FileVersion": 1,
+        "Files": [
+            {
+                "Col": 0,
+                "EditorGroup": 0,
+                "FileName": "main.tex",
+                "FirstLine": 0,
+                "FoldedLines": "",
+                "Line": 0
+            },
+            {
+                "Col": 18,
+                "EditorGroup": 0,
+                "FileName": "preamble.tex",
+                "FirstLine": 212,
+                "FoldedLines": "",
+                "Line": 179
+            },
+            {
+                "Col": 0,
+                "EditorGroup": 0,
+                "FileName": "chapters/02_Shortcircuitcurrent in the medium voltage grid/02_Shorcircuitcurrent in the medium voltage grid.tex",
+                "FirstLine": 0,
+                "FoldedLines": "",
+                "Line": 0
+            },
+            {
+                "Col": 13,
+                "EditorGroup": 0,
+                "FileName": "chapters/01 Transformer und Shunt Reactor/01_Transformer_and_ShuntReactor.tex",
+                "FirstLine": 70,
+                "FoldedLines": "",
+                "Line": 90
+            }
+        ],
+        "MasterFile": "",
+        "VerticalSplit": false
+    }
+}

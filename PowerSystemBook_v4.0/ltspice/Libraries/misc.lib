@@ -1,0 +1,87 @@
+*MISC Devices
+
+* start stop count (step=0)
+* start stop step (count=0)
+.subckt breakpoint out params: start=300ms step=0.1ns count=100 stop=400ms
+.param step1={IF(step==0,(stop-start)/(count+1p),step)}
+.param count1={IF(count==0,(stop-start)/step/20,count/20)}
+.param frequ={1/20/step1}
+V1 out 0 SINE(0 1 {frequ} {start} 0 0 {count1})
+.ends
+
+* Z from U,I RMS value
+.subckt Z Uin Iin Zout params: TD=100ms mult=1 add=0 div=1
+GZ 0 zout VALUE={IF(time>TD,IF(v(Iin)>0,(add+mult*(v(Uin)/v(Iin)))/div,0),0)} tripdv={tdv} tripdt={tdt} rpar=1
+.ends
+
+* Z from dU,I with sinusvalues
+.subckt Z2 Uin1 Uin2 Iin Zout params: TD=100ms mult=1 add=0 div=1 fc=3
+Gdu 0 du VALUE={(V(Uin1,Uin2))} tripdv={tdv} tripdt={tdt} 
+Rdu du 0 1
+XV2 du Uinrms RMS1b params: T=20m
+XI1 Iin Iinrms RMS1b params: T=20m   
+GZ2 0 zout VALUE={IF(time>TD,IF(v(Iinrms)>0,(add+mult*abs(v(Uinrms)))/div/v(IinRMS),0),0)} tripdv={tdv} tripdt={tdt}
+RZ2 zout 0 1
+.ends
+
+.SUBCKT RMS1b v+ rms params: T=20ms tenable=1us
+Gcu 0 V value={v(V+,0)}  tripdv={tdv} tripdt={tdt}
+Ru  V 0 1
+Cu  V 0 {T/1Meg}IC=0
+Evu V1  0 value={if(time>tenable,v(V),0)}  tripdv={tdv} tripdt={tdt}
+Tvu V1  0 V2  0 Z0=75 TD={T}
+R2u V2  0 75
+Grmsu 0 rms  value={sqrt(v(idt1)/T)*STP(time-T)}  tripdv={tdv} tripdt={tdt}
+G1x 0 idt1  VALUE={pwr(v(V1),2)-pwr(v(V2),2)} tripdv={tdv} tripdt={tdt}
+C1x idt1 0 1 IC=0
+R1x idt1 0 1e10
+R4u rms  0 1
+.ENDS
+
+
+.subckt RMS1 in out params: fc=100 b0=3 b1=3 lim=1g
+Asq 0 in in 0 0 0 sq 0 ota vhigh={lim} rout=1 linear
+Adiv_lf _sq sq 0 0 0 0 div 0 ota vhigh={lim} rout=1g cout={1n/fc} linear
+Adiv 0 div out 0 0 0 _sq 0 ota vhigh={lim} rout=1 linear
+Ab0 out div 0 0 0 0 1 0 ota vhigh={lim} vlow={-lim} cout={.5/pi/fc} rout=1g g={b0/b1} linear
+Ab1 out 1 0 0 0 0 out 0 ota vhigh={lim} vlow={-lim} cout={.5/pi/fc} rout=1g g={b1} linear
+.ends RMS1
+
+* Gives a 0->1 and hold it if input is from 0->1->0
+.subckt pulse2step in out params: td1=100u
+A1 in out 0 0 0 0 out 0 OR Td={td1}
+.ends
+
+* Gives a 0->1 pulse at the output if 0->1 on the input
+* Length of output impulse from parameter trig
+* input pulse can be short
+.subckt pulse2pulse in trig params: delay=20u
+vd d 0 1
+A3 d 0 in 0 clr 0 trig 0 DFLOP
+A1 trig 0 0 0 0 0 clr 0 BUF Td={delay}
+.ends
+
+
+* Device to reset a ltspice integrator (third parameter)
+* Gives a short impulse  if in goes from 0 to 1
+* Reset has to be a 0-1-0
+* note: td2 > td1
+* v(in) is 0->1 and may also go later to 0 again without changing output=v(res)
+.subckt step2pulse in res params: td1=100u td2=200u
+A1 IN N001 0 0 0 0 res 0 AND Td={td1}
+A2 IN 0 0 0 0 N001 0 0 BUF Td={td2}
+* R1 Vx N001 100
+* V1 Vx 0 pwl 0s 1v
+.ends
+
+* gives a ramp at output if
+* input is changed from 0 to 1 or 1 to 0 
+.subckt step2ramp in ramp params: td=1n trise=100m tfall=100m
+A1 in 0 0 0 0 0 ramp 0 OR tfall={tfall} trise={trise} td={td}
+.ends
+
+
+
+
+
+

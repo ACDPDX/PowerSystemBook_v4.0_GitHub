@@ -28,10 +28,10 @@ LINE Normal 15 36 15 36
 LINE Normal 15 28 15 36
 LINE Normal 15 28 15 28
 LINE Normal -15 28 15 28
-LINE Normal 41 -10 -41 -10 2
-LINE Normal 41 42 41 -10 2
-LINE Normal -41 42 41 42 2
-LINE Normal -41 -10 -41 42 2
+LINE Normal 41 -10 -41 -10
+LINE Normal 41 42 41 -10
+LINE Normal -41 42 41 42
+LINE Normal -41 -10 -41 42
 SYMATTR Prefix X
 SYMATTR SpiceModel Impedance
 SYMATTR Value length=1 fn={fn1}
