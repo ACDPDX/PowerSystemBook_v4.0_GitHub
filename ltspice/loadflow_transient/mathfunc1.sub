@@ -224,6 +224,14 @@ R1 idt1 0 1e10
 .subckt int in out
 B1 0 out I=int(v(in)) rpar=1 tripdv={tdv} tripdt={tdt}
 .ends int
+************************
+*
+*	inv(x)
+*
+************************
+.subckt inv in out
+B1 0 out I=-(v(in)) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends int
 ********************************
 *
 *	ln(x), log(x)
@@ -253,6 +261,14 @@ B1 0 out I=log10(v(in)) Rpar=1  tripdv={tdv} tripdt={tdt}
 .param y=2
 B1 0 out I=v(in)-int(v(in)/y)*y Rpar=1 tripdv={tdv} tripdt={tdt}
 .ends mod1
+************************
+*
+*	neg(x)
+*
+************************
+.subckt neg in out
+B1 0 out I=-(v(in)) rpar=1 tripdv={tdv} tripdt={tdt}
+.ends int
 ************************
 *
 *	pow(x)

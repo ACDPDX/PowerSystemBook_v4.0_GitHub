@@ -244,6 +244,7 @@ Ef      f   0  VALUE={v(n)*p/60} tripdv={tdv} tripdt={tdt}
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1; 
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -371,7 +372,7 @@ EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 * Xd of generator for cylindrical pole machine
 Exd xd 0 VALUE={Xd} tripdv={tdv} tripdt={tdt}
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 Rn1 n 0 1k
 Vn n 0 {n1}
 * friction
@@ -413,6 +414,7 @@ Ef      f   0  VALUE={v(n)*p/60} tripdv={tdv} tripdt={tdt}
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -540,7 +542,7 @@ EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 * Xd of generator for cylindrical pole machine
 Exd xd 0 VALUE={Xd} tripdv={tdv} tripdt={tdt}
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 Rn1 n 0 1k
 Vn n 0 {n1}
 * friction
@@ -1070,6 +1072,7 @@ Eomega omega 0 VALUE={DDT(v(alpha))} tripdv={tdv} tripdt={tdt}
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -1549,6 +1552,7 @@ Ctheta theta 0 10u
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -1662,7 +1666,7 @@ Rtheta theta 0 1
 Ctheta theta 0 10u
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 Rn1 n 0 1k
 Vn n 0 {n1}
 * friction
@@ -1698,6 +1702,7 @@ Ral   alpha   0      1
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -1832,7 +1837,7 @@ Rtheta theta 0 1
 Ctheta theta 0 10u
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 Rn1 n 0 1k
 Vn n 0 {n1}
 * friction
@@ -1927,6 +1932,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 +  alpha_0=0
 *+  U_E={UN*sqrt(2)*RE/(omega_el*Lhd3)}
 +  err0=0 RE_factor=0.6666 ;Matlab compatible with RE_factor=2/3=0.6666
++   Mvz=1;
 .PARAM
 +	UN={UN_verkettet/sqrt(3)}
 +	ZN={UN/IN}
@@ -2018,7 +2024,7 @@ Ridy    idy    0    1MEG
 Gm1     0    mi      VALUE={ Lhd3*(v(isx)+v(ie)+v(idx))*v(isy)} tripdv={tdv} tripdt={tdt}
 Gm2     0    mi      VALUE={-Lhq3*(v(isy)+v(idy))*v(isx)} tripdv={tdv} tripdt={tdt}
 Rm      mi    0      {1.5*p}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -2137,6 +2143,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 +  alpha_0=0
 *+  U_E={UN*sqrt(2)*RE/(omega_el*Lhd3)}
 +  err0=0 RE_factor=0.6666 ;Matlab compatible with RE_factor=2/3=0.6666
++   Mvz=1;
 .PARAM
 +	UN={UN_verkettet/sqrt(3)}
 +	ZN={UN/IN}
@@ -2228,7 +2235,7 @@ Ridy    idy    0    1MEG
 Gm1     0    mi      VALUE={ Lhd3*(v(isx)+v(ie)+v(idx))*v(isy)} tripdv={tdv} tripdt={tdt}
 Gm2     0    mi      VALUE={-Lhq3*(v(isy)+v(idy))*v(isx)} tripdv={tdv} tripdt={tdt}
 Rm      mi    0      {1.5*p}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -2349,6 +2356,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 +  alpha_0=0
 *+  U_E={UN*sqrt(2)*RE/(omega_el*Lhd3)}
 +  err0=0 RE_factor=0.6666 ;Matlab compatible with RE_factor=2/3=0.6666
++   Mvz=1;
 .PARAM
 +  a1={a}
 +  m1={m}
@@ -2447,7 +2455,7 @@ Elhq3 Lhq3 0 VALUE={Lhq3*(1/(a2+(1-a2)*PWRS(LIMIT(abs(v(psihy)+1p)/PsiN,-10,10),
 *Gm2     0    mi      VALUE={-v(Lhq3)*(v(isy)+v(idy))*v(isx)} tripdv={tdv} tripdt={tdt}
 *Rm      mi    0      {1.5*p}
 Emi		Mi	0	VALUE={1.5*p*(v(psihx)*v(isy)-v(psihy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -3412,6 +3420,7 @@ Ctheta theta 0 10u
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -3525,7 +3534,7 @@ Rtheta theta 0 1
 Ctheta theta 0 10u
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 Rn1 n 0 1k
 Vn n 0 {n1}
 * friction
@@ -4245,6 +4254,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -4379,7 +4389,7 @@ Rtheta theta 0 1
 Ctheta theta 0 10u
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 Rn1 n 0 1k
 Vn n 0 {n1}
 * friction
@@ -4478,6 +4488,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 *+  psi_hx0=0; {Lhd3*U_E/RE}
 *+  psi_E0=0 ;{(Lhd3+LE)*U_E/RE}
 *+  psi_hy0=0   I0_0=0
++   Mvz=1;
 .PARAM
 +	UN={UN_verkettet/sqrt(3)}
 +	ZN={UN/IN}
@@ -4569,7 +4580,7 @@ Ridy    idy    0    1MEG
 Gm1     0    mi      VALUE={ Lhd3*(v(isx)+v(ie)+v(idx))*v(isy)} tripdv={tdv} tripdt={tdt}
 Gm2     0    mi      VALUE={-Lhq3*(v(isy)+v(idy))*v(isx)} tripdv={tdv} tripdt={tdt}
 Rm      mi    0      {1.5*p}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -4688,6 +4699,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +  a1={a}
 +  m1={m}
@@ -4787,7 +4799,7 @@ Elhq3 Lhq3 0 VALUE={Lhq3*(1/(a2+(1-a2)*PWRS(LIMIT(abs(v(psihy)+1p)/PsiN,-10,10),
 *Gm2     0    mi      VALUE={-v(Lhq3)*(v(isy)+v(idy))*v(isx)} tripdv={tdv} tripdt={tdt}
 *Rm      mi    0      {1.5*p}
 Emi		Mi	0	VALUE={1.5*p*(v(psihx)*v(isy)-v(psihy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -5478,6 +5490,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -5612,7 +5625,7 @@ Rtheta theta 0 1
 Ctheta theta 0 10u
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 Rn1 n 0 1k
 Vn n 0 {n1}
 * friction
@@ -5703,6 +5716,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 +  err0=1 RE_factor=0.6666 ;Matlab compatible with RE_factor=2/3=0.6666
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=1
++   Mvz=1;
 .PARAM
 +   a1={a}
 +   m1={m}
@@ -5814,7 +5828,7 @@ Elhq3 Lhq3 0 VALUE={Lhq3*(1/(a2+(1-a2)*PWRS(LIMIT(abs(v(psihy)+1p)/PsiN,-10,10),
 *Gm2     0    mi1      VALUE={-v(Lhq3)*(v(isy)+v(idy1))*v(isx)} tripdv={tdv} tripdt={tdt}
 *Rm2     mi1    0      {1.5*p}
 Emi		Mi	0	VALUE={1.5*p*(v(psihx)*v(isy)-v(psihy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={(-v(Mi)+v(Rbg))*Mvz} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -6323,6 +6337,7 @@ XU21 verr verr1 SW_1Phase_off_1a t_Stop={t_stop_fixerr} t_Start={t_start_fixerr}
 +  err0=1 RE_factor=0.6666 ;Matlab compatible with RE_factor=2/3=0.6666
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=1
++   Mvz=1;
 .PARAM
 +   a1={a}
 +   m1={m}
@@ -6434,7 +6449,7 @@ Elhq3 Lhq3 0 VALUE={Lhq3*(1/(a2+(1-a2)*PWRS(LIMIT(abs(v(psihy)+1p)/PsiN,-10,10),
 *Gm2     0    mi1      VALUE={-v(Lhq3)*(v(isy)+v(idy1))*v(isx)} tripdv={tdv} tripdt={tdt}
 *Rm2     mi1    0      {1.5*p}
 Emi		Mi	0	VALUE={1.5*p*(v(psihx)*v(isy)-v(psihy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -6717,6 +6732,7 @@ Ctheta theta 0 10u
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -6830,7 +6846,7 @@ Rtheta theta 0 1
 Ctheta theta 0 10u
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 Rn1 n 0 1k
 Vn n 0 {n1}
 * friction
@@ -6864,6 +6880,7 @@ Ral   alpha   0      1
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -6998,7 +7015,7 @@ Rtheta theta 0 1
 Ctheta theta 0 10u
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 Rn1 n 0 1k
 Vn n 0 {n1}
 * friction
@@ -7096,6 +7113,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 *+  psi_hx0=0; {Lhd3*U_E/RE}
 *+  psi_E0=0 ;{(Lhd3+LE)*U_E/RE}
 *+  psi_hy0=0   I0_0=0
++   Mvz=1;
 .PARAM
 +	UN={UN_verkettet/sqrt(3)}
 +	ZN={UN/IN}
@@ -7187,7 +7205,7 @@ Ridy    idy    0    1MEG
 Gm1     0    mi      VALUE={ Lhd3*(v(isx)+v(ie)+v(idx))*v(isy)} tripdv={tdv} tripdt={tdt}
 Gm2     0    mi      VALUE={-Lhq3*(v(isy)+v(idy))*v(isx)} tripdv={tdv} tripdt={tdt}
 Rm      mi    0      {1.5*p}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -7309,6 +7327,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 *+  psi_hx0=0; {Lhd3*U_E/RE}
 *+  psi_E0=0 ;{(Lhd3+LE)*U_E/RE}
 *+  psi_hy0=0   I0_0=0
++   Mvz=1;
 .PARAM
 +	UN={UN_verkettet/sqrt(3)}
 +	ZN={UN/IN}
@@ -7385,7 +7404,7 @@ Risy    isy    0    1MEG
 Gm1     0    mi      VALUE={ Lhd3*(v(isx)+v(ie))*v(isy)} tripdv={tdv} tripdt={tdt}
 Gm2     0    mi      VALUE={-Lhq3*(v(isy))*v(isx)} tripdv={tdv} tripdt={tdt}
 Rm      mi    0      {1.5*p}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -7503,6 +7522,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 +  alpha_0=0
 *+  U_E={UN*sqrt(2)*RE/(omega_el*Lhd3)}
 +  err0=0 RE_factor=0.6666 ;Matlab compatible with RE_factor=2/3=0.6666
++   Mvz=1;
 .PARAM
 +  a1={a}
 +  m1={m}
@@ -7601,7 +7621,7 @@ Elhq3 Lhq3 0 VALUE={Lhq3*(1/(a2+(1-a2)*PWRS(LIMIT(abs(v(psihy)+1p)/PsiN,-10,10),
 *Gm2     0    mi      VALUE={-v(Lhq3)*(v(isy)+v(idy))*v(isx)} tripdv={tdv} tripdt={tdt}
 *Rm      mi    0      {1.5*p}
 Emi		Mi	0	VALUE={1.5*p*(v(psihx)*v(isy)-v(psihy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -8800,6 +8820,7 @@ Ctheta theta 0 10u
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -8913,7 +8934,7 @@ Rtheta theta 0 1
 Ctheta theta 0 10u
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 Rn1 n 0 1k
 Vn n 0 {n1}
 * friction
@@ -8941,6 +8962,7 @@ Ral   alpha   0      1
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=1
 +   RE_factor=0.6666
++   Mvz=1;
 .PARAM
 +   a1={a}
 +   m1={m}
@@ -9054,7 +9076,7 @@ Elhq3 Lhq3 0 VALUE={Lhq3*(1/(a2+(1-a2)*PWRS(LIMIT(abs(v(psihy)+1p)/PsiN,-10,10),
 *Gm2     0    mi      VALUE={-Lhq3*(v(isy)+v(idy1)+v(idy2))*v(isx)} tripdv={tdv} tripdt={tdt}
 *Rm      mi    0      {1.5*p}
 Emi		Mi	0	VALUE={1.5*p*(v(psihx)*v(isy)-v(psihy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -9181,6 +9203,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)}  tripdv={tdv} tripdt={tdt}
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -9315,7 +9338,7 @@ Rtheta theta 0 1
 Ctheta theta 0 10u
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 Rn1 n 0 1k
 Vn n 0 {n1}
 * friction
@@ -9413,6 +9436,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -9547,7 +9571,7 @@ Rtheta theta 0 1
 Ctheta theta 0 10u
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 Rn1 n 0 1k
 Vn n 0 {n1}
 * friction
@@ -9647,6 +9671,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 *+  psi_hx0=0; {Lhd3*U_E/RE}
 *+  psi_E0=0 ;{(Lhd3+LE)*U_E/RE}
 *+  psi_hy0=0   I0_0=0
++   Mvz=1;
 .PARAM
 +	UN={UN_verkettet/sqrt(3)}
 +	ZN={UN/IN}
@@ -9738,7 +9763,7 @@ Ridy    idy    0    1MEG
 Gm1     0    mi      VALUE={ Lhd3*(v(isx)+v(ie)+v(idx))*v(isy)} tripdv={tdv} tripdt={tdt}
 Gm2     0    mi      VALUE={-Lhq3*(v(isy)+v(idy))*v(isx)} tripdv={tdv} tripdt={tdt}
 Rm      mi    0      {1.5*p}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -9858,6 +9883,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 +   m=7
 +   alpha_0=0
 +   err0=1 RE_factor=0.6666 ;Matlab compatible with RE_factor=2/3=0.6666
++   Mvz=1;
 .PARAM
 +  a1={a}
 +  m1={m}
@@ -9957,7 +9983,7 @@ Elhq3 Lhq3 0 VALUE={Lhq3*(1/(a2+(1-a2)*PWRS(LIMIT(abs(v(psihy)+1p)/PsiN,-10,10),
 *Gm2     0    mi      VALUE={-v(Lhq3)*(v(isy)+v(idy))*v(isx)} tripdv={tdv} tripdt={tdt}
 *Rm      mi    0      {1.5*p}
 Emi		Mi	0	VALUE={1.5*p*(v(psihx)*v(isy)-v(psihy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -10992,6 +11018,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 +   err0=1 RE_factor=0.6666 ;Matlab compatible with RE_factor=2/3=0.6666
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=1
++   Mvz=1;
 .PARAM
 +   a1={a}
 +   m1={m}
@@ -11101,7 +11128,7 @@ Elhq3 Lhq3 0 VALUE={Lhq3*(1/(a2+(1-a2)*PWRS(LIMIT(abs(v(psihy)+1p)/PsiN,-10,10),
 *Gm2     0    mi      VALUE={-Lhq3*(v(isy)+v(idy1)+v(idy2))*v(isx)} tripdv={tdv} tripdt={tdt}
 *Rm      mi    0      {1.5*p}
 Emi		Mi	0	VALUE={1.5*p*(v(psihx)*v(isy)-v(psihy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -11213,6 +11240,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 +  err0=1 RE_factor=0.6666 ;Matlab compatible with RE_factor=2/3=0.6666
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=1
++   Mvz=1;
 .PARAM
 +   a1={a}
 +   m1={m}
@@ -11324,7 +11352,7 @@ Elhq3 Lhq3 0 VALUE={Lhq3*(1/(a2+(1-a2)*PWRS(LIMIT(abs(v(psihy)+1p)/PsiN,-10,10),
 *Gm2     0    mi1      VALUE={-v(Lhq3)*(v(isy)+v(idy1))*v(isx)} tripdv={tdv} tripdt={tdt}
 *Rm2     mi1    0      {1.5*p}
 Emi		Mi	0	VALUE={1.5*p*(v(psihx)*v(isy)-v(psihy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -11608,6 +11636,7 @@ Ctheta theta 0 10u
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -11721,7 +11750,7 @@ Rtheta theta 0 1
 Ctheta theta 0 10u
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 Rn1 n 0 1k
 Vn n 0 {n1}
 * friction
@@ -11755,6 +11784,7 @@ Ral   alpha   0      1
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -11889,7 +11919,7 @@ Rtheta theta 0 1
 Ctheta theta 0 10u
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 Rn1 n 0 1k
 Vn n 0 {n1}
 * friction
@@ -11987,6 +12017,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 *+  psi_hx0=0; {Lhd3*U_E/RE}
 *+  psi_E0=0 ;{(Lhd3+LE)*U_E/RE}
 *+  psi_hy0=0   I0_0=0
++   Mvz=1;
 .PARAM
 +	UN={UN_verkettet/sqrt(3)}
 +	ZN={UN/IN}
@@ -12078,7 +12109,7 @@ Ridy    idy    0    1MEG
 Gm1     0    mi      VALUE={ Lhd3*(v(isx)+v(ie)+v(idx))*v(isy)} tripdv={tdv} tripdt={tdt}
 Gm2     0    mi      VALUE={-Lhq3*(v(isy)+v(idy))*v(isx)} tripdv={tdv} tripdt={tdt}
 Rm      mi    0      {1.5*p}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -12197,6 +12228,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 +   m=7
 +   alpha_0=0
 +   err0=1 RE_factor=0.6666 ;Matlab compatible with RE_factor=2/3=0.6666
++   Mvz=1;
 .PARAM
 +  a1={a}
 +  m1={m}
@@ -12296,7 +12328,7 @@ Elhq3 Lhq3 0 VALUE={Lhq3*(1/(a2+(1-a2)*PWRS(LIMIT(abs(v(psihy)+1p)/PsiN,-10,10),
 *Gm2     0    mi      VALUE={-v(Lhq3)*(v(isy)+v(idy))*v(isx)} tripdv={tdv} tripdt={tdt}
 *Rm      mi    0      {1.5*p}
 Emi		Mi	0	VALUE={1.5*p*(v(psihx)*v(isy)-v(psihy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -13489,6 +13521,7 @@ Ctheta theta 0 10u
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -13602,7 +13635,7 @@ Rtheta theta 0 1
 Ctheta theta 0 10u
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 Rn1 n 0 1k
 Vn n 0 {n1}
 * friction
@@ -13640,6 +13673,7 @@ Ral   alpha   0      1
 +   alpha_0=0
 +   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
 +   m=7
++   Mvz=1;
 .PARAM
 +   a1={a};  Saturation parameter d-axis
 +   m1={m};  Saturation parameter d-axis
@@ -13774,7 +13808,7 @@ Rtheta theta 0 1
 Ctheta theta 0 10u
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 Rn1 n 0 1k
 Vn n 0 {n1}
 * friction
@@ -13873,6 +13907,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 *+  psi_hx0=0; {Lhd3*U_E/RE}
 *+  psi_E0=0 ;{(Lhd3+LE)*U_E/RE}
 *+  psi_hy0=0   I0_0=0
++   Mvz=1;
 .PARAM
 +	UN={UN_verkettet/sqrt(3)}
 +	ZN={UN/IN}
@@ -13964,7 +13999,7 @@ Ridy    idy    0    1MEG
 Gm1     0    mi      VALUE={ Lhd3*(v(isx)+v(ie)+v(idx))*v(isy)} tripdv={tdv} tripdt={tdt}
 Gm2     0    mi      VALUE={-Lhq3*(v(isy)+v(idy))*v(isx)} tripdv={tdv} tripdt={tdt}
 Rm      mi    0      {1.5*p}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
@@ -14084,6 +14119,7 @@ EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 +   m=7
 +   alpha_0=0
 +   err0=0 RE_factor=0.6666 ;Matlab compatible with RE_factor=2/3=0.6666
++   Mvz=1;
 .PARAM
 +  a1={a}
 +  m1={m}
@@ -14183,7 +14219,7 @@ Elhq3 Lhq3 0 VALUE={Lhq3*(1/(a2+(1-a2)*PWRS(LIMIT(abs(v(psihy)+1p)/PsiN,-10,10),
 *Gm2     0    mi      VALUE={-v(Lhq3)*(v(isy)+v(idy))*v(isx)} tripdv={tdv} tripdt={tdt}
 *Rm      mi    0      {1.5*p}
 Emi		Mi	0	VALUE={1.5*p*(v(psihx)*v(isy)-v(psihy)*v(isx))} tripdv={tdv} tripdt={tdt}
-EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
 *    Friction
 GRbg  0	   Rbg1	   TABLE {v(n)} (-1,-1) (1,1)
 RRbg  Rbg1	0	   1
