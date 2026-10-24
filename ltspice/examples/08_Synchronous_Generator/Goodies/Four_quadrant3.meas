@@ -1,0 +1,11 @@
+.meas TRAN usx3 FIND v(gen2:usx) AT 10s
+.meas TRAN usy3 FIND v(gen2:usy) AT 10s
+.meas TRAN isx3 FIND v(gen2:isx) AT 10s
+.meas TRAN isy3 FIND v(gen2:isy) AT 10s
+.meas TRAN imx3 FIND v(gen2:imx) AT 10s
+.meas TRAN imy3 FIND v(gen2:imy) AT 10s
+
+
+ 
+
+ 
