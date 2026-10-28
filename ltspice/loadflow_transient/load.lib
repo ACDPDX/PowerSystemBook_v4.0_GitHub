@@ -295,9 +295,9 @@ RGND N 0 {g}
 +	R2={V*V/PN20}
 +	R3={V*V/PN30}
 Rctrl ctrl 0 1e12   
-GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R1*pf)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R2*pf)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 N VALUE={(v(ctrl)+1p)*v(L1,N)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={(v(ctrl)+1p)*v(L2,N)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={(v(ctrl)+1p)*v(L3,N)/(R3*pf)} tripdv={tdv} tripdt={tdt}
 RGND N 0 {g}
 .ENDS
 
@@ -333,21 +333,21 @@ RGND N 0 {g}
 +	L2={(V*V*QN20/(PN20*PN20+QN20*QN20))/omega}
 +	L3={(V*V*QN30/(PN30*PN30+QN30*QN30))/omega}
 Rctrl ctrl 0 1e12
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R1*pf)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R2*pf)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={(v(ctrl)+1p)*v(L2,L2a)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={(v(ctrl)+1p)*v(L3,L3a)/(R3*pf)} tripdv={tdv} tripdt={tdt}
 RL1 L1a L1b {rser}
 RL2 L2a L2b {rser}
 RL3 L3a L3b {rser}
-GLL1 L1b N VALUE={v(ctrl)*v(idt1)/(L1*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL1 L1b N VALUE={(v(ctrl)+1p)*v(idt1)/(L1*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G1x 0 idt1 VALUE={v(L1b,N)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
-GLL2 L2b N VALUE={v(ctrl)*v(idt2)/(L2*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL2 L2b N VALUE={(v(ctrl)+1p)*v(idt2)/(L2*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G2x 0 idt2 VALUE={v(L2b,N)} tripdv=1 tripdt=1
 C2x idt2 0 1
 R2x idt2 0 1e10
-GLL3 L3b N VALUE={v(ctrl)*v(idt3)/(L3*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL3 L3b N VALUE={(v(ctrl)+1p)*v(idt3)/(L3*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G3x 0 idt3 VALUE={v(L3b,N)} tripdv=1 tripdt=1
 C3x idt3 0 1
 R3x idt3 0 1e10
@@ -386,7 +386,7 @@ RGND N 0 {g}
 +	L3={(V*V*QN30/(PN30*PN30+QN30*QN30))/omega}
 Rctrl ctrl 0 1e12
 Rctrl1 ctrl1 0 1e12
-Ectrl ctrl1 0 value={1/(sqrt(v(ctrl))+1p)} tripdv=1 tripdt=1
+Ectrl ctrl1 0 value={1/(sqrt((v(ctrl)+1p))+1p)} tripdv=1 tripdt=1
 XU7 L1 L2 L3 N1 P001 P002 P003 N2 ctrl1 Trafo3Yy0_ideal_ctrl1 U1Nenn={VN} U20={VN} fn={fn} N1=1000
 L1 P001 N {L1*pf} rser={R1*pf}
 L2 P002 N {L2*pf} rser={R2*pf}
@@ -428,15 +428,15 @@ RGND N 0 {g}
 + C2={IF(QN2>=0,(PN20*PN20+QN20*QN20)/(V*V*QN20*omega),-(PN20*PN20+QN20*QN20)/(V*V*QN20*omega))}
 + C3={IF(QN3>=0,(PN30*PN30+QN30*QN30)/(V*V*QN30*omega),-(PN30*PN30+QN30*QN30)/(V*V*QN30*omega))}
 Rctrl ctrl 0 1e12
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R1*pf)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R2*pf)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={(v(ctrl)+1p)*v(L2,L2a)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={(v(ctrl)+1p)*v(L3,L3a)/(R3*pf)} tripdv={tdv} tripdt={tdt}
 RC1 L1a L1b {rser}
 RC2 L2a L2b {rser}
 RC3 L3a L3b {rser}
-GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*(C1/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL2 L2b N VALUE={v(ctrl)*DDT(v(L2b,N))*(C2/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL3 L3b N VALUE={v(ctrl)*DDT(v(L3b,N))*(C3/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL1 L1b N VALUE={(v(ctrl)+1p)*DDT(v(L1b,N))*(C1/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b N VALUE={(v(ctrl)+1p)*DDT(v(L2b,N))*(C2/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b N VALUE={(v(ctrl)+1p)*DDT(v(L3b,N))*(C3/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
 RGND N 0 {g}
 .ENDS
 
@@ -472,21 +472,21 @@ RGND N 0 {g}
 +	L2={(V*V/QN20)/omega}
 +	L3={(V*V/QN30)/omega}
 Rctrl ctrl 0 1e12
-GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R1*pf)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R2*pf)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 N VALUE={(v(ctrl)+1p)*v(L1,N)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={(v(ctrl)+1p)*v(L2,N)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={(v(ctrl)+1p)*v(L3,N)/(R3*pf)} tripdv={tdv} tripdt={tdt}
 RL1 L1 L1a {rser}
 RL2 L2 L2a {rser}
 RL3 L3 L3a {rser}
-GLL1 L1a N VALUE={v(ctrl)*v(idt1)/(L1*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL1 L1a N VALUE={(v(ctrl)+1p)*v(idt1)/(L1*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G1x 0 idt1 VALUE={v(L1a,N)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
-GLL2 L2a N VALUE={v(ctrl)*v(idt2)/(L2*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL2 L2a N VALUE={(v(ctrl)+1p)*v(idt2)/(L2*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G2x 0 idt2 VALUE={v(L2a,N)} tripdv=1 tripdt=1
 C2x idt2 0 1
 R2x idt2 0 1e10
-GLL3 L3a N VALUE={v(ctrl)*v(idt3)/(L3*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL3 L3a N VALUE={(v(ctrl)+1p)*v(idt3)/(L3*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G3x 0 idt3 VALUE={v(L3a,N)} tripdv=1 tripdt=1
 C3x idt3 0 1
 R3x idt3 0 1e10
@@ -525,7 +525,7 @@ RGND N 0 {g}
 +	L2={(V*V/QN20)/omega}
 +	L3={(V*V/QN30)/omega}
 Rctrl ctrl 0 1e12
-Ectrl ctrl1 0 value={1/(sqrt(v(ctrl))+1p)} tripdv=1 tripdt=1
+Ectrl ctrl1 0 value={1/(sqrt((v(ctrl)+1p))+1p)} tripdv=1 tripdt=1
 XU7 L1 L2 L3 N1 P001 P002 P003 N2 ctrl1 Trafo3Yy0_ideal_ctrl1 U1Nenn={VN} U20={VN} fn={fn} N1=1000
 L1 P001 N {L1*pf} rser={rser}
 L2 P002 N {L2*pf} rser={rser}
@@ -572,15 +572,15 @@ RGND N 0 {g}
 +	C2={IF(QN2>=0,QN20/(V*V*omega),-QN20/(V*V*omega))}
 +	C3={IF(QN3>=0,QN30/(V*V*omega),-QN30/(V*V*omega))}
 Rctrl ctrl 0 1e12
-GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R1*pf)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R2*pf)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 N VALUE={(v(ctrl)+1p)*v(L1,N)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={(v(ctrl)+1p)*v(L2,N)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={(v(ctrl)+1p)*v(L3,N)/(R3*pf)} tripdv={tdv} tripdt={tdt}
 RC1 L1 L1b {rser}
 RC2 L2 L2b {rser}
 RC3 L3 L3b {rser}
-GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*(C1/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL2 L2b N VALUE={v(ctrl)*DDT(v(L2b,N))*(C2/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL3 L3b N VALUE={v(ctrl)*DDT(v(L3b,N))*(C3/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL1 L1b N VALUE={(v(ctrl)+1p)*DDT(v(L1b,N))*(C1/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b N VALUE={(v(ctrl)+1p)*DDT(v(L2b,N))*(C2/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b N VALUE={(v(ctrl)+1p)*DDT(v(L3b,N))*(C3/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
 RGND N 0 {g}
 .ENDS
 
@@ -1083,9 +1083,9 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 
 * CONST R
 * IR = U/R   R=R*(ua^2/VN^2)
-GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 N VALUE={(v(ctrl)+1p)*v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={(v(ctrl)+1p)*v(L2,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={(v(ctrl)+1p)*v(L3,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 RGND N 0 {g}
 .ENDS
 
@@ -1122,23 +1122,23 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua^2/VN^2)
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={(v(ctrl)+1p)*v(L2,L2a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={(v(ctrl)+1p)*v(L3,L3a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 * CONST L
 * IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
 RL1 L1a L1b {rser}
 RL2 L2a L2b {rser}
 RL3 L3a L3b {rser}
-GLL1 L1b N VALUE={v(ctrl)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL1 L1b N VALUE={(v(ctrl)+1p)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G1x 0 idt1 VALUE={v(L1b,N)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
-GLL2 L2b N VALUE={v(ctrl)*v(idt2)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL2 L2b N VALUE={(v(ctrl)+1p)*v(idt2)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G2x 0 idt2 VALUE={v(L2b,N)} tripdv=1 tripdt=1
 C2x idt2 0 1
 R2x idt2 0 1e10
-GLL3 L3b N VALUE={v(ctrl)*v(idt3)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL3 L3b N VALUE={(v(ctrl)+1p)*v(idt3)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G3x 0 idt3 VALUE={v(L3b,N)} tripdv=1 tripdt=1
 C3x idt3 0 1
 R3x idt3 0 1e10
@@ -1178,17 +1178,17 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua^2/VN^2)
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={(v(ctrl)+1p)*v(L2,L2a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={(v(ctrl)+1p)*v(L3,L3a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 * CONST C
 * IC = C*d(U)/dt  C=C*(VN^2/ua^2)
 RC1 L1a L1b {rser}
 RC2 L2a L2b {rser}
 RC3 L3a L3b {rser}
-GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL2 L2b N VALUE={v(ctrl)*DDT(v(L2b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL3 L3b N VALUE={v(ctrl)*DDT(v(L3b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL1 L1b N VALUE={(v(ctrl)+1p)*DDT(v(L1b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b N VALUE={(v(ctrl)+1p)*DDT(v(L2b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b N VALUE={(v(ctrl)+1p)*DDT(v(L3b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
 RGND N 0 {g}
 .ENDS
 
@@ -1225,23 +1225,23 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua^2/VN^2)
-GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 N VALUE={(v(ctrl)+1p)*v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={(v(ctrl)+1p)*v(L2,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={(v(ctrl)+1p)*v(L3,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 * CONST L
 * IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
 RL1 L1 L1a {rser}
 RL2 L2 L2a {rser}
 RL3 L3 L3a {rser}
-GLL1 L1a N VALUE={v(ctrl)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GLL1 L1a N VALUE={(v(ctrl)+1p)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 G1x 0 idt1 VALUE={v(L1a,N)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
-GLL2 L2a N VALUE={v(ctrl)*v(idt2)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GLL2 L2a N VALUE={(v(ctrl)+1p)*v(idt2)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 G2x 0 idt2 VALUE={v(L2a,N)} tripdv=1 tripdt=1
 C2x idt2 0 1
 R2x idt2 0 1e10
-GLL3 L3a N VALUE={v(ctrl)*v(idt3)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GLL3 L3a N VALUE={(v(ctrl)+1p)*v(idt3)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 G3x 0 idt3 VALUE={v(L3a,N)} tripdv=1 tripdt=1
 C3x idt3 0 1
 R3x idt3 0 1e10
@@ -1281,17 +1281,17 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua^2/VN^2)
-GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 N VALUE={(v(ctrl)+1p)*v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={(v(ctrl)+1p)*v(L2,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={(v(ctrl)+1p)*v(L3,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 * CONST C
 * IC = C*d(U)/dt  C=C*(VN^2/ua^2
 RC1 L1 L1b {rser}
 RC2 L2 L2b {rser}
 RC3 L3 L3b {rser}
-GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL2 L2b N VALUE={v(ctrl)*DDT(v(L2b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL3 L3b N VALUE={v(ctrl)*DDT(v(L3b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL1 L1b N VALUE={(v(ctrl)+1p)*DDT(v(L1b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b N VALUE={(v(ctrl)+1p)*DDT(v(L2b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b N VALUE={(v(ctrl)+1p)*DDT(v(L3b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
 RGND N 0 {g}
 .ENDS
 
@@ -1323,9 +1323,9 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua/VN)
-GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 N VALUE={(v(ctrl)+1p)*v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={(v(ctrl)+1p)*v(L2,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={(v(ctrl)+1p)*v(L3,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 RGND N 0 {g}
 .ENDS
 
@@ -1362,23 +1362,23 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua^2/VN^2)
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={(v(ctrl)+1p)*v(L2,L2a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={(v(ctrl)+1p)*v(L3,L3a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 * CONST L
 * IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
 RL1 L1a L1b {rser}
 RL2 L2a L2b {rser}
 RL3 L3a L3b {rser}
-GLL1 L1b N VALUE={v(ctrl)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL1 L1b N VALUE={(v(ctrl)+1p)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G1x 0 idt1 VALUE={v(L1b,N)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
-GLL2 L2b N VALUE={v(ctrl)*v(idt2)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL2 L2b N VALUE={(v(ctrl)+1p)*v(idt2)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G2x 0 idt2 VALUE={v(L2b,N)} tripdv=1 tripdt=1
 C2x idt2 0 1
 R2x idt2 0 1e10
-GLL3 L3b N VALUE={v(ctrl)*v(idt3)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL3 L3b N VALUE={(v(ctrl)+1p)*v(idt3)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G3x 0 idt3 VALUE={v(L3b,N)} tripdv=1 tripdt=1
 C3x idt3 0 1
 R3x idt3 0 1e10
@@ -1418,17 +1418,17 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua^2/VN^2)
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={(v(ctrl)+1p)*v(L2,L2a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={(v(ctrl)+1p)*v(L3,L3a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 * CONST C
 * IC = C*d(U)/dt  C=C*(VN^2/ua^2)
 RC1 L1a L1b {rser}
 RC2 L2a L2b {rser}
 RC3 L3a L3b {rser}
-GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL2 L2b N VALUE={v(ctrl)*DDT(v(L2b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL3 L3b N VALUE={v(ctrl)*DDT(v(L3b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL1 L1b N VALUE={(v(ctrl)+1p)*DDT(v(L1b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b N VALUE={(v(ctrl)+1p)*DDT(v(L2b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b N VALUE={(v(ctrl)+1p)*DDT(v(L3b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
 RGND N 0 {g}
 .ENDS
 
@@ -1464,23 +1464,23 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua/VN)
-GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 N VALUE={(v(ctrl)+1p)*v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={(v(ctrl)+1p)*v(L2,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={(v(ctrl)+1p)*v(L3,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 * CONST L
 * IL = 1/L * Int(U) dt  L=L*(ua/VN)
 RL1 L1 L1a {rser}
 RL2 L2 L2a {rser}
 RL3 L3 L3a {rser}
-GLL1 L1a N VALUE={v(ctrl)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GLL1 L1a N VALUE={(v(ctrl)+1p)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 G1x 0 idt1 VALUE={v(L1a,N)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
-GLL2 L2a N VALUE={v(ctrl)*v(idt2)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GLL2 L2a N VALUE={(v(ctrl)+1p)*v(idt2)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 G2x 0 idt2 VALUE={v(L2a,N)} tripdv=1 tripdt=1
 C2x idt2 0 1
 R2x idt2 0 1e10
-GLL3 L3a N VALUE={v(ctrl)*v(idt3)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GLL3 L3a N VALUE={(v(ctrl)+1p)*v(idt3)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 G3x 0 idt3 VALUE={v(L3a,N)} tripdv=1 tripdt=1
 C3x idt3 0 1
 R3x idt3 0 1e10
@@ -1519,17 +1519,17 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua/VN)
-GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 N VALUE={v(ctrl)*v(L2,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 N VALUE={v(ctrl)*v(L3,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 N VALUE={(v(ctrl)+1p)*v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 N VALUE={(v(ctrl)+1p)*v(L2,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 N VALUE={(v(ctrl)+1p)*v(L3,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 * CONST C
 * IC = C*d(U)/dt  C=C*(VN/ua)
 RC1 L1 L1b {rser}
 RC2 L2 L2b {rser}
 RC3 L3 L3b {rser}
-GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL2 L2b N VALUE={v(ctrl)*DDT(v(L2b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL3 L3b N VALUE={v(ctrl)*DDT(v(L3b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL1 L1b N VALUE={(v(ctrl)+1p)*DDT(v(L1b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b N VALUE={(v(ctrl)+1p)*DDT(v(L2b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b N VALUE={(v(ctrl)+1p)*DDT(v(L3b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
 RGND N 0 {g}
 .ENDS
 
@@ -1791,9 +1791,9 @@ CL3 L3 L1 {C3/pf} Rser={rser}
 +	R2={IF(PN2>0,VN*VN/PN2,VN*VN/PQ0)}
 +	R3={IF(PN3>0,VN*VN/PN3,VN*VN/PQ0)}
 Rctrl ctrl 0 1e12
-GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R1*pf)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R2*pf)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L2 VALUE={(v(ctrl)+1p)*v(L1,L2)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={(v(ctrl)+1p)*v(L2,L3)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={(v(ctrl)+1p)*v(L3,L1)/(R3*pf)} tripdv={tdv} tripdt={tdt}
 .ENDS
 
 * delta load RL with serial impedances and ctrl node
@@ -1827,21 +1827,21 @@ GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R3*pf)} tripdv={tdv} tripdt={tdt}
 +	L2={(V*V*QN20/(PN20*PN20+QN20*QN20))/omega}
 +	L3={(V*V*QN30/(PN30*PN30+QN30*QN30))/omega}
 Rctrl ctrl 0 1e12
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R1*pf)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R2*pf)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={(v(ctrl)+1p)*v(L2,L2a)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={(v(ctrl)+1p)*v(L3,L3a)/(R3*pf)} tripdv={tdv} tripdt={tdt}
 RL1 L1a L1b {rser}
 RL2 L2a L2b {rser}
 RL3 L3a L3b {rser}
-GLL1 L1b L2 VALUE={v(ctrl)*v(idt1)/(L1*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL1 L1b L2 VALUE={(v(ctrl)+1p)*v(idt1)/(L1*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G1x 0 idt1 VALUE={v(L1b,L2)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
-GLL2 L2b L3 VALUE={v(ctrl)*v(idt2)/(L2*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL2 L2b L3 VALUE={(v(ctrl)+1p)*v(idt2)/(L2*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G2x 0 idt2 VALUE={v(L2b,L3)} tripdv=1 tripdt=1
 C2x idt2 0 1
 R2x idt2 0 1e10
-GLL3 L3b L1 VALUE={v(ctrl)*v(idt3)/(L3*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL3 L3b L1 VALUE={(v(ctrl)+1p)*v(idt3)/(L3*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G3x 0 idt3 VALUE={v(L3b,L1)} tripdv=1 tripdt=1
 C3x idt3 0 1
 R3x idt3 0 1e10
@@ -1878,15 +1878,15 @@ R3x idt3 0 1e10
 + C2={IF(QN2>=0,(PN20*PN20+QN20*QN20)/(V*V*QN20*omega),-(PN20*PN20+QN20*QN20)/(V*V*QN20*omega))}
 + C3={IF(QN3>=0,(PN30*PN30+QN30*QN30)/(V*V*QN30*omega),-(PN30*PN30+QN30*QN30)/(V*V*QN30*omega))}
 Rctrl ctrl 0 1e12
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R1*pf)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R2*pf)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={(v(ctrl)+1p)*v(L2,L2a)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={(v(ctrl)+1p)*v(L3,L3a)/(R3*pf)} tripdv={tdv} tripdt={tdt}
 RC1 L1a L1b {rser}
 RC2 L2a L2b {rser}
 RC3 L3a L3b {rser}
-GCL1 L1b L2 VALUE={v(ctrl)*DDT(v(L1b,L2))*(C1/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL2 L2b L3 VALUE={v(ctrl)*DDT(v(L2b,L3))*(C2/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL3 L3b L1 VALUE={v(ctrl)*DDT(v(L3b,L1))*(C3/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL1 L1b L2 VALUE={(v(ctrl)+1p)*DDT(v(L1b,L2))*(C1/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b L3 VALUE={(v(ctrl)+1p)*DDT(v(L2b,L3))*(C2/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b L1 VALUE={(v(ctrl)+1p)*DDT(v(L3b,L1))*(C3/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
 .ENDS
 
 * delta load RL with parallel impedances and ctrl node
@@ -1920,21 +1920,21 @@ GCL3 L3b L1 VALUE={v(ctrl)*DDT(v(L3b,L1))*(C3/pf)} tripdv={tdv} tripdt={tdt} rpa
 +	L2={(V*V/QN20)/omega}
 +	L3={(V*V/QN30)/omega}
 Rctrl ctrl 0 1e12
-GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R1*pf)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R2*pf)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L2 VALUE={(v(ctrl)+1p)*v(L1,L2)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={(v(ctrl)+1p)*v(L2,L3)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={(v(ctrl)+1p)*v(L3,L1)/(R3*pf)} tripdv={tdv} tripdt={tdt}
 RL1 L1 L1a {rser}
 RL2 L2 L2a {rser}
 RL3 L3 L3a {rser}
-GLL1 L1a L2 VALUE={v(ctrl)*(v(idt1))/(L1*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL1 L1a L2 VALUE={(v(ctrl)+1p)*(v(idt1))/(L1*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G1x 0 idt1 VALUE={v(L1a,L2)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
-GLL2 L2a L3 VALUE={v(ctrl)*(v(idt2))/(L2*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL2 L2a L3 VALUE={(v(ctrl)+1p)*(v(idt2))/(L2*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G2x 0 idt2 VALUE={v(L2a,L3)} tripdv=1 tripdt=1
 C2x idt2 0 1
 R2x idt2 0 1e10
-GLL3 L3a L1 VALUE={v(ctrl)*(v(idt3))/(L3*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL3 L3a L1 VALUE={(v(ctrl)+1p)*(v(idt3))/(L3*pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G3x 0 idt3 VALUE={v(L3a,L1)} tripdv=1 tripdt=1
 C3x idt3 0 1
 R3x idt3 0 1e10
@@ -1971,15 +1971,15 @@ R3x idt3 0 1e10
 +	C2={IF(QN2>=0,QN20/(V*V*omega),-QN20/(V*V*omega))}
 +	C3={IF(QN3>=0,QN30/(V*V*omega),-QN30/(V*V*omega))}
 Rctrl ctrl 0 1e12
-GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R1*pf)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R2*pf)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R3*pf)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L2 VALUE={(v(ctrl)+1p)*v(L1,L2)/(R1*pf)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={(v(ctrl)+1p)*v(L2,L3)/(R2*pf)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={(v(ctrl)+1p)*v(L3,L1)/(R3*pf)} tripdv={tdv} tripdt={tdt}
 RC1 L1 L1b {rser}
 RC2 L2 L2b {rser}
 RC3 L3 L3b {rser}
-GCL1 L1b L2 VALUE={v(ctrl)*DDT(v(L1b,L2))*(C1/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12 
-GCL2 L2b L3 VALUE={v(ctrl)*DDT(v(L2b,L3))*(C2/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL3 L3b L1 VALUE={v(ctrl)*DDT(v(L3b,L1))*(C3/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL1 L1b L2 VALUE={(v(ctrl)+1p)*DDT(v(L1b,L2))*(C1/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12 
+GCL2 L2b L3 VALUE={(v(ctrl)+1p)*DDT(v(L2b,L3))*(C2/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b L1 VALUE={(v(ctrl)+1p)*DDT(v(L3b,L1))*(C3/pf)} tripdv={tdv} tripdt={tdt} rpar=1e12
 .ENDS
 
 * delta load R with S=const
@@ -2456,9 +2456,9 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua^2/VN^2)
-GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
-GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
-GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GRL1 L1 L2 VALUE={(v(ctrl)+1p)*v(L1,L2)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GRL2 L2 L3 VALUE={(v(ctrl)+1p)*v(L2,L3)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GRL3 L3 L1 VALUE={(v(ctrl)+1p)*v(L3,L1)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
 .ENDS
 
 * delta load RL with serial impedances and S=const and ctrl node
@@ -2493,23 +2493,23 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua^2/VN^2)
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={(v(ctrl)+1p)*v(L2,L2a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={(v(ctrl)+1p)*v(L3,L3a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 * CONST L
 * IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
 RL1 L1a L1b {rser}
 RL2 L2a L2b {rser}
 RL3 L3a L3b {rser}
-GLL1 L1b L2 VALUE={v(ctrl)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL1 L1b L2 VALUE={(v(ctrl)+1p)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G1x 0 idt1 VALUE={v(L1b,L2)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
-GLL2 L2b L3 VALUE={v(ctrl)*v(idt2)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL2 L2b L3 VALUE={(v(ctrl)+1p)*v(idt2)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G2x 0 idt2 VALUE={v(L2b,L3)} tripdv=1 tripdt=1
 C2x idt2 0 1
 R2x idt2 0 1e10
-GLL3 L3b L1 VALUE={v(ctrl)*v(idt3)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL3 L3b L1 VALUE={(v(ctrl)+1p)*v(idt3)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G3x 0 idt3 VALUE={v(L3b,L1)} tripdv=1 tripdt=1
 C3x idt3 0 1
 R3x idt3 0 1e10
@@ -2547,17 +2547,17 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua^2/VN^2)
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={(v(ctrl)+1p)*v(L2,L2a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={(v(ctrl)+1p)*v(L3,L3a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 * CONST C
 * IC = C*d(U)/dt  C=C*(VN^2/ua^2)
 RC1 L1a L1b {rser}
 RC2 L2a L2b {rser}
 RC3 L3a L3b {rser}
-GCL1 L1b L2 VALUE={v(ctrl)*DDT(v(L1b,L2))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL2 L2b L3 VALUE={v(ctrl)*DDT(v(L2b,L3))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL3 L3b L1 VALUE={v(ctrl)*DDT(v(L3b,L1))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL1 L1b L2 VALUE={(v(ctrl)+1p)*DDT(v(L1b,L2))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b L3 VALUE={(v(ctrl)+1p)*DDT(v(L2b,L3))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b L1 VALUE={(v(ctrl)+1p)*DDT(v(L3b,L1))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
 .ENDS
 
 * delat load RL with parallel impedances and S=const and ctrl node
@@ -2592,23 +2592,23 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua^2/VN^2)
-GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L2 VALUE={(v(ctrl)+1p)*v(L1,L2)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={(v(ctrl)+1p)*v(L2,L3)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={(v(ctrl)+1p)*v(L3,L1)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 * CONST L
 * IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
 RL1 L1 L1a {rser}
 RL2 L2 L2a {rser}
 RL3 L3 L3a {rser}
-GLL1 L1a L2 VALUE={v(ctrl)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL1 L1a L2 VALUE={(v(ctrl)+1p)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G1x 0 idt1 VALUE={v(L1a,L2)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
-GLL2 L2a L3 VALUE={v(ctrl)*v(idt2)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL2 L2a L3 VALUE={(v(ctrl)+1p)*v(idt2)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G2x 0 idt2 VALUE={v(L2a,L3)} tripdv=1 tripdt=1
 C2x idt2 0 1
 R2x idt2 0 1e10
-GLL3 L3a L1 VALUE={v(ctrl)*v(idt3)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL3 L3a L1 VALUE={(v(ctrl)+1p)*v(idt3)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G3x 0 idt3 VALUE={v(L3a,L1)} tripdv=1 tripdt=1
 C3x idt3 0 1
 R3x idt3 0 1e10
@@ -2646,17 +2646,17 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua^2/VN^2)
-GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L2 VALUE={(v(ctrl)+1p)*v(L1,L2)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={(v(ctrl)+1p)*v(L2,L3)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={(v(ctrl)+1p)*v(L3,L1)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 * CONST C
 * IC = C*d(U)/dt  C=C*(VN^2/ua^2)
 RC1 L1 L1b {rser}
 RC2 L2 L2b {rser}
 RC3 L3 L3b {rser}
-GCL1 L1b L2 VALUE={v(ctrl)*DDT(v(L1b,L2))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL2 L2b L3 VALUE={v(ctrl)*DDT(v(L2b,L3))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL3 L3b L1 VALUE={v(ctrl)*DDT(v(L3b,L1))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL1 L1b L2 VALUE={(v(ctrl)+1p)*DDT(v(L1b,L2))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b L3 VALUE={(v(ctrl)+1p)*DDT(v(L2b,L3))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b L1 VALUE={(v(ctrl)+1p)*DDT(v(L3b,L1))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
 .ENDS
 
 * delta load R with I=const und ctrl node
@@ -2684,9 +2684,9 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua/VN)
-GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L2 VALUE={(v(ctrl)+1p)*v(L1,L2)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={(v(ctrl)+1p)*v(L2,L3)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={(v(ctrl)+1p)*v(L3,L1)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 .ENDS
 
 * delta load RL with serial impedances and I=const and ctrl node
@@ -2721,23 +2721,23 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua^2/VN^2)
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={(v(ctrl)+1p)*v(L2,L2a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={(v(ctrl)+1p)*v(L3,L3a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 * CONST L
 * IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
 RL1 L1a L1b {rser}
 RL2 L2a L2b {rser}
 RL3 L3a L3b {rser}
-GLL1 L1b L2 VALUE={v(ctrl)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL1 L1b L2 VALUE={(v(ctrl)+1p)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G1x 0 idt1 VALUE={v(L1b,L2)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
-GLL2 L2b L3 VALUE={v(ctrl)*v(idt2)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL2 L2b L3 VALUE={(v(ctrl)+1p)*v(idt2)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G2x 0 idt2 VALUE={v(L2b,L3)} tripdv=1 tripdt=1
 C2x idt2 0 1
 R2x idt2 0 1e10
-GLL3 L3b L1 VALUE={v(ctrl)*v(idt3)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL3 L3b L1 VALUE={(v(ctrl)+1p)*v(idt3)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G3x 0 idt3 VALUE={v(L3b,L1)} tripdv=1 tripdt=1
 C3x idt3 0 1
 R3x idt3 0 1e10
@@ -2775,17 +2775,17 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua^2/VN^2)
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L2a VALUE={v(ctrl)*v(L2,L2a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L3a VALUE={v(ctrl)*v(L3,L3a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L2a VALUE={(v(ctrl)+1p)*v(L2,L2a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L3a VALUE={(v(ctrl)+1p)*v(L3,L3a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 * CONST C
 * IC = C*d(U)/dt  C=C*(VN^2/ua^2)
 RC1 L1a L1b {rser}
 RC2 L2a L2b {rser}
 RC3 L3a L3b {rser}
-GCL1 L1b L2 VALUE={v(ctrl)*DDT(v(L1b,L2))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL2 L2b L3 VALUE={v(ctrl)*DDT(v(L2b,L3))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL3 L3b L1 VALUE={v(ctrl)*DDT(v(L3b,L1))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL1 L1b L2 VALUE={(v(ctrl)+1p)*DDT(v(L1b,L2))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b L3 VALUE={(v(ctrl)+1p)*DDT(v(L2b,L3))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b L1 VALUE={(v(ctrl)+1p)*DDT(v(L3b,L1))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
 .ENDS
 
 * delta load RL with parallel impedances and I=const and ctrl node
@@ -2819,23 +2819,23 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua/VN)
-GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L2 VALUE={(v(ctrl)+1p)*v(L1,L2)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={(v(ctrl)+1p)*v(L2,L3)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={(v(ctrl)+1p)*v(L3,L1)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 * CONST L
 * IL = 1/L * Int(U) dt  L=L*(ua/VN)
 RL1 L1 L1a {rser}
 RL2 L2 L2a {rser}
 RL3 L3 L3a {rser}
-GLL1 L1a L2 VALUE={v(ctrl)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL1 L1a L2 VALUE={(v(ctrl)+1p)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G1x 0 idt1 VALUE={v(L1a,L2)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
-GLL2 L2a L3 VALUE={v(ctrl)*v(idt2)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL2 L2a L3 VALUE={(v(ctrl)+1p)*v(idt2)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G2x 0 idt2 VALUE={v(L2a,L3)} tripdv=1 tripdt=1
 C2x idt2 0 1
 R2x idt2 0 1e10
-GLL3 L3a L1 VALUE={v(ctrl)*v(idt3)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
+GLL3 L3a L1 VALUE={(v(ctrl)+1p)*v(idt3)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt} rpar=1e12
 G3x 0 idt3 VALUE={v(L3a,L1)} tripdv=1 tripdt=1
 C3x idt3 0 1
 R3x idt3 0 1e10
@@ -2873,17 +2873,17 @@ Elim ua 0 VALUE={Limit(v(ua1),Ulo*VN,Uhi*VN)} tripdv={tdv} tripdt={tdt}
 *
 * CONST R
 * IR = U/R   R=R*(ua/VN)
-GRL1 L1 L2 VALUE={v(ctrl)*v(L1,L2)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL2 L2 L3 VALUE={v(ctrl)*v(L2,L3)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
-GRL3 L3 L1 VALUE={v(ctrl)*v(L3,L1)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L2 VALUE={(v(ctrl)+1p)*v(L1,L2)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL2 L2 L3 VALUE={(v(ctrl)+1p)*v(L2,L3)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL3 L3 L1 VALUE={(v(ctrl)+1p)*v(L3,L1)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 * CONST C
 * IC = C*d(U)/dt  C=C*(VN/ua)
 RC1 L1 L1b {rser}
 RC2 L2 L2b {rser}
 RC3 L3 L3b {rser}
-GCL1 L1b L2 VALUE={v(ctrl)*DDT(v(L1b,L2))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL2 L2b L3 VALUE={v(ctrl)*DDT(v(L2b,L3))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
-GCL3 L3b L1 VALUE={v(ctrl)*DDT(v(L3b,L1))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL1 L1b L2 VALUE={(v(ctrl)+1p)*DDT(v(L1b,L2))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL2 L2b L3 VALUE={(v(ctrl)+1p)*DDT(v(L2b,L3))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
+GCL3 L3b L1 VALUE={(v(ctrl)+1p)*DDT(v(L3b,L1))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt} rpar=1e12
 .ENDS
 
 * 1 phase R impedance
@@ -2998,7 +2998,7 @@ RGND N 0 {g}
 + V={VN/sqrt(3)}
 +	R={IF(P>0,V*V/P,V*V/PQ0)}
 Rctrl ctrl 0 1e12
-GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/R} tripdv={tdv} tripdt={tdt}
+GRL1 L1 N VALUE={(v(ctrl)+1p)*v(L1,N)/R} tripdv={tdv} tripdt={tdt}
 RGND N 0 {g}
 .ENDS
 
@@ -3019,9 +3019,9 @@ RGND N 0 {g}
 + R={V*V*P0/(P0*P0+Q0*Q0)}
 + L={(V*V*Q0/(P0*P0+Q0*Q0))/omega}
 Rctrl ctrl 0 1e12
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/R} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/R} tripdv={tdv} tripdt={tdt}
 RL1 L1a L1b {rser}
-GLL1 L1b N VALUE={v(ctrl)*v(idt1)/L} tripdv={tdv} tripdt={tdt}
+GLL1 L1b N VALUE={(v(ctrl)+1p)*v(idt1)/L} tripdv={tdv} tripdt={tdt}
 G1x 0 idt1 VALUE={v(L1b,N)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
@@ -3046,9 +3046,9 @@ RGND N 0 {g}
 +	R={V*V*PN10/(PN10*PN10+QN10*QN10)}
 +	C={IF(Q>=0,(PN10*PN10+QN10*QN10)/(V*V*QN10*omega),-(PN10*PN10+QN10*QN10)/(V*V*QN10*omega))}
 Rctrl ctrl 0 1e12
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/R} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/R} tripdv={tdv} tripdt={tdt}
 RC1 L1a L1b {rser}
-GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C} tripdv={tdv} tripdt={tdt}
+GCL1 L1b N VALUE={(v(ctrl)+1p)*DDT(v(L1b,N))*C} tripdv={tdv} tripdt={tdt}
 RGND N 0 {g}
 .ENDS
 
@@ -3069,9 +3069,9 @@ RGND N 0 {g}
 +	R={V*V/PN10}
 +	L={(V*V/QN10)/omega}
 Rctrl ctrl 0 1e12
-GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/R} tripdv={tdv} tripdt={tdt}
+GRL1 L1 N VALUE={(v(ctrl)+1p)*v(L1,N)/R} tripdv={tdv} tripdt={tdt}
 RL1 L1 L1a {rser}
-GLL1 L1a N VALUE={v(ctrl)*v(idt1)/L} tripdv={tdv} tripdt={tdt}
+GLL1 L1a N VALUE={(v(ctrl)+1p)*v(idt1)/L} tripdv={tdv} tripdt={tdt}
 G1x 0 idt1 VALUE={v(L1a,N)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
@@ -3096,9 +3096,9 @@ RGND N 0 {g}
 +	R={V*V/PN10}                         
 +	C={IF(Q>=0,QN10/(V*V*omega),-QN10/(V*V*omega))}
 Rctrl ctrl 0 1e12
-GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/R} tripdv={tdv} tripdt={tdt}
+GRL1 L1 N VALUE={(v(ctrl)+1p)*v(L1,N)/R} tripdv={tdv} tripdt={tdt}
 RC1 L1 L1b {rser}
-GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C} tripdv={tdv} tripdt={tdt}
+GCL1 L1b N VALUE={(v(ctrl)+1p)*DDT(v(L1b,N))*C} tripdv={tdv} tripdt={tdt}
 RGND N 0 {g}
 .ENDS
 
@@ -3449,7 +3449,7 @@ Xvmeter L1 ua1 vmeter2
 + params: fc={fc} vfactor={vfactor}
 * CONST R
 * IR = U/R   R=R*(ua/VN)
-GRL1 L1 L1a VALUE={v(L1,L1a)*v(ctrl)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={v(L1,L1a)*(v(ctrl)+1p)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 RL1 L1a N {rser}
 RGND N 0 {g}
 .ENDS
@@ -3480,11 +3480,11 @@ Xvmeter L1 ua1 vmeter2
 + params: fc={fc} vfactor={vfactor}
 * CONST R
 * IR = U/R   R=R*(ua/VN)
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 * CONST L
 * IL = 1/L * Int(U) dt  L=L*(ua/VN)
 RL1 L1a L1b {rser}
-GLL1 L1b N VALUE={v(ctrl)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GLL1 L1b N VALUE={(v(ctrl)+1p)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 G1x 0 idt1 VALUE={v(L1b,N)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
@@ -3517,11 +3517,11 @@ Xvmeter L1 ua1 vmeter2
 + params: fc={fc} vfactor={vfactor}
 * CONST R
 * IR = U/R   R=R*(ua/VN)
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 * CONST C
 RC1 L1a L1b {rser}
 * IC = C*d(U)/dt  C=C*(VN/ua)
-GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt}
+GCL1 L1b N VALUE={(v(ctrl)+1p)*DDT(v(L1b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt}
 RGND N 0 {g}
 .ENDS
 
@@ -3551,11 +3551,11 @@ Xvmeter L1 ua1 vmeter2
 + params: fc={fc} vfactor={vfactor}
 * CONST R
 * IR = U/R   R=R*(ua^2/VN^2)
-GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 N VALUE={(v(ctrl)+1p)*v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 * CONST L
 * IL = 1/L * Int(U) dt  L=L*(ua^2/VN^2)
 RL1 L1 L1a {rser}
-GLL1 L1a N VALUE={v(ctrl)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GLL1 L1a N VALUE={(v(ctrl)+1p)*v(idt1)/(L*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 G1x 0 idt1 VALUE={v(L1a,N)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
@@ -3588,11 +3588,11 @@ Xvmeter L1 ua1 vmeter2
 + params: fc={fc} vfactor={vfactor}
 * CONST R
 * IR = U/R   R=R*(ua^2/VN^2)
-GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 N VALUE={(v(ctrl)+1p)*v(L1,N)/(R*v(ua)*v(ua)/VN2)} tripdv={tdv} tripdt={tdt}
 * CONST C
 * IC = C*d(U)/dt  C=C*(VN^2/ua^2)
 RC1 L1 L1b {rser}
-GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt}
+GCL1 L1b N VALUE={(v(ctrl)+1p)*DDT(v(L1b,N))*C*VN2/(v(ua)*v(ua))} tripdv={tdv} tripdt={tdt}
 RGND N 0 {g}
 .ENDS
 
@@ -3617,7 +3617,7 @@ Xvmeter L1 ua1 vmeter2
 + params: fc={fc} vfactor={vfactor}
 * CONST R
 * IR = U/R   R=R*(ua/VN)
-GRL1 L1 L1a VALUE={v(L1,L1a)*v(ctrl)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={v(L1,L1a)*(v(ctrl)+1p)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 * CONST L
 RL1 L1a N {rser}
 RGND N 0 {g}
@@ -3649,11 +3649,11 @@ Xvmeter L1 ua1 vmeter2
 + params: fc={fc} vfactor={vfactor}
 * CONST R
 * IR = U/R   R=R*(ua/VN)
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 * CONST L
 * IL = 1/L * Int(U) dt  L=L*(ua/VN)
 RL1 L1a L1b {rser}
-GLL1 L1b N VALUE={v(ctrl)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GLL1 L1b N VALUE={(v(ctrl)+1p)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 G1x 0 idt1 VALUE={v(L1b,N)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
@@ -3686,11 +3686,11 @@ Xvmeter L1 ua1 vmeter2
 + params: fc={fc} vfactor={vfactor}
 * CONST R
 * IR = U/R   R=R*(ua/VN)
-GRL1 L1 L1a VALUE={v(ctrl)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 L1a VALUE={(v(ctrl)+1p)*v(L1,L1a)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 * CONST C
 RC1 L1a L1b {rser}
 * IC = C*d(U)/dt  C=C*(VN/ua)
-GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt}
+GCL1 L1b N VALUE={(v(ctrl)+1p)*DDT(v(L1b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt}
 RGND N 0 {g}
 .ENDS
 
@@ -3719,11 +3719,11 @@ Xvmeter L1 ua1 vmeter2
 + params: fc={fc} vfactor={vfactor}
 * CONST R
 * IR = U/R   R=R*(ua/VN)
-GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 N VALUE={(v(ctrl)+1p)*v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 * CONST L
 * IL = 1/L * Int(U) dt  L=L*(ua/VN)
 RL1 L1 L1a {rser}
-GLL1 L1a N VALUE={v(ctrl)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GLL1 L1a N VALUE={(v(ctrl)+1p)*v(idt1)/(L*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 G1x 0 idt1 VALUE={v(L1a,N)} tripdv=1 tripdt=1
 C1x idt1 0 1
 R1x idt1 0 1e10
@@ -3755,11 +3755,11 @@ Xvmeter L1 ua1 vmeter2
 + params: fc={fc} vfactor={vfactor}
 * CONST R
 * IR = U/R   R=R*(ua/VN)
-GRL1 L1 N VALUE={v(ctrl)*v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
+GRL1 L1 N VALUE={(v(ctrl)+1p)*v(L1,N)/(R*v(ua)/VN)} tripdv={tdv} tripdt={tdt}
 * CONST C
 * IC = C*d(U)/dt  C=C*(VN/ua)
 RC1 L1 L1b {rser}
-GCL1 L1b N VALUE={v(ctrl)*DDT(v(L1b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt}
+GCL1 L1b N VALUE={(v(ctrl)+1p)*DDT(v(L1b,N))*C*VN/(v(ua))} tripdv={tdv} tripdt={tdt}
 RGND N 0 {g}
 .ENDS
 

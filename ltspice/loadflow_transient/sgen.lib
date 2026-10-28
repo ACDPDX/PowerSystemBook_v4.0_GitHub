@@ -189,9 +189,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 * current RMS of generator
 Ei i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))}  tripdv={tdv} tripdt={tdt}
@@ -356,9 +354,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 * current RMS of generator
 Ei i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))}  tripdv={tdv} tripdt={tdt}
@@ -526,9 +522,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 * current RMS of generator
 Ei i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))}  tripdv={tdv} tripdt={tdt}
@@ -671,9 +665,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}  ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 * current RMS of generator
 Ei i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))}  tripdv={tdv} tripdt={tdt}
 * voltage RMS of generator
@@ -847,9 +839,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 * current RMS of generator
 Ei i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))}  tripdv={tdv} tripdt={tdt}
@@ -1011,9 +1001,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 * current RMS of generator
 Ei i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))}  tripdv={tdv} tripdt={tdt}
@@ -1203,9 +1191,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
 EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
@@ -1239,7 +1225,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -1247,7 +1233,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -1521,9 +1507,7 @@ Galpha 0 idt7  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
 Calpha idt7 0 1 IC=0
 Ralpha idt7 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 .ENDS 
 
 * without measurement nodes
@@ -1661,9 +1645,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
 EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
@@ -1832,9 +1814,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
 EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
@@ -1868,7 +1848,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -1876,7 +1856,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -2055,7 +2035,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current q-axes
 *
@@ -2078,7 +2058,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -2086,7 +2066,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -2266,7 +2246,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current q-axes
 *
@@ -2289,7 +2269,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -2297,7 +2277,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -2486,7 +2466,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current q-axes
 * Compute f
@@ -2506,7 +2486,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -2515,7 +2495,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -2728,9 +2708,7 @@ Galpha 0 idt7  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
 Calpha idt7 0 1 IC=0
 Ralpha idt7 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 * Compute n
 *En		n	0  VALUE={n0+60/(2*pi)/J*v(idt8)} tripdv={tdv} tripdt={tdt}
 *Gn 0 idt8  VALUE={v(M)*Mvz+v(Mi)-v(Rbg)} tripdv={tdv} tripdt={tdt}
@@ -2753,7 +2731,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -2761,7 +2739,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -2944,7 +2922,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current
 *
@@ -2964,7 +2942,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Compute f
 Ef      f   0  VALUE={v(n)*p/60} tripdv={tdv} tripdt={tdt}
@@ -2981,7 +2959,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  tripdv={tdv} tripdt={tdt}
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -3174,7 +3152,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current
 *
@@ -3192,7 +3170,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -3201,7 +3179,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -3393,9 +3371,7 @@ Galpha 0 idt7  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
 Calpha idt7 0 1 IC=0
 Ralpha idt7 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 .ENDS
 
 * without measurement nodes
@@ -3529,9 +3505,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
 EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
@@ -3720,9 +3694,7 @@ Galpha 0 idt7  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
 Calpha idt7 0 1 IC=0
 Ralpha idt7 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 * Compute n
 *En		n	0  VALUE={n0+60/(2*pi)/J*v(idt8)} tripdv={tdv} tripdt={tdt}
 *Gn 0 idt8  VALUE={v(M)*Mvz+v(Mi)-v(Rbg)} tripdv={tdv} tripdt={tdt}
@@ -3745,7 +3717,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -3753,7 +3725,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -3938,7 +3910,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current
 *
@@ -3958,7 +3930,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Compute f
 Ef      f   0  VALUE={v(n)*p/60} tripdv={tdv} tripdt={tdt}
@@ -3975,7 +3947,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  tripdv={tdv} tripdt={tdt}
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -4169,7 +4141,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current
 *
@@ -4187,7 +4159,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -4196,7 +4168,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -4384,9 +4356,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
 EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
@@ -4420,7 +4390,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -4428,7 +4398,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -4611,7 +4581,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current q-axes
 *
@@ -4634,7 +4604,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -4642,7 +4612,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -4830,7 +4800,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current q-axes
 * Compute f
@@ -4850,7 +4820,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -4859,7 +4829,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -5218,9 +5188,7 @@ Galpha 0 idt7  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
 Calpha idt7 0 1 IC=0
 Ralpha idt7 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 .ENDS
 
 .SUBCKT Sgen_150MW_type1 U1 V1 W1  F1  M  n GND1
@@ -5398,9 +5366,7 @@ Galpha 0 idt7  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
 Calpha idt7 0 1 IC=0
 Ralpha idt7 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 * Compute n
 *En		n	0  VALUE={n0+60/(2*pi)/J*v(idt8)} tripdv={tdv} tripdt={tdt}
 *Gn 0 idt8  VALUE={v(M)*Mvz+v(Mi)-v(Rbg)} tripdv={tdv} tripdt={tdt}
@@ -5423,7 +5389,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -5431,7 +5397,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -5620,9 +5586,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
 EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
@@ -5656,7 +5620,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -5664,7 +5628,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -5861,7 +5825,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt} ;magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy1)+v(idy2)} tripdv={tdv} tripdt={tdt}       ;magnetizing current q-axes
 *
@@ -5880,7 +5844,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -5889,7 +5853,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -6092,7 +6056,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt} ;magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy1)+v(idy2)} tripdv={tdv} tripdt={tdt}       ;magnetizing current q-axes
 *
@@ -6111,7 +6075,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -6119,7 +6083,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -6482,7 +6446,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt} ;magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy1)+v(idy2)} tripdv={tdv} tripdt={tdt}       ;magnetizing current q-axes
 *
@@ -6501,7 +6465,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -6510,7 +6474,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -6702,9 +6666,7 @@ Galpha 0 idt7  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
 Calpha idt7 0 1 IC=0
 Ralpha idt7 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 .ENDS 
 
 
@@ -6841,9 +6803,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
 EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
@@ -7010,9 +6970,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
 EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
@@ -7046,7 +7004,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -7054,7 +7012,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -7236,7 +7194,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Etheta_DC theta_DC 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current q-axes
@@ -7260,7 +7218,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -7268,7 +7226,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -7435,7 +7393,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)}       tripdv={tdv} tripdt={tdt};magnetizing current q-axes
 *
@@ -7456,7 +7414,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -7464,7 +7422,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -7652,7 +7610,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current q-axes
 * Compute f
@@ -7672,7 +7630,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -7681,7 +7639,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -7883,7 +7841,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt} ;magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy1)+v(idy2)} tripdv={tdv} tripdt={tdt}       ;magnetizing current q-axes
 *
@@ -7902,7 +7860,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -7911,7 +7869,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -8124,9 +8082,7 @@ Galpha 0 idt7  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
 Calpha idt7 0 1 IC=0
 Ralpha idt7 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 * Compute n
 *En		n	0  VALUE={n0+60/(2*pi)/J*v(idt8)} tripdv={tdv} tripdt={tdt}
 *Gn 0 idt8  VALUE={v(M)*Mvz+v(Mi)-v(Rbg)} tripdv={tdv} tripdt={tdt}
@@ -8149,7 +8105,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -8157,7 +8113,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -8193,6 +8149,251 @@ EQdamper Qdamper 0 VALUE={v(Qrotdamper)+v(Qtdamper)} tripdv={tdv} tripdt={tdt}
 * Qsum = Qstator + Qdamper - Qext = -Qexciter 
 EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
 .ENDS 
+
+* 400MW generator with more measurement nodes !!
+.SUBCKT Sgen_400MW_type1_Test U1 V1 W1  F1  M  n GND1
++	PARAMS:
++	UN_verkettet=20000
++	IN=14.434k
++	Pel=400e6  ;UN_verkettet*IN*sqrt(3)*cosphi of 0.8
++	fn={fn1}
++	Kc=0.5
++	UE0=600V ; Power of exciter = 0.25-5% * SN machine (smaller values for higher SN) (UEminmax=0.3-2*UE0) UE=100-600V(old) RE~0.1-1 (typical 0.2-0.5)
++	IE0=2000A
++	p=2
++	Streuung=0.05 ;
++	rcu=0.01
++	rbg=0.001
++	Schenkelpolfaktor=1 ;(1=cylindrical pole 0.5=Salient pole)
++	Daempferfaktor=1
++	err0=0 RE_factor=0.6666 ;Matlab compatible with RE_factor=2/3=0.6666
++   n0=1500 ;starts with 1500U/min
++   alpha_0=0
++   taumech=6.23 ; parameter for inertia J={p*taumech*MN/omega_el}
++   a=0.9 ; Parameter for nonlinear noload line (should be about 0.6-0.9)
++   m=7
++   Mvz=1
+.PARAM
++   a1={a};  Saturation parameter d-axis
++   m1={m};  Saturation parameter d-axis
++   a2={a1}; Saturation parameter q-axis ( default: same as d-axis -> may be overwritten if different from d-axis )
++   m2={m1}; Saturation parameter q-axis ( default: same as d-axis -> may be overwritten if different from d-axis )
++	UN={UN_verkettet/sqrt(3)}
++	ZN={UN/IN}
++	Rs={ZN*rcu}
++	omega_el={(2*pi)*fN}
++	Ls={Streuung*ZN/Kc/omega_el}
++	PsiN={sqrt(2)*UN/omega_el}
++	RE={UE0/IE0}
++	RD={Rs/Daempferfaktor}
++   RDx={RD} ; can be overwritten by setting this parameters directly here to a numerical value
++   RDy={RD} ; can be overwritten by setting this parameters directly here to a numerical value
++   LDx={Ls} ; can be overwritten by setting this parameters directly here to a numerical value
++   LDy={Ls} ; can be overwritten by setting this parameters directly here to a numerical value
++   LE={Ls} ; can be overwritten by setting this parameters directly here to a numerical value
++   R0={Rs} ; can be overwritten by setting this parameters directly here to a numerical value
++   L0={Ls} ; can be overwritten by setting this parameters directly here to a numerical value(X0 is 0.03-0.1 p.u)
++   Lsd={Ls} 
++   Lsq={Ls}
++   XD={UN/IN/Kc}
++   XQ={XD*Schenkelpolfaktor}
++   g={UE0/(UN*sqrt(2)*RE/(XD-omega_el*Lsd))} ; updated formula for g parameter
++   g1={UE0/(UN*sqrt(2)*RE/(XQ-omega_el*Lsq))} ; updated formula for salient pole machine
++	ImNx={IE0/g} ; d-axis magnetizing current
++	ImNy={IE0/g1} ;q-axis magnetizing current
++	MN={Pel*(1-rbg-rcu)*p/omega_el}
++   J= {p*taumech*MN/omega_el}
++  Lhd3={XD/(2*pi*fn)-Lsd}
++  Lhq3={XQ/(2*pi*fn)-Lsq}
+*	Wicklungsstroeme
+*	Wicklungsstroeme
+Rf1 f1 0 1e12
+Rm  m  0 1e12
+Rn2  n  0 1e12
+EJ J 0 VALUE={J} tripdv={tdv} tripdt={tdt}
+Eun un 0 VALUE={Un} tripdv={tdv} tripdt={tdt}
+Ein in 0 VALUE={In} tripdv={tdv} tripdt={tdt}
+Esn sn 0 VALUE={3*Un*In} tripdv={tdv} tripdt={tdt}
+Epn pn 0 VALUE={pel} tripdv={tdv} tripdt={tdt}
+Ecosphin cosphi 0 VALUE={pel/(3*Un*In)} tripdv={tdv} tripdt={tdt}
+Ezn zn 0 VALUE={Zn} tripdv={tdv} tripdt={tdt}
+Ers rs 0 VALUE={Rs} tripdv={tdv} tripdt={tdt}
+* New
+Epcu pcu 0 VALUE={3*v(i)*v(i)*Rs} tripdv={tdv} tripdt={tdt}
+* Pcu1 same as Pcu
+*Epcu1 pcu1 0 VALUE={1.5*Rs*(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
+Epcu2 pcu2 0 VALUE={v(idx)*v(idx)*RDx+v(idy)*v(idy)*RDy} tripdv={tdv} tripdt={tdt}
+* This loss is fed by the external exciter !!!! Pcu_exciter=UE*IE
+Epcu3 pcu3 0 VALUE={v(ie)*v(ie)*g*g*Re*RE_factor} tripdv={tdv} tripdt={tdt}
+Epcusum pcusum 0 VALUE={v(pcu)+v(pcu2)+v(pcu3)} tripdv={tdv} tripdt={tdt}
+*	currents of windings
+G1	U1	U2	VALUE={v(isxS)+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G2	V1	V2	VALUE={(-v(isxS)+v(isyS)*sqrt(3))/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+G3	W1	W2	VALUE={(-v(isxS)-v(isyS)*sqrt(3))/2+v(i_Null)} tripdv={tdv} tripdt={tdt}
+GiE	F1	0	VALUE={v(ie)*g} tripdv={tdv} tripdt={tdt}
+*	voltage components
+EuxS	usxS	0	VALUE={(2*v(u1,u2)-v(v1,v2)-v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+EuyS	usyS	0	VALUE={(v(v1,v2)-v(w1,w2))/sqrt(3)} tripdv={tdv} tripdt={tdt}
+Eux	usx	0	VALUE={ v(usxS)*cos(v(alpha))+v(usyS)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+Euy	usy	0	VALUE={-v(usxS)*sin(v(alpha))+v(usyS)*cos(v(alpha))} tripdv={tdv} tripdt={tdt}
+*    Starpoint
+R2     v2    GND1   1u
+R12    u2    GND1   1u
+R23    w2    GND1   1u
+RGND1  GND1  0  1e6
+ErefL1 Uref_L1 0 VALUE={-sqrt(2)*UN*sin(2*pi*(fN*(TIME)))} tripdv={tdv} tripdt={tdt}
+*	Nullsystem
+Eu0	u_Null 0	VALUE={(v(u1,u2)+v(v1,v2)+v(w1,w2))/3} tripdv={tdv} tripdt={tdt}
+Ei0	i_Null 0	VALUE={v(idt1)/L0} tripdv={tdv} tripdt={tdt}
+Gi0 0 idt1  VALUE={v(u_Null)-R0*v(i_null)} tripdv={tdv} tripdt={tdt}
+Ci0 idt1 0 1 IC=0
+Ri0 idt1 0 1e10
+*
+*	current components
+EisxS		isxS	0 VALUE={v(isx)*cos(v(alpha))-v(isy)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+EisyS		isyS	0 VALUE={v(isy)*cos(v(alpha))+v(isx)*sin(v(alpha))} tripdv={tdv} tripdt={tdt}
+*	magnetic coupling of direct axis with saturation
+Gpsix		0	isx	VALUE={v(psisx)} tripdv={tdv} tripdt={tdt}
+Rsx		isx	0	{1/Lsd}
+Gpsidx	isx	iDx1	VALUE={v(psiDx)} tripdv={tdv} tripdt={tdt} ; *********
+Rsdx		iDx1	isx	{1/LDx}
+GpsiEx	iDx1	imx1	VALUE={v(psiE)} tripdv={tdv} tripdt={tdt} ; ie oder if ist iDx,imx !!!!
+RsEx		imx1	iDx1	{1/LE}
+vphx		imx1	imxa1	0
+Eimx1		imxa1	0	VALUE={ImNx*(a1*i(vphx)/PsiN+(1-a1)*PWRS(i(vphx)/PsiN,m1))} tripdv={tdv} tripdt={tdt}
+*	magnetic coupling of quadrature axis with saturation
+Gpsiy		0	isy	VALUE={v(psisy)} tripdv={tdv} tripdt={tdt}
+Rsy		isy	0	{1/Lsq}
+Gpsidy	isy	imy1	VALUE={v(psiDy)} tripdv={tdv} tripdt={tdt}
+Rsdy		imy1	isy	{1/LDy}
+vphy		imy1	imya1	0
+Eimy1		imya1	0	VALUE={ImNy*(a2*i(vphy)/PsiN+(1-a2)*PWRS(i(vphy)/PsiN,m2))} tripdv={tdv} tripdt={tdt}
+*
+Eidx  idx 0 VALUE={v(idx1)-v(isx)} tripdv={tdv} tripdt={tdt}
+Eidy  idy 0 VALUE={v(imy1)-v(isy)} tripdv={tdv} tripdt={tdt}
+Eie ie 0 VALUE={v(imx1)-v(idx1)} tripdv={tdv} tripdt={tdt}
+Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current d-axes
+Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current q-axes
+* nonlinear magnetics
+Elhd3 Lhd3 0 VALUE={Lhd3*(1/(a1+(1-a1)*PWRS(LIMIT(abs(v(psihx)+1p)/PsiN,-10,10),m1-1)))} tripdv={tdv} tripdt={tdt}
+Elhq3 Lhq3 0 VALUE={Lhq3*(1/(a2+(1-a2)*PWRS(LIMIT(abs(v(psihy)+1p)/PsiN,-10,10),m2-1)))} tripdv={tdv} tripdt={tdt}
+
+*	Flux components
+Epsi_sx	psisx	0 VALUE={err0*PsiN+v(idt2)} tripdv={tdv} tripdt={tdt}
+Gpsi_sx 0 idt2  VALUE={v(usx)-Rs*v(isx)+p*(2*pi)/60*v(n)*v(psisy)} tripdv={tdv} tripdt={tdt}
+Cpsi_sx idt2 0 1 IC=0
+Rpsi_sx idt2 0 1e10
+*
+Epsi_sy	psisy	0 VALUE={v(idt3)} tripdv={tdv} tripdt={tdt}
+Gpsi_sy 0 idt3  VALUE={v(usy)-Rs*v(isy)-p*(2*pi)/60*v(n)*v(psisx)} tripdv={tdv} tripdt={tdt}
+Cpsi_sy idt3 0 1 IC=0
+Rpsi_sy idt3 0 1e10
+*
+Epsi_Dx	psiDx	0 VALUE={err0*psiN+v(idt4)} tripdv={tdv} tripdt={tdt}
+Gpsi_Dx 0 idt4  VALUE={-RDx*v(idx)} tripdv={tdv} tripdt={tdt}
+Cpsi_Dx idt4 0 1 IC=0
+Rpsi_Dx idt4 0 1e10
+*
+
+Epsi_Dy	psiDy	0 VALUE={v(idt5)} tripdv={tdv} tripdt={tdt}
+Gpsi_Dy 0 idt5  VALUE={-RDy*v(idy)} tripdv={tdv} tripdt={tdt}
+Cpsi_Dy idt5 0 1 IC=0
+Rpsi_Dy idt5 0 1e10
+*
+Epsi_E	psiE	0 VALUE={err0*psiN*(1+Streuung)+v(idt6)} tripdv={tdv} tripdt={tdt}
+Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} tripdt={tdt} ;<--------- MATLAB compatible 
+Cpsi_E idt6 0 1 IC=0
+Rpsi_E idt6 0 1e10
+*
+*
+*Emi		Mi	0	VALUE={1.5*p*(i(Vphx)*v(isy)-i(Vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
+Emi		Mi	0	VALUE={1.5*p*(v(psihx)*v(isy)-v(psihy)*v(isx))} tripdv={tdv} tripdt={tdt}
+*Emi		Mi	0	VALUE={1.5*p*(v(psihx)*v(isy)-v(psihy)*v(isx))} tripdv={tdv} tripdt={tdt}
+*EMoment	M 0	VALUE={-v(Mi)+v(Rbg)} tripdv={tdv} tripdt={tdt}
+*En    n  0  Value={N1} tripdv={tdv} tripdt={tdt}
+* Berechner n
+* Compute n
+En		n	0  VALUE={n0+60/(2*pi)/J*v(idt8)} tripdv={tdv} tripdt={tdt}
+Gn 0 idt8  VALUE={-v(M)+v(Mi)-v(Rbg)} tripdv={tdv} tripdt={tdt}
+Cn idt8 0 1 IC=0
+Rn idt8 0 1e10
+* friction
+GRbg		0	Rbg	TABLE {v(n)} (-1,-1) (1,1)
+RRbg		Rbg	0	{MN*rbg}
+* Compute alpha
+Ealpha	alpha	0	VALUE={alpha_0*pi/180+v(idt7)*p/60*(2*pi)} tripdv={tdv} tripdt={tdt}
+Galpha 0 idt7  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
+Calpha idt7 0 1 IC=0
+Ralpha idt7 0 1e10
+*
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
+* Compute n
+*En		n	0  VALUE={n0+60/(2*pi)/J*v(idt8)} tripdv={tdv} tripdt={tdt}
+*Gn 0 idt8  VALUE={v(M)*Mvz+v(Mi)-v(Rbg)} tripdv={tdv} tripdt={tdt}
+*Cn idt8 0 1 IC=0
+*Rn idt8 0 1e10
+* Compute f
+Ef      f   0  VALUE={v(n)*p/60} tripdv={tdv} tripdt={tdt}
+* voltage RMS of generator
+Ev Us 0 VALUE={sqrt(v(usx)*v(usx)+v(usy)*v(usy))} tripdv={tdv} tripdt={tdt}
+* Xd=Xq for cylindrical pole machine Xd,Xq different for salient pole
+Exd xd 0 VALUE={(v(Lhd3)+Lsd)*2*pi*fn} tripdv={tdv} tripdt={tdt} ;better measured from sliptest
+Exq xq 0 VALUE={(v(Lhq3)+Lsq)*2*pi*fn} tripdv={tdv} tripdt={tdt} ;better measured from sliptest
+* New added
+Epsihx psihx 0 VALUE={v(psisx)-Lsd*v(isx)} tripdv={tdv} tripdt={tdt}
+Epsihy psihy 0 VALUE={v(psisy)-Lsq*v(isy)} tripdv={tdv} tripdt={tdt}
+Epsihx1 psihx1 0 VALUE={v(psidx)-Ldx*v(iDx)} tripdv={tdv} tripdt={tdt} ;same as pshihx
+Epsihy1 psihy1 0 VALUE={v(psidy)-Ldy*v(iDy)} tripdv={tdv} tripdt={tdt} ;same as pshihy
+Epsihx2 psihx2 0 VALUE={v(psie)-Le*v(ie)}  tripdv={tdv} tripdt={tdt}  ;same as pshihx
+Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
+EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
+Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
+* Other formulas for active and reactive power
+Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
+Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
+Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
+* Other formula for up
+*Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+*Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+*
+Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
+Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
+Ewd wmagndamper 0 VALUE={1.5*0.5*(v(psidx)*v(idx)+v(psidy)*v(idy))}  tripdv={tdv} tripdt={tdt}
+Ewsumm wmagnsum 0 VALUE={v(wmagnstator)+v(wmagndamper)+v(wmagnexciter)} tripdv={tdv} tripdt={tdt}
+*
+* Psum2=Psum3 P from Wmagn ( P=dWmagn/dt )
+Etest Psum2 0 VALUE={v(Pstator)+v(Pexciter)+v(Pdamper)} tripdv={tdv} tripdt={tdt} 
+Etest2 Psum3 0 VALUE={DDT(v(wmagnstator))+DDT(v(wmagnexciter))+DDT(v(wmagndamper))} tripdv={tdv} tripdt={tdt} 
+*
+EPstator Pstator  0 VALUE={1.5*(v(isx)*DDT(v(psisx)))+1.5*(v(isy)*DDT(v(psisy)))} tripdv={tdv} tripdt={tdt} 
+* Exciter is fed by external unit
+EPexiter Pexciter 0 VALUE={1.5*(v(ie)*DDT(v(psie)))} tripdv={tdv} tripdt={tdt}
+EPdamper Pdamper 0 VALUE={1.5*(v(idx)*DDT(v(psidx))+v(idy)*DDT(v(psidy)))} tripdv={tdv} tripdt={tdt}
+EPsum1 Psum1 0 VALUE={v(Pstator)+v(Pdamper)+v(Pexciter)} tripdv={tdv} tripdt={tdt}
+EPsum Psum 0 VALUE={v(Psum1)+V(Pcusum)-v(Pcu3)-v(Pexciter)-V(P)+V(rbg)*omega_el/p} tripdv={tdv} tripdt={tdt}
+EPM   Pmech 0 VALUE={-v(M)*omega_el/p} tripdv={tdv} tripdt={tdt}
+* other formulas for theta theta2 for non salient machine and theta3 for salient machine
+*Etheta2 theta2 0 VALUE={-180/pi*atan2(v(i)*v(xd)*cos(pi/180*v(phi)),(v(u)-v(i)*v(xd)*sin(pi/180*v(phi))))}  ;for round pole
+*Etheta3 theta3 0 VALUE={-180/pi*atan2(v(i)*v(xq)*cos(pi/180*v(phi)),(v(u)-v(i)*v(xq)*sin(pi/180*v(phi))))}  ;for salient pole
+*
+* Qtsum = Qtstator + Qtdamper = -Qtexciter
+EQtransf1 Qtstator 0 VALUE={1.5*(v(isx)*DDT(v(psisy))-v(isy)*DDT(v(psisx)))} tripdv={tdv} tripdt={tdt}
+EQtransf2 Qtexciter 0 VALUE={1.5*(v(isx)*DDT(v(psihx)))} tripdv={tdv} tripdt={tdt}
+EQtransf3 Qtdamper 0 VALUE={1.5*(v(isx)*DDT(v(psihx))+v(isy)*DDT(v(psihy)))} tripdv={tdv} tripdt={tdt}
+EQtranssum Qtsum 0 VALUE={v(Qtstator)+v(Qtdamper)} tripdv={tdv} tripdt={tdt}
+EQmagn1 Qrotstator 0 VALUE={1.5*omega_el*(v(isx)*v(isx)*(v(Lhd3)+Lsd)+v(isy)*v(isy)*(v(Lhq3)+Lsq))} tripdv={tdv} tripdt={tdt}
+EQmagn2 Qrotexciter 0 VALUE={1.5*omega_el*(v(ie)*v(isx)*v(Lhd3))} tripdv={tdv} tripdt={tdt}
+EQmagn3 Qrotdamper 0 VALUE={1.5*omega_el*(v(isx)*v(idx)*v(Lhd3)+v(idy)*v(isy)*v(Lhq3))} tripdv={tdv} tripdt={tdt}
+EQexciter Qexciter 0 VALUE={v(Qrotexciter)+v(Qtexciter)}  tripdv={tdv} tripdt={tdt}
+EQstator Qstator 0 VALUE={v(Qrotstator)+v(Qtstator)}  tripdv={tdv} tripdt={tdt}
+EQdamper Qdamper 0 VALUE={v(Qrotdamper)+v(Qtdamper)} tripdv={tdv} tripdt={tdt}
+* Qsum = Qstator + Qdamper - Qext = -Qexciter 
+EQsum Qsum 0 VALUE={v(Qstator)+v(Qdamper)-V(Q)} tripdv={tdv} tripdt={tdt}
+.ENDS
 
 
 
@@ -8342,7 +8543,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current
 *
@@ -8362,7 +8563,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Compute f
 Ef      f   0  VALUE={v(n)*p/60} tripdv={tdv} tripdt={tdt}
@@ -8379,7 +8580,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  tripdv={tdv} tripdt={tdt}
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -8573,7 +8774,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current
 *
@@ -8591,7 +8792,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -8600,7 +8801,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -8793,9 +8994,7 @@ Galpha 0 idt7  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
 Calpha idt7 0 1 IC=0
 Ralpha idt7 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0)))} tripdv={tdv} tripdt={tdt} 
 .ENDS
 
 * without measurement nodes
@@ -8929,9 +9128,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
 EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
@@ -9107,7 +9304,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt} ;magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy1)+v(idy2)} tripdv={tdv} tripdt={tdt}       ;magnetizing current q-axes
 * Berechner f
@@ -9128,7 +9325,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EEU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Some qz work for salient qy for nonsalient machines
@@ -9144,7 +9341,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -9333,9 +9530,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
 EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
@@ -9369,7 +9564,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -9377,7 +9572,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -9566,9 +9761,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
 EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
@@ -9602,7 +9795,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -9610,7 +9803,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -9794,7 +9987,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current q-axes
 *
@@ -9817,7 +10010,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -9825,7 +10018,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -10014,7 +10207,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current q-axes
 * Compute f
@@ -10034,7 +10227,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -10043,7 +10236,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -10245,7 +10438,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt} ;magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy1)+v(idy2)} tripdv={tdv} tripdt={tdt}       ;magnetizing current q-axes
 *
@@ -10264,7 +10457,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -10273,7 +10466,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -10487,9 +10680,7 @@ Galpha 0 idt7  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
 Calpha idt7 0 1 IC=0
 Ralpha idt7 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 * Compute n
 *En		n	0  VALUE={n0+60/(2*pi)/J*v(idt8)} tripdv={tdv} tripdt={tdt}
 *Gn 0 idt8  VALUE={v(M)*Mvz+v(Mi)-v(Rbg)} tripdv={tdv} tripdt={tdt}
@@ -10512,7 +10703,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -10520,7 +10711,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -10705,7 +10896,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current
 *
@@ -10725,7 +10916,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Compute f
 Ef      f   0  VALUE={v(n)*p/60} tripdv={tdv} tripdt={tdt}
@@ -10742,7 +10933,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  tripdv={tdv} tripdt={tdt}
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -10937,7 +11128,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current
 *
@@ -10955,7 +11146,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -10964,7 +11155,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -11159,7 +11350,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt} ;magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy1)+v(idy2)} tripdv={tdv} tripdt={tdt}       ;magnetizing current q-axes
 *
@@ -11178,7 +11369,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -11187,7 +11378,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -11385,7 +11576,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt} ;magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy1)+v(idy2)} tripdv={tdv} tripdt={tdt}       ;magnetizing current q-axes
 *
@@ -11404,7 +11595,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -11413,7 +11604,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -11608,9 +11799,7 @@ Galpha 0 idt7  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
 Calpha idt7 0 1 IC=0
 Ralpha idt7 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 .ENDS
 
 * without measurement nodes
@@ -11745,9 +11934,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
 EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
@@ -11914,9 +12101,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
 EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
@@ -11950,7 +12135,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -11958,7 +12143,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -12140,7 +12325,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current q-axes
 *
@@ -12163,7 +12348,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -12171,7 +12356,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -12359,7 +12544,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current q-axes
 * Compute f
@@ -12379,7 +12564,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -12388,7 +12573,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -12589,7 +12774,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt} ;magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy1)+v(idy2)} tripdv={tdv} tripdt={tdt}       ;magnetizing current q-axes
 *
@@ -12608,7 +12793,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -12617,7 +12802,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -12832,9 +13017,7 @@ Galpha 0 idt7  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
 Calpha idt7 0 1 IC=0
 Ralpha idt7 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 * Compute n
 *En		n	0  VALUE={n0+60/(2*pi)/J*v(idt8)} tripdv={tdv} tripdt={tdt}
 *Gn 0 idt8  VALUE={v(M)*Mvz+v(Mi)-v(Rbg)} tripdv={tdv} tripdt={tdt}
@@ -12857,7 +13040,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -12865,7 +13048,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -13049,7 +13232,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current
 *
@@ -13069,7 +13252,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Compute f
 Ef      f   0  VALUE={v(n)*p/60} tripdv={tdv} tripdt={tdt}
@@ -13086,7 +13269,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  tripdv={tdv} tripdt={tdt}
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -13281,7 +13464,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current
 *
@@ -13299,7 +13482,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -13308,7 +13491,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -13493,9 +13676,7 @@ Galpha 0 idt7  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
 Calpha idt7 0 1 IC=0
 Ralpha idt7 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 .ENDS
 
 * without measurement nodes
@@ -13630,9 +13811,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
 EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
@@ -13803,9 +13982,7 @@ Gpsi_E 0 idt6  VALUE={v(F1,0)*g*RE_factor-RE*RE_factor*g*g*v(ie)} tripdv={tdv} t
 Cpsi_E idt6 0 1 IC=0
 Rpsi_E idt6 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 *
 Emi		Mi	0	VALUE={1.5*p*(i(vphx)*v(isy)-i(vphy)*v(isx))} tripdv={tdv} tripdt={tdt}
 EMoment	M 0	VALUE={Mvz*(-v(Mi)+v(Rbg))} tripdv={tdv} tripdt={tdt}
@@ -13839,7 +14016,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -13847,7 +14024,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -14030,7 +14207,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current q-axes
 *
@@ -14053,7 +14230,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -14061,7 +14238,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -14250,7 +14427,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current q-axes
 * Compute f
@@ -14270,7 +14447,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -14279,7 +14456,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -14481,7 +14658,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt} ;magnetizing current d-axes
 Eimy imy 0 VALUE={v(isy)+v(idy1)+v(idy2)} tripdv={tdv} tripdt={tdt}       ;magnetizing current q-axes
 *
@@ -14500,7 +14677,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -14509,7 +14686,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -14721,9 +14898,7 @@ Galpha 0 idt7  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
 Calpha idt7 0 1 IC=0
 Ralpha idt7 0 1e10
 *
-Gtheta 0 theta VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}   ;Lastwinkel!!!!
-Rtheta theta 0 1
-Ctheta theta 0 10u
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 * Compute n
 *En		n	0  VALUE={n0+60/(2*pi)/J*v(idt8)} tripdv={tdv} tripdt={tdt}
 *Gn 0 idt8  VALUE={v(M)*Mvz+v(Mi)-v(Rbg)} tripdv={tdv} tripdt={tdt}
@@ -14746,7 +14921,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt} 
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 Ephiu phius 0 VALUE={180/pi*atan2(v(usy),v(usx))}  tripdv={tdv} tripdt={tdt} 
@@ -14754,7 +14929,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -14939,7 +15114,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current
 *
@@ -14959,7 +15134,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Compute f
 Ef      f   0  VALUE={v(n)*p/60} tripdv={tdv} tripdt={tdt}
@@ -14976,7 +15151,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  tripdv={tdv} tripdt={tdt}
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
@@ -15172,7 +15347,7 @@ R12    u2    GND1   1u
 R23    w2    GND1   1u
 RGND1  GND1  0  1e6
 *    Some measurements (active power, reactive power, load angle)
-Etheta theta 0 VALUE={180/pi*atan2(v(usx),v(usy))} tripdv={tdv} tripdt={tdt}
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt}
 Eimx imx 0 VALUE={v(isx)+v(idx)+v(ie)} tripdv={tdv} tripdt={tdt};magnetizing current
 Eimy imy 0 VALUE={v(isy)+v(idy)}       tripdv={tdv} tripdt={tdt};magnetizing current
 *
@@ -15190,7 +15365,7 @@ Eg  g 0 VALUE={g} tripdv={tdv} tripdt={tdt}
 EU  u 0 VALUE={v(us)*sqrt(3)/sqrt(2)} tripdv={tdv} tripdt={tdt}
 Ei  i 0 VALUE={0.7071*sqrt(v(isx)*v(isx)+v(isy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Eap p 0 VALUE={3*(v(usx)*v(isx)/2+v(usy)*v(isy)/2)}  tripdv={tdv} tripdt={tdt}
-Eaq q 0 VALUE={3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
+Eaq q 0 VALUE={sgn(v(n))*3*(v(usy)*v(isx)/2-v(usx)*v(isy)/2)} tripdv={tdv} tripdt={tdt}
 Es  s 0 VALUE={sqrt(v(p)*v(p)+v(q)*v(q))} tripdv={tdv} tripdt={tdt}
 * Other formulas for active and reactive power
 * Other formulas for active and reactive power
@@ -15199,7 +15374,7 @@ Ephii phiis 0 VALUE={180/pi*atan2(v(isy),v(isx))}  tripdv={tdv} tripdt={tdt}
 Ephi phi 0 VALUE={(v(phius)-v(phiis))}   tripdv={tdv} tripdt={tdt}
 * Other formula for up
 *Eup2 up2 0 VALUE={sqrt((v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))*(v(u)-v(i)*v(xd)*sin(pi/180*v(phi)))+(v(i)*v(xd)*cos(pi/180*v(phi)))*(v(i)*v(xd)*cos(pi/180*v(phi))))}  
-Eup up 0 VALUE={(v(usy)-v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
+Eup up 0 VALUE={sgn(v(n))*(v(usy)-sgn(v(n))*v(isx)*v(xd))/sqrt(2)} tripdv={tdv} tripdt={tdt}
 *
 Ews wmagnstator 0 VALUE={1.5*0.5*(v(psisx)*v(isx)+v(psisy)*v(isy))} tripdv={tdv} tripdt={tdt}
 Ewe wmagnexciter 0 VALUE={1.5*0.5*v(psie)*v(ie)} tripdv={tdv} tripdt={tdt}
