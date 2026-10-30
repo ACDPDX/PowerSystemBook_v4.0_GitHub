@@ -8994,7 +8994,7 @@ Galpha 0 idt7  VALUE={v(n)} tripdv={tdv} tripdt={tdt}
 Calpha idt7 0 1 IC=0
 Ralpha idt7 0 1e10
 *
-Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0)))} tripdv={tdv} tripdt={tdt} 
+Etheta theta 0 VALUE={If(sgn(v(n))>0,If(time>10us,180/pi*atan2(v(usx),v(usy)),0),If(time>10us,180/pi*atan2(v(usx),v(usy))-180,0))} tripdv={tdv} tripdt={tdt} 
 .ENDS
 
 * without measurement nodes

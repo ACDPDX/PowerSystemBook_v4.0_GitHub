@@ -349,7 +349,7 @@ rmax10 on2 0 1e12
   * measurement stuff
   eiabs_m i_m 0 value = {sqrt(i(vi1r)*i(vi1r)+i(vi1i)*i(vi1i))} tripdv={TRIPDV} tripdt={TRIPDT} ; abs. current
   es1mag_m  s_m 0 value = {v(v_m)*v(i_m) * sfactor/vfactor }  tripdv={TRIPDV} tripdt={TRIPDT}  ;
-  ev  v_m 0 value = {uout*vfactor*sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i_m))}  tripdv={TRIPDV} tripdt={TRIPDT} ; abs. voltage
+  ev  v_m 0 value = {uout*vfactor*sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))+(1-uout)*v(i_m)}  tripdv={TRIPDV} tripdt={TRIPDT} ; abs. voltage
   ep  p_m 0 value = {(v(v1r)*i(vi1r)+v(v1i)*i(vi1i))*sfactor-v(dp)*v(on)}  tripdv={TRIPDV} tripdt={TRIPDT}  ; real power
   eq  q_m1 0 value = {(v(v1i1)*i(vi1r)-v(v1r1)*i(vi1i))*sfactor}  tripdv={TRIPDV} tripdt={TRIPDT}  ; imag power
   rvm v_m 0  1e12

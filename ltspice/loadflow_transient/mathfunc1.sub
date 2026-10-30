@@ -185,8 +185,8 @@ B1 0 out I=ddt(v(in)) Rpar=1 tripdv={tdv} tripdt={tdt}
 *	delay(x)
 *
 ************************
-.subckt delay in out
-B1 0 out I=delay(v(in)) Rpar=1 tripdv={tdv} tripdt={tdt}
+.subckt delay in out params: t=1ms
+B1 0 out I=delay(v(in),t) Rpar=1 tripdv={tdv} tripdt={tdt}
 .ends delay
 ************************
 *
@@ -212,7 +212,7 @@ B1 0 out I=floor(v(in)) rpar=1 tripdv={tdv} tripdt={tdt}
 .subckt idt in out
 .param ic=0
 B2 out 0 I=v(idt1) Rpar=1 tripdv={tdv} tripdt={tdt}
-G1 0 idt1 I={v(in)}
+G1 0 idt1 Value={v(in)}
 C1 idt1 0 1 IC={ic}
 R1 idt1 0 1e10
 .ends idt
@@ -337,7 +337,7 @@ B1 0 out I=round(v(in)) rpar=1 tripdv={tdv} tripdt={tdt}
 .subckt sdt in out
 .param ic=0
 B2 out 0 I=v(idt1) Rpar=1 tripdv={tdv} tripdt={tdt}
-G1 0 idt1 I={v(in)}
+G1 0 idt1 Value={v(in)}
 C1 idt1 0 1 IC={ic}
 R1 idt1 0 1e10
 .ends idt
