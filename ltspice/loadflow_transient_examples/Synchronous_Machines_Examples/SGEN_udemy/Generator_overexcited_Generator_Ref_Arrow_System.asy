@@ -1,0 +1,28 @@
+Version 4
+SymbolType BLOCK
+LINE Normal -208 0 176 0
+LINE Normal 161 -5 176 0
+LINE Normal 162 6 176 0
+LINE Normal -111 97 -208 0
+LINE Normal 241 -64 176 0
+LINE Normal -208 0 -144 -64 2
+LINE Normal 241 -64 -208 0
+LINE Normal 224 -67 241 -64
+LINE Normal 225 -57 241 -64
+LINE Normal 234 -52 241 -64
+LINE Normal -125 90 -111 97
+LINE Normal -117 84 -111 97
+LINE Normal -151 -51 -144 -64
+LINE Normal -157 -57 -144 -64
+TEXT 218 -28 Left 4 + j*Xd*I
+TEXT 138 -62 Left 4 E
+TEXT 17 -10 Left 4 V
+TEXT -169 54 Left 4 I
+TEXT -188 -40 Left 4 S
+SYMATTR Prefix X
+PIN -208 0 NONE 8
+PINATTR PinName a
+PINATTR SpiceOrder 1
+PIN -208 0 NONE 8
+PINATTR PinName a1
+PINATTR SpiceOrder 2

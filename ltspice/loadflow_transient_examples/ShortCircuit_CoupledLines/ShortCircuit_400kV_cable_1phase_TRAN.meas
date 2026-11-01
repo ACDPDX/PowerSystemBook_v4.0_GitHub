@@ -1,0 +1,13 @@
+* impedance of phase1 of left example
+.meas TRAN Vab MAX V(a,b) FROM 500m TO 520m
+.meas TRAN Iab MAX Ix(U25:IN1) FROM 500m TO 520m
+.meas TRAN Zab PARAM Vab/Iab
+* impedance of phase2 of left example
+.meas TRAN Vde MAX V(d,e) FROM 500m TO 520m
+.meas TRAN Ide MAX Ix(U25:IN2) FROM 500m TO 520m
+.meas TRAN Zde PARAM Vde/Ide
+* impedance of phase3 of left example
+.meas TRAN Vgh MAX V(g) FROM 500m TO 520m
+* since Igh is not symmetric to the y-axis peak to peak:
+.meas TRAN Igh PP Ix(U25:IN3) FROM 500m TO 520m
+.meas TRAN Zgh PARAM Vgh/(Igh/2)

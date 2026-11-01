@@ -1,0 +1,251 @@
+* My special thank to Emer. Prof. Dr. Otto Justus who
+* allowed me to use his models of transformer and synchronous generator
+
+*  One tranformer leg : Two Windings and iron limb
+* For other vector groups only change node names
+* vector group YY0
+* Xu	1U	1N	2U	2N	magn1	magn2	Trafoschenkel2_Yy
+* Xv	1V	1N	2V	2N	magn1	magn2	Trafoschenkel2_Yy
+* Xw	1W	1N	2W	2N	magn1	magn2	Trafoschenkel2_Yy
+* vector group YY6
+* Xu	1U	1N	2N	2U	magn1	magn2	Trafoschenkel2_Yy
+* Xv	1V	1N	2N	2V	magn1	magn2	Trafoschenkel2_Yy
+* Xw	1W	1N	2N	2W	magn1	magn2	Trafoschenkel2_Yy
+
+* Transformer with iron lost, leakage, copper lost, nonlinear core, remanent flux
+*
+.SUBCKT Trafo3Yy0  1U  1V  1W  1N  2U  2V  2W  2N
++	PARAMS:
++	SN=10kVA ; nominal apparent power
++	U1Nenn=400V ; primary voltage
++	U20=400V ; secondary voltage
++	fn={fn1} ; frequency
++	N1=1000 ; Nr. of windings
++	uR=0.04 ; relative parameter for resistance of winding
++	uX=0.08 ; relative parameter for reactance of winding (uk=sqrt(ur*ur+ux*ux)) = rel. short circuit voltage 
++	i0=0.05 ; no load current ( vectorial sum of iron lost current and magnetizing current ) 
++	p0=0.005 ; relative iron lost parameter (have to be smaller than i0) 
++   a=0.75 ; nonlinear magnetizing shape parameter (lower a -> higher nonlinearity, a=1 linear core)
++   m=9 ; second nonlinear magnetizing shape parameter set as odd e.g. 7,9 (m=1 for linear core)
++   psi_0=0 ; Remanent flux parameter set 1 for full remanent flux
++   psir=1 ; Full remanent flux on Phase1
++   psis=-0.5 ; Halve neg. remanent flux on Phase2
++   psit=-0.5 ; Halve neg. remanent 
++   tpsi0=1000s ; Time when full remanent flux is applied
++   tpsid=0.1ms ; Switcher parameter for setting remanent flux (do not change) 
++   ron=0.00001 ; Switcher parameter for setting remanent flux (do not change)
++   bf=0    ; If 1 Phase 2 (middle) magnetizing current is simulated lower due to smaller magnetizing path
++   rkessel=1e20 ; magn. resistance of the transformer kettle
+Xu	1U	1N	2U	2N	magn1	magn2	TransformerLeg_Yy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn/sqrt(3)}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,1.2)}
++ p0={p0*IF(bf==0,1,1.2)}
++ a={a}
++ m={m}
++ psi_0={psir*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+Xv	1V	1N	2V	2N	magn1	magn2	TransformerLeg_Yy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn/sqrt(3)}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf==0,1,0.6)}
++ p0={p0*IF(bf==0,1,0.6)}
++ a={a}
++ m={m}
++ psi_0={psis*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+Xw	1W	1N	2W	2N	magn1	magn2	TransformerLeg_Yy
++ PARAMS:
++ SN={SN/3}
++ U1N={U1Nenn/sqrt(3)}
++ U20={U20/sqrt(3)}
++ fN={fN}
++ N1={N1}
++ uR={uR}
++ uX={uX}
++ i0={i0*IF(bf<=0,1,1.2)}
++ p0={p0*IF(bf<=0,1,1.2)}
++ a={a}
++ m={m}
++ psi_0={psit*psi_0}
++ tpsi0={tpsi0}
++ tpsid={tpsid}
++ ron={ron}
+Rm	magn1	0	1MEG
+Rkessel magn1 magn2 {rkessel} ; oil kettle magnetic resistance 
+RGND1U 1U 0 1e12
+RGND1V 1V 0 1e12
+RGND1W 1W 0 1e12
+RGND2U 2U 0 1e12
+RGND2V 2V 0 1e12
+RGND2W 2W 0 1e12
+RGND1N 1N 0 1e12
+RGND2N 2N 0 1e12
+.ENDS
+*$
+
+
+
+* Some other vector groups for two windings legs
+
+* TrafoDy5  ..............
+*          W1      W2     
+*        o   u   o   u  
+* Xu	1U	1V	2N	2U   magn1	magn2	Trafoschenkel2_Yy
+* Xv	1V	1W	2N	2V   magn1	magn2	Trafoschenkel2_Yy
+* Xw	1W	1U	2N	2W   magn1	magn2	Trafoschenkel2_Yy
+
+
+* TrafoDy11  ..............
+*          W1      W2     
+*        o   u   o   u  
+* Xu	1U	1V	2U	2N   magn1	magn2	Trafoschenkel2_Yy
+* Xv	1V	1W	2V	2N   magn1	magn2	Trafoschenkel2_Yy
+* Xw	1W	1U	2W	2N   magn1	magn2	Trafoschenkel2_Yy
+
+* TrafoDy1  ..............
+*          W1      W2     
+*        o   u   o   u  
+* Xu	1U	1W	2U	2N   magn1	magn2	Trafoschenkel2_Yy
+* Xv	1V	1U	2V	2N   magn1	magn2	Trafoschenkel2_Yy
+* Xw	1W	1V	2W	2N   magn1	magn2	Trafoschenkel2_Yy
+
+
+* TrafoDd6  ..............
+*          W1      W2     
+*        o   u   o   u  
+* Xu	1U	1W	2U	2V   magn1	magn2	Trafoschenkel2_Yy
+* Xv	1V	1U	2V	2W   magn1	magn2	Trafoschenkel2_Yy
+* Xw	1W	1V	2W	2U   magn1	magn2	Trafoschenkel2_Yy
+*
+* Trafo3Yd5  ..............
+*          W1      W2     
+*        o   u   o   u    
+* Xu	1U	1N	2W	2U   magn1	magn2	Trafoschenkel2_Yy
+* Xv	1V	1N	2U	2V   magn1	magn2	Trafoschenkel2_Yy
+* Xw	1W	1N	2V	2W   magn1	magn2	Trafoschenkel2_Yy
+
+* Trafo3Yd11 ..............
+*          W1      W2     
+*        o   u   o   u  
+* Xu	1U	1N	2U	2W   magn1	magn2	Trafoschenkel2_Yy
+* Xv	1V	1N	2V	2U   magn1	magn2	Trafoschenkel2_Yy
+* Xw	1W	1N	2W	2V   magn1	magn2	Trafoschenkel2_Yy
+
+
+* Trafo3Yd1
+* 
+*          W1      W2     
+*        o   u   o   u  
+* Xu	1U	1N	2V	2U   magn1	magn2	Trafoschenkel2_Yy
+* Xv	1V	1N	2W	2V   magn1	magn2	Trafoschenkel2_Yy
+* Xw	1W	1N	2U	2W   magn1	magn2	Trafoschenkel2_Yy
+
+* HINT: For three winding transformers like Ydy or Yzn 
+*       and much, much more examples also with other elements of power systems see 
+*       my files at ltspice usergroup ..files/z_yahoo/adventures with loadflow/
+*       or my homepage www.friedrichschmidt.at
+
+
+.SUBCKT   TransformerLeg_Yy  1_1 1_2  2_1 2_2  magnP1 magnP2
++	PARAMS:
++	SN=10kVA
++	U1N=400V
++	U20=400V
++	fn={fn1}
++	N1=1000
++	uR=0.04
++	uX=0.08
++	i0=0.05
++	p0=0.005
++   a={0.3} ; FS
++   m={7} ; FS
++   psi_0=0 ; Remanent flux parameter 0,1,-1 ;0=no remanent flux,1=full pos.remanent flux,-1=full neg.remanent flux (steady state immediately reached) 
++   tpsi0=40ms
++   tpsid=0.1ms
++   ron=0.00001
+.PARAM
++	I1N={SN/U1N} ; nominal current
++	Z1N={U1N/I1N} ; nominal impedance 
++	omegaN={(2*pi)*fN} ;circular frequency
++	R1={Z1N*uR/2} ; primary resistance due to copper lost
++	L1s={Z1N*uX/2/omegaN} ; primary reactance
++	RFe={U1N*U1N/(p0*SN)} ; resistance for simulating iron lost
++	N2={N1*U20/U1N} ; nr. of windings on secondary side
++	R2={R1*N2/N1*N2/N1} ; secondary resistance 
++   Xh={(U1N*U1N)/(SN*sqrt(i0*i0-p0*p0))} ; Main field impedance
++   iu={U1N/Xh} ; Nominal magnetizing current
++   ImyN={sqrt(2)*iu} ; Nominal magnetizing current peak value
++	phiN={sqrt(2)*U1N/omegaN/N1} ; Nominal flux peak value
++   a={a} ; Parameter for nonlinear core
++   m={m} ; Parameter for nonlinear core
+*	Primary current
+Gi1	1_1	1_2	VALUE={v(a,magnP1)/(N1)} tripdv={tdv} tripdt={tdt}
+Rpi1	1_1	1_2	1000MEG
+*   Secondary current
+Gi2	2_1	2_2	VALUE={v(b,a)/N2} tripdv={tdv} tripdt={tdt}
+Rpi2	2_1	2_2	1000MEG
+* Primary Winding
+X_W1	magnP1	a	1_1	1_2	Winding_Yy 
++PARAMS:  R={R1}  N={N1}  Rphis={N1*N1/L1s} psi_0={psi_0*phiN} tpsi0={tpsi0} tpsid={tpsid} ron={ron} 
+* Secondary Winding
+X_W2	a   b    2_1	2_2	Winding_Yy 
++PARAMS:  R={R2}  N={N2}  Rphis={N1*N1/L1s} psi_0={psi_0*phiN} tpsi0={tpsi0} tpsid={tpsid} ron={ron} 
+* Iron core leg
+X_SCH	b	magnP2	IronLeg_Yy   PARAMS:
++	N={N1}  RFe={RFe}  ImyN={ImyN}  
++	phiN={phiN}	a={a}   m={m}
+.ENDS
+
+
+
+
+* Winding
+*
+.SUBCKT Winding_Yy  ma  mb  ea  eb
++PARAMS:   R=1   N=1    Rphis=1 psi_0=0 tpsi0=1000s tpsid=0.1ms ron=0.00001 
+* Main Flux
+Gphi	ma	mb	VALUE={v(phi)} tripdv={tdv} tripdt={tdt} 
+* Leakage Flux
+Rphis	ma	mb	{Rphis}  
+*****************************************************************************
+* Flux integrator with GCR-devices (better convergence as SDT,IDT device)
+Gp	0	phi	VALUE={(v(ea,eb)-R*v(mb,ma)/(N))/(N)} tripdv={tdv} tripdt={tdt} ; GCR integrator of flux
+Cp  phi 0 1 IC=0 
+Rp	phi 0	1000MEG
+******************************************************************************
+* Code for remanent flux if psi_0=1
+Vctrl ctrl 0 pwl 0s 0v {tpsi0+1p} 0v {tpsi0+tpsid+2p} 1V {tpsi0+2*tpsid+3p} 1v {tpsi0+3*tpsid+4p} 0v
+S1 phi phix ctrl 0 MS1
+.model MS1 SW(Ron={Ron} Roff=1e9 Vt=0.9 Vh=0 Lser=0 Vser=0
+E1 phix 0 value={psi_0} tripdv={tdv} tripdt={tdt} ; This is the voltagesource for loading the capacitance Cp with remanent flux 
+.ENDS ;  
+*$
+
+* Iron leg
+*$
+.SUBCKT IronLeg_Yy  m1  m2
++PARAMS:   N=1  RFe=1  ImyN=1  a=1  phiN=1 m=9 ctrl=1
+LRFe	m1	mh	{N*N/RFe} ; Iron lost modelled in the magnetic circuitry (Rfe->LRFe) 
+vphi	mh	mh1	0
+rphi    mh  0 1e12 
+Eimy	mh1	m2
+* Theta = N*imy(Phi) nonlinear imy
++VALUE={N*imyN*(a*i(vphi)/phiN+(1-a)*PWRS(i(vphi)/phiN,m))} tripdv={tdv} tripdt={tdt}
+.ENDS;  SCHENKEL_Yy

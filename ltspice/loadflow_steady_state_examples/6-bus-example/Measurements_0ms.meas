@@ -1,0 +1,38 @@
+* Current and powerlost and reactive power balance of all lines:
+.func mag2(a,b) {sqrt(a*a+b*b)}
+.meas TRAN Current_OverHeadLine_3_1 FIND mag2(Ix(ln13:v1r),Ix(ln13:v1i)) AT 10us
+.meas TRAN Current_OverHeadLine_1_3 FIND mag2(Ix(ln13:v2r),Ix(ln13:v2i)) AT 10us
+
+.meas TRAN Current_OverHeadLine_1_2 FIND mag2(Ix(ln12:v1r),Ix(ln12:v1i)) AT 10us
+.meas TRAN Current_OverHeadLine_2_1 FIND mag2(Ix(ln12:v2r),Ix(ln12:v2i)) AT 10us
+
+.meas TRAN Current_OverHeadLine_3_2 FIND mag2(Ix(ln23:v1r),Ix(ln23:v1i)) AT 10us
+.meas TRAN Current_OverHeadLine_2_3 FIND mag2(Ix(ln23:v2r),Ix(ln23:v2i)) AT 10us
+
+.meas TRAN Current_Cable_4_6 FIND mag2(Ix(ln46:v1r),Ix(ln46:v1i)) AT 10us
+.meas TRAN Current_Cable_6_4 FIND mag2(Ix(ln46:v2r),Ix(ln46:v2i)) AT 10us
+
+.meas TRAN Current_Cable_5_6 FIND mag2(Ix(ln56:v1r),Ix(ln56:v1i)) AT 10us
+.meas TRAN Current_Cable_6_5 FIND mag2(Ix(ln56:v2r),Ix(ln56:v2i)) AT 10us
+
+.meas TRAN Current_Transformer_3_5 FIND mag2(Ix(tr35:v1r),Ix(tr35:v1i)) AT 10us
+.meas TRAN Current_Transformer_5_3 FIND mag2(Ix(tr35:v2r),Ix(tr35:v2i)) AT 10us
+
+.meas TRAN Current_Transformer_2_4 FIND mag2(Ix(tr24:v1r),Ix(tr24:v1i)) AT 10us
+.meas TRAN Current_Transformer_4_2 FIND mag2(Ix(tr24:v2r),Ix(tr24:v2i)) AT 10us
+
+.meas TRAN Powerlost_OverHeadLines FIND V(p1)+v(p2)+V(p3)+v(p4)+v(p9)+v(p10) AT 10us
+.meas TRAN Powerlost_Cables FIND V(p11)+v(p12)+V(p13)+v(p14) AT 10us
+.meas TRAN Powerlost_Transformers FIND V(p5)+v(p6)+V(p7)+v(p8) AT 10us
+
+.meas TRAN Reactive_power_balance_OverHeadLines FIND V(q1)+v(q2)+v(q3)+v(q4)+v(q9)+v(q10) AT 10us
+.meas TRAN Reactive_power_balance_Cables FIND V(q11)+v(q12)+v(q13)+v(q14) AT 10us
+.meas TRAN Reactive_power_balance_Tranformers FIND V(q5)+v(q6)+v(q7)+v(q8) AT 10us
+
+* Current of loads, pv_element, slack
+
+.meas TRAN Current_of_each_load FIND mag2(Ix(ld2:v1r),Ix(ld2:v1i)) AT 10us
+
+.meas TRAN Current_of_pv_element  FIND mag2(Ix(pv_slack6:v1r),Ix(pv_slack6:v1i)) AT 10us
+
+.meas TRAN Current_of_slack FIND mag2(Ix(slack1:v1r),Ix(slack1:v1i)) AT 10us

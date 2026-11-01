@@ -1,0 +1,30 @@
+* C:\Users\fried\Documents\ltspice\loadflow_transient_examples_with_some_documentation_directly_in_asc_file\OtherTestingModelling\Digital\TTL\test.asc
+Q1 N005 N003 in1 0 NPN1
+Q3 N002 N005 N006 0 NPN1
+R1 vcc N003 4000
+R2 vcc N002 1600
+R3 vcc N001 130
+Q2 N001 N002 N004 0 NPN1
+R4 N006 0 1000
+Q4 out N006 0 0 NPN1
+D1 N004 out D
+D2 0 in1 D
+C1 out 0 0.001p
+R5 out 0 1e6
+Q5 N005 N003 in2 0 NPN1
+D3 0 in2 D
+.model D D
+.lib C:\Users\fried\Documents\LTspiceXVII\lib\cmp\standard.dio
+.model NPN NPN
+.model PNP PNP
+.lib C:\Users\fried\Documents\LTspiceXVII\lib\cmp\standard.bjt
+vcc vcc 0 5v
+vin1 in1 0 0
+vin2 in2 0 5
+.tran 0 100n 0 0.1n
+.model npn1 NPN (Bf=100)
+.MODEL DIODE D(CJ0 .5PF)
+* For faster convergence
+* TTL-NAND 2 inputs
+.backanno
+.end

@@ -1,0 +1,22 @@
+********************************************************************************
+* Three phase switcher
+* Tstart=switching on time
+* Tstop=(later) switching off time
+********************************************************************************
+.SUBCKT Sw_3Phase in1 in2 in3 out1 out2 out3
++PARAMS:
++t_Start=0.5
++t_Stop=1e6
++tsw=100u toff=10m ; on and off switching times 
++ron=0.01
++roff=1e9
++vt=0.9
++vh=0
+Vsw ctrl 0 PWL(0s 0v {t_Start+1p} 0 {t_Start+tsw+2p} 1 {t_Stop+3p} 1 {t_Stop+toff+4p} 0 )
+S1 in1 out1 ctrl 0 MS1
+S2 in2 out2 ctrl 0 MS1
+S3 in3 out3 ctrl 0 MS1
+.model MS1 SW(Ron={ron} Roff={roff} Vt={Vt} Vh={Vh} Lser=0 Vser=0)
+.ENDS
+
+

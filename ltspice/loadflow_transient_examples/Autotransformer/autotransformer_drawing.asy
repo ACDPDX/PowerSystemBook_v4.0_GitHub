@@ -1,0 +1,70 @@
+Version 4
+SymbolType CELL
+LINE Normal -17 95 -17 95
+LINE Normal -25 95 -25 -15
+LINE Normal -22 95 -22 -15
+LINE Normal -16 -15 -16 -28
+LINE Normal -14 -15 -16 -15
+LINE Normal -16 15 -16 28
+LINE Normal -16 15 -16 15
+LINE Normal -14 15 -16 15
+LINE Normal -16 -28 -16 -32
+LINE Normal -16 32 -16 28
+LINE Normal -16 65 -16 47
+LINE Normal -16 95 -16 112
+LINE Normal -16 65 -15 65
+LINE Normal -15 95 -16 95
+LINE Normal -16 47 -16 32
+LINE Normal -80 -32 -16 -32
+LINE Normal -80 112 -16 112
+LINE Normal 48 112 -16 112
+LINE Normal 48 40 -16 40
+LINE Normal -80 104 -80 -26
+LINE Normal 48 103 48 48
+LINE Normal -82 96 -80 104
+LINE Normal -78 96 -82 96
+LINE Normal -80 104 -78 96
+LINE Normal 46 95 48 103
+LINE Normal 50 95 46 95
+LINE Normal 48 103 50 95
+LINE Normal 0 32 0 -16
+LINE Normal 0 32 0 32
+LINE Normal -2 24 0 32
+LINE Normal 2 24 -2 24
+LINE Normal 0 32 2 24
+LINE Normal 1 49 1 97
+LINE Normal 1 49 1 49
+LINE Normal 3 57 1 49
+LINE Normal -1 57 3 57
+LINE Normal 1 49 -1 57
+LINE Normal 81 57 81 40
+LINE Normal 81 112 81 96
+LINE Normal 64 112 81 112
+LINE Normal 97 97 97 49
+LINE Normal 97 97 97 97
+LINE Normal 95 89 97 97
+LINE Normal 99 89 95 89
+LINE Normal 97 97 99 89
+RECTANGLE Normal 81 40 64 40
+RECTANGLE Normal 84 96 77 57
+CIRCLE Normal -14 -41 -18 -45
+ARC Normal -18 77 -12 83 -14 95 -15 65
+ARC Normal -17 -15 -11 -9 -13 3 -14 -27
+ARC Normal -17 -9 -11 -3 -13 9 -14 -21
+ARC Normal -17 -3 -11 3 -13 15 -14 -15
+ARC Normal -17 3 -11 9 -13 21 -14 -9
+ARC Normal -17 9 -11 15 -13 27 -14 -3
+ARC Normal -18 71 -12 77 -14 89 -15 59
+ARC Normal -18 65 -12 71 -14 83 -15 53
+ARC Normal -18 83 -12 89 -14 101 -15 71
+ARC Normal -18 89 -12 95 -14 107 -15 77
+TEXT -76 40 Left 2 U1
+TEXT 53 73 Left 2 U2
+TEXT 6 7 Left 2 I1
+TEXT 5 73 Left 2 I2
+TEXT 103 72 Left 2 I1+I2
+TEXT -16 124 Left 2 Picture1
+TEXT -40 7 Left 2 N1
+TEXT -40 73 Left 2 N2
+TEXT 5 -25 Left 2 N=N1+N2
+SYMATTR Prefix U

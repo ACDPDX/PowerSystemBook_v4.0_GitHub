@@ -1,0 +1,11 @@
+.PARAM Td1=1000ms
+.FUNC f1(a) {2*a}
+
+.meas TRAN Time1 FIND time WHEN Ix(U2:Gnd3)=0 TD={TD1} Rise=1
+.meas TRAN Time2 FIND time WHEN Ix(U2:Gnd3)=0 TD={TD1} Rise=2.meas TRAN Frequ1 PARAM f1(0.5)/(Time2-Time1)
+
+
+.meas TRAN Time3 FIND time WHEN Ix(U2:Gnd1)=0 TD={TD1} Rise=1
+.meas TRAN Time4 FIND time WHEN Ix(U2:Gnd1)=0 TD={TD1} Rise=2
+.meas TRAN Frequ2 PARAM 1/(Time4-Time3)
+

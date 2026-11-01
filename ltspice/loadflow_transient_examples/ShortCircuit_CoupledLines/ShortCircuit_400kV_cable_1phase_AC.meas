@@ -1,0 +1,17 @@
+* impedance of phase1 of left example
+.meas AC Vab FIND V(a,b) AT 50
+.meas AC Iab FIND Ix(U25:IN1) AT 50
+.meas AC Zab PARAM ABS(Vab/Iab)
+
+
+* impedance of phase2 of left example
+.meas AC Vde FIND V(d,e) AT 50
+.meas AC Ide FIND Ix(U25:IN2) AT 50
+.meas AC Zde PARAM ABS(Vde/Ide)
+
+
+
+* impedance of phase3 of left example
+.meas AC Vgh FIND V(g) AT 50
+.meas AC Igh FIND Ix(U25:IN3) AT 50
+.meas AC Zgh PARAM ABS(Vgh/Igh)

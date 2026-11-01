@@ -1,0 +1,55 @@
+The line below is a result from ATP for a 400kV 1200mm2 Cu Cable with Oilimpregnation as insulator
+The phases are in earth 1m in depth and 1m from line to line
+The phases are magnetically coupled 
+The lines are without a conducting shield but the same parametersare also valid for a additional shield since the shield currentsand voltages should be small and therefore have little influence on the magnetical
+coupling parameters
+For the DATA see the atp-file: OILcable_400kV_1200mm2_unshielded
+
+
+            Total impedance [Zt] in Ohm/m
+  6.72716E-05  4.92326E-05  4.92320E-05
+  6.88043E-04  4.29705E-04  3.86154E-04  Core 1
+
+  4.92326E-05  6.72716E-05  4.92326E-05
+  4.29705E-04  6.88043E-04  4.29705E-04  Core 2
+
+  4.92320E-05  4.92326E-05  6.72716E-05
+  3.86154E-04  4.29705E-04  6.88043E-04  Core 3
+
+            Total admittance [Yt] in mho/m
+  0.00000E+00  0.00000E+00  0.00000E+00
+  8.01114E-08  0.00000E+00  0.00000E+00  Core 1
+
+  0.00000E+00  0.00000E+00  0.00000E+00
+  0.00000E+00  8.01114E-08  0.00000E+00  Core 2
+
+  0.00000E+00  0.00000E+00  0.00000E+00
+  0.00000E+00  0.00000E+00  8.01114E-08  Core 3
+
+
+
+
+For line_coupled model: 10km Length =10^4 m
+
+R1,R2,R3=0.1826
+XL11=XL22=XL33=6.88043 
+XM12=4.29705 XM13=3.86154 XM23=4.29705
+C11=C22=C33=2550nFC12=1p C13=1p C23=1p  
+
+
+For line_CE model: 10km Length =10^4 m
+
+R1,R2,R3=0.1826
+XL1=XL3=6.88043-0.5*4.29705-0.5*3.86154=2.801ohm -> L={2.801/314.159}
+XL2=6.88043-0.5*4.29705-0.5*4.29705=2.583ohm->L={2.583/314.159}
+The average of inductance: (2*2.801+2.583)/3=2.728
+XC=1/8.01114e-4=1248.26ohm                         -> CB/CE=1/(314.159*1248.26)=2550nF CL=0
+ 
+Coupling Factors:
+
+CF phase1 phase2 CF=XM12/sqrt(XL11*XL22)=0.624532 
+CF phase2 phase3 CF=XM23/sqrt(XL33*XL22)=0.624532 
+CF phase3 phase1 CF=XM13/sqrt(XL11*XL33)=0.561235
+
+
+The lines are 1m depth in ground and each phase 1m in distance between * * * 

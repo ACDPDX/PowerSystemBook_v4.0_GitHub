@@ -1,0 +1,72 @@
+Die Synchronmaschine
+Zweipolige Maschine p=1  
+Durchmesser ca. max. 1.25m
+Länge ca. max. 7m wegen Durchhängung
+Nennleistungsfaktor meist 0.8 bis 0.85
+Wasserkraftmaschinen niedriger Drehzahl
+z.B Itaipu: Brasilien: 18x824MW, cosphi=0.8 Durchmesser 
+von 16m bei geringerer Länge von 3.5m
+
+Die Synchronreaktanz der Maschine ist ein Maß für die Rückwirkung des Stator-
+stromes auf die Klemmenspannung. Je größer der Luftspalt der Maschine umso kleiner
+ist die synchrone Reaktanz. (Dies ist wahrscheinlich Kc) 
+
+Synchronreaktanz: Xd=UN/1.73205/IK0 = 20000/1.73205/IN/KC=1.59ohm (unsaturated)
+Xd=2pu SN=100MVA, UN=10kV:
+I=100e6/3/10kV/1.732=5.77kA
+Bezugsimpedanz=10kV/1.73/5.77kA=1ohm
+Absolute Xd=2*1=2ohm
+Xdpu= üblich 1pu bis 2.5pu
+
+Subtransiente Reaktanz bis zu 10x kleiner als synchrone Reaktanz
+Kurzschlussstrom so bis zu 10x größer als Dauerkurzschlussstrom
+Zusätzlich zum Anfangskurzschlussstrom kommt noch ein Gleichstromglied
+hinzu das im ungünstigsten Fall (abhängig vom Eintrittszeitpunkt) des Kurzschlusses
+in Höhe des Anfangskurzschlussstromes entspricht
+
+Dauerkurzschlussstrom ist 0.4-1x IN
+IKpu=Upu/Xdpu=1/1=1pu bis 1/2.5pu=0.4pu 
+
+Xd ist keine konstante Größe sondern vom Erregerstrom abhängig
+Sie ist am Anfang konstant und wird dann wenn die Leerlaufkennlinie zur
+Sättigung übergeht immer kleiner
+
+Am Anfang der Kurzschlusskennlinie ist die Magnetisierung durch den magn. Wider-
+stand des Luftspalt vorgegeben. Das Eisen hat einen viel geringeren magn. Widerstand.
+Dies ändert sich allerdings später und das gesättigte Eisen hat einen noch
+höheren Widerstand als der Luftspalt 
+
+Leerlauf_XD_Kennlinie.jpg
+
+Testen dieser Kennlinie mit Kombinierter Simulation von Leerlauf und Kurzschluss-
+kennlinie: 
+Ik=f(IE) und Us=f(IE)
+
+Versuch XD1 ergibt gesättigte Reaktanz
+Versuch XD2 ergibt ungesättigte Reaktanz
+
+Xd kleiner, Luftspalt größer, IK größer, KC größer
+Max. aufnehmbare Blindleistung (bei unerregter Maschine) ist am größten
+je kleiner Xd ist.
+
+Bei größer werdendem Luftspalt ist der Erregerbedarf höher 
+siehe auch g={IE0/((1+Streuung)*Kc*IN*sqrt(2))} 
+Neu g=(IE0*(1-Streuung))/(KC*IN*sqrt(2))
+wird kleiner->
+IE wird größer. 
+
+Max. aufnehmbere Blindleistung abhängig von XD
+I=U/Xd
+Q=I*I*Xd oder U*U/Xd
+Im Erzeugerzählpfeilsystem ist Q neg. dh. es wird Blindleistung bezogen
+Im Verbraucherzählpfeilsystem ist Q pos. dh. es wird auch Blindleistung bezogen
+
+
+
+
+
+
+
+
+
+ 

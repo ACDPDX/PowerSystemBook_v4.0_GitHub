@@ -1,0 +1,35 @@
+* C:\Users\fried\Documents\ltspice\Optimization\Emtex_Loadflow_7bus_first_optimization_example\Emtex_result_4_tran.asc
+xv1 r1 i1 n001 n020 n022 vri_slack_lf on=1 vr=1 vi=0 vfactor={vfactor} sfactor={sfactor}
+xln24 r2 i2 r4 i4 n008 n009 n010 n012 n011 line_lf on=1 r=0.015 xl=0.092 cb=5.76141e-4 ce=5.76141e-4 length=1 fn=50 vfactor={vfactor} sfactor={sfactor} zlfactor=1 zqfactor=1
+xsg3 r3 i3 n019 n021 n023 constpower_lf on=1 p=-5 q=-0.8 vfactor={vfactor} sfactor={sfactor}
+xsg5 r5 i5 n043 n055 n056 constpower_lf on=1 p=-2 q=-0.82 vfactor={vfactor} sfactor={sfactor}
+xln67 r6 i6 r7 i7 n050 n051 n052 n054 n053 line_lf on=1 r=0.015 xl=0.092 cb=5.76141e-4 ce=5.76141e-4 length=1 fn=50 vfactor={vfactor} sfactor={sfactor} zlfactor=1 zqfactor=1
+xln26 r2 i2 r6 i6 n033 n035 n037 n041 n039 line_lf on=1 r=0.023 xl=0.138 cb=8.6263e-4 ce=8.6263e-4 length=1 fn=50 vfactor={vfactor} sfactor={sfactor} zlfactor=1 zqfactor=1
+xln47 r4 i4 r7 i7 n034 n036 n038 n042 n040 line_lf on=1 r=0.023 xl=0.138 cb=8.6263e-4 ce=8.6263e-4 length=1 fn=50 vfactor={vfactor} sfactor={sfactor} zlfactor=1 zqfactor=1
+xsl2 r2 i2 n026 n025 n024 constpower_lf on=1 p=2 q=0.3 vfactor={vfactor} sfactor={sfactor}
+xsl4 r4 i4 n029 n028 n027 constpower_lf on=1 p=2 q=0.2 vfactor={vfactor} sfactor={sfactor}
+xsl3 r3 i3 n032 n031 n030 constpower_lf on=1 p=0.6 q=0.08 vfactor={vfactor} sfactor={sfactor}
+xsl6 r6 i6 n062 n061 n060 constpower_lf on=1 p=1 q=0.3 vfactor={vfactor} sfactor={sfactor}
+xsl5 r5 i5 n059 n058 n057 constpower_lf on=1 p=0.5 q=0.05 vfactor={vfactor} sfactor={sfactor}
+xu1 r3 i3 r4 i4 n018 n017 n016 n015 n013 n014 on l_ s_ transformer_ctrl_lf ue=1 stproz=1.42 ykr=6.9 yki=-82.76 y0r=1.0e-6 y0i=-1.0e-6 middle=0 phir=-0.5 phii=-0.866025404 vfactor={vfactor} sfactor={sfactor} zlfactor=1.0 zqfactor=1.0
+xu2 r1 i1 r2 i2 n002 n003 n004 n005 n007 n006 on l_ s_ transformer_ctrl_lf ue=1 stproz=1.42 ykr=6.9 yki=-82.76 y0r=1.0e-6 y0i=-1.0e-6 middle=0 phir=-0.5 phii=-0.866025404 vfactor={vfactor} sfactor={sfactor} zlfactor=1.0 zqfactor=1.0
+xu3 r5 i5 r6 i6 n044 n045 n046 n047 n049 n048 on l_ s_ transformer_ctrl_lf ue=1 stproz=1.42 ykr=6.9 yki=-82.76 y0r=1.0e-6 y0i=-1.0e-6 middle=0 phir=-0.5 phii=-0.866025404 vfactor={vfactor} sfactor={sfactor} zlfactor=1.0 zqfactor=1.0
+xu4 r7 i7 sl7_v sl7_p sl7_q on1 p q constpower_ctrl_lf p=1 q=1 vfactor={vfactor} sfactor={sfactor}
+.tran 10m
+.param vfactor = 1 sfactor=1
+.options abstol=1u vntol=1u
+vs_ s_ 0 1
+vl_ l_ 0 pwl 0s {tap1} 2ms {tap1} 2.5ms {tap2} 4ms {tap2} 4.5ms {tap3} 6.0ms {tap3} 6.5ms {tap4} 8ms {tap4} 8.5ms {tap5}
+von on 0 1
+von1 on1 0 1
+vp p 0 4
+vq q 0 pwl 0s -0.3 10m 1.1
+.params tap1opt=0  tap2opt=0 tap3opt=-3 tap4opt=-5 tap5opt=-7
+.param tap1=-1.70585560225386 tap2=-3.97772926398533 tap3=-5.87370605928452 tap4=-7.76167037447407 tap5=-9.56550641750379
+v1 1 0 1
+ev7 f 0 value={1e6*idt( ( v(1)-v(sl7_v))**2)     } tripdv=1 tripdt=1
+.meas tran cost find v(f) at 9.99ms
+.lib ltspice.lib
+.lib ltspice_ctrl.lib
+.backanno
+.end

@@ -1,0 +1,247 @@
+Examplefiles:
+=============
+
+AT FIRST READ Ltspice_Loadflow_ENG.doc
+
+v_r.cir (dircetory 1st_examples)
+=======
+
+This is the first simple text based example. It is a pure textual netlist without grafical input.
+It shows the first stage of devicemodelling for loadflowcomputation.
+Best you drag&drop the file to the ltspice-icon
+For the example itself see the ltspice_loadflow_eng.doc for details.
+
+v_r_2.cir
+=========
+
+This second text based example shows a better devicemodel. It comes with additional measurementnodes.
+See the ltspice_loadflow_eng.doc for details.
+
+
+v_r.asc
+=======
+
+The same like v_r.cir but now with grafical input and the full-featured device model in ltspice.lib
+The netlist can be obtained by Menu-View-SpiceNetlist
+The expanded netlist can be obtained by Menu-Tools-ControlPanel-Operation- Enable GenerateExpandedListing
+ Menu-View-SpiceErrorLog
+You can also look at the library ltspice.lib
+
+
+
+load_test.asc
+=============
+
+second simple example
+This example shows the load macro model from ltspice.lib
+If k = 2 the load behaves like a normal constpowerload
+If k = 1 the load behaves like a constcurrentload
+If k = 0 the load behaves like a constimpedanceload
+
+Result:
+ 
+You see that the biggest power changes ( on altering the voltage V1 ) are with
+the constimpedanceload due to the quadratic relation V to P
+The constcurrentload has lower powerchanges due to the only linear relation V to P
+The constpowerload has no powerchange at all at different voltage levels !!
+
+Minimal_powerlost.asc
+=====================
+
+This example shows the optimal set for the transformer tap ( parameter svar ) to minimize the powerlost of the two lines and  the
+transformer
+
+This is a high energy network example to show you some of the loadflow devices.
+Place the symbols in lib/sym/loadflow. The necessary library files are ltspice.lib and ltspice_special.lib
+Devices are : Voltage or current slacks , transformers , lines, impedances, loads, .....
+
+General: Each network element has at least two inputs/outputs : one represent a real quantity ( voltage , power , ..) and one a imag quantity
+The real pin is signed with a "x" 
+You should only connect "x" pins with "x" pins and pins without "x" with pins without "x"
+The results of the loadflow analysis ( with .op or .tran analysis ) are the "normal" spice variables ( current,voltage) and 
+the variables from the additional measurement nodes of each device ( real , imag power, voltage magnitudes and so on )
+
+Analysis of the network: 
+Since the line ln2 is very long ( 30 km ) relative to ln1 ( 1km )  the 120 kV voltage-slack v1 takes nearly the full load ( v1_p = 116MW input )
+The full load is 100Mw from the constpower load1 ( ld1_p ) and 20MW from the constcurrent Load2 ( i1_p ) 
+The 400kV voltage-slack v2 ( v2_p) contributes only 5 Mw
+ 
+Example 1 : To change the realpower flow you can change the transformer setting ( parameter s_ ). 
+If you makes s_ more positive -> realpower flows from the 400 kV side to the 120 kv side
+
+Example 2 : You want to decrease the 120 kV voltage ( t1_v1) : You can change the transformer setting ( parameter l_ )
+If you make l_  more positive -> the voltage decrease on the 120kV side ( imagpower transfer to the 400 Kv side )
+Alternatively you can switch on a  l_batt or kd - element = KD1 ( inductance ) to the 120Kv side ( on=1 )
+ 
+Exercise 3 : Look at the imag power flow ( v2_q , ln2_q2, ln2_q1, t1_q2, t1_q1, kd_q, ln1_q1, ln1_q2, v1_q) and their influence to the voltage level
+How much capacitive power has the 30km - 400kV line ln2 ? What parameter (s_) of device t1 makes the lowest powerlost of the whole circuit ?
+
+
+
+loadline.asc (directory loadline)
+============
+
+A very interesting example.
+
+This example shows a loadlflowcomputation for a whole day ( 24 hours )
+
+The whole interval is simulated in only one simulation 
+( with the ltspice_control.lib and pwl-input at the controlling nodes) 
+
+possible variations are:
+different parameters of devices e.g. 
+on/off of lines ( line_ctrl )
+different rates of reactive power compensation ( lbatt_ctrl )   
+lower or higher generator/loads values ( constpower_ctrl )
+different transformer settings ( transformer_ctrl )
+
+shapes:
+
+The loadline is v(ll24h)
+The powerunit input is v(kw24h)
+The timewise switch off with line 7 ( and the cutoff from gen2 ) is shown at v(on_24h)
+The changing transformer tap setting to regulate the voltage level is shown at v(ru_24h)
+The changing voltage value with inductive compensation ( kd1 ) is shown at v(q_24h)
+
+
+
+emtex.asc (directory Emtex_Book_Example)
+=========
+
+Sample network from book "studientexte Elektrotechnik"
+Shows also voltage breakdown !
+
+This example shows a voltage-breakdown at high inductive load at node 7 (r7;i7) 
+the parameter q7 is stepped from  -0.3 to 0.37608
+If sl7_q goes over 0.37608 the voltage is off.
+See also v(sl7_v) = voltage magnitude at node 7
+ 
+Also see ctrl_test.asc for a simpler circuit with the same problem
+
+To stabilize the voltage at node 7 you can:
+1) Compensate the node with a capacitor-battery at node 7
+2) Insert a new line e.g. from node 2 to node 7 to make the impedance of the 
+network smaller
+
+
+VoltageBreakdown.asc (directory VoltageBreakdown)
+====================
+
+Shows the voltage breakdown at high load
+
+In this example there is a voltage_slack model and a load model - both with controlling nodes.
+The voltage at the controlling nodes can modify the parameters of the model during the simulation.
+This is done by appropriate pwl-sources combined with a .tran analysis 
+The power of the load1 is varied via pf = real powerfactor ( multiplicator of the nominal
+ powervalue ) 
+
+Result:
+
+You can see that the voltage (ld_v = voltage on constant power element ) decreases with the increasing power of the load  
+The shape of the Voltage ld_v is linear at the beginning and later exponential
+
+At the point of approximately 60kV the circuit cannot converge because a voltage breakdown occur.
+see also the power lost curve at Z_r 
+
+The powerlost at Z_r at the end of the simulation ( when the voltage breakdown occur ) is as high as the power of the load !!!
+
+You can draw the powerlostline of Z_r :
+ ALT+ left mouseklick to the Z_r device 
+The result is the 1~ powerlost -> edit and multiply the expression in the graphic
+by 3 to get the 3~ lost
+or:
+plot v(r_p1)+v(r_p2)
+ 
+Hint: If you plot the powerlost with the first method it will be displayed with a 
+right y-axis in unit MW
+With the second method the powerlost is displayed with a left y-axis in unit MV
+If you mix this two methods be sure that both y-axis have the same ymin and
+ymax values
+
+scr_test_fault.asc (directory ShortCircuitReactance_SCR)
+==================
+
+shows a line with a current limiting reactor to limit in the short circuit case 
+with a fault
+
+scr_test_normalload.asc (directory ShortCircuitReactance_SCR)
+=======================
+ 
+shows a line with a current limiting reactor to limit in the short circuit case 
+without a fault
+
+
+peterson_unsymm.asc (directory Petersen_Earth_compensation)
+===================
+
+show how peterson coil acts in the normal ( unsymmetric line to earth impedances ) case.
+shows how to optimal adjust ( compensate ) a network
+
+
+peterson_lowohmic.asc (directory Petersen_Earth_compensation)
+=====================
+
+shows how peterson coil acts in the lowohmic-earth-fault-case 
+
+
+long_line.asc (directory LongLine)
+=============
+
+
+Shows a long line with length parameter variations
+
+
+You can play with:
+
+
+	ferranti effect: line is opened , voltage at end of line is higher as on begin
+        
+	max. line length detection: also the opened ( uncompensated ) line can only have a certain length, because the reactive
+	power need of the line increases with the length and drives a current which may be as high ( or higher ) 
+	as the thermal parameters of the line. 
+
+        different directions of real power and reactive powerflow can stabilize the voltage at the end.
+        
+        different compensation of reactive power of line  
+
+
+
+Flosdorf_Hilgarty.asc (directory FlosdorfHilgarty_Book_Example)
+=====================
+
+Example from the book "Elektrische Energieverteiltung", Flosdorf,Hilgarty
+
+
+
+LineTest.asc (directory LineTest)
+============
+
+Shows the models line and load with parameter variations
+
+Lfl_course.asc (directory LoadFlowCourse)
+==============
+
+Testcircuit for i-slack, transformer and multimeter
+The current angle is changed 0,90,90 degrees
+The voltage in bus1 changes in all three cases
+
+
+Transformertest with i-slack, simple transformer and multimeter
+
+Loadflow_transient_kombi.asc (directory Combination_Loadflow_Transient_Toolbox)
+============================
+
+Test a voltagesource with a transformer as
+Steady state AND transients in one simulation
+Their results are equal
+For cosimulation see also short_circuit_in_medium_voltage_power_grid_LF_cosimulation.asc
+
+Loadfree_line_data.asc (directory LineTest)
+======================
+
+Verifies the currents and reactive power for two lines (110kV and 380kV line) at zero load
+
+
+
+
+

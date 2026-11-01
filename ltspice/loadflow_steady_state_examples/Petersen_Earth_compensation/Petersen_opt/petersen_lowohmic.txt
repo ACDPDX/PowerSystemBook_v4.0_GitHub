@@ -1,0 +1,24 @@
+* this example minimizes the reactive power load of the transformer
+delt=5
+itermax=100; 300 
+ndim=5;
+funcfile=Transformer_phase_regulation.log 
+ascfile=Transformer_phase_regulation.asc  
+cirfile=Transformer_phase_regulation.net 
+* cmd line without cirfilename !
+spicecmdline=scad3 -b  
+* dependent from your perl configuration: choose
+* simendfile=tinyperl simend_ltspice.pl     
+* simendfile=simend_ltspice.exe  
+simendfile=tinyperl simend_ltspice.pl  
+lolimits=-13 -13 -13 -13 -13 
+uplimits=13 13 13 13 13
+initvals=-1 -2 -3 -4 -5
+varnames={tap1opt}_{tap2opt}_{tap3opt}_{tap4opt}_{tap5opt}; 
+* debug=0,1,2
+debug=2
+ftol=1e-4
+pause=0
+* set random nr. generator (not used in this optimization algorithm)
+idum=1
+

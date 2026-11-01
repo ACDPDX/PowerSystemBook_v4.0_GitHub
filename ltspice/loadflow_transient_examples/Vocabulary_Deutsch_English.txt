@@ -1,0 +1,90 @@
+Deutsch																 English
+=======                                                              ========   
+belastet                                                             burdened,loaded		                      
+Blindleistung                                                        reactive power					
+Blindleistungskompensation                                           reactive power compensation	
+Durchhang(Freileitung)                                               conductor sag					
+Effektivwert                                                         root mean square (RMS)          
+Einspeisung                                                          supply,feed,infeed				
+Eisenkern                                                            iron core						
+Erdschlusskompensation                                               earth fault compensation		
+Erregerkreisverlust                                                  exciter loss					
+Erregermaschine                                                      exciter							
+Erregerstrom                                                         exciter current 				
+Erregerstrom                                                         magnetic field current          
+Erzeugerpfeilsystem                                                  generator reference arrow sys.  
+Flanke                                                               edge							
+Freileitung                                                          overhead line					
+Funkenstrecke,Überspannungsableiter                                  spark gap
+Gegensystem                                                          negative phase sequence system	
+geladen                                                              charged						
+HHS-Sicherung                                                        high breaking capacity fuse     
+Halbwelle, Volle Welle                                               halve wave, full wave			
+Hauptfeld                                                            magnetizing field				
+Hauptinduktivität                                                    magnetizing inductance			
+Hauptumspannwerk                                                     mainstation
+hochfahren                                                           ramping								
+Kabel                                                                cable,underground cable         
+Kapazitätsbatterie                                                   capacitor bank					
+Kapazitätsbatterie (Kompensationsdrossel)                            inductor bank           		Kompensationsgerät (Kompensationsdrossel,Kapazitätsbatterie)         shunt reactor           		Kurzschlussdrossel                                                   current limiting reactor		
+Klemmenspannung                                                      terminal voltage				
+Kraftwerk                                                            power plant, power station		
+Kurzschlussdrossel                                                   short circuit reactor(SCR)      
+Last                                                                 load	
+Lastwinkel                                                           load angle, torque angle     						
+Leistungsfaktor                                                      powerfactor	
+(Leistungs-)schalter                                                 switcher,breaker									
+Leistungsschalter                                                    circuit breaker, disconnector   
+Leiter                                                               conductor						
+Leitung                                                              line							
+Längsregler                                                          inphase regulator				
+MOV,Überspannungsableiter                                            metal oxid varistor   			
+Magn. Fluss                                                          magnetic flux			
+Mitsystem                                                            positive phase sequence system		
+Nenn ..                                                              nominal, rated	
+normierte ..                                                         p.u per unit, normalized
+Nullsystem                                                           zero phase sequence system
+Oberwelle                                                            harmonic wave     				
+Petersenspule                                                        petersen coil					
+Phasenfolge                                                          phase sequence					
+Phasenspannung, Leiter Erdspannung                                   phase to earth voltage			
+Sammelschiene                                                        bus								
+Schaltgruppe(Trafo)                                                  vector group					
+Scheinleistung                                                       apparent power					
+Schenkelpolmaschine                                                  salient pole machine
+Schieflast                                                           unbalanced power				
+Schrägregler                                                         phaseangle regulator 			
+Sicherung                                                            fuse							
+Spannung ohne Bezugspunkt                                            floating voltage				
+Spannunginstabilität, Pulsierende Spannung,Schwebespg.               fluctuating voltage				
+Spannungsabfall                                                      voltage drop					
+Spannungseinbruch                                                    voltage dip						
+Spannungserhöhung                                                    voltage rise					
+Spannungsregler (AVR)                                                automaic voltage regulator      
+Spannungsspitze                                                      voltage spike					
+Spannungswiederkehr                                                  voltage recovery				
+Spitzenwert                                                          peak value						
+Spule                                                                coil	
+Überspannungsableiter                                                overvoltage protecting device   
+Überspannungsableiter,Blitzableiter                                  surge arrester,lightning arr.   						
+Umspannwerk                                                          substation						
+Verbraucher                                                          consumer,load					
+Verbraucherpfeilsystem                                               load reference arrow system		
+Verkettete Spannung                                                  phase to phase voltage			
+Vollpolmaschine                                                      round pole machine
+Welligkeit                                                           ripple							
+Windung                                                              winding							
+Wirkleistung                                                         active power					
+Zeitverzögerung                                                      delay time
+
+
+Einebenenmast  ............. mast with horizontal conductor placement (1sys,2sys)
+Tonnenmast ................. mast with ton-form conductor placement (2sys)
+Donaumast .................. mast with triangle form conductor placement (2sys)
+Reversed Donaumast ......... mast with reversed triangle form conductor placement (2sys)
+Doppeltonnenmast ........... mast with double tons conductor placement (4sys)
+Vertikalmast ............... mast with vertical conductor placement (2sys left and right) 
+Portalmast ................. mast with horizontal conductor placement (no ground,always only one sys,   
+                              directly at substation )
+Kombimast(Tannenbaummast) .. mast with horizontal conductor placement below 
+                             and with triangle conductor placement above (4sys,6sys)                                                      						                    

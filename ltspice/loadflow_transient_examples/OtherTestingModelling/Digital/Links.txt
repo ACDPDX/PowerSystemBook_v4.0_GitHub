@@ -1,0 +1,13 @@
+https://www.mathematik.uni-marburg.de/~thormae/lectures/ti1/ti_7_3_ger_web.html#1
+https://de.wikipedia.org/wiki/Flipflop
+https://de.wikibooks.org/wiki/Digitale_Schaltungstechnik/_Flipflop/_T-Flipflop/_Herleitung
+http://www.netzmafia.de/skripten/digitaltechnik/astabil.html
+https://www.electronics-tutorials.ws/de/sequentielle/multivibratoren.html
+https://www.electronics-tutorials.ws/de/sequentielle/d-flipflop.html
+https://www.electronics-tutorials.ws/de/sequentielle/jk-flipflop.html
+https://www.electronics-tutorials.ws/de/sequentielle/konvertieren-flipflops.html
+http://hyperphysics.phy-astr.gsu.edu/hbase/Electronic/jkflipflop.html
+https://www.falstad.com/circuit/e-edgedff.html   simulation of electric circuits !!!!!!
+https://www.youspice.com/login/   many ltspice examples 
+
+

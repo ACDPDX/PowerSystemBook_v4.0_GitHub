@@ -1,0 +1,19 @@
+* Measurement of active, reactive, apparent power for 50/60Hz at starttime tx1
+* change starttime tx1,
+* change Ix(Plant1:U1) 2x
+* change V(n006) 2x
+*
+.meas TRAN tx1 PARAM 6s
+.meas TRAN tx2 PARAM tx1+20ms
+*
+.meas TRAN ti1 FIND time WHEN Ix(Plant1:U1)=0 TD=tx1 RISE=1
+.meas TRAN tv1 FIND time WHEN v(n006)=0 TD=ti1 RISE=1
+.meas TRAN Imax1 MAX Ix(Plant1:U1) FROM tx1 TO tx2 ; delta >=20ms
+.meas TRAN Vmax1 MAX v(n006) FROM tx1 TO tx2
+* for 60Hz instead of 5m choose 4.1667m
+.meas TRAN Q1 PARAM 3*0.5*Imax1*Vmax1*sin((ti1-tv1)*90/5m)
+.meas TRAN P1 PARAM 3*0.5*Imax1*Vmax1*cos((ti1-tv1)*90/5m)
+.meas TRAN S1 PARAM 3*0.5*Imax1*Vmax1
+.meas TRAN dt1 PARAM ti1-tv1
+
+

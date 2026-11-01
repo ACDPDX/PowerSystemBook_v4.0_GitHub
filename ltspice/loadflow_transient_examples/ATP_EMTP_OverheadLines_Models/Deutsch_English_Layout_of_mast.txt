@@ -1,0 +1,9 @@
+Einebenenmast  .... mast with horizontal conductor placement (1sys,2sys)
+Tonnenmast ........ mast with ton-form conductor placement (2sys)
+Donaumast ......... mast with triangle form conductor placement (2sys)
+Reversed Donaumast  mast with reversed triangle form conductor placement (2sys)
+Doppeltonnenmast .. mast with double tons conductor placement (4sys)
+Vertikalmast ...... mast with vertical conductor placement (2sys left and right) 
+Portalmast ........ mast with horizontal conductor placement (no ground,always only one sys, directly at substation )
+Kombimast ......... mast with horizontal conductor placement below 
+                     and with triangle conductor placement above (4sys,6sys) 

@@ -1,0 +1,43 @@
+* C:\Users\fried\Documents\ltspice\Optimization\Loadline_optimized_Powerlost\Loadline.asc
+xru1_ctrl 1r 1i 2r 2i ru1_p1 ru1_q1 ru1_v1 ru1_v2 ru1_p2 ru1_q2 1 ru24h 0 transformer_ctrl_lf stproz=1.0 sn=300e6 u1nenn=400e3 u20=120e3 ur=0.002 ux=0.2 i0=0.0006 p0=0.0004 middle=0 phir=-0.5 phii=-0.866025404 vfactor={vfactor} sfactor={sfactor} zlfactor=1.0 zqfactor=1.0
+xv_slack1 1r 1i v1_v v1_p v1_q vri_slack_lf on=1 vr=400000 vi=0 vfactor={vfactor} sfactor={sfactor}
+xld3_ctrl 2r 2i ld3_v ld3_p ld3_q 1 ll24h ll24h constpower_ctrl_lf p=30e6 q=7e6 vfactor={vfactor} sfactor={sfactor}
+xld4_ctrl 3r 3i ld4_v ld4_p ld4_q 1 ll24h ll24h constpower_ctrl_lf p=40e6 q=5e6 vfactor={vfactor} sfactor={sfactor}
+xld5_ctrl 4r 4i ld5_v ld5_p ld5_q 1 ll24h ll24h constpower_ctrl_lf p=70e6 q=15e6 vfactor={vfactor} sfactor={sfactor}
+xld2_ctrl 7r 7i ld2_v ld2_p ld2_q 1 ll24h ll24h constpower_ctrl_lf p=50e6 q=20e6 vfactor={vfactor} sfactor={sfactor}
+xld1_ctrl 6r 6i ld1_v ld1_p ld1_q 1 ll24h ll24h constpower_ctrl_lf p=60e6 q=10e6 vfactor={vfactor} sfactor={sfactor}
+xkd2_ctrl 7r 7i kd2_v kd2_q q24h 1 l_batt_ctrl_lf q=50e6 vfactor={vfactor} sfactor={sfactor}
+xln5 3r 3i 4r 4i ln5_p1 ln5_q1 ln5_v ln5_p2 ln5_q2 stalu_u110_o2x560mm2_lf on=1 length=1 vfactor={vfactor} sfactor={sfactor} zlfactor=1 zqfactor=1
+xln1 6r 6i 2r 2i ln1_p2 ln1_q2 ln1_v ln1_p1 ln1_q1 stalu_u110_o2x560mm2_lf on=1 length=1 vfactor={vfactor} sfactor={sfactor} zlfactor=1 zqfactor=1
+xln2 6r 6i 4r 4i ln2_p2 ln2_q2 ln2_v ln2_p1 ln2_q1 stalu_u110_o2x560mm2_lf on=1 length=1 vfactor={vfactor} sfactor={sfactor} zlfactor=1 zqfactor=1
+xln4 2r 2i 3r 3i ln4_p2 ln4_q2 ln4_v ln4_p1 ln4_q1 stalu_u110_o2x560mm2_lf on=1 length=1 vfactor={vfactor} sfactor={sfactor} zlfactor=1 zqfactor=1
+xln6 5r 5i 4r 4i ln6_p2 ln6_q2 ln6_v ln6_p1 ln6_q1 stalu_u110_o2x560mm2_lf on=1 length=1 vfactor={vfactor} sfactor={sfactor} zlfactor=1 zqfactor=1
+xln3 7r 7i 5r 5i ln3_p2 ln3_q2 ln3_v ln3_p1 ln3_q1 stalu_u110_o240mm2_lf on=1 length=1 vfactor={vfactor} sfactor={sfactor} zlfactor=1 zqfactor=1
+vru24h ru24h 0 pwl(0ns 0v 3ns 0v 4ns 2v 6ns 2v 7ns 0v 9ns -2v 11ns -2v 12ns 0 14ns 0 15ns 0v 17ns 0v)
+v_line_on_off_24h on24h 0 pwl(0s 1v 10ns 1v 10.1ns 1v 19ns 1v 19.1ns 0v 22ns 0v 22.1ns 1v)
+vkw24h kw24h 0 pwl(0s {kw1} 2ns {kw1} 2.1ns {kw2} 4ns {kw2} 4.1ns {kw3} 6ns {kw3} 6.1ns {kw4} 8ns {kw4} 8.1ns {kw5} 10ns {kw5} 10.1ns {kw6} 12ns {kw6} 12.1ns {kw7} 14ns {kw7} 14.1ns {kw8} 16ns {kw8} 16.1ns {kw9} 18ns {kw9} 18.1ns {kw10} 20ns {kw10} 20.1ns {kw11 } 22ns {kw11} 22.1ns {kw12}
+vloadline24h ll24h 0 pwl(0s 1 1ns 1.4 2ns 1.2 3ns 1.0 4ns 0.9 5ns 0.8 7ns 0.8 8ns 1.2 9ns 1.4 10ns 1.5 15ns 1.5 16ns 1.4 17ns 1.3 19ns 1.3 20ns 1.4 21ns 1.5 22ns 1.4 23ns 1.2 24ns 1.0)
+xgen1 9r 9i gen1_v gen1_p gen1_q on24h kw24h kw24h constpower_ctrl_lf p=-300e6 q=0 vfactor={vfactor} sfactor={sfactor}
+xln7_ctrl 8r 8i 9r 9i ln7_p1 ln7_q1 ln7_v ln7_p2 ln7_q2 1 1 line_ctrl_lf r=0.1 xl=0.4 cb=8n ce=3n g=1e12 vfactor={vfactor} sfactor={sfactor} zlfactor=1 zqfactor=1
+v1 1 0 1 rser=0
+v10 10 0 10 rser=0
+vq q24h 0 pwl(0s 1v 11ns 1v 12ns 0v 19ns 0v 22ns 1v)
+xu1 6r 6i cb1_v cb1_q 1 qvar c_batt_ctrl_lf q=200e6 vn=120000 vfactor={vfactor} sfactor={sfactor}
+xru1 8r 8i 5r 5i ru2_p1 ru2_q1 ru2_v1 ru2_v2 ru2_p2 ru2_q2 1 0 0 transformer_ctrl_lf stproz=1.0 sn=300e6 u1nenn=400e3 u20=120e3 ur=0.002 ux=0.2 i0=0.0006 p0=0.0004 middle=0 phir=-0.5 phii=-0.866025404 vfactor={vfactor} sfactor={sfactor} zlfactor=1.0 zqfactor=1.0
+v0 0 0 0 rser=0
+.param vfactor={sqrt(3)} sfactor=3.0
+.options abstol=100 vntol=100m reltol=0.01
+.tran 0 24ns 0 0.01ns
+vqvar qvar 0  pwl 0s {tap1} 2ns {tap1} 2.5ns {tap2} 4ns {tap2} 4.5ns {tap3} 6.0ns {tap3} 6.5ns {tap4} 8ns {tap4} 8.5ns {tap5} 10ns {tap5} 10.5ns {tap6} 12ns {tap6} 12.5ns {tap7} 14ns {tap7} 14.5ns {tap8} 16ns {tap8} 16.5ns {tap9} 18ns {tap9} 18.5ns {tap10} 20ns {tap10} 20.5ns {tap11} 22ns {tap11}  22.5ns {tap12}
+.param kw1opt=0.5 kw2opt=0.5 kw3opt=0.3 kw4opt=0.3 kw5opt=0.7 kw6opt=0.7 kw7opt=0.7 kw8opt=0.7 kw9opt=0.7 kw10opt=0.7 kw11opt=0.7 kw12opt=0.5
+.param kw1=0.468796371432988 kw2=0.380865287249358 kw3=0.312358158402849 kw4=0.363374047503698  kw5=0.534307861785023 kw6=0.562638841350932 kw7=0.56779859562357 kw8=0.560212857770293  kw9=0.497286048091275 kw10=0.513390240673022 kw11=0.582687657823666 kw12=0.457222523689213
+.param tap1=0.511844895293077 tap2=0.429752581180237 tap3=0.433858986252272 tap4=0.33131709518755 tap5=0.50345363316505  tap6=0.489882370603375 tap7=0.376208105940148 tap8=0.368095537535968 tap9=0.286749068789437 tap10=0.354483169752422  tap11=0.626239796392202 tap12=0.478499678973034
+ev7 f 0 value={idt((v(plost)**2))}  tripdv=1 tripdt=1
+.meas tran cost find v(f) at 23.99ns
+eplost plost 0 value={v(ln1_p1)+v(ln1_p2)+v(ln2_p1)+v(ln2_p2)+v(ln3_p1)+v(ln3_p2)+v(ln4_p1)+v(ln4_p2)+v(ln5_p1)+v(ln5_p2)+v(ln6_p1)+v(ln6_p2)+v(ru1_p1)+v(ru1_p2)+v(ru2_p1)+v(ru2_p2)}  tripdv=1 tripdt=1
+vkwold kwold 0 pwl(0s 0.5v 3.9ns 0.5v 4ns 0.3v 8ns 0.3v 8.1ns 0.7v 19ns 0.7v 19.1ns 0 22ns 0 22.1ns 0.5v)
+.lib ltspice.lib
+.lib ltspice_ctrl.lib
+.lib ltspice_special.lib
+.backanno
+.end

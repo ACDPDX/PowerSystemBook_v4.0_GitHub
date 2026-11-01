@@ -1,0 +1,56 @@
+.param
+****************************************
++ Lself={(2*L1+L0)/3} 
++ Lm={(L0-L1)/3}
+****************************************
++ CE={C0} ; Line2earth capacitance also for uncoupled case
++ CLL={(C1-C0)/3} ; Line2Line capacitance
++ CL=1
+****************************************
++ length=1
++ g=1e12
++ fn={fn1}
++ omega={fn*2*3.14159}
+********************************
++ Rnn={(2*R1+R0)/3}
++ Rmn={(R0-R1)/3}
++ R={Rnn-Rmn} ; for uncoupled case
+********************************
++ CB={CE+3*CLL} ; for uncoupled case
++ L={Lself-Lm} ; for uncoupled case
+********************************
+V1 1a 1ax 0 rser=1e-15
+V2 2a 2ax 0 rser=1e-15
+V3 3a 3ax 0 rser=1e-15
+*
+E1 1ax 1bx VALUE={length/2*(Rnn*I(V1)+Rmn*I(V2)+Rmn*I(V3))+length/2*(Lself*DDT(I(V1))+Lm*DDT(I(V2))+Lm*DDT(I(V3)))} tripdv={tdv} tripdt={tdt}
+E2 2ax 2bx VALUE={length/2*(Rmn*I(V1)+Rnn*I(V2)+Rmn*I(V3))+length/2*(Lm*DDT(I(V1))+Lself*DDT(I(V2))+Lm*DDT(I(V3)))} tripdv={tdv} tripdt={tdt}
+E3 3ax 3bx VALUE={length/2*(Rmn*I(V1)+Rmn*I(V2)+Rnn*I(V3))+length/2*(Lm*DDT(I(V1))+Lm*DDT(I(V2))+Lself*DDT(I(V3)))} tripdv={tdv} tripdt={tdt}
+*
+E11 1bx 1by VALUE={length/2*(Rnn*I(V11)+Rmn*I(V21)+Rmn*I(V31))+length/2*(Lself*DDT(I(V11))+Lm*DDT(I(V21))+Lm*DDT(I(V31)))} tripdv={tdv} tripdt={tdt}
+E12 2bx 2by VALUE={length/2*(Rmn*I(V11)+Rnn*I(V21)+Rmn*I(V31))+length/2*(Lm*DDT(I(V11))+Lself*DDT(I(V21))+Lm*DDT(I(V31)))} tripdv={tdv} tripdt={tdt}
+E13 3bx 3by VALUE={length/2*(Rmn*I(V11)+Rmn*I(V21)+Rnn*I(V31))+length/2*(Lm*DDT(I(V11))+Lm*DDT(I(V21))+Lself*DDT(I(V31)))} tripdv={tdv} tripdt={tdt}
+*
+V11 1by 1b 0 rser=1e-15
+V21 2by 2b 0 rser=1e-15
+V31 3by 3b 0 rser=1e-15
+*
+*******************************
+C_10a 1bx 0 {cl*length*CE}
+C_20a 2bx 0 {cl*length*CE}
+C_30a 3bx 0 {cl*length*CE}
+*******************************
+C12a 1bx 2bx {cl*length*CLL}
+C13a 1bx 3bx {cl*length*CLL}
+C23a 2bx 3bx {cl*length*CLL}
+*******************
+Rgnd1 1a 0 {g}
+Rgnd2 2a 0 {g}
+Rgnd3 3a 0 {g}
+Rgnd4 1b 0 {g}
+Rgnd5 2b 0 {g}
+Rgnd6 3b 0 {g}
+*******************************
+.ENDS
+*
+*

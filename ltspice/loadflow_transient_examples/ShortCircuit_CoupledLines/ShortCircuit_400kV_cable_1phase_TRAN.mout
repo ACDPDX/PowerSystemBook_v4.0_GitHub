@@ -1,0 +1,3 @@
+C:\Users\fried\Documents\ltspice\loadflow_transient_examples\ShortCircuit_CoupledLines\ShortCircuit_400kV_cable_1phase_TRAN.meas(3): Current not found.
+.meas TRAN Iab MAX Ix(U25:IN1) FROM 500m TO 520m
+                   ^^^^^^^^^^^

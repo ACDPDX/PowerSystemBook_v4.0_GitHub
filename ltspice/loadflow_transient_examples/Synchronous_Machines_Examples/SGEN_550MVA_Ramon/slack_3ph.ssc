@@ -1,0 +1,48 @@
+component slack_3ph
+% 3 phase slack
+% The block represents an ideal 3phase voltage source 
+
+nodes
+    p1 = foundation.electrical.electrical; % L1:top
+    n1 = foundation.electrical.electrical; % N1:bottom
+    p2 = foundation.electrical.electrical; % L2:top
+    n2 = foundation.electrical.electrical; % N2:bottom
+    p3 = foundation.electrical.electrical; % L3:top
+    n3 = foundation.electrical.electrical; % N3:bottom
+end
+
+variables(Access=private)
+    i1 = { 0, 'A' };
+    v1 = { 0, 'V' };
+    i2 = { 0, 'A' };
+    v2 = { 0, 'V' };
+    i3 = { 0, 'A' };
+    v3 = { 0, 'V' };
+end
+
+parameters
+    Amp = { 10, '1' }; % Amplitude
+    Freq = { 60, '1' }; % Frequency
+    Texp = { 100e-3, '1' }; % Exponential swingin
+    phase1 = { 0 '1' }; % phase1
+    phase2 = { -120 '1' }; % phase2
+    phase3 = { 120 '1' }; % phase3
+    dphase = { 0, '1' }; % dphase
+end
+
+branches
+    i1 : p1.i -> n1.i;
+    i2 : p2.i -> n2.i;
+    i3 : p3.i -> n3.i;
+end
+
+equations
+    v1 == p1.v - n1.v;
+    v1 == Amp*0.8165*sin(Freq*2*3.14159*time*{ 1, '1/s' }+((phase1+dphase)*2*3.14159/360))*(1-exp(-abs((time*{ 1, '1/s' })/(Texp+1e-12))))*{ 1, 'V' };
+    v2 == p2.v - n2.v;
+    v2 == Amp*0.8165*sin(Freq*2*3.14159*time*{ 1, '1/s' }+((phase2+dphase)*2*3.14159/360))*(1-exp(-abs((time*{ 1, '1/s' })/(Texp+1e-12))))*{ 1, 'V' };
+    v3 == p3.v - n3.v;
+    v3 == Amp*0.8165*sin(Freq*2*3.14159*time*{ 1, '1/s' }+((phase3+dphase)*2*3.14159/360))*(1-exp(-abs((time*{ 1, '1/s' })/(Texp+1e-12))))*{ 1, 'V' };
+end
+
+end

@@ -1,0 +1,41 @@
+Open a command window Win+R cmd.exe
+Change the directory where the optimization example.bat file resides e.g. analytic_function_7dim.bat
+
+If necessary edit the .bat file and change the path where to find the 
+1) XVIIx64.exe file of the ltspice distribution and
+2) the tinyperl.exe file of the perl distribution 
+
+e.g: for me the .bat file contains
+
+set path=%path%;C:\Program Files\LTC\LTspiceXVII;C:\Users\fried\Documents\ltspice\loadflow_transient
+tinyperl optimizer.pl analytic_function_7dim_init.txt 
+start XVIIx64.exe analytic_function_7dim_opti.asc
+pause
+
+Then open the analytic_function_7dim.asc file in ltspice and IMPORTANT! simulate one time -> .net file is created which must be present for the optimization process
+
+HINT:
+
+The objective function to optimize resides in the .asc file
+It must be a .meas command with the name "cost" 
+Always (after simulation is done) give a look to the logfile 
+(VIEW/spiceerror log) to see if the .meas command is not failed !!!!
+The optimization will also fail if .meas fails !!!
+
+Then execute analytic_function_7dim.bat from the command line !!! important not click the bat file directly at the explorer window (except you have a very fast pc)
+(NOTE: You must previously cd to the actual optimization example directory) 
+
+The optimization ends and automatically invoke analytic_function_7dim_opti.asc with the optimized parameters
+
+Restart the simulation with the optimized parameters 
+
+Ready.
+
+For the options in the simulation control file see:
+
+OptimizationControlFileHelp.txt 
+
+
+
+
+

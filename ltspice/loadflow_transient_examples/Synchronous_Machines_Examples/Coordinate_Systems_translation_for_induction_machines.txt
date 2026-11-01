@@ -1,0 +1,27 @@
+* Coordinate System change! examples with phi
+* For usx, isx change the names (e.g. prx) below !!
+* Drehfeld->Rotor
+*Eprxdr prxdr 0  value={v(prx)*cos(-314.6*t+p*v(alpha))+v(pry)*sin(-314.6*t+p*v(alpha))}
+*Eprydr prydr 0  value={-v(prx)*sin(-314.6*t+p*v(alpha))+v(pry)*cos(-314.6*t+p*v(alpha))}
+* Rotor->Drehfeld 
+*Eprxrd prxrd 0  value={v(prxdr)*cos(314.6*t-p*v(alpha))+v(prydr)*sin(314.6*t-p*v(alpha))}
+*Epryrd pryrd 0  value={-v(prxdr)*sin(314.6*t-p*v(alpha))+v(prydr)*cos(314.6*t-p*v(alpha))}
+* Drehfeld->Stator
+*Eprxds prxds 0  value={v(prx)*cos(-314.6*t-0*v(alpha))+v(pry)*sin(-314.6*t-0*v(alpha))}
+*Epryds pryds 0  value={-v(prx)*sin(-314.6*t-0*v(alpha))+v(pry)*cos(-314.6*t-0*v(alpha))}
+* Stator->Drehfeld 
+*Eprxsd prxsd 0  value={v(prxds)*cos(314.6*t-0*v(alpha))+v(pryds)*sin(314.6*t-0*v(alpha))}
+*Eprysd prysd 0  value={-v(prxds)*sin(314.6*t-0*v(alpha))+v(pryds)*cos(314.6*t-0*v(alpha))}
+* Stator->Rotor
+*Eprxsr prxsr 0  value={v(prxds)*cos(+p*v(alpha))+v(pryds)*sin(+p*v(alpha))}
+*Eprysr prysr 0  value={-v(prxds)*sin(+p*v(alpha))+v(pryds)*cos(+p*v(alpha))}
+* Rotor->Stator
+*Eprxrs prxrs 0  value={v(prxsr)*cos(-p*v(alpha))+v(prysr)*sin(-p*v(alpha))}
+*Epryrs pryrs 0  value={-v(prxsr)*sin(-p*v(alpha))+v(prysr)*cos(-p*v(alpha))}
+
+* Synchronous machine: Formulas default: in rotor system
+* Asynchronous machine: Formulas default: in stator system
+
+Galpha  0    alpha      VALUE={v(omegam)} tripdv={tdv} tripdt={tdt}
+Calpha  alpha    0      1    IC=0
+Ralpha  alpha    0  1e9

@@ -1,0 +1,104 @@
+   Current capacities found from WEB searches
+NOTE: Current capacity is dependent of many factors and the values below are only a small Hint.
+
+Overhead lines:
+===============
+
+
+Alu/Steel T=35°ambient temp,0.6m/s wind speed,80°conductor temp.
+
+35/6 180A
+50/8 220A
+70/12 290A
+95/34 360A
+120/20 410A
+125/30 425A
+150/25 470A
+185/30 535A
+240/40 645A
+265/35 680A
+300/50 740A
+435/55 900A
+450/40 920A
+560/50 1040A
+570/40 1050A
+635/117 1106A
+650/85 1120A
+680/85 1150A
+1045/45 1580A
+4x264/34 2720A (400kV)
+3x635/117 3200A (400kV)
+4x560/50 4100A (750kV)
+4x635/117 4500A (750kV)
+6x680/85 6900A (1100kV)
+
+
+Isolating distance of overhead lines:
+1150kV 15m
+750kV 11m
+500kV 8m
+380kV 5m
+110kV 2m
+20kV 0.180m
+
+
+
+
+Cables:
+=======
+
+Oil-Cable 110kV E-PMDNY (Copper) 
+300 345A 
+500 455A
+
+Oil-Cable 110kV E-APMUDY (Alu)
+500 360A 
+
+Oil-Cable 380kV
+1200 900A
+
+VPE-Cable 110kV E-2XHM2Y (Copper) 2 Systems, flat positioning
+185 350A
+300 460A
+500 580A 
+630 627A
+800 682A
+1200 940A
+1400 1000A
+1600 1067A 
+2500 1255A 
+
+VPE-Cable 380kV E-2XHM2Y (Copper) 2 Systems, flat positioning 
+1200 855A
+1400 912A
+1600 957A 
+2500 1086A 
+
+VPE-Cable 110kV Alu
+240 412A 
+
+GIL 110kV (internally gas isolated cable) copper 1 System flat
+185 340A
+240 390A
+300 435A
+500 535A
+630 580A
+800 625A
+
+VPE-Cable 400kV
+2500 1900A 
+2000 1500A
+1600 1120A
+
+Isolating distances of cables:
+380kV 30mm
+110kv 18mm
+20kV 6mm
+
+Current capacity dependent from many factors:
+=============================================
+
+overhead lines - wind speed, ambient temp, conductor material, degree of load during time, ...
+
+cable - cable length, cable positioning and ambient, cable sheath grounding, conductor material,
+degree of load during time, ambient temp, ....     

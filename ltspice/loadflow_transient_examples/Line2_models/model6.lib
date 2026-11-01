@@ -1,0 +1,49 @@
+.param
+****************************************
++ Lself={(2*L1+L0)/3} 
++ Lm={(L0-L1)/3}
+****************************************
++ CE={C0} ; Line2earth capacitance also for uncoupled case
++ CLL={(C1-C0)/3} ; Line2Line capacitance
++ CL=1
+****************************************
++ length=1
++ g=1e12
+.param R1x={R1*length}
+.param R0x={R0*length}
+.param Z1c=sqrt(L1/(C1*CL))
+.param Z0c=sqrt(L0/(C0*CL))
+.param Z1=Z1c+R1x/4
+.param Z0=Z0c+R0x/4
+.param tau1=length*sqrt(L1*C1*CL)
+.param tau0=length*sqrt(L0*C0*CL)
+.param h1=(Z1c-R1x/4)/Z1
+.param h0=(Z0c-R0x/4)/Z0
+B3 L1 0 V=v(1a)*0.577+v(2a)*0.577+v(3a)*0.577 tripdv=1 tripdt=1
+B4 L2 0 V=v(1a)*0.707-v(2a)*0.707 tripdv=1 tripdt=1
+B5 L3 0 V=v(1a)*0.408+v(2a)*0.408-v(3a)*0.816 tripdv=1 tripdt=1
+B6 0 1a I=I(B3)*0.577+I(B4)*0.707+I(B5)*0.408 tripdv=1 tripdt=1
+B7 0 2a I=I(B3)*0.577-I(B4)*0.707+I(B5)*0.408 tripdv=1 tripdt=1
+B8 0 3a I=I(B3)*0.577-I(B5)*0.816 tripdv=1 tripdt=1
+B9 L4 0 V=v(1b)*0.577+v(2b)*0.577+v(3b)*0.577 tripdv=1 tripdt=1
+B10 L5 0 V=v(1b)*0.707-v(2b)*0.707 tripdv=1 tripdt=1
+B11 L6 0 V=v(1b)*0.408+v(2b)*0.408-v(3b)*0.816 tripdv=1 tripdt=1
+B12 0 1b I=I(B9)*0.577+I(B10)*0.707+I(B11)*0.408 tripdv=1 tripdt=1
+B13 0 2b I=I(B9)*0.577-I(B10)*0.707+I(B11)*0.408 tripdv=1 tripdt=1
+B14 0 3b I=I(B9)*0.577-I(B11)*0.816 tripdv=1 tripdt=1
+O1 L1 0 L4 0 LTLine1
+.model LTLine1  LTRA(len={length} R={R0s} L={L0s} C={C0s}) 
+O2 L2 0 L5 0 LTLine2
+.model LTLine2  LTRA(len={length} R={R1s} L={L1s} C={C1s}) 
+O3 L3 0 L6 0 LTLine3
+.model LTLine3  LTRA(len={length} R={R1s} L={L1s} C={C1s}) 
+Rgnd1 1a 0 {g}
+Rgnd2 2a 0 {g}
+Rgnd3 3a 0 {g}
+Rgnd4 1b 0 {g}
+Rgnd5 2b 0 {g}
+Rgnd6 3b 0 {g}
+*******************************
+.ENDS
+*
+*

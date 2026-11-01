@@ -1,0 +1,25 @@
+* *************************************************
+* Three phase voltage source with soft swinging (texp or tpwl parameter)
+* texp = exponential swingin time
+* tpwl = linear swingin time
+* fact=0.8165 = sqrt(2)/sqrt(3) = sqrt(2)/sqrt(3)
+* sign=0 (sinus voltage source)
+* sign=1 (cosinus voltage source)
+* vr,vs,vt=multiplier for Phase1,2,3
+* Phir,s,t=phase angle of phase1,2,3
+* Td=time delay
+* fn1=frequency !!! This parameter have to be defined in the main circuit as .param fn1=val !!!
+.SUBCKT V_3Phase L1 L2 L3 N
++PARAMS: U1Nenn=400 fact=0.8165 frequ={fn1} Texp=5m Tpwl=0ms TD = 0 vrf=1 vsf=1 vtf=1 phir=0 phis=-120 phit=120 dphi=0 sign=1
+Vpwl1 pwl1 0 pwl 0s 0v {Tpwl+1p} 1v ; Tpwl>0 TD=0
+Vpwl2 pwl2 0 pwl 0s 0v {TD+1p} 0v {TD+Tpwl+2p} 1 ; TD>0 Tpwl>0
+Gpwl 0 pwl VALUE={if(Tpwl>0,if(TD>0,v(pwl2),v(pwl1)),1)} rpar=1 tripdv={tdv} tripdt={tdt}
+El1	L1	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vrf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phir+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El2	L2	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vsf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phis+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+El3	L3	N	Value={if(time > TD,v(pwl)*fact*U1Nenn*vtf*sin(2*sign*pi*(FREQU*(TIME-TD)+(phit+dphi)/360))*+
++(1-exp(-abs(time-TD)/(Texp+1p))),0)} tripdv={tdv} tripdt={tdt}
+RGND N 0 1e10
+.ENDS
+

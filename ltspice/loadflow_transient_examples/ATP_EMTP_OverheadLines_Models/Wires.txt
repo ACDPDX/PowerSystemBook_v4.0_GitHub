@@ -1,0 +1,26 @@
+Conductor wire: (Cb,Ce,XL,XM dependent of voltage level - geometrical positions)
+
+(see also HELP_linedata.asc)
+35/6 ri=1.35 ra=4.05 RDC=0.8342 I=180A    
+50/8 ri=1.6  ra=4.8 RDC=0.5939 I=220A     
+70/12 ri=2.16 ra=5.85 RDC=0.4132 I=290A  
+95/15 ri=2.505 ra=6.8 RDC=0.3060 I=350A
+120/20 ri=2.85 ra=7.75 RDC=0.2376 I=410A
+150/25 ri=3.15 ra=8.55 RDC=0.194 I=470A
+
+185/30 ri=0.35cm ra=0.95cm RDC=0.1571 I=535A
+300/50 ri=0.45cm ra=1.22cm RDC=0.0949 I=740A
+450/40 ri=0.40cm ra=1.435cm RDC=0.0644 I=920A
+495/35 ri=0.374cm ra=1.5cm RDC=0.0585 I=920A
+560/50 ri=0.45 ra=1.61 RDC=0.0515 I=1040A
+635/117 ri=0.7 ra=1.78 RDC=0.0431 I=1100A
+650/45 ri=0.43 ra=1.72 RDC=0.0442 I=1100A
+680/85 ri=0.6 ra=1.8 RDC=0.0426 I=1780A
+
+Earthwire:
+
+234/47 ri=0.4725 ra=1.1025 RDC=0.1338 
+95/15  ri=0.25 ra=0.68 RDC=0.304
+115/40 ri=0.3 ra=0.8 RDC=0.2511
+
+

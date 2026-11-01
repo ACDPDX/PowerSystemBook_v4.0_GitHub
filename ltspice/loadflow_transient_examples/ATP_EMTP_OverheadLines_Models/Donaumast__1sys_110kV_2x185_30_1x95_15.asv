@@ -1,0 +1,211 @@
+%% ============================================================
+%  3-Phasen-Freileitung mit Erdseil
+%  Modalanalyse für LTspice-TLINE
+% =============================================================
+
+clear
+clc
+
+%% X-Matrix [Ohm/km] bei 50 Hz
+
+X = [ ...
+0.7486259 0.3443590 0.3443590 0.3099470;
+0.3443590 0.7482006 0.3628296 0.2819665;
+0.3443590 0.3628296 0.7482006 0.2899715;
+0.3099470 0.2819665 0.2899715 0.7702639 ];
+
+%% R-Matrix [Ohm/km]
+
+R = [ ...
+0.2053785 0.0481985 0.0481985 0.0477226;
+0.0481985 0.2057728 0.0483963 0.0479135;
+0.0481985 0.0483963 0.2057728 0.0479158;
+0.0477226 0.0479135 0.0479158 0.3515934 ];
+
+%% C-Matrix [F/km]
+
+C = 1e-9*[ ...
+ 7.599158 -1.234291 -1.215864 -1.004616;
+-1.234291  7.896965 -1.488520 -0.437452;
+-1.215864 -1.488520  7.915247 -0.559254;
+-1.004616 -0.437452 -0.559254  6.640519 ];
+
+%% X -> L
+
+w = 2*pi*50;
+
+L = X/w;
+
+%% ============================================================
+% Modalanalyse
+%% ============================================================
+
+A = L*C;
+
+[T,D] = eig(A);
+
+lambda = diag(D);
+
+%% Sortierung nach Laufzeit
+
+[tau,idx] = sort(sqrt(lambda),'descend');
+
+T = T(:,idx);
+
+lambda = lambda(idx);
+
+%% Modale Matrizen
+
+Lm = inv(T)*L*inv(T');
+Cm = T'*C*T;
+
+Lmodal = diag(Lm);
+Cmodal = diag(Cm);
+
+Z0 = sqrt(Lmodal./Cmodal);
+
+v = 1./sqrt(lambda);
+
+%% ============================================================
+% Ausgabe
+%% ============================================================
+
+disp(' ')
+disp('===== Modal Transformation Matrix =====')
+disp(T)
+
+disp(' ')
+disp('===== Laufzeiten =====')
+
+for k=1:4
+    fprintf('Mode %d : %8.3f us/km\n', ...
+        k,1e6*tau(k)*1000);
+end
+
+disp(' ')
+disp('===== Wellenimpedanzen =====')
+
+for k=1:4
+    fprintf('Mode %d : %8.1f Ohm\n', ...
+        k,Z0(k));
+end
+
+%% ============================================================
+% LTspice-Ausgabe
+%% ============================================================
+
+
+fprintf('\n')
+fprintf('===== LTSPICE TLINE =====\n')
+
+fprintf(';\n')
+fprintf('; Leitungslänge l [km]\n')
+fprintf('.param l=1\n\n')
+
+for k=1:4
+
+    TD = tau(k)*1000;
+
+    fprintf('T%d m%din 0 m%dout1 0 Z0=%7.1f TD={%.6eus*l}\n',...
+        k,k,k,Z0(k),TD*1e6);
+
+end
+
+S=transpose(inv(T));
+
+
+phase = {'A','B','C','E'};
+
+fprintf('\n\n')
+fprintf('**************************************************\n')
+fprintf('* INPUT E SOURCES (Phase -> Mode)\n')
+fprintf('**************************************************\n')
+
+Ti=transpose(T);
+
+fprintf('\n');
+
+for m=1:4
+
+    fprintf('\nEin%d M%din%d 0 VALUE={',m,m,m);
+
+    for p=1:4
+
+        coeff = Ti(m,p);
+
+        fprintf('%+.12f*V(%sin1)', ...
+                coeff,phase{p});
+
+    end
+
+    fprintf('}');
+
+end
+
+fprintf('\n\n')
+fprintf('**************************************************\n')
+fprintf('* OUTPUT E SOURCES (Phase -> Mode) Vmode\n')
+fprintf('**************************************************\n')
+
+fprintf('\n');
+
+for m=1:4
+
+    fprintf('\nEout%d M%dout 0 VALUE={',m,m);
+
+    for p=1:4
+
+        coeff = Ti(m,p);
+
+        fprintf('%+.12f*V(%sin1)', ...
+                coeff,phase{p});
+
+    end
+
+    fprintf('}');
+
+end
+
+fprintf('\n');
+
+for p=1:4
+
+    fprintf('\nG_%sin 0 %sin1 VALUE={', ...
+        phase{p},phase{p});
+
+    for m=1:4
+
+        coeff = S(p,m);
+
+        fprintf('%+.12f*I(V%d)', ...
+                coeff,m);
+
+    end
+
+    fprintf('}');
+
+end
+
+fprintf('\n');
+
+
+for p=1:4
+
+    fprintf('\nG_%sout %sout 0 VALUE={', ...
+        phase{p},phase{p});
+
+    for m=1:4
+
+        coeff = S(p,m);
+
+        fprintf('%+.12f*I(V%d)', ...
+                coeff,m+4);
+
+    end
+
+    fprintf('}');
+
+end
+
+fprintf('\n');
+

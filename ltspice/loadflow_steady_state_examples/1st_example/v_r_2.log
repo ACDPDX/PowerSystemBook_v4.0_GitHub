@@ -1,0 +1,51 @@
+
+   --- Expanded Deck Component Count ---
+B's 7
+R's 2
+V's 2
+tot: 11
+
+
+    --- Expanded Netlist ---
+Example of a simple V - R - Circuit in LT_SPICE - SYNTAX with additional measurement nodes:
+b:v:§eev1r v1r v:v10 v=1 *(100 / 1)+(1- 1)*v(v1r)
+b:v:§eev1i v1i v:v20 v=1 *(0 / 1)+(1- 1)*v(v1i)
+v:v:i1r v:v10 0 dc 0v
+v:v:i1i v:v20 0 dc 0v
+b:v:§evabs_m v1_m 0 v=1 *sqrt(v(v1r)*v(v1r)+v(v1i)*v(v1i))
+b:v:§ep1_m p1_m 0 v=(v(v1r)*i(v:v:i1r)+v(v1i)*i(v:v:i1i))* 1 
+b:v:§eq1_m q1_m 0 v=(v(v1i)*i(v:v:i1r)-v(v1r)*i(v:v:i1i))* 1 
+r:v:max1 v1r 0 1000000000000 
+r:v:max2 v1i 0 1000000000000 
+b:zr:§g1r v1r 0 i=1/ 20 *v(v1r)
+b:zr:§g1i v1i 0 i=1/ 20 *v(v1i)
+.op
+.options vntol=0.001
+.options abstol=0.001
+.options reltol=0.001
+.end
+
+WARNING: Less than two connections to node V1_M.  This node is used by E:V:VABS_M.
+WARNING: Less than two connections to node P1_M.  This node is used by E:V:P1_M.
+WARNING: Less than two connections to node Q1_M.  This node is used by E:V:Q1_M.
+Ignoring empty pin current: Ix(zr:v2r)
+Ignoring empty pin current: Ix(zr:v2i)
+Direct Newton iteration for .op point succeeded.
+
+Date: Tue Aug 11 22:41:41 2020
+Total elapsed time: 0.017 seconds.
+
+tnom = 27
+temp = 27
+method = trap
+totiter = 4
+traniter = 0
+tranpoints = 0
+accept = 0
+rejected = 0
+matrix size = 14
+fillins = 0
+solver = Alternate
+Matrix Compiler1: 472 bytes object code size
+Matrix Compiler2: 886 bytes object code size
+

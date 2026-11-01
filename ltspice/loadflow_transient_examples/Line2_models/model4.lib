@@ -1,0 +1,55 @@
+.param
+****************************************
++ Lself={(2*L1+L0)/3} 
++ Lm={(L0-L1)/3}
+****************************************
++ CE={C0} ; Line2earth capacitance also for uncoupled case
++ CLL={(C1-C0)/3} ; Line2Line capacitance
++ CL=1
+****************************************
++ length=1
++ g=1e12
+.param R1x={R1*length}
+.param R0x={R0*length}
+.param Z1c=sqrt(L1/(C1*CL))
+.param Z0c=sqrt(L0/(C0*CL))
+.param Z1=Z1c+R1x/4
+.param Z0=Z0c+R0x/4
+.param tau1=length*sqrt(L1*C1*CL)
+.param tau0=length*sqrt(L0*C0*CL)
+.param h1=(Z1c-R1x/4)/Z1
+.param h0=(Z0c-R0x/4)/Z0
+B3 L1 0 V=v(1a)*0.577+v(2a)*0.577+v(3a)*0.577 tripdv={tdv} tripdt={tdt}
+B4 L2 0 V=v(1a)*0.707-v(2a)*0.707 tripdv={tdv} tripdt={tdt}
+B5 L3 0 V=v(1a)*0.408+v(2a)*0.408-v(3a)*0.816 tripdv={tdv} tripdt={tdt}
+B6 0 1a I=I(B3)*0.577+I(B4)*0.707+I(B5)*0.408 tripdv={tdv} tripdt={tdt}
+B7 0 2a I=I(B3)*0.577-I(B4)*0.707+I(B5)*0.408 tripdv={tdv} tripdt={tdt}
+B8 0 3a I=I(B3)*0.577-I(B5)*0.816 tripdv={tdv} tripdt={tdt}
+B9 L4 0 V=v(1b)*0.577+v(2b)*0.577+v(3b)*0.577 tripdv={tdv} tripdt={tdt}
+B10 L5 0 V=v(1b)*0.707-v(2b)*0.707 tripdv={tdv} tripdt={tdt}
+B11 L6 0 V=v(1b)*0.408+v(2b)*0.408-v(3b)*0.816 tripdv={tdv} tripdt={tdt}
+B12 0 1b I=I(B9)*0.577+I(B10)*0.707+I(B11)*0.408 tripdv={tdv} tripdt={tdt}
+B13 0 2b I=I(B9)*0.577-I(B10)*0.707+I(B11)*0.408 tripdv={tdv} tripdt={tdt}
+B14 0 3b I=I(B9)*0.577-I(B11)*0.816 tripdv={tdv} tripdt={tdt}
+Bs0 0 L1 i=((1+h0)/2)*((1+h0)/Z0*delay(v(L4),tau0)-h0*delay(i(Br0),tau0))+((1-h0)/2)*((1+h0)/Z0*delay(v(L1),tau0)-h0*delay(i(Bs0),tau0)) tripdv={tdv} tripdt={tdt}
+Br0 0 L4 i=((1+h0)/2)*((1+h0)/Z0*delay(v(L1),tau0)-h0*delay(i(Bs0),tau0))+((1-h0)/2)*((1+h0)/Z0*delay(v(L4),tau0)-h0*delay(i(Br0),tau0)) tripdv={tdv} tripdt={tdt}
+Bs1 0 L2 i=((1+h1)/2)*((1+h1)/Z1*delay(v(L5),tau1)-h1*delay(i(Br1),tau1))+((1-h1)/2)*((1+h1)/Z1*delay(v(L2),tau1)-h1*delay(i(Bs1),tau1)) tripdv={tdv} tripdt={tdt}
+Br1 0 L5 i=((1+h1)/2)*((1+h1)/Z1*delay(v(L2),tau1)-h1*delay(i(Bs1),tau1))+((1-h1)/2)*((1+h1)/Z1*delay(v(L5),tau1)-h1*delay(i(Br1),tau1)) tripdv={tdv} tripdt={tdt}
+Bs2 0 L3 i=((1+h1)/2)*((1+h1)/Z1*delay(v(L6),tau1)-h1*delay(i(Br2),tau1))+((1-h1)/2)*((1+h1)/Z1*delay(v(L3),tau1)-h1*delay(i(Bs2),tau1)) tripdv={tdv} tripdt={tdt}
+Br2 0 L6 i=((1+h1)/2)*((1+h1)/Z1*delay(v(L3),tau1)-h1*delay(i(Bs2),tau1))+((1-h1)/2)*((1+h1)/Z1*delay(v(L6),tau1)-h1*delay(i(Br2),tau1)) tripdv={tdv} tripdt={tdt}
+R1 L1 0 {Z0}
+R2 L2 0 {Z1}
+R3 L3 0 {Z1}
+R13 L4 0 {Z0}
+R14 L5 0 {Z1}
+R15 L6 0 {Z1}
+Rgnd1 1a 0 {g}
+Rgnd2 2a 0 {g}
+Rgnd3 3a 0 {g}
+Rgnd4 1b 0 {g}
+Rgnd5 2b 0 {g}
+Rgnd6 3b 0 {g}
+*******************************
+.ENDS
+*
+*

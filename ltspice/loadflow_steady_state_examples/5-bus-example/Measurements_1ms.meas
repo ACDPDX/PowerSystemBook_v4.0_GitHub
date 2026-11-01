@@ -1,0 +1,36 @@
+* Current and powerlost and reactive power balance of all lines:
+
+.meas TRAN Current_Line_1_2 FIND mag2(Ix(ln12:v2r),Ix(ln12:v2i)) AT 1ms
+.meas TRAN Current_Line_2_1 FIND mag2(Ix(ln12:v1r),Ix(ln12:v1i)) AT 1ms
+
+.meas TRAN Current_Line_1_4 FIND mag2(Ix(ln14:v1r),Ix(ln14:v1i)) AT 1ms
+.meas TRAN Current_Line_4_1 FIND mag2(Ix(ln14:v2r),Ix(ln14:v2i)) AT 1ms
+
+.meas TRAN Current_Line_4_5 FIND mag2(Ix(ln45:v1r),Ix(ln45:v1i)) AT 1ms
+.meas TRAN Current_Line_5_4 FIND mag2(Ix(ln45:v2r),Ix(ln45:v2i)) AT 1ms
+
+.meas TRAN Current_Line_4_2 FIND mag2(Ix(ln24:v2r),Ix(ln24:v2i)) AT 1ms
+.meas TRAN Current_Line_2_4 FIND mag2(Ix(ln24:v1r),Ix(ln24:v1i)) AT 1ms
+
+.meas TRAN Current_Line_2_3 FIND mag2(Ix(ln23:v2r),Ix(ln23:v2i)) AT 1ms
+.meas TRAN Current_Line_3_2 FIND mag2(Ix(ln23:v1r),Ix(ln23:v1i)) AT 1ms
+
+.meas TRAN Current_Line_3_5 FIND mag2(Ix(ln35:v1r),Ix(ln35:v1i)) AT 1ms
+.meas TRAN Current_Line_5_3 FIND mag2(Ix(ln35:v2r),Ix(ln35:v2i)) AT 1ms
+
+.meas TRAN Powerlost_Lines FIND V(p1)+v(p2)+V(p3)+v(p4)+V(p5)+v(p6)+V(p7)+v(p8)+V(p9)+v(p10)+V(p11)+v(p12) AT 1ms
+
+.meas TRAN Reactive_power_balance_Lines FIND V(q1)+v(q2)+v(q3)+v(q4)+V(q5)+v(q6)+V(q7)+v(q8)+V(q9)+v(q10)+V(q11)+v(q12) AT 1ms
+
+
+* Current of loads, c_batt, pv_element, slack
+
+.meas TRAN Current_of_load4 FIND mag2(Ix(ld4:v1r),Ix(ld4:v1i)) AT 1ms
+.meas TRAN Current_of_load3 FIND mag2(Ix(ld3:v1r),Ix(ld3:v1i)) AT 1ms
+.meas TRAN Current_of_load2 FIND mag2(Ix(ld2:v1r),Ix(ld2:v1i)) AT 1ms
+
+.meas TRAN Current_of_cbatt FIND mag2(Ix(cbatt4:v1r),Ix(cbatt4:v1i)) AT 1ms
+
+.meas TRAN Current_of_pv_element  FIND mag2(Ix(pv_slack5:v1r),Ix(pv_slack5:v1i)) AT 1ms
+
+.meas TRAN Current_of_slack FIND mag2(Ix(slack1:v1r),Ix(slack1:v1i)) AT 1ms

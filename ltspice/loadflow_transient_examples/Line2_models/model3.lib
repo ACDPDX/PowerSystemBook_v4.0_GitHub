@@ -1,0 +1,12 @@
++ length=1
++ cl=1
++ g=1e12
+X1 1a 2a 3a 1a1 2a1 3a1 modelfilename30
++ params: R0s={R0} R1s={R1} L0s={L0} L1s={L1} C0s={C0} C1s={C1} length={length/3} cl={cl} g={g}
+X2 1a1 2a1 3a1 1a2 2a2 3a2 modelfilename30
++ params: R0s={R0} R1s={R1} L0s={L0} L1s={L1} C0s={C0} C1s={C1} length={length/3} cl={cl} g={g}
+X3 1a2 2a2 3a2 1b 2b 3b modelfilename30
++ params: R0s={R0} R1s={R1} L0s={L0} L1s={L1} C0s={C0} C1s={C1} length={length/3} cl={cl} g={g}
+.ENDS
+*
+*

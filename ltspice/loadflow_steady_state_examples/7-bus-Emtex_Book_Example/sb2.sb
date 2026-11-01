@@ -1,0 +1,90 @@
+* .SAVEBIAS from circuit: * C:\Users\fried\Documents\ltspice\loadflow_steady_state_examples\7-bus-Emtex_Book_Example\test.asc
+
+* time=1.00889e-006
+.nodeset V(u1:ss)=1 V(u1:v10)=0 V(r1)=230940.2154 V(u1:v20)=0 V(i1)=2.71024977e-008
++ V(u1:i_m)=548.2025969 V(n001)=400000 V(n003)=-330143076.9 V(n005)=-187771699.7 V(u2:v10)=0
++ V(u2:v20)=0 V(r2)=60577.35219 V(u2:v30)=0 V(i2)=-10989.74281 V(u2:v40)=0 V(n009)=400000
++ V(n010)=106635.6386 V(u2:i1_m)=548.2025761 V(u2:i2_m)=1889.306637 V(u2:s1_m)=379806063
++ V(n007)=330143060.4 V(n012)=-329274625 V(n008)=187771699.7 V(n011)=-115523640.9
++ V(u2:pv_m)=868435.4399 V(u2:qv_m)=72248058.76 V(r3)=0 V(u4:v10)=0 V(i3)=0 V(u4:v20)=0
++ V(r4)=0 V(u4:v30)=0 V(i4)=0 V(u4:v40)=0 V(n021)=0 V(n020)=0 V(u4:i1_m)=0 V(u4:i2_m)=0
++ V(u4:s1_m)=0 V(n023)=0 V(n018)=0 V(n022)=0 V(n019)=0 V(u4:pv_m)=0 V(u4:qv_m)=0 V(r5)=201394.1934
++ V(u5:v10)=0 V(i5)=-49436.28372 V(u5:v20)=0 V(r6)=59094.47154 V(u5:v30)=0 V(i6)=-13000.07695
++ V(u5:v40)=0 V(n048)=359180.4268 V(n049)=104802.029 V(u5:i1_m)=80.87861616 V(u5:i2_m)=279.9994122
++ V(u5:s1_m)=50316129.85 V(n046)=-49052433.87 V(n051)=49227299.4 V(n047)=-11205876.68
++ V(n050)=12648157.93 V(u5:pv_m)=174865.5273 V(u5:qv_m)=1442281.255 V(u6:v01)=0 V(u6:v02)=0
++ V(u6:v03)=0 V(u6:v04)=0 V(n015)=106635.6386 V(u6:v2_m)=0 V(u6:i1_m)=0 V(u6:i2_m)=0
++ V(u6:s1_m)=0 V(n013)=0 V(n017)=0 V(n014)=0 V(n016)=0 V(u6:pv_m)=0 V(u6:qv_m)=0 V(u7:v01)=0
++ V(u7:v02)=0 V(r7)=0 V(u7:v03)=0 V(i7)=0 V(u7:v04)=0 V(n054)=104802.029 V(u7:v2_m)=0
++ V(u7:i1_m)=0 V(u7:i2_m)=0 V(u7:s1_m)=0 V(n052)=0 V(n056)=0 V(n053)=0 V(n055)=0 V(u7:pv_m)=0
++ V(u7:qv_m)=0 V(u8:v01)=0 V(u8:v02)=0 V(u8:v03)=0 V(u8:v04)=0 V(n037)=106635.6386
++ V(u8:v2_m)=104802.029 V(u8:i1_m)=829.1497978 V(u8:i2_m)=829.9670908 V(u8:s1_m)=153142673.4
++ V(n033)=142874496.5 V(n041)=-142337695.8 V(n035)=55132176.34 V(n039)=-49373393.02
++ V(u8:pv_m)=536800.7182 V(u8:qv_m)=5758783.321 V(u9:v01)=0 V(u9:v02)=0 V(u9:v03)=0
++ V(u9:v04)=0 V(n038)=0 V(u9:v2_m)=0 V(u9:i1_m)=0 V(u9:i2_m)=0 V(u9:s1_m)=0 V(n034)=0
++ V(n042)=0 V(n036)=0 V(n040)=0 V(u9:pv_m)=0 V(u9:qv_m)=0 V(u3:ss)=1 V(u3:1:ss)=1
++ V(u3:1:v10)=0 V(u3:1:v20)=0 V(u3:1:i1_m)=0 V(u3:v2_m)=0 V(u3:1:s1_m)=0 V(u3:p2_m)=0
++ V(u3:q2_m)=0 V(u3:v10)=0 V(u3:v20)=0 V(u3:v1r1)=1e-010 V(u3:v1i1)=1e-010 V(u3:q_m)=0
++ V(u3:q_m1)=0 V(n002)=0 V(n004)=0 V(n006)=400000000 V(u3:i_m)=0 V(u10:ss)=1 V(u10:1:ss)=1
++ V(u10:1:v10)=0 V(u10:1:v20)=0 V(u10:1:i1_m)=0 V(u10:v2_m)=359180.4268 V(u10:1:s1_m)=0
++ V(u10:p2_m)=0 V(u10:q2_m)=0 V(u10:v10)=0 V(u10:v20)=0 V(u10:v1r1)=1e-010 V(u10:v1i1)=1e-010
++ V(u10:q_m)=0 V(u10:q_m1)=0 V(n043)=359180.4268 V(n044)=0 V(n045)=0 V(u10:i_m)=0
++ V(u12:trafo:l_)=-8.050950897 V(u12:trafo:a)=-8.050950876 V(u12:trafo:x1)=-2195357.952
++ V(u12:trafo:rel)=-0.7245855808 V(u12:trafo:res)=0 V(u12:trafo:ue1r)=5.275414419
++ V(u12:trafo:ue1i)=0 V(u12:trafo:gar)=0.001045729177 V(u12:trafo:gai)=-0.1041609095
++ V(u12:trafo:gbr)=-0.005494673886 V(u12:trafo:gbi)=0.5494673886 V(u12:trafo:gcr)=-0.005494673886
++ V(u12:trafo:gci)=0.5494673886 V(u12:trafo:gdr)=0.02910263627 V(u12:trafo:gdi)=-2.898797442
++ V(u12:trafo:v10)=0 V(u12:trafo:v20)=0 V(u12:v2r)=10634.01969 V(u12:trafo:v30)=0
++ V(u12:v2i)=-3290.872962 V(u12:trafo:v40)=0 V(u12:trafo:i1_m)=551.3993205 V(u12:trafo:i2_m)=2905.426636
++ V(u12:vt1_m)=104802.029 V(u12:vt2_m)=19280.4642 V(u12:pt1_m)=93110396.39 V(u12:pt2_m)=-92934069.4
++ V(u12:qt1_m)=36725235.09 V(u12:qt2_m)=-27880220.82 V(u12:trafo:pv_m)=176326.9868
++ V(u12:trafo:qv_m)=8845014.272 V(u12:load:v10)=0 V(u12:load:v20)=0 V(u12:load:li2r)=2411.687202
++ V(u12:load:li2i)=-1620.268207 V(n062)=19280.4642 V(n061)=92934069.4 V(n060)=27880220.82
++ V(on)=1 V(u13:trafo:l_)=-13 V(u13:trafo:a)=-14.8739105 V(u13:trafo:x1)=-195000000
++ V(u13:trafo:rel)=-1.17 V(u13:trafo:res)=0 V(u13:trafo:ue1r)=4.83 V(u13:trafo:ue1i)=0
++ V(u13:trafo:gar)=0.001742881962 V(u13:trafo:gai)=-0.1736015159 V(u13:trafo:gbr)=-0.008384578209
++ V(u13:trafo:gbi)=0.8384578209 V(u13:trafo:gcr)=-0.008384578209 V(u13:trafo:gci)=0.8384578209
++ V(u13:trafo:gdr)=0.040659519 V(u13:trafo:gdi)=-4.049932403 V(u13:trafo:v10)=0 V(u13:trafo:v20)=0
++ V(u13:v2r)=0 V(u13:trafo:v30)=0 V(u13:v2i)=0 V(u13:trafo:v40)=0 V(u13:trafo:it1_m)=0
++ V(u13:trafo:it2_m)=0 V(u13:vt1_m)=0 V(u13:vt2_m)=0 V(u13:pt1_m)=0 V(u13:pt2_m)=0
++ V(u13:qt1_m)=0 V(u13:qt2_m)=0 V(u13:trafo:pv_m)=0 V(u13:trafo:qv_m)=0 V(p)=1 V(q)=0.03293493726
++ V(u13:load:v10)=0 V(u13:load:v20)=0 V(u13:load:li2r)=0 V(u13:load:li2i)=0 V(sl7_v)=0
++ V(sl7_p)=0 V(sl7_q)=0 V(u14:trafo:l_)=-7.46508054 V(u14:trafo:a)=-7.465080519 V(u14:trafo:x1)=-2094732.452
++ V(u14:trafo:rel)=-2.239524162 V(u14:trafo:res)=0 V(u14:trafo:ue1r)=17.76047584 V(u14:trafo:ue1i)=0
++ V(u14:trafo:gar)=3.137187531e-005 V(u14:trafo:gai)=-0.003124827285 V(u14:trafo:gbr)=-0.000554959374
++ V(u14:trafo:gbi)=0.0554959374 V(u14:trafo:gcr)=-0.000554959374 V(u14:trafo:gci)=0.0554959374
++ V(u14:trafo:gdr)=0.009895770683 V(u14:trafo:gdi)=-0.9856782208 V(u14:trafo:v10)=0
++ V(u14:trafo:v20)=0 V(u14:v2r)=10673.20545 V(u14:trafo:v30)=0 V(u14:v2i)=-4078.94554
++ V(u14:trafo:v40)=0 V(u14:trafo:i1_m)=80.87861535 V(u14:trafo:i2_m)=1435.381101 V(u14:vt1_m)=359180.4268
++ V(u14:vt2_m)=19790.52675 V(u14:pt1_m)=49052433.35 V(u14:pt2_m)=-48958116.23 V(u14:qt1_m)=11205876.68
++ V(u14:qt2_m)=-4895811.622 V(u14:trafo:pv_m)=94317.12711 V(u14:trafo:qv_m)=6310065.054
++ V(u14:load:v10)=0 V(u14:load:v20)=0 V(u14:load:li2r)=1283.162666 V(u14:load:li2i)=-643.2826608
++ V(n059)=19790.52675 V(n058)=48958116.22 V(n057)=4895811.622 V(u15:trafo:l_)=-7.667337364
++ V(u15:trafo:a)=-7.667337342 V(u15:trafo:x1)=-2134689.175 V(u15:trafo:rel)=-0.6900603627
++ V(u15:trafo:res)=0 V(u15:trafo:ue1r)=5.309939637 V(u15:trafo:ue1i)=0 V(u15:trafo:gar)=0.001045729177
++ V(u15:trafo:gai)=-0.1041609095 V(u15:trafo:gbr)=-0.005530634059 V(u15:trafo:gbi)=0.5530634059
++ V(u15:trafo:gcr)=-0.005530634059 V(u15:trafo:gci)=0.5530634059 V(u15:trafo:gdr)=0.0294848104
++ V(u15:trafo:gdi)=-2.936864282 V(u15:trafo:v10)=0 V(u15:trafo:v20)=0 V(u15:v2r)=10484.64733
++ V(u15:trafo:v30)=0 V(u15:v2i)=-3749.984688 V(u15:trafo:v40)=0 V(u15:trafo:i1_m)=1060.859611
++ V(u15:trafo:i2_m)=5629.825766 V(u15:vt1_m)=106635.6386 V(u15:vt2_m)=19286.53108
++ V(u15:pt1_m)=186400128.4 V(u15:pt2_m)=-185985130.3 V(u15:qt1_m)=60391464.58 V(u15:qt2_m)=-27897769.55
++ V(u15:trafo:pv_m)=414998.0438 V(u15:trafo:qv_m)=32493695.03 V(u15:load:v10)=0 V(u15:load:v20)=0
++ V(u15:load:li2r)=4961.070189 V(u15:load:li2i)=-2661.338413 V(n026)=19286.53108 V(n025)=185985130.3
++ V(n024)=27897769.55 V(u16:trafo:l_)=-13 V(u16:trafo:a)=-14.8739105 V(u16:trafo:x1)=-195000000
++ V(u16:trafo:rel)=-1.17 V(u16:trafo:res)=0 V(u16:trafo:ue1r)=4.83 V(u16:trafo:ue1i)=0
++ V(u16:trafo:gar)=0.001045729177 V(u16:trafo:gai)=-0.1041609095 V(u16:trafo:gbr)=-0.005030746925
++ V(u16:trafo:gbi)=0.5030746925 V(u16:trafo:gcr)=-0.005030746925 V(u16:trafo:gci)=0.5030746925
++ V(u16:trafo:gdr)=0.0243957114 V(u16:trafo:gdi)=-2.429959442 V(u16:trafo:v10)=0 V(u16:trafo:v20)=0
++ V(u16:v2r)=0 V(u16:trafo:v30)=0 V(u16:v2i)=0 V(u16:trafo:v40)=0 V(u16:trafo:i1_m)=0
++ V(u16:trafo:i2_m)=0 V(u16:vt1_m)=0 V(u16:vt2_m)=0 V(u16:pt1_m)=0 V(u16:pt2_m)=0
++ V(u16:qt1_m)=0 V(u16:qt2_m)=0 V(u16:trafo:pv_m)=0 V(u16:trafo:qv_m)=0 V(u16:load:v10)=0
++ V(u16:load:v20)=0 V(u16:load:li2r)=0 V(u16:load:li2i)=0 V(n029)=0 V(n028)=0 V(n027)=0
++ V(u17:trafo:l_)=-13 V(u17:trafo:a)=-14.8739105 V(u17:trafo:x1)=-195000000 V(u17:trafo:rel)=-1.17
++ V(u17:trafo:res)=0 V(u17:trafo:ue1r)=4.83 V(u17:trafo:ue1i)=0 V(u17:trafo:gar)=0.001045729177
++ V(u17:trafo:gai)=-0.1041609095 V(u17:trafo:gbr)=-0.005030746925 V(u17:trafo:gbi)=0.5030746925
++ V(u17:trafo:gcr)=-0.005030746925 V(u17:trafo:gci)=0.5030746925 V(u17:trafo:gdr)=0.0243957114
++ V(u17:trafo:gdi)=-2.429959442 V(u17:trafo:v10)=0 V(u17:trafo:v20)=0 V(u17:v2r)=0
++ V(u17:trafo:v30)=0 V(u17:v2i)=0 V(u17:trafo:v40)=0 V(u17:trafo:i1_m)=0 V(u17:trafo:i2_m)=0
++ V(u17:vt1_m)=0 V(u17:vt2_m)=0 V(u17:pt1_m)=0 V(u17:pt2_m)=0 V(u17:qt1_m)=0 V(u17:qt2_m)=0
++ V(u17:trafo:pv_m)=0 V(u17:trafo:qv_m)=0 V(u17:load:v10)=0 V(u17:load:v20)=0 V(u17:load:li2r)=0
++ V(u17:load:li2i)=0 V(n032)=0 V(n031)=0 V(n030)=0
