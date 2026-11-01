@@ -1,12 +1,0 @@
-.param start=435m stop={start+20m}.meas TRAN Upeak MAX V(n012) FROM {start} TO {stop}
-.meas TRAN Ipeak MAX  Ix(U21:in) FROM {start} TO {stop}
- 
-.meas TRAN T1 FIND time WHEN V(n012)=0 TD={start}
-.meas TRAN T2 FIND time WHEN Ix(U21:in)=0 TD={start}
-.meas TRAN dt PARAM t2-t1
-.meas TRAN dt1 PARAM If(dt>5m,dt-10m,IF(dt<-5m,dt+10m,dt))
-.meas TRAN t2phi PARAM dt1*90/5m* sfactor=3 3x1phase power as output
-.meas TRAN S PARAM 1.5*Upeak*Ipeak
-.meas TRAN P50Hz PARAM IF(dt<5m & dt>=-5ms,S*cos(t2phi),-S*cos(t2phi))
-.meas TRAN Q50Hz PARAM IF(dt<5m & dt>=-5ms,S*sin(t2phi),-S*sin(t2phi))
-* See above the same value for S.meas TRAN S50Hz PARAM sqrt(P50Hz*P50Hz+Q50Hz*Q50Hz) ; same as S before

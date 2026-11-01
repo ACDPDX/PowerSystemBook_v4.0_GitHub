@@ -1,2 +1,0 @@
-openExample('simscapeelectricalsps/SeriesCompensatedNetworkExample')
-

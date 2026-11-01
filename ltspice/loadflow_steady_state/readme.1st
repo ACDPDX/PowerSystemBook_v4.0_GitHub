@@ -1,8 +1,0 @@
-I tried to adapt a standard program for doing network analysis for electronics ( Spice ) to the high energy network domain. One important thing 
-to do here is to compute the loadflow of a high voltage network. 
-
-I do not want to concur with a commercial product ( speed, reliability, optimization ) but i think it is at this state very useful for doing 
-didactical explorations and HAVE FUN !
-
-
-

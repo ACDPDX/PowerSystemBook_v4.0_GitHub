@@ -1,7 +1,0 @@
-EPS change capacity
-PE:2.4 XLPE:2.3(2.66modified) PP:2.1 PVC:4-5
-Oil/Paper: 3.7-4.3 (higher value=higher Capacity)
-Cu:1.78e-8 (1.848e-8)
-Alu:2.3e-8 (2.83e-8)
-Conductor-Conductor of one system distance (bigger distance bigger XL)
-Distance System1 System 2 changes XMs
