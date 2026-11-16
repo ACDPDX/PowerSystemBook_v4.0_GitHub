@@ -4,3 +4,7 @@ In addition, I'd like to introduce my LTspice PDF book here to explain the 9 exa
 
 I originally wanted to make the book available as an Open Access book, but then decided to go with Amazon because it's easier to be found there.
 
+IMPORTANT: Users are responsible for validating models and results for their own applications. There is no responsibility using
+
+this toolbox 
+
